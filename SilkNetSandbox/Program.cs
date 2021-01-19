@@ -25,11 +25,11 @@ partial class Program {
 
   static Program() {
     // ReSharper disable once InvertIf
-    if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows)) {
+    /*if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows)) {
       Windows.User32.SetProcessDPIAware();
       Windows.User32.SetProcessDpiAwarenessContext(Windows.User32.DpiAwarenessContext.PerMonitorAwareV2);
       Windows.ShCore.SetProcessDpiAwareness(Windows.ShCore.ProcessDpiAwareness.PerMonitorDpiAware);
-    }
+    }*/
   }
 
   private static int _majOES = 3;
