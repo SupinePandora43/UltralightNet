@@ -9,9 +9,7 @@ namespace ImpromptuNinjas.UltralightSharp {
   internal static class InternalExtensions {
 
     internal static string GetLocalCodeBaseDirectory(this Assembly asm)
-      => Path.GetDirectoryName(new Uri((asm.CodeBase
-            ?? throw new PlatformNotSupportedException())
-          .Replace("#", "%23")).LocalPath)
+      => Path.GetDirectoryName(asm.Location)
         ?? throw new PlatformNotSupportedException();
 
     internal static Assembly GetAssembly(this Type type)
