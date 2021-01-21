@@ -1,9 +1,12 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
 		<OutputType>Exe</OutputType>
 		<TargetFramework>net5</TargetFramework>
 		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+		<ShaderContentIncludePath>Shaders</ShaderContentIncludePath>
+		<ShaderOutputPath>$(BaseIntermediateOutputPath)Shaders</ShaderOutputPath>
+		<ListAllShaderPaths Condition="'$(Configuration)' == 'Debug'">true</ListAllShaderPaths>
 	</PropertyGroup>
 
 	<ItemGroup>
@@ -41,18 +44,17 @@
 	</ItemGroup>
 
 	<ItemGroup>
+		<PackageReference Include="ShaderGen.Build" Version="1.2.0-beta3" PrivateAssets="All" />
+		<PackageReference Include="ShaderGen.Primitives" Version="1.2.0-beta3" />
 		<PackageReference Include="Veldrid" Version="4.8.0" />
 		<PackageReference Include="Veldrid.SPIRV" Version="1.0.13" />
 		<PackageReference Include="Veldrid.StartupUtilities" Version="4.8.0" />
 	</ItemGroup>
 
 	<ItemGroup>
-		<ProjectReference Include="..\UltralightSharp\UltralightSharp.csproj" >
+		<ProjectReference Include="..\UltralightSharp\UltralightSharp.csproj">
 			<ReferenceOutputAssembly>true</ReferenceOutputAssembly>
 		</ProjectReference>
-	</ItemGroup>
-	<ItemGroup>
-		<Folder Include="Shaders\" />
 	</ItemGroup>
 
 </Project>

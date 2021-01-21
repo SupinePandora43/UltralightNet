@@ -3,6 +3,7 @@ using ImpromptuNinjas.UltralightSharp.Safe;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Numerics;
 using System.Reflection;
 using System.Text;
 using Veldrid;
@@ -46,7 +47,7 @@ namespace VeldridSandbox
 		private GraphicsDevice graphicsDevice;
 		private ResourceFactory factory;
 
-		private Veldrid.CommandList _commandList;
+		private Veldrid.CommandList commandList;
 		private DeviceBuffer _vertexBuffer;
 		private DeviceBuffer _indexBuffer;
 		private Shader[] _shaders;
@@ -60,13 +61,13 @@ namespace VeldridSandbox
 		}
 		public class RenderBufferEntry
 		{
-			public uint FrameBuffer { get; set; }
+			public Framebuffer FrameBuffer { get; set; }
 			public TextureEntry TextureEntry { get; set; } = null!;
 		}
 
 		public class TextureEntry
 		{
-			public uint Texure { get; set; }
+			public Texture Texure { get; set; }
 			public uint Width { get; set; }
 			public uint Height { get; set; }
 		}
@@ -123,15 +124,27 @@ namespace VeldridSandbox
 
 		private void CreateTexture(uint textureId, Bitmap bitmap)
 		{
-			/*var index = (int)textureId - 1;
+			var index = (int)textureId - 1;
 			var entry = TextureEntries[index];
 			var texWidth = bitmap.GetWidth();
 			entry.Width = texWidth;
 			var texHeight = bitmap.GetHeight();
 			entry.Height = texHeight;
 			Console.WriteLine($"GpuDriver.CreateTexture({textureId} {texWidth}x{texHeight})");
-			factory.CreateTexture(TextureDescription.Texture2D(texWidth, texHeight, 1, 1, PixelFormat.R8_G8_B8_A8_UInt, TextureUsage.Sampled));
-			var tex = _gl.GenTexture();
+			entry.Texure = factory.CreateTexture(TextureDescription.Texture2D(texWidth, texHeight, 1, 1, PixelFormat.R8_G8_B8_A8_UInt, TextureUsage.Staging));
+			graphicsDevice.UpdateTexture(entry.Texure,
+				bitmap.LockPixels(),
+				texWidth * texHeight * 4,
+				0,
+				0,
+				0,
+				texWidth,
+				texHeight,
+				1,
+				0,
+				0);
+			bitmap.UnlockPixels();
+			/*var tex = _gl.GenTexture();
 			entry.Texure = tex;
 			_gl.ActiveTexture(TextureUnit.Texture0);
 			_gl.BindTexture(TextureTarget.Texture2D, tex);
@@ -259,10 +272,88 @@ namespace VeldridSandbox
 			Stream resourceStream = assembly.GetManifestResourceStream("VeldridSandbox." + path) ?? throw new FileNotFoundException(path);
 			StreamReader resourceStreamReader = new(resourceStream, Encoding.UTF8, false, 16, true);
 			string shaderCode = resourceStreamReader.ReadToEnd();
-			ShaderDescription shaderDescription = new(shaderStages, Encoding.UTF8.GetBytes(shaderCode), "main");
+			SpirvCompilationResult spirv = SpirvCompilation.CompileGlslToSpirv(shaderCode,path,shaderStages, GlslCompileOptions.Default);
+			//ShaderDescription shaderDescription = new(shaderStages, Encoding.UTF8.GetBytes(shaderCode), "main");
+			ShaderDescription shaderDescription = new(shaderStages, spirv.SpirvBytes, "main");
 			return factory.CreateFromSpirv(shaderDescription);
 		}
 
+		private void Render()
+		{
+			commandList.Begin();
+			commandList.SetFramebuffer(graphicsDevice.SwapchainFramebuffer);
+			commandList.SetFullViewports();
+			commandList.ClearColorTarget(0, RgbaFloat.Black);
+
+			commandList.SetVertexBuffer(0, _vertexBuffer);
+			commandList.SetIndexBuffer(_indexBuffer, IndexFormat.UInt16);
+			commandList.SetPipeline(_pipeline);
+
+			commandList.DrawIndexed(
+				indexCount: 4,
+				instanceCount: 1,
+				indexStart: 0,
+				vertexOffset: 0,
+				instanceStart: 0);
+
+			commandList.End();
+			graphicsDevice.SubmitCommands(commandList);
+			graphicsDevice.SwapBuffers();
+		}
+		private const string VertexCode = @"
+#version 450
+layout(location = 0) in vec2 Position;
+layout(location = 1) in vec4 Color;
+layout(location = 0) out vec4 fsin_Color;
+void main()
+{
+    gl_Position = vec4(Position, 0, 1);
+    fsin_Color = Color;
+}";
+		private const string FragmentCode = @"
+#version 450
+layout(location = 0) in vec4 fsin_Color;
+layout(location = 0) out vec4 fsout_Color;
+void main()
+{
+    fsout_Color = fsin_Color;
+}";
+		struct VertexPositionColor
+		{
+			public const uint SizeInBytes = 24;
+			public Vector2 Position;
+			public RgbaFloat Color;
+			public VertexPositionColor(Vector2 position, RgbaFloat color)
+			{
+				Position = position;
+				Color = color;
+			}
+		}
+		private byte[] LoadShaderBytes(string name)
+		{
+			string extension;
+			switch (graphicsDevice.BackendType)
+			{
+				case GraphicsBackend.Direct3D11:
+					extension = "hlsl.bytes";
+					break;
+				case GraphicsBackend.Vulkan:
+					extension = "450.glsl";
+					break;
+				case GraphicsBackend.OpenGL:
+					extension = "330.glsl";
+					break;
+				case GraphicsBackend.Metal:
+					extension = "metallib";
+					break;
+				case GraphicsBackend.OpenGLES:
+					extension = "300.glsles";
+					break;
+				default: throw new InvalidOperationException();
+			}
+
+			return File.ReadAllBytes(Path.Combine(AppContext.BaseDirectory ?? assembly.Location, "Shaders", $"{name}.{extension}"));
+		}
 		private void Run()
 		{
 			WindowCreateInfo windowCI = new()
@@ -280,17 +371,57 @@ namespace VeldridSandbox
 				PreferStandardClipSpaceYDirection = true,
 				PreferDepthRangeZeroToOne = true
 			};
-			graphicsDevice = VeldridStartup.CreateGraphicsDevice(window, options, GraphicsBackend.OpenGLES);
+			graphicsDevice = VeldridStartup.CreateGraphicsDevice(window, options, GraphicsBackend.Direct3D11);
 
 			factory = graphicsDevice.ResourceFactory;
+			#region idk
+			VertexPositionColor[] quadVertices =
+			{
+				new VertexPositionColor(new Vector2(-.75f, .75f), RgbaFloat.Red),
+				new VertexPositionColor(new Vector2(.75f, .75f), RgbaFloat.Green),
+				new VertexPositionColor(new Vector2(-.75f,- .75f), RgbaFloat.Blue),
+				new VertexPositionColor(new Vector2(.75f, -.75f), RgbaFloat.Yellow)
+			};
+			BufferDescription vbDescription = new BufferDescription(
+				4 * VertexPositionColor.SizeInBytes,
+				BufferUsage.VertexBuffer);
+			_vertexBuffer = factory.CreateBuffer(vbDescription);
+			graphicsDevice.UpdateBuffer(_vertexBuffer, 0, quadVertices);
 
+			ushort[] quadIndices = { 0, 1, 2, 3 };
+			BufferDescription ibDescription = new BufferDescription(
+				4 * sizeof(ushort),
+				BufferUsage.IndexBuffer);
+			_indexBuffer = factory.CreateBuffer(ibDescription);
+			graphicsDevice.UpdateBuffer(_indexBuffer, 0, quadIndices);
+
+			VertexLayoutDescription vertexLayout = new VertexLayoutDescription(
+				new VertexElementDescription("Position", VertexElementSemantic.TextureCoordinate, VertexElementFormat.Float2),
+				new VertexElementDescription("Color", VertexElementSemantic.TextureCoordinate, VertexElementFormat.Float4));
+
+
+			/*ShaderDescription vertexShaderDesc = new ShaderDescription(
+				ShaderStages.Vertex,
+				LoadShaderBytes("FillPath-vertex"),
+				"main");
+			ShaderDescription fragmentShaderDesc = new ShaderDescription(
+				ShaderStages.Fragment,
+				LoadShaderBytes("FillPath-fragment"),
+				"main");
+			_shaders = new[] {
+				factory.CreateShader(vertexShaderDesc),
+				factory.CreateShader(fragmentShaderDesc)
+			};*/
+			
+			//_shaders = factory.CreateFromSpirv(vertexShaderDesc, fragmentShaderDesc);
+			#endregion
 			Shader vertexShader = GetShader("embedded.shader_v2f_c4f_t2f_t2f_d28f.vert.glsl", ShaderStages.Vertex);
 			Shader fragmentShader = GetShader("embedded.shader_fill.frag.glsl", ShaderStages.Fragment);
 			Shader pathVertexShader = GetShader("embedded.shader_v2f_c4f_t2f.vert.glsl", ShaderStages.Vertex);
 			Shader pathFragmentShader = GetShader("embedded.shader_fill_path.frag.glsl", ShaderStages.Fragment);
-
+			
 			// Create pipeline
-			GraphicsPipelineDescription pipelineDescription = new GraphicsPipelineDescription();
+			GraphicsPipelineDescription pipelineDescription = new();
 			pipelineDescription.BlendState = BlendStateDescription.SingleOverrideBlend;
 			pipelineDescription.DepthStencilState = new DepthStencilStateDescription(
 				depthTestEnabled: true,
@@ -305,18 +436,21 @@ namespace VeldridSandbox
 			pipelineDescription.PrimitiveTopology = PrimitiveTopology.TriangleStrip;
 			pipelineDescription.ResourceLayouts = System.Array.Empty<ResourceLayout>();
 			pipelineDescription.ShaderSet = new ShaderSetDescription(
-				vertexLayouts: new VertexLayoutDescription[] { },
+				vertexLayouts: new VertexLayoutDescription[] { vertexLayout },
 				shaders: _shaders);
 			pipelineDescription.Outputs = graphicsDevice.SwapchainFramebuffer.OutputDescription;
+
 			_pipeline = factory.CreateGraphicsPipeline(pipelineDescription);
 
-			_commandList = factory.CreateCommandList();
+			commandList = factory.CreateCommandList();
 
 			while (window.Exists)
 			{
+				Render();
 				window.PumpEvents();
-				renderer.Update();
+				/*renderer.Update();
 				renderer.Render();
+				*/
 			}
 		}
 	}
