@@ -1,0 +1,58 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<OutputType>Exe</OutputType>
+		<TargetFramework>net5</TargetFramework>
+		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+	</PropertyGroup>
+
+	<ItemGroup>
+	  <None Remove="embedded\basic.frag.glsl" />
+	  <None Remove="embedded\basic.vert.glsl" />
+	  <None Remove="embedded\shader_fill.frag.glsl" />
+	  <None Remove="embedded\shader_fill_path.frag.glsl" />
+	  <None Remove="embedded\shader_v2f_c4f_t2f.vert.glsl" />
+	  <None Remove="embedded\shader_v2f_c4f_t2f_t2f_d28f.vert.glsl" />
+	  <None Remove="resources\cacert.pem" />
+	  <None Remove="resources\icudt67l.dat" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <Content Include="resources\cacert.pem">
+	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	    <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+	    <PackageCopyToOutput>True</PackageCopyToOutput>
+	    <Pack>True</Pack>
+	  </Content>
+	  <Content Include="resources\icudt67l.dat">
+	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	    <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+	    <PackageCopyToOutput>True</PackageCopyToOutput>
+	    <Pack>True</Pack>
+	  </Content>
+	</ItemGroup>
+	<ItemGroup>
+	  <EmbeddedResource Include="embedded\basic.frag.glsl" />
+	  <EmbeddedResource Include="embedded\basic.vert.glsl" />
+	  <EmbeddedResource Include="embedded\shader_fill.frag.glsl" />
+	  <EmbeddedResource Include="embedded\shader_fill_path.frag.glsl" />
+	  <EmbeddedResource Include="embedded\shader_v2f_c4f_t2f.vert.glsl" />
+	  <EmbeddedResource Include="embedded\shader_v2f_c4f_t2f_t2f_d28f.vert.glsl" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<PackageReference Include="Veldrid" Version="4.8.0" />
+		<PackageReference Include="Veldrid.SPIRV" Version="1.0.13" />
+		<PackageReference Include="Veldrid.StartupUtilities" Version="4.8.0" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="..\UltralightSharp\UltralightSharp.csproj" >
+			<ReferenceOutputAssembly>true</ReferenceOutputAssembly>
+		</ProjectReference>
+	</ItemGroup>
+	<ItemGroup>
+		<Folder Include="Shaders\" />
+	</ItemGroup>
+
+</Project>

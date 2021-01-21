@@ -34,7 +34,7 @@ partial class Program {
 
   private static int _majOES = 3;
 
-  private static readonly string AsmPath = new Uri(typeof(Program).Assembly.CodeBase!).LocalPath;
+  private static readonly string AsmPath = typeof(Program).Assembly.Location;
 
   private static readonly string AsmDir = Path.GetDirectoryName(AsmPath)!;
 
@@ -83,6 +83,7 @@ partial class Program {
       if (opts.GlApi != null) {
         _automaticFallback = false;
         _useOpenGl = !opts.GlApi.Contains("es");
+            _useOpenGl = true;
       }
 
       if (opts.GlMajorVersion != null) {
@@ -297,8 +298,8 @@ partial class Program {
     Console.WriteLine("Initializing window...");
 
     _snView.Initialize();
-
-    if (_snView.Handle == null) {
+        
+    if (_snView.Handle == IntPtr.Zero) {
       var code = _glfw.GetError(out char* pDesc);
       if (code == ErrorCode.NoError || pDesc == null)
         throw new PlatformNotSupportedException("Can't create a window via GLFW. Unknown error.");

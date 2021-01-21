@@ -21,11 +21,11 @@
         <GenerateAssemblyConfigurationAttribute>False</GenerateAssemblyConfigurationAttribute>
     </PropertyGroup>
 
-    <ItemGroup>
+	<!--ItemGroup>
         <PackageReference Include="ImpromptuNinjas.UltralightSharp.Core.WinX64" Version="[$(Version)]" IncludeAssets="native" />
         <PackageReference Include="ImpromptuNinjas.UltralightSharp.Core.LinuxX64" Version="[$(Version)]" IncludeAssets="native" />
         <PackageReference Include="ImpromptuNinjas.UltralightSharp.Core.OsxX64" Version="[$(Version)]" IncludeAssets="native" />
-    </ItemGroup>
+    </ItemGroup-->
     
     <Choose>
         <When Condition="'$(TargetFramework)'=='net45'">
@@ -43,15 +43,15 @@
             <ItemGroup>
                 <ProjectReference Include="..\UltralightSharp.Core.WinX64\UltralightSharp.Core.WinX64.csproj">
                     <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
-                    <ExcludeAssets>all</ExcludeAssets>
+                    <!--<ExcludeAssets>all</ExcludeAssets>-->
                 </ProjectReference>
                 <ProjectReference Include="..\UltralightSharp.Core.LinuxX64\UltralightSharp.Core.LinuxX64.csproj">
                     <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
-                    <ExcludeAssets>all</ExcludeAssets>
+                    <!--<ExcludeAssets>all</ExcludeAssets>-->
                 </ProjectReference>
                 <ProjectReference Include="..\UltralightSharp.Core.OsxX64\UltralightSharp.Core.OsxX64.csproj">
                     <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
-                    <ExcludeAssets>all</ExcludeAssets>
+                    <!--<ExcludeAssets>all</ExcludeAssets>-->
                 </ProjectReference>
             </ItemGroup>
         </Otherwise>
@@ -73,8 +73,8 @@
         <Content Include="resources\**\*">
             <Pack>True</Pack>
             <PackageCopyToOutput>True</PackageCopyToOutput>
-            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-            <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+            <CopyToOutputDirectory>True</CopyToOutputDirectory>
+            <CopyToPublishDirectory>True</CopyToPublishDirectory>
         </Content>
         <Content Include="Ultralight*.txt">
             <Pack>True</Pack>
@@ -84,9 +84,9 @@
         </Content>
         <None Include="runtimes\*\**">
             <Pack>True</Pack>
-            <PackageCopyToOutput>False</PackageCopyToOutput>
-            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-            <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+            <PackageCopyToOutput>True</PackageCopyToOutput>
+            <CopyToOutputDirectory>True</CopyToOutputDirectory>
+            <CopyToPublishDirectory>True</CopyToPublishDirectory>
             <PackagePath>%(Identity)</PackagePath>
             <Link>%(Identity)</Link>
         </None>
