@@ -24,11 +24,14 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UltralightSharp.Core.OsxX64
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UltralightSharp.Core.LinuxX64", "UltralightSharp.Core.LinuxX64\UltralightSharp.Core.LinuxX64.csproj", "{1C062697-D3E5-4B3C-836D-D64FEC442C8D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "VeldridSandbox", "VeldridSandbox\VeldridSandbox.csproj", "{E4960165-1F8A-4582-962E-D440B4C76413}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "VeldridSandbox", "VeldridSandbox\VeldridSandbox.csproj", "{E4960165-1F8A-4582-962E-D440B4C76413}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{F0B30069-69C2-4DE7-BBD1-71A4D62B5C29}"
 	ProjectSection(SolutionItems) = preProject
 		.editorconfig = .editorconfig
+		.github\workflows\build-and-test.yml = .github\workflows\build-and-test.yml
+		.github\workflows\package-version-tags.yml = .github\workflows\package-version-tags.yml
+		.github\workflows\unity.yml = .github\workflows\unity.yml
 	EndProjectSection
 EndProject
 Global
