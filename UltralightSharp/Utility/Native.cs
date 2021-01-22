@@ -53,10 +53,8 @@ namespace ImpromptuNinjas.UltralightSharp
 
         private static unsafe IntPtr LoadLib(string libName)
         {
-            var asm = typeof(Native).GetAssembly();
-            var baseDir = asm.GetLocalCodeBaseDirectory();
-
-            var ptrBits = sizeof(void*) * 8;
+            var asm = typeof(Native).Assembly;
+            var baseDir = Path.GetDirectoryName(asm.Location);
 
             // ReSharper disable once RedundantAssignment
             IntPtr lib = default;
@@ -69,7 +67,7 @@ namespace ImpromptuNinjas.UltralightSharp
             {
                 libPath = Path.Combine(baseDir, $"{libName}.dll");
                 if (!TryLoad(libPath, out lib))
-                    libPath = Path.Combine(baseDir, "runtimes", ptrBits == 32 ? "win-x86" : "win-x64", "native", $"{libName}.dll");
+                    libPath = Path.Combine(baseDir, "runtimes", "win-x64", "native", $"{libName}.dll");
             }
             else if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
             {
@@ -95,7 +93,7 @@ namespace ImpromptuNinjas.UltralightSharp
                     throw new DllNotFoundException(libPath);
 #else
           throw new FileNotFoundException(libPath + "\n" +
-            $"You may need to specify <RuntimeIdentifier>{(ptrBits == 32 ? "win-x86" : "win-x64")}<RuntimeIdentifier> or <RuntimeIdentifier>win<RuntimeIdentifier> in your project file.",
+            $"You may need to specify <RuntimeIdentifier>{"win-x64"}<RuntimeIdentifier> or <RuntimeIdentifier>win<RuntimeIdentifier> in your project file.",
             libPath);
 #endif
             }
@@ -105,18 +103,25 @@ namespace ImpromptuNinjas.UltralightSharp
 
         private static bool TryLoad(string libPath, out IntPtr lib)
         {
-            try
-            {
-                lib = NativeLibrary.Load(libPath);
-            }
-            catch (Exception ex)
-            {
-                Console.Error.WriteLine($"Library loading error: {libPath}\n{ex}");
-                lib = default;
-                return false;
-            }
-
-            return true;
+			if (File.Exists(libPath))
+			{
+				try
+				{
+					lib = NativeLibrary.Load(libPath);
+					return true;
+				}
+				catch (Exception ex)
+				{
+					Console.Error.WriteLine($"Library loading error: {libPath}\n{ex}");
+					lib = default;
+					return false;
+				}
+			}
+			else
+			{
+				lib = default;
+				return false;
+			}
         }
 
         public static IntPtr LibUltralightCore => LazyLoadedLibUltralightCore.Value;
@@ -128,7 +133,7 @@ namespace ImpromptuNinjas.UltralightSharp
         public static IntPtr LibWebCore => LazyLoadedLibWebCore.Value;
 
         static Native()
-          => NativeLibrary.SetDllImportResolver(typeof(Native).GetAssembly(),
+          => NativeLibrary.SetDllImportResolver(typeof(Native).Assembly,
             (name, assembly, path)
               =>
             {
