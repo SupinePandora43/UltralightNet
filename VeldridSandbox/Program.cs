@@ -2,6 +2,7 @@ using ImpromptuNinjas.UltralightSharp.Enums;
 using ImpromptuNinjas.UltralightSharp.Safe;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Numerics;
 using System.Reflection;
@@ -40,6 +41,10 @@ namespace VeldridSandbox
 			Program program = new Program();
 			program.Run();
 		}
+		private int width = 512;
+		private int height = 512;
+
+		private Stopwatch stopwatch;
 
 		private Renderer renderer;
 		private View view;
@@ -52,6 +57,8 @@ namespace VeldridSandbox
 		private DeviceBuffer _indexBuffer;
 		private Shader[] _shaders;
 		private Pipeline _pipeline;
+
+		private DeviceBuffer uniformBuffer;
 
 		public class GeometryEntry
 		{
@@ -272,18 +279,30 @@ namespace VeldridSandbox
 			Stream resourceStream = assembly.GetManifestResourceStream("VeldridSandbox." + path) ?? throw new FileNotFoundException(path);
 			StreamReader resourceStreamReader = new(resourceStream, Encoding.UTF8, false, 16, true);
 			string shaderCode = resourceStreamReader.ReadToEnd();
-			SpirvCompilationResult spirv = SpirvCompilation.CompileGlslToSpirv(shaderCode,path,shaderStages, GlslCompileOptions.Default);
+			SpirvCompilationResult spirv = SpirvCompilation.CompileGlslToSpirv(shaderCode, "VertexFill", shaderStages, GlslCompileOptions.Default);
 			//ShaderDescription shaderDescription = new(shaderStages, Encoding.UTF8.GetBytes(shaderCode), "main");
 			ShaderDescription shaderDescription = new(shaderStages, spirv.SpirvBytes, "main");
 			return factory.CreateFromSpirv(shaderDescription);
 		}
-
+		private Random random;
 		private void Render()
 		{
 			commandList.Begin();
 			commandList.SetFramebuffer(graphicsDevice.SwapchainFramebuffer);
 			commandList.SetFullViewports();
 			commandList.ClearColorTarget(0, RgbaFloat.Black);
+
+			/*VertexPositionColor[] quadVertices =
+			{
+				new VertexPositionColor(new Vector2(-.75f, MathF.Sin(stopwatch.ElapsedMilliseconds/100)), RgbaFloat.Red),
+				new VertexPositionColor(new Vector2(.75f, .75f), RgbaFloat.Green),
+				new VertexPositionColor(new Vector2(-.75f,- .75f), RgbaFloat.Blue),
+				new VertexPositionColor(new Vector2(.75f, -.75f), RgbaFloat.Yellow)
+			};
+			graphicsDevice.UpdateBuffer(_vertexBuffer, 0, quadVertices);
+			*/
+			Uniforms uniforms = new(new(width));
+			graphicsDevice.UpdateBuffer(uniformBuffer, 0, uniforms);
 
 			commandList.SetVertexBuffer(0, _vertexBuffer);
 			commandList.SetIndexBuffer(_indexBuffer, IndexFormat.UInt16);
@@ -329,6 +348,63 @@ void main()
 				Color = color;
 			}
 		}
+		struct Uniforms
+		{
+			public Vector4 State; // 16
+			public Matrix4x4 Transform; // 64
+										//public Vector4[] Scalar4;
+			public Vector4 Scalar4_0; // 16
+			public Vector4 Scalar4_1; // 16
+									  //public Vector4[] Vector; // 16*8 = 128
+			public Vector4 Vector_0; // 16
+			public Vector4 Vector_1; // 16
+			public Vector4 Vector_2; // 16
+			public Vector4 Vector_3; // 16
+			public Vector4 Vector_4; // 16
+			public Vector4 Vector_5; // 16
+			public Vector4 Vector_6; // 16
+			public Vector4 Vector_7; // 16
+									 //public float fClipSize;  // 4
+									 //public Matrix4x4[] Clip; // 64 * 8 = 512
+			public Matrix4x4 Clip_0; // 64
+			public Matrix4x4 Clip_1; // 64
+			public Matrix4x4 Clip_2; // 64
+			public Matrix4x4 Clip_3; // 64
+			public Matrix4x4 Clip_4; // 64
+			public Matrix4x4 Clip_5; // 64
+			public Matrix4x4 Clip_6; // 64
+			public Matrix4x4 Clip_7; // 64
+
+			public Uniforms(Vector4 state)
+			{
+				State = state;
+
+				Transform = new();
+
+				Scalar4_0 = new();
+				Scalar4_1 = new();
+
+				Vector_0 = new();
+				Vector_1 = new();
+				Vector_2 = new();
+				Vector_3 = new();
+				Vector_4 = new();
+				Vector_5 = new();
+				Vector_6 = new();
+				Vector_7 = new();
+
+				//fClipSize = new();
+
+				Clip_0 = new();
+				Clip_1 = new();
+				Clip_2 = new();
+				Clip_3 = new();
+				Clip_4 = new();
+				Clip_5 = new();
+				Clip_6 = new();
+				Clip_7 = new();
+			}
+		}
 		private byte[] LoadShaderBytes(string name)
 		{
 			string extension;
@@ -356,6 +432,8 @@ void main()
 		}
 		private void Run()
 		{
+			random = new();
+			stopwatch = Stopwatch.StartNew();
 			WindowCreateInfo windowCI = new()
 			{
 				X = 100,
@@ -371,9 +449,20 @@ void main()
 				PreferStandardClipSpaceYDirection = true,
 				PreferDepthRangeZeroToOne = true
 			};
-			graphicsDevice = VeldridStartup.CreateGraphicsDevice(window, options, GraphicsBackend.Direct3D11);
+			graphicsDevice = VeldridStartup.CreateGraphicsDevice(
+				window,
+				options,
+				GraphicsBackend.Vulkan);
+
+			window.Resized += () =>
+			{
+				graphicsDevice.ResizeMainWindow((uint)window.Width, (uint)window.Height);
+				width = window.Width;
+				height = window.Height;
+			};
 
 			factory = graphicsDevice.ResourceFactory;
+
 			#region idk
 			VertexPositionColor[] quadVertices =
 			{
@@ -382,12 +471,19 @@ void main()
 				new VertexPositionColor(new Vector2(-.75f,- .75f), RgbaFloat.Blue),
 				new VertexPositionColor(new Vector2(.75f, -.75f), RgbaFloat.Yellow)
 			};
-			BufferDescription vbDescription = new BufferDescription(
+
+			BufferDescription vbDescription = new(
 				4 * VertexPositionColor.SizeInBytes,
 				BufferUsage.VertexBuffer);
+
 			_vertexBuffer = factory.CreateBuffer(vbDescription);
 			graphicsDevice.UpdateBuffer(_vertexBuffer, 0, quadVertices);
+			BufferDescription uniformBufferDescription = new(
+				752,
+				BufferUsage.UniformBuffer
+			);
 
+			uniformBuffer = factory.CreateBuffer(uniformBufferDescription);
 			ushort[] quadIndices = { 0, 1, 2, 3 };
 			BufferDescription ibDescription = new BufferDescription(
 				4 * sizeof(ushort),
@@ -400,26 +496,35 @@ void main()
 				new VertexElementDescription("Color", VertexElementSemantic.TextureCoordinate, VertexElementFormat.Float4));
 
 
-			/*ShaderDescription vertexShaderDesc = new ShaderDescription(
+			ShaderDescription vertexShaderDesc = new ShaderDescription(
 				ShaderStages.Vertex,
-				LoadShaderBytes("FillPath-vertex"),
+				Encoding.UTF8.GetBytes(VertexCode),//LoadShaderBytes("FillPath-vertex"),
 				"main");
 			ShaderDescription fragmentShaderDesc = new ShaderDescription(
 				ShaderStages.Fragment,
-				LoadShaderBytes("FillPath-fragment"),
+				Encoding.UTF8.GetBytes(FragmentCode),//LoadShaderBytes("FillPath-fragment"),
 				"main");
-			_shaders = new[] {
-				factory.CreateShader(vertexShaderDesc),
-				factory.CreateShader(fragmentShaderDesc)
-			};*/
-			
-			//_shaders = factory.CreateFromSpirv(vertexShaderDesc, fragmentShaderDesc);
+
+			//Shader[] __shaders = factory.CreateFromSpirv(vertexShaderDesc, fragmentShaderDesc);
 			#endregion
-			Shader vertexShader = GetShader("embedded.shader_v2f_c4f_t2f_t2f_d28f.vert.glsl", ShaderStages.Vertex);
+			/*Shader vertexShader = GetShader("embedded.shader_v2f_c4f_t2f_t2f_d28f.vert.glsl", ShaderStages.Vertex);
 			Shader fragmentShader = GetShader("embedded.shader_fill.frag.glsl", ShaderStages.Fragment);
 			Shader pathVertexShader = GetShader("embedded.shader_v2f_c4f_t2f.vert.glsl", ShaderStages.Vertex);
 			Shader pathFragmentShader = GetShader("embedded.shader_fill_path.frag.glsl", ShaderStages.Fragment);
-			
+			*/
+			_shaders = new[]
+			{
+				GetShader("embedded.shader_v2f_c4f_t2f_t2f_d28f.vert.glsl", ShaderStages.Vertex),
+				//factory.CreateShader(vertexShaderDesc),
+				factory.CreateShader(fragmentShaderDesc),
+				/*__shaders[0],
+				__shaders[1]
+				/*vertexShader,
+				fragmentShader,
+				pathVertexShader,
+				pathFragmentShader*/
+			};
+
 			// Create pipeline
 			GraphicsPipelineDescription pipelineDescription = new();
 			pipelineDescription.BlendState = BlendStateDescription.SingleOverrideBlend;

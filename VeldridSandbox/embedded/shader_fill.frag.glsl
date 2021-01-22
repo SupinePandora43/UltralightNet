@@ -1,13 +1,15 @@
-#version 300 es
+#version 450
 precision highp float;
 
 // Program Uniforms
-uniform vec4 State;
-uniform mat4 Transform;
-uniform vec4 Scalar4[2];
-uniform vec4 Vector[8];
-uniform float fClipSize;
-uniform mat4 Clip[8];
+layout(binding=2) uniform Uniforms {
+	uniform vec4 State;
+	uniform mat4 Transform;
+	uniform vec4 Scalar4[2];
+	uniform vec4 Vector[8];
+	uniform float fClipSize;
+	uniform mat4 Clip[8];
+};
 
 // Uniform Accessor Functions
 float Time() { return State[0]; }
@@ -17,25 +19,25 @@ float ScreenScale() { return State[3]; }
 float Scalar(uint i) { if (i < 4u) return Scalar4[0][i]; else return Scalar4[1][i - 4u]; }
 
 // Texture Units
-uniform sampler2D Texture1;
-uniform sampler2D Texture2;
-uniform sampler2D Texture3;
+layout(binding=0) uniform sampler2D Texture1;
+layout(binding=1) uniform sampler2D Texture2;
+layout(binding=2) uniform sampler2D Texture3;
 
 // Vertex Attributes
-in vec4 ex_Color;
-in vec2 ex_TexCoord;
-in vec2 ex_ObjectCoord;
-in vec2 ex_ScreenCoord;
-in vec4 ex_Data0;
-in vec4 ex_Data1;
-in vec4 ex_Data2;
-in vec4 ex_Data3;
-in vec4 ex_Data4;
-in vec4 ex_Data5;
-in vec4 ex_Data6;
+layout(location=0) in vec4 ex_Color;
+layout(location=1) in vec2 ex_TexCoord;
+layout(location=2) in vec2 ex_ObjectCoord;
+layout(location=3) in vec2 ex_ScreenCoord;
+layout(location=4) in vec4 ex_Data0;
+layout(location=5) in vec4 ex_Data1;
+layout(location=6) in vec4 ex_Data2;
+layout(location=7) in vec4 ex_Data3;
+layout(location=8) in vec4 ex_Data4;
+layout(location=9) in vec4 ex_Data5;
+layout(location=10) in vec4 ex_Data6;
 
 // Out Params
-out vec4 out_Color;
+layout(location=0) out vec4 out_Color;
 
 uint FillType() { return uint(ex_Data0.x + 0.5); }
 vec4 TileRectUV() { return Vector[0]; }
