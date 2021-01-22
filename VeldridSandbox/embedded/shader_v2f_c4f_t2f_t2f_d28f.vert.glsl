@@ -2,12 +2,12 @@
 precision highp float;
 
 // Program Uniforms
-layout(binding=2) uniform Uniforms {
+layout(set=0, binding=0) uniform Uniforms {
 	uniform vec4 State;
 	uniform mat4 Transform;
 	uniform vec4 Scalar4[2];
 	uniform vec4 Vector[8];
-	//uniform float fClipSize;
+	uniform float fClipSize;
 	uniform mat4 Clip[8];
 };
 
@@ -19,15 +19,6 @@ float ScreenScale() { return State[3]; }
 float Scalar(uint i) { if (i < 4u) return Scalar4[0][i]; else return Scalar4[1][i - 4u]; }
 vec4 sRGBToLinear(vec4 val) { return vec4(val.xyz * (val.xyz * (val.xyz * 0.305306011 + 0.682171111) + 0.012522878), val.w); }
 
-layout(location = 0) in vec2 Position;
-layout(location = 1) in vec4 Color;
-layout(location = 0) out vec4 fsin_Color;
-void main()
-{
-	gl_Position = vec4(vec2(Position.x, State[1]==0 ? Position.y : Position.y - State[1] + 512), 0, 1);
-	fsin_Color = Color;
-}
-/*
 // Vertex Attributes
 layout(location = 0)in vec2 in_Position;
 layout(location = 1)in vec4 in_Color;
@@ -68,4 +59,3 @@ void main(void)
   ex_Data5 = in_Data5;
   ex_Data6 = in_Data6;
 }
-*/

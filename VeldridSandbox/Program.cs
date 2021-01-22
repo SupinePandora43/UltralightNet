@@ -6,6 +6,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Numerics;
 using System.Reflection;
+using System.Runtime.InteropServices;
 using System.Text;
 using Veldrid;
 using Veldrid.Sdl2;
@@ -57,6 +58,7 @@ namespace VeldridSandbox
 		private DeviceBuffer _indexBuffer;
 		private Shader[] _shaders;
 		private Pipeline _pipeline;
+		private ResourceSet resourceSet;
 
 		private DeviceBuffer uniformBuffer;
 
@@ -290,23 +292,19 @@ namespace VeldridSandbox
 			commandList.Begin();
 			commandList.SetFramebuffer(graphicsDevice.SwapchainFramebuffer);
 			commandList.SetFullViewports();
-			commandList.ClearColorTarget(0, RgbaFloat.Black);
+			commandList.ClearColorTarget(0, RgbaFloat.DarkRed);
 
-			/*VertexPositionColor[] quadVertices =
-			{
-				new VertexPositionColor(new Vector2(-.75f, MathF.Sin(stopwatch.ElapsedMilliseconds/100)), RgbaFloat.Red),
-				new VertexPositionColor(new Vector2(.75f, .75f), RgbaFloat.Green),
-				new VertexPositionColor(new Vector2(-.75f,- .75f), RgbaFloat.Blue),
-				new VertexPositionColor(new Vector2(.75f, -.75f), RgbaFloat.Yellow)
+			// Update uniforms
+			Uniforms uniforms = new() {
+				State = new(width)
 			};
-			graphicsDevice.UpdateBuffer(_vertexBuffer, 0, quadVertices);
-			*/
-			Uniforms uniforms = new(new(width));
 			graphicsDevice.UpdateBuffer(uniformBuffer, 0, uniforms);
 
 			commandList.SetVertexBuffer(0, _vertexBuffer);
 			commandList.SetIndexBuffer(_indexBuffer, IndexFormat.UInt16);
 			commandList.SetPipeline(_pipeline);
+
+			commandList.SetGraphicsResourceSet(0, resourceSet);
 
 			commandList.DrawIndexed(
 				indexCount: 4,
@@ -321,12 +319,23 @@ namespace VeldridSandbox
 		}
 		private const string VertexCode = @"
 #version 450
+
+layout(set=0, binding=0) uniform Uniforms {
+	uniform vec4 State;
+	uniform mat4 Transform;
+	uniform vec4 Scalar4[2];
+	uniform vec4 Vector[8];
+	uniform float fClipSize;
+	uniform mat4 Clip[8];
+};
+
 layout(location = 0) in vec2 Position;
 layout(location = 1) in vec4 Color;
 layout(location = 0) out vec4 fsin_Color;
 void main()
 {
-    gl_Position = vec4(Position, 0, 1);
+	gl_Position = vec4(Position.x, Position.y - ((State.y - 512)/512), 0, 1);
+    //gl_Position = vec4(Position, 0, 1);
     fsin_Color = Color;
 }";
 		private const string FragmentCode = @"
@@ -348,14 +357,17 @@ void main()
 				Color = color;
 			}
 		}
-		struct Uniforms
+		/// <summary>
+		/// Uniforms
+		/// </summary>
+		public struct Uniforms
 		{
 			public Vector4 State; // 16
 			public Matrix4x4 Transform; // 64
-										//public Vector4[] Scalar4;
+
 			public Vector4 Scalar4_0; // 16
 			public Vector4 Scalar4_1; // 16
-									  //public Vector4[] Vector; // 16*8 = 128
+
 			public Vector4 Vector_0; // 16
 			public Vector4 Vector_1; // 16
 			public Vector4 Vector_2; // 16
@@ -364,8 +376,9 @@ void main()
 			public Vector4 Vector_5; // 16
 			public Vector4 Vector_6; // 16
 			public Vector4 Vector_7; // 16
-									 //public float fClipSize;  // 4
-									 //public Matrix4x4[] Clip; // 64 * 8 = 512
+
+			public float fClipSize;  // 4
+
 			public Matrix4x4 Clip_0; // 64
 			public Matrix4x4 Clip_1; // 64
 			public Matrix4x4 Clip_2; // 64
@@ -374,36 +387,6 @@ void main()
 			public Matrix4x4 Clip_5; // 64
 			public Matrix4x4 Clip_6; // 64
 			public Matrix4x4 Clip_7; // 64
-
-			public Uniforms(Vector4 state)
-			{
-				State = state;
-
-				Transform = new();
-
-				Scalar4_0 = new();
-				Scalar4_1 = new();
-
-				Vector_0 = new();
-				Vector_1 = new();
-				Vector_2 = new();
-				Vector_3 = new();
-				Vector_4 = new();
-				Vector_5 = new();
-				Vector_6 = new();
-				Vector_7 = new();
-
-				//fClipSize = new();
-
-				Clip_0 = new();
-				Clip_1 = new();
-				Clip_2 = new();
-				Clip_3 = new();
-				Clip_4 = new();
-				Clip_5 = new();
-				Clip_6 = new();
-				Clip_7 = new();
-			}
 		}
 		private byte[] LoadShaderBytes(string name)
 		{
@@ -479,7 +462,7 @@ void main()
 			_vertexBuffer = factory.CreateBuffer(vbDescription);
 			graphicsDevice.UpdateBuffer(_vertexBuffer, 0, quadVertices);
 			BufferDescription uniformBufferDescription = new(
-				752,
+				768, // actual size is 756
 				BufferUsage.UniformBuffer
 			);
 
@@ -505,20 +488,20 @@ void main()
 				Encoding.UTF8.GetBytes(FragmentCode),//LoadShaderBytes("FillPath-fragment"),
 				"main");
 
-			//Shader[] __shaders = factory.CreateFromSpirv(vertexShaderDesc, fragmentShaderDesc);
+			//_shaders = factory.CreateFromSpirv(vertexShaderDesc, fragmentShaderDesc);
 			#endregion
-			/*Shader vertexShader = GetShader("embedded.shader_v2f_c4f_t2f_t2f_d28f.vert.glsl", ShaderStages.Vertex);
+			Shader vertexShader = GetShader("embedded.shader_v2f_c4f_t2f_t2f_d28f.vert.glsl", ShaderStages.Vertex);
 			Shader fragmentShader = GetShader("embedded.shader_fill.frag.glsl", ShaderStages.Fragment);
 			Shader pathVertexShader = GetShader("embedded.shader_v2f_c4f_t2f.vert.glsl", ShaderStages.Vertex);
 			Shader pathFragmentShader = GetShader("embedded.shader_fill_path.frag.glsl", ShaderStages.Fragment);
-			*/
+			
 			_shaders = new[]
 			{
-				GetShader("embedded.shader_v2f_c4f_t2f_t2f_d28f.vert.glsl", ShaderStages.Vertex),
-				//factory.CreateShader(vertexShaderDesc),
+				//GetShader("embedded.shader_v2f_c4f_t2f_t2f_d28f.vert.glsl", ShaderStages.Vertex),
+				factory.CreateShader(vertexShaderDesc),
 				factory.CreateShader(fragmentShaderDesc),
 				/*__shaders[0],
-				__shaders[1]
+				__shaders[1]*/
 				/*vertexShader,
 				fragmentShader,
 				pathVertexShader,
@@ -539,14 +522,29 @@ void main()
 				depthClipEnabled: true,
 				scissorTestEnabled: false);
 			pipelineDescription.PrimitiveTopology = PrimitiveTopology.TriangleStrip;
-			pipelineDescription.ResourceLayouts = System.Array.Empty<ResourceLayout>();
+			pipelineDescription.ResourceLayouts = new[] {
+				factory.CreateResourceLayout(
+					new ResourceLayoutDescription(
+						new ResourceLayoutElementDescription(
+							"Uniforms",
+							ResourceKind.UniformBuffer,
+							ShaderStages.Vertex
+						)
+					)
+				)
+			};
 			pipelineDescription.ShaderSet = new ShaderSetDescription(
 				vertexLayouts: new VertexLayoutDescription[] { vertexLayout },
 				shaders: _shaders);
 			pipelineDescription.Outputs = graphicsDevice.SwapchainFramebuffer.OutputDescription;
 
 			_pipeline = factory.CreateGraphicsPipeline(pipelineDescription);
-
+			resourceSet = factory.CreateResourceSet(
+				new ResourceSetDescription(
+					pipelineDescription.ResourceLayouts[0],
+					uniformBuffer
+				)
+			);
 			commandList = factory.CreateCommandList();
 
 			while (window.Exists)
