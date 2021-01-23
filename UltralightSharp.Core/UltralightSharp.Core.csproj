@@ -18,9 +18,7 @@
         <PackageTags>ultralight webkit webcore appcore ultralight-ux</PackageTags>
         <PackageIcon>icon.png</PackageIcon>
         <IsPackable>True</IsPackable>
-		<IncludeContentInPack>true</IncludeContentInPack>
-		<IncludeBuildOutput>false</IncludeBuildOutput>
-		<NoBuild>true</NoBuild>
+		<NoBuild>True</NoBuild>
         <!--<GenerateAssemblyConfigurationAttribute>False</GenerateAssemblyConfigurationAttribute>-->
     </PropertyGroup>
 
@@ -60,41 +58,14 @@
     </ItemGroup>
 
     <ItemGroup>
-      <None Update="runtimes\linux-x64\native\libAppCore.so">
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      </None>
-      <None Update="runtimes\linux-x64\native\libUltralight.so">
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      </None>
-      <None Update="runtimes\linux-x64\native\libUltralightCore.so">
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      </None>
-      <None Update="runtimes\linux-x64\native\libWebCore.so">
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      </None>
-      <None Update="runtimes\osx-x64\native\libAppCore.dylib">
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      </None>
-      <None Update="runtimes\osx-x64\native\libUltralight.dylib">
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      </None>
-      <None Update="runtimes\osx-x64\native\libUltralightCore.dylib">
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      </None>
-      <None Update="runtimes\osx-x64\native\libWebCore.dylib">
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      </None>
-      <None Update="runtimes\win-x64\native\AppCore.dll">
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      </None>
-      <None Update="runtimes\win-x64\native\Ultralight.dll">
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      </None>
-      <None Update="runtimes\win-x64\native\UltralightCore.dll">
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      </None>
-      <None Update="runtimes\win-x64\native\WebCore.dll">
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      </None>
+              <None Include="runtimes\*\**">
+            <Pack>True</Pack>
+            <PackagePath>runtimes\</PackagePath>
+            <PackageCopyToOutput>False</PackageCopyToOutput>
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+            <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+            <Link>%(Identity)</Link>
+        </None>
+        <Content Remove="runtimes\*\**" />
     </ItemGroup>
 </Project>

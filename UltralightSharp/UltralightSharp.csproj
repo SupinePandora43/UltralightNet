@@ -28,13 +28,13 @@
     </PropertyGroup>
 
     <ItemGroup>
+        <PackageReference Include="ImpromptuNinjas.UltralightSharp.Core" Version="[$(Version)]" IncludeAssets="native" />
         <PackageReference Include="JetBrains.Annotations" Version="2020.1.0" PrivateAssets="all" />
         <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0" PrivateAssets="all" />
         <PackageReference Include="Fody" Version="6.2.4" PrivateAssets="all" />
         <PackageReference Include="InlineIL.Fody" Version="1.5.0" PrivateAssets="all" />
         <PackageReference Include="InfoOf.Fody" Version="2.0.1" PrivateAssets="all" />
         <PackageReference Include="ModuleInit.Fody" Version="2.1.0" PrivateAssets="all" />
-        <!--<PackageReference Include="ImpromptuNinjas.UltralightSharp.Core" Version="[$(Version)]" IncludeAssets="native;contentfiles" />-->
     </ItemGroup>
 
     <Choose>
@@ -90,15 +90,6 @@
             <PackageCopyToOutput>True</PackageCopyToOutput>
             <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
         </Content>
-        <None Include="runtimes\*\**">
-            <Pack>True</Pack>
-            <PackagePath>runtimes\</PackagePath>
-            <PackageCopyToOutput>False</PackageCopyToOutput>
-            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-            <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
-            <Link>%(Identity)</Link>
-        </None>
-        <Content Remove="runtimes\*\**" />
     </ItemGroup>
 
     <ItemGroup>
@@ -185,12 +176,4 @@
           <WouldDependOn>JsObjectPrivate</WouldDependOn>
         </Compile>
     </ItemGroup>
-
-    <ItemGroup>
-      <ProjectReference Include="..\UltralightSharp.Core\UltralightSharp.Core.csproj">
-          <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
-          <ExcludeAssets>all</ExcludeAssets>
-      </ProjectReference>
-    </ItemGroup>
-
 </Project>
