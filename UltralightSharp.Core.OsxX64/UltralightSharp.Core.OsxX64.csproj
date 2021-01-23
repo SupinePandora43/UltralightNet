@@ -21,6 +21,7 @@
 		<GenerateAssemblyConfigurationAttribute>False</GenerateAssemblyConfigurationAttribute>
 		<RuntimeIdentifier>osx-x64</RuntimeIdentifier>
 		<RuntimeIdentifiers>osx-x64</RuntimeIdentifiers>
+		<NoBuild>true</NoBuild>
 	</PropertyGroup>
 
 	<ItemGroup>
@@ -42,15 +43,30 @@
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 			<CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
 		</Content>
-		<None Include="runtimes\*\**">
+		<Content Include="runtimes\*\**">
 			<Pack>True</Pack>
 			<PackageCopyToOutput>True</PackageCopyToOutput>
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 			<CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
 			<PackagePath>%(Identity)</PackagePath>
 			<Link>%(Identity)</Link>
-		</None>
+		</Content>
 		<Content Remove="runtimes\*\**" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <None Update="runtimes\osx-x64\native\libAppCore.dylib">
+	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	  </None>
+	  <None Update="runtimes\osx-x64\native\libUltralight.dylib">
+	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	  </None>
+	  <None Update="runtimes\osx-x64\native\libUltralightCore.dylib">
+	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	  </None>
+	  <None Update="runtimes\osx-x64\native\libWebCore.dylib">
+	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	  </None>
 	</ItemGroup>
 
 </Project>

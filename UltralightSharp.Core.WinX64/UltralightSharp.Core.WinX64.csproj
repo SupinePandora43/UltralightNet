@@ -21,6 +21,7 @@
 		<GenerateAssemblyConfigurationAttribute>False</GenerateAssemblyConfigurationAttribute>
 		<RuntimeIdentifier>win-x64</RuntimeIdentifier>
 		<RuntimeIdentifiers>win-x64</RuntimeIdentifiers>
+		<NoBuild>true</NoBuild>
 	</PropertyGroup>
 
 
@@ -51,14 +52,14 @@
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 			<CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
 		</Content>
-		<None Include="runtimes\*\**">
+		<Content Include="runtimes\*\**">
 			<Pack>True</Pack>
-			<PackageCopyToOutput>True</PackageCopyToOutput>
-			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-			<CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+			<PackageCopyToOutput>False</PackageCopyToOutput>
+			<CopyToOutputDirectory>Never</CopyToOutputDirectory>
+			<CopyToPublishDirectory>Never</CopyToPublishDirectory>
 			<PackagePath>%(Identity)</PackagePath>
 			<Link>%(Identity)</Link>
-		</None>
+		</Content>
 		<Content Remove="runtimes\*\**" />
 	</ItemGroup>
 

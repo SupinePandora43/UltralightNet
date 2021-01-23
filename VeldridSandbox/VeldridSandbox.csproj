@@ -21,20 +21,6 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <Content Include="resources\cacert.pem">
-	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-	    <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
-	    <PackageCopyToOutput>True</PackageCopyToOutput>
-	    <Pack>True</Pack>
-	  </Content>
-	  <Content Include="resources\icudt67l.dat">
-	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-	    <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
-	    <PackageCopyToOutput>True</PackageCopyToOutput>
-	    <Pack>True</Pack>
-	  </Content>
-	</ItemGroup>
-	<ItemGroup>
 	  <EmbeddedResource Include="embedded\basic.frag.glsl" />
 	  <EmbeddedResource Include="embedded\basic.vert.glsl" />
 	  <EmbeddedResource Include="embedded\shader_fill.frag.glsl" />

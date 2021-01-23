@@ -21,6 +21,7 @@
 		<GenerateAssemblyConfigurationAttribute>False</GenerateAssemblyConfigurationAttribute>
 		<RuntimeIdentifier>linux-x64</RuntimeIdentifier>
 		<RuntimeIdentifiers>linux-x64</RuntimeIdentifiers>
+		<NoBuild>true</NoBuild>
 	</PropertyGroup>
 
 	<ItemGroup>
@@ -42,15 +43,30 @@
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 			<CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
 		</Content>
-		<None Include="runtimes\*\**">
+		<Content Include="runtimes\*\**">
 			<Pack>True</Pack>
 			<PackageCopyToOutput>True</PackageCopyToOutput>
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
 			<CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
 			<PackagePath>%(Identity)</PackagePath>
 			<Link>%(Identity)</Link>
-		</None>
+		</Content>
 		<Content Remove="runtimes\*\**" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <None Update="runtimes\linux-x64\native\libAppCore.so">
+	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	  </None>
+	  <None Update="runtimes\linux-x64\native\libUltralight.so">
+	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	  </None>
+	  <None Update="runtimes\linux-x64\native\libUltralightCore.so">
+	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	  </None>
+	  <None Update="runtimes\linux-x64\native\libWebCore.so">
+	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	  </None>
 	</ItemGroup>
 
 </Project>
