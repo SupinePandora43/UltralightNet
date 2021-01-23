@@ -7,6 +7,7 @@
 		<ShaderContentIncludePath>Shaders</ShaderContentIncludePath>
 		<ShaderOutputPath>$(BaseIntermediateOutputPath)Shaders</ShaderOutputPath>
 		<ListAllShaderPaths Condition="'$(Configuration)' == 'Debug'">true</ListAllShaderPaths>
+		<NoWarn>8002</NoWarn>
 	</PropertyGroup>
 
 	<ItemGroup>
@@ -16,8 +17,6 @@
 	  <None Remove="embedded\shader_fill_path.frag.glsl" />
 	  <None Remove="embedded\shader_v2f_c4f_t2f.vert.glsl" />
 	  <None Remove="embedded\shader_v2f_c4f_t2f_t2f_d28f.vert.glsl" />
-	  <None Remove="resources\cacert.pem" />
-	  <None Remove="resources\icudt67l.dat" />
 	</ItemGroup>
 
 	<ItemGroup>
@@ -38,9 +37,16 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<ProjectReference Include="..\UltralightSharp\UltralightSharp.csproj">
-			<!--<ReferenceOutputAssembly>true</ReferenceOutputAssembly>-->
-		</ProjectReference>
+		<ProjectReference Include="..\UltralightSharp\UltralightSharp.csproj" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <None Update="resources\cacert.pem">
+	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	  </None>
+	  <None Update="resources\icudt67l.dat">
+	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	  </None>
 	</ItemGroup>
 
 </Project>

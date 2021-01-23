@@ -8,6 +8,7 @@ namespace VeldridSandbox.Shaders
 {
 	class FillPath
 	{
+#pragma warning disable CS0649
 		public Vector4 State;
 		public Matrix4x4 Mat;
 		public float GetWidth()

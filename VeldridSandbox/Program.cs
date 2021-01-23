@@ -39,7 +39,7 @@ namespace VeldridSandbox
 
 			AppCore.EnablePlatformFontLoader();
 			AppCore.EnablePlatformFileSystem("./");
-			Program program = new Program();
+			Program program = new();
 			program.Run();
 		}
 		private int width = 512;
@@ -81,9 +81,9 @@ namespace VeldridSandbox
 			public uint Height { get; set; }
 		}
 
-		private static readonly SlottingList<GeometryEntry> GeometryEntries = new SlottingList<GeometryEntry>(32, 8);
-		private static readonly SlottingList<TextureEntry> TextureEntries = new SlottingList<TextureEntry>(32, 8);
-		private static readonly SlottingList<RenderBufferEntry> RenderBufferEntries = new SlottingList<RenderBufferEntry>(8, 2);
+		private static readonly SlottingList<GeometryEntry> GeometryEntries = new(32, 8);
+		private static readonly SlottingList<TextureEntry> TextureEntries = new(32, 8);
+		private static readonly SlottingList<RenderBufferEntry> RenderBufferEntries = new(8, 2);
 
 		public Program()
 		{
@@ -295,7 +295,8 @@ namespace VeldridSandbox
 			commandList.ClearColorTarget(0, RgbaFloat.DarkRed);
 
 			// Update uniforms
-			Uniforms uniforms = new() {
+			Uniforms uniforms = new()
+			{
 				State = new(width)
 			};
 			graphicsDevice.UpdateBuffer(uniformBuffer, 0, uniforms);
@@ -360,6 +361,7 @@ void main()
 		/// <summary>
 		/// Uniforms
 		/// </summary>
+#pragma warning disable CS0649
 		public struct Uniforms
 		{
 			public Vector4 State; // 16
@@ -390,27 +392,15 @@ void main()
 		}
 		private byte[] LoadShaderBytes(string name)
 		{
-			string extension;
-			switch (graphicsDevice.BackendType)
+			string extension = graphicsDevice.BackendType switch
 			{
-				case GraphicsBackend.Direct3D11:
-					extension = "hlsl.bytes";
-					break;
-				case GraphicsBackend.Vulkan:
-					extension = "450.glsl";
-					break;
-				case GraphicsBackend.OpenGL:
-					extension = "330.glsl";
-					break;
-				case GraphicsBackend.Metal:
-					extension = "metallib";
-					break;
-				case GraphicsBackend.OpenGLES:
-					extension = "300.glsles";
-					break;
-				default: throw new InvalidOperationException();
-			}
-
+				GraphicsBackend.Direct3D11 => "hlsl.bytes",
+				GraphicsBackend.Vulkan => "450.glsl",
+				GraphicsBackend.OpenGL => "330.glsl",
+				GraphicsBackend.Metal => "metallib",
+				GraphicsBackend.OpenGLES => "300.glsles",
+				_ => throw new InvalidOperationException(),
+			};
 			return File.ReadAllBytes(Path.Combine(AppContext.BaseDirectory ?? assembly.Location, "Shaders", $"{name}.{extension}"));
 		}
 		private void Run()
@@ -468,22 +458,22 @@ void main()
 
 			uniformBuffer = factory.CreateBuffer(uniformBufferDescription);
 			ushort[] quadIndices = { 0, 1, 2, 3 };
-			BufferDescription ibDescription = new BufferDescription(
+			BufferDescription ibDescription = new(
 				4 * sizeof(ushort),
 				BufferUsage.IndexBuffer);
 			_indexBuffer = factory.CreateBuffer(ibDescription);
 			graphicsDevice.UpdateBuffer(_indexBuffer, 0, quadIndices);
 
-			VertexLayoutDescription vertexLayout = new VertexLayoutDescription(
+			VertexLayoutDescription vertexLayout = new(
 				new VertexElementDescription("Position", VertexElementSemantic.TextureCoordinate, VertexElementFormat.Float2),
 				new VertexElementDescription("Color", VertexElementSemantic.TextureCoordinate, VertexElementFormat.Float4));
 
 
-			ShaderDescription vertexShaderDesc = new ShaderDescription(
+			ShaderDescription vertexShaderDesc = new(
 				ShaderStages.Vertex,
 				Encoding.UTF8.GetBytes(VertexCode),//LoadShaderBytes("FillPath-vertex"),
 				"main");
-			ShaderDescription fragmentShaderDesc = new ShaderDescription(
+			ShaderDescription fragmentShaderDesc = new(
 				ShaderStages.Fragment,
 				Encoding.UTF8.GetBytes(FragmentCode),//LoadShaderBytes("FillPath-fragment"),
 				"main");
@@ -494,7 +484,7 @@ void main()
 			Shader fragmentShader = GetShader("embedded.shader_fill.frag.glsl", ShaderStages.Fragment);
 			Shader pathVertexShader = GetShader("embedded.shader_v2f_c4f_t2f.vert.glsl", ShaderStages.Vertex);
 			Shader pathFragmentShader = GetShader("embedded.shader_fill_path.frag.glsl", ShaderStages.Fragment);
-			
+
 			_shaders = new[]
 			{
 				//GetShader("embedded.shader_v2f_c4f_t2f_t2f_d28f.vert.glsl", ShaderStages.Vertex),

@@ -2,7 +2,7 @@
 
     <PropertyGroup>
         <OutputType>Library</OutputType>
-        <TargetFrameworks>net5.0;net45;netstandard2.0;netstandard2.1;netcoreapp3.1</TargetFrameworks>
+        <TargetFrameworks>net5;net45;netstandard2.0;netstandard2.1;netcoreapp3.1</TargetFrameworks>
         <GeneratePackageOnBuild Condition="'$(Configuration)'=='Release'">true</GeneratePackageOnBuild>
     </PropertyGroup>
     
@@ -18,8 +18,9 @@
         <PackageTags>ultralight webkit webcore appcore ultralight-ux</PackageTags>
         <PackageIcon>icon.png</PackageIcon>
         <IsPackable>True</IsPackable>
+		<IncludeBuildOutput>false</IncludeBuildOutput>
 		<NoBuild>True</NoBuild>
-        <!--<GenerateAssemblyConfigurationAttribute>False</GenerateAssemblyConfigurationAttribute>-->
+        <GenerateAssemblyConfigurationAttribute>False</GenerateAssemblyConfigurationAttribute>
     </PropertyGroup>
 
     <Choose>
@@ -43,12 +44,6 @@
             <PackagePath />
             <Link>LICENSE</Link>
         </None>
-        <Content Include="resources\**\*">
-            <Pack>True</Pack>
-            <PackageCopyToOutput>True</PackageCopyToOutput>
-            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-            <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
-        </Content>
         <Content Include="Ultralight*.txt">
             <Pack>True</Pack>
             <PackageCopyToOutput>True</PackageCopyToOutput>
@@ -58,7 +53,7 @@
     </ItemGroup>
 
     <ItemGroup>
-              <None Include="runtimes\*\**">
+         <None Include="runtimes\*\**">
             <Pack>True</Pack>
             <PackagePath>runtimes\</PackagePath>
             <PackageCopyToOutput>False</PackageCopyToOutput>
@@ -66,6 +61,6 @@
             <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
             <Link>%(Identity)</Link>
         </None>
-        <Content Remove="runtimes\*\**" />
+		<Content Remove="runtimes\*\**" />
     </ItemGroup>
 </Project>

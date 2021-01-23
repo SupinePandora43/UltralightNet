@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.IO;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
@@ -25,7 +25,7 @@ namespace ImpromptuNinjas.UltralightSharp.Demo {
         Ansi.WindowsConsole.TryEnableVirtualTerminalProcessing();
       }
 
-      var asmPath = new Uri(typeof(DemoProgram).Assembly.CodeBase!).LocalPath;
+      var asmPath = typeof(DemoProgram).Assembly.Location;
       var asmDir = Path.GetDirectoryName(asmPath)!;
       var tempDir = Path.GetTempPath();
       // find a place to stash instance storage
