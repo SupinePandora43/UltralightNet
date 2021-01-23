@@ -132,32 +132,33 @@ namespace ImpromptuNinjas.UltralightSharp
 
         public static IntPtr LibWebCore => LazyLoadedLibWebCore.Value;
 
-        static Native()
-          => NativeLibrary.SetDllImportResolver(typeof(Native).Assembly,
-            (name, assembly, path)
-              =>
-            {
-                switch (name)
-                {
-                    case "UltralightCore":
-                        Debug.Assert(LibUltralightCore != default);
-                        return LibUltralightCore;
-                    case "Ultralight":
-                        Debug.Assert(LibUltralight != default);
-                        return LibUltralight;
-                    case "AppCore":
-                        Debug.Assert(LibAppCore != default);
-                        return LibAppCore;
-                    case "WebCoreCore":
-                        Debug.Assert(LibWebCore != default);
-                        return LibWebCore;
-                    default:
-                        return default;
-                }
-            });
+        //static Native()
+        //  => NativeLibrary.SetDllImportResolver(typeof(Native).Assembly,
+        //    (name, assembly, path)
+        //      =>
+        //    {
+        //        switch (name)
+        //        {
+        //            case "UltralightCore":
+        //                Debug.Assert(LibUltralightCore != default);
+        //                return LibUltralightCore;
+        //            case "Ultralight":
+        //                Debug.Assert(LibUltralight != default);
+        //                return LibUltralight;
+        //            case "AppCore":
+        //                Debug.Assert(LibAppCore != default);
+        //                return LibAppCore;
+        //            case "WebCoreCore":
+        //                Debug.Assert(LibWebCore != default);
+        //                return LibWebCore;
+        //            default:
+        //                return default;
+        //        }
+        //    });
 
         public static void Init()
         {
+			return;
 #if !NETFRAMEWORK
             if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
             {
