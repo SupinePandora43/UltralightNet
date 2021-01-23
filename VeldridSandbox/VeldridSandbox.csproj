@@ -39,7 +39,7 @@
 
 	<ItemGroup>
 		<ProjectReference Include="..\UltralightSharp\UltralightSharp.csproj">
-			<ReferenceOutputAssembly>true</ReferenceOutputAssembly>
+			<!--<ReferenceOutputAssembly>true</ReferenceOutputAssembly>-->
 		</ProjectReference>
 	</ItemGroup>
 

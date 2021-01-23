@@ -18,43 +18,18 @@
         <PackageTags>ultralight webkit webcore appcore ultralight-ux</PackageTags>
         <PackageIcon>icon.png</PackageIcon>
         <IsPackable>True</IsPackable>
+		<IncludeContentInPack>true</IncludeContentInPack>
+		<IncludeBuildOutput>false</IncludeBuildOutput>
 		<NoBuild>true</NoBuild>
-        <GenerateAssemblyConfigurationAttribute>False</GenerateAssemblyConfigurationAttribute>
+        <!--<GenerateAssemblyConfigurationAttribute>False</GenerateAssemblyConfigurationAttribute>-->
     </PropertyGroup>
 
-	<!--ItemGroup>
-        <PackageReference Include="ImpromptuNinjas.UltralightSharp.Core.WinX64" Version="[$(Version)]" IncludeAssets="native" />
-        <PackageReference Include="ImpromptuNinjas.UltralightSharp.Core.LinuxX64" Version="[$(Version)]" IncludeAssets="native" />
-        <PackageReference Include="ImpromptuNinjas.UltralightSharp.Core.OsxX64" Version="[$(Version)]" IncludeAssets="native" />
-    </ItemGroup-->
     <Choose>
         <When Condition="'$(TargetFramework)'=='net45'">
             <ItemGroup>
                 <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" Version="1.0.0" PrivateAssets="all" />
-
-                <ProjectReference Include="..\UltralightSharp.Core.WinX64\UltralightSharp.Core.WinX64.csproj">
-                    <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
-                    <ExcludeAssets>all</ExcludeAssets>
-                </ProjectReference>
             </ItemGroup>
         </When>
-        <Otherwise>
-
-            <ItemGroup>
-                <ProjectReference Include="..\UltralightSharp.Core.WinX64\UltralightSharp.Core.WinX64.csproj">
-                    <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
-                    <ExcludeAssets>all</ExcludeAssets>
-                </ProjectReference>
-                <ProjectReference Include="..\UltralightSharp.Core.LinuxX64\UltralightSharp.Core.LinuxX64.csproj">
-                    <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
-                    <ExcludeAssets>all</ExcludeAssets>
-                </ProjectReference>
-                <ProjectReference Include="..\UltralightSharp.Core.OsxX64\UltralightSharp.Core.OsxX64.csproj">
-                    <ReferenceOutputAssembly>false</ReferenceOutputAssembly>
-                    <ExcludeAssets>all</ExcludeAssets>
-                </ProjectReference>
-            </ItemGroup>
-        </Otherwise>
     </Choose>
 
     <ItemGroup>
@@ -82,90 +57,44 @@
             <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
             <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
         </Content>
-        <None Include="runtimes\*\**">
-            <Pack>True</Pack>
-            <PackageCopyToOutput>False</PackageCopyToOutput>
-            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-            <CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
-            <PackagePath>%(Identity)</PackagePath>
-            <Link>%(Identity)</Link>
-        </None>
-        <Content Remove="runtimes\*\**"/>
     </ItemGroup>
-    <Choose>
-        <When Condition="'$(RuntimeIdentifier)'=='win-x64'">
-            <ItemGroup>
-                <None Include="runtimes\win-x64\native\*">
-                    <Pack>True</Pack>
-                    <PackageCopyToOutput>True</PackageCopyToOutput>
-                    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-                    <CopyToPublishDirectory>Always</CopyToPublishDirectory>
-                    <PackagePath>%(Identity)</PackagePath>
-                    <Link>%(Filename)%(Extension)</Link>
-                    <Visible>false</Visible>
-                </None>
-            </ItemGroup>
-        </When>
-        <When Condition="'$(RuntimeIdentifier)'=='linux-x64'">
-            <ItemGroup>
-                <None Include="runtimes\linux-x64\native\*">
-                    <Pack>True</Pack>
-                    <PackageCopyToOutput>True</PackageCopyToOutput>
-                    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-                    <CopyToPublishDirectory>Always</CopyToPublishDirectory>
-                    <PackagePath>%(Identity)</PackagePath>
-                    <Link>%(Filename)%(Extension)</Link>
-                    <Visible>false</Visible>
-                </None>
-            </ItemGroup>
-        </When>
-        <When Condition="'$(RuntimeIdentifier)'=='osx-x64'">
-            <ItemGroup>
-                <None Include="runtimes\osx-x64\native\*">
-                    <Pack>True</Pack>
-                    <PackageCopyToOutput>True</PackageCopyToOutput>
-                    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-                    <CopyToPublishDirectory>Always</CopyToPublishDirectory>
-                    <PackagePath>%(Identity)</PackagePath>
-                    <Link>%(Filename)%(Extension)</Link>
-                    <Visible>false</Visible>
-                </None>
-            </ItemGroup>
-        </When>
-		<When Condition="'$(RuntimeIdentifier)'==''">
-            <ItemGroup>
-                <None Include="runtimes\win-x64\native\*">
-                    <Pack>True</Pack>
-                    <PackageCopyToOutput>True</PackageCopyToOutput>
-                    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-                    <CopyToPublishDirectory>Always</CopyToPublishDirectory>
-                    <PackagePath>%(Identity)</PackagePath>
-                    <Link>%(Filename)%(Extension)</Link>
-                    <Visible>false</Visible>
-                </None>
-            </ItemGroup>
-			<ItemGroup>
-                <None Include="runtimes\linux-x64\native\*">
-                    <Pack>True</Pack>
-                    <PackageCopyToOutput>True</PackageCopyToOutput>
-                    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-                    <CopyToPublishDirectory>Always</CopyToPublishDirectory>
-                    <PackagePath>%(Identity)</PackagePath>
-                    <Link>%(Filename)%(Extension)</Link>
-                    <Visible>false</Visible>
-                </None>
-            </ItemGroup>
-            <ItemGroup>
-                <None Include="runtimes\osx-x64\native\*">
-                    <Pack>True</Pack>
-                    <PackageCopyToOutput>True</PackageCopyToOutput>
-                    <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-                    <CopyToPublishDirectory>Always</CopyToPublishDirectory>
-                    <PackagePath>%(Identity)</PackagePath>
-                    <Link>%(Filename)%(Extension)</Link>
-                    <Visible>false</Visible>
-                </None>
-            </ItemGroup>
-        </When>
-    </Choose>
+
+    <ItemGroup>
+      <None Update="runtimes\linux-x64\native\libAppCore.so">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+      <None Update="runtimes\linux-x64\native\libUltralight.so">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+      <None Update="runtimes\linux-x64\native\libUltralightCore.so">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+      <None Update="runtimes\linux-x64\native\libWebCore.so">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+      <None Update="runtimes\osx-x64\native\libAppCore.dylib">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+      <None Update="runtimes\osx-x64\native\libUltralight.dylib">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+      <None Update="runtimes\osx-x64\native\libUltralightCore.dylib">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+      <None Update="runtimes\osx-x64\native\libWebCore.dylib">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+      <None Update="runtimes\win-x64\native\AppCore.dll">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+      <None Update="runtimes\win-x64\native\Ultralight.dll">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+      <None Update="runtimes\win-x64\native\UltralightCore.dll">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+      <None Update="runtimes\win-x64\native\WebCore.dll">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+    </ItemGroup>
 </Project>

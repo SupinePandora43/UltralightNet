@@ -1,8 +1,9 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <AssemblyName>ImpromptuNinjas.UltralightSharp</AssemblyName>
-        <IncludeSource>False</IncludeSource>
+        <AssemblyName>UltralightSharp</AssemblyName>
+        <IncludeSource>True</IncludeSource>
+		<IncludeSymbols>True</IncludeSymbols>
         <LangVersion>8</LangVersion>
         <TargetFrameworks>net5.0;net45;netstandard2.0;netstandard2.1;netcoreapp3.1</TargetFrameworks>
         <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
