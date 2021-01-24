@@ -1,3 +1,4 @@
+#if !NETFRAMEWORK
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -5,12 +6,9 @@ using System.IO;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading;
-using JetBrains.Annotations;
 
 namespace ImpromptuNinjas.UltralightSharp
 {
-
-	[PublicAPI]
 	public static partial class Native
 	{
 
@@ -58,9 +56,6 @@ namespace ImpromptuNinjas.UltralightSharp
 
 			IntPtr lib = default;
 
-#if NETFRAMEWORK
-      string libPath = Path.Combine(baseDir, $"{libName}.dll");
-#else
 			string libPath;
 			if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
 			{
@@ -81,7 +76,6 @@ namespace ImpromptuNinjas.UltralightSharp
 					libPath = Path.Combine(baseDir, "runtimes", $"{(IsMusl() ? "linux-musl-" : "linux-")}{GetProcArchString()}", "native", $"lib{libName}.so");
 			}
 			else throw new PlatformNotSupportedException();
-#endif
 
 			if (lib == default)
 			{
@@ -89,10 +83,6 @@ namespace ImpromptuNinjas.UltralightSharp
 				if (lib == default)
 #if !NETFRAMEWORK
 					throw new DllNotFoundException(libPath);
-#else
-          throw new FileNotFoundException(libPath + "\n" +
-            $"You may need to specify <RuntimeIdentifier>{"win-x64"}<RuntimeIdentifier> or <RuntimeIdentifier>win<RuntimeIdentifier> in your project file.",
-            libPath);
 #endif
 			}
 
@@ -151,7 +141,6 @@ namespace ImpromptuNinjas.UltralightSharp
 		//        }
 		//    });
 
-#if !NETFRAMEWORK
 		public static void Init()
 		{
 			if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
@@ -159,7 +148,6 @@ namespace ImpromptuNinjas.UltralightSharp
 				// deal with osx dylib load path ordeal
 				if (LibUltralightCore == default)
 					throw new PlatformNotSupportedException("Can't preload LibUltralightCore");
-
 				if (LibWebCore == default)
 					throw new PlatformNotSupportedException("Can't preload LibWebCore");
 				if (LibUltralight == default)
@@ -169,8 +157,6 @@ namespace ImpromptuNinjas.UltralightSharp
 			}
 			return;
 		}
-#endif
-
 	}
-
 }
+#endif
