@@ -15,6 +15,7 @@ jobs:
     env:
       DOTNET_NOLOGO: 1
       DOTNET_CLI_TELEMETRY_OPTOUT: 1
+      HOMEBREW_NO_INSTALL_CLEANUP: 1
     if: "!contains(github.event.head_commit.message, '[skip ci]')"
 
     steps:
@@ -42,6 +43,10 @@ jobs:
           name: NuGet Package(s) built by ${{ matrix.os }}
           path: '**/*.nupkg'
           if-no-files-found: error
+        continue-on-error: true
+      - name: Tree
+        run: |
+          tree
       - name: Build platform specific SilkNetSandbox
         run: dotnet publish -c Release SilkNetSandbox/SilkNetSandbox.csproj -o SilkNetSandboxArtifact
       - uses: actions/upload-artifact@v2
