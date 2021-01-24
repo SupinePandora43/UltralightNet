@@ -31,10 +31,10 @@ namespace ImpromptuNinjas.UltralightSharp {
 		{
 			if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
 			{
-				TryLoad("UltralightCore");
-				TryLoad("WebCore");
-				TryLoad("Ultralight");
-				TryLoad("AppCore");
+				TryLoad("libUltralightCore.dylib");
+				TryLoad("libWebCore.dylib");
+				TryLoad("libUltralight.dylib");
+				TryLoad("libAppCore.dylib");
 			}
 		}
 #endif
