@@ -1,8 +1,10 @@
-#if !NETFRAMEWORK && NETCOREAPP3_0_OR_GREATER
+#if NETCOREAPP3_0_OR_GREATER
 using System;
+/*
 #if NET5_0_OR_GREATER
 using System.Runtime.CompilerServices;
 #endif
+*/
 using System.Runtime.InteropServices;
 using System.IO;
 using System.Threading;
@@ -18,9 +20,16 @@ namespace ImpromptuNinjas.UltralightSharp.Utility
 		private static readonly Lazy<IntPtr> LazyLoadedIcudata = new Lazy<IntPtr>(() => LoadLib("icudata"), LazyThreadSafetyMode.ExecutionAndPublication);
 		private static readonly Lazy<IntPtr> LazyLoadedIcuuc = new Lazy<IntPtr>(() => LoadLib("icuuc"), LazyThreadSafetyMode.ExecutionAndPublication);
 		private static readonly Lazy<IntPtr> LazyLoadedIcui18n = new Lazy<IntPtr>(() => LoadLib("icui18n"), LazyThreadSafetyMode.ExecutionAndPublication);
-#if NET5_0_OR_GREATER
-		[MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
-#endif
+
+		public static IntPtr LibUltralightCore => LazyLoadedLibUltralightCore.Value;
+		public static IntPtr LibUltralight => LazyLoadedLibUltralight.Value;
+		public static IntPtr LibAppCore => LazyLoadedLibAppCore.Value;
+		public static IntPtr LibWebCore => LazyLoadedLibWebCore.Value;
+		/*
+		#if NET5_0_OR_GREATER
+				[MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
+		#endif
+		*/
 		private static IntPtr LoadLib(string lib)
 		{
 			string libFullName = $"lib{lib}.dylib";
@@ -38,20 +47,22 @@ namespace ImpromptuNinjas.UltralightSharp.Utility
 			}
 			throw new DllNotFoundException($"{lib} was not found");
 		}
+/*
 #if NET5_0_OR_GREATER
 		[MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
 #endif
+*/
 		public static void Init()
 		{
 			if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
 			{
-				if (LazyLoadedLibUltralightCore.Value == default)
+				if (LibUltralightCore == default)
 					throw new DllNotFoundException("UltralightCore");
-				if (LazyLoadedLibWebCore.Value == default)
+				if (LibWebCore == default)
 					throw new DllNotFoundException("WebCore");
-				if (LazyLoadedLibUltralight.Value == default)
+				if (LibUltralight == default)
 					throw new DllNotFoundException("Ultralight");
-				if (LazyLoadedLibAppCore.Value == default)
+				if (LibAppCore == default)
 					throw new DllNotFoundException("AppCore");
 			}
 		}
