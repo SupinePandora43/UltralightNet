@@ -5,8 +5,6 @@
 		<TargetFramework>net5</TargetFramework>
 		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
 		<ShaderContentIncludePath>Shaders</ShaderContentIncludePath>
-		<ShaderOutputPath>$(BaseIntermediateOutputPath)Shaders</ShaderOutputPath>
-		<ListAllShaderPaths Condition="'$(Configuration)' == 'Debug'">true</ListAllShaderPaths>
 		<NoWarn>8002</NoWarn>
 	</PropertyGroup>
 
@@ -29,8 +27,6 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<PackageReference Include="ShaderGen.Build" Version="1.2.0-beta3" PrivateAssets="All" />
-		<PackageReference Include="ShaderGen.Primitives" Version="1.2.0-beta3" />
 		<PackageReference Include="Veldrid" Version="4.8.0" />
 		<PackageReference Include="Veldrid.SPIRV" Version="1.0.13" />
 		<PackageReference Include="Veldrid.StartupUtilities" Version="4.8.0" />

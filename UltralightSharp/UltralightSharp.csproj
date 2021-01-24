@@ -5,7 +5,7 @@
         <IncludeSource>True</IncludeSource>
 		<IncludeSymbols>True</IncludeSymbols>
         <LangVersion>8</LangVersion>
-        <TargetFrameworks>net5;net45;netstandard2.0;netstandard2.1;netcoreapp3.1</TargetFrameworks>
+        <TargetFrameworks>net5;net45;netstandard2.0;netstandard2.1;netcoreapp3.0;netcoreapp3.1</TargetFrameworks>
         <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
         <GeneratePackageOnBuild Condition="'$(Configuration)'=='Release'">true</GeneratePackageOnBuild>
         <Nullable>enable</Nullable>
