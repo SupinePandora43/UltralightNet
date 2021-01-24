@@ -22,20 +22,23 @@ namespace ImpromptuNinjas.UltralightSharp {
 #endif
 		private static void TryLoad(string lib)
 		{
+			Console.WriteLine($"Loading {lib}");
 			IntPtr library = NativeLibrary.Load(lib, assembly, DllImportSearchPath.AssemblyDirectory);
 			if (library == IntPtr.Zero)
 			{
+				Console.WriteLine($"{lib} not found");
 				throw new DllNotFoundException(lib);
 			}
+			Console.WriteLine($"{lib} was loaded");
 		}
 		static Ultralight()
 		{
 			if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
 			{
-				TryLoad("libUltralightCore.dylib");
-				TryLoad("libWebCore.dylib");
-				TryLoad("libUltralight.dylib");
-				TryLoad("libAppCore.dylib");
+				TryLoad("UltralightCore");
+				TryLoad("WebCore");
+				TryLoad("Ultralight");
+				TryLoad("AppCore");
 			}
 		}
 #endif
