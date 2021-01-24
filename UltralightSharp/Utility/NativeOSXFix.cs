@@ -13,9 +13,9 @@ namespace ImpromptuNinjas.UltralightSharp.Utility
 	internal static class NativeOSXFix
 	{
 		private static readonly Lazy<IntPtr> LazyLoadedLibUltralightCore = new Lazy<IntPtr>(() => LoadLib("UltralightCore"), LazyThreadSafetyMode.ExecutionAndPublication);
-		private static readonly Lazy<IntPtr> LazyLoadedLibWebCore = new Lazy<IntPtr>(() => LoadLib("WebCore"), LazyThreadSafetyMode.ExecutionAndPublication);
 		private static readonly Lazy<IntPtr> LazyLoadedLibUltralight = new Lazy<IntPtr>(() => LoadLib("Ultralight"), LazyThreadSafetyMode.ExecutionAndPublication);
 		private static readonly Lazy<IntPtr> LazyLoadedLibAppCore = new Lazy<IntPtr>(() => LoadLib("AppCore"), LazyThreadSafetyMode.ExecutionAndPublication);
+		private static readonly Lazy<IntPtr> LazyLoadedLibWebCore = new Lazy<IntPtr>(() => LoadLib("WebCore"), LazyThreadSafetyMode.ExecutionAndPublication);
 		private static readonly Assembly assembly = typeof(Ultralight).Assembly;
 #if NET5_0_OR_GREATER
 		[MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]

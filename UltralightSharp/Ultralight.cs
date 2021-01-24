@@ -8,9 +8,12 @@ namespace ImpromptuNinjas.UltralightSharp {
 
   [PublicAPI]
   public static unsafe class Ultralight {
-#if !NETFRAMEWORK && NETCOREAPP3_0_OR_GREATER
-		static Ultralight() => Utility.NativeOSXFix.Init();
-#endif
+	static Ultralight()
+		{
+	#if NETCOREAPP3_0_OR_GREATER
+			Utility.NativeOSXFix.Init();
+	#endif
+		}
 	[NativeTypeName("const ULFileHandle")]
     public static readonly UIntPtr InvalidFileHandle = (UIntPtr) (-1);
 
