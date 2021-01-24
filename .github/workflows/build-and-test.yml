@@ -45,6 +45,7 @@ jobs:
           if-no-files-found: error
         continue-on-error: true
       - name: Tree
+        if: matrix.os=='macos-latest'
         run: |
           tree
       - name: Build platform specific SilkNetSandbox
