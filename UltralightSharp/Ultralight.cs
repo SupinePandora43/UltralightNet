@@ -30,7 +30,7 @@ namespace ImpromptuNinjas.UltralightSharp {
 		}
 		static Ultralight()
 		{
-			if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+			//if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
 			{
 				TryLoad("UltralightCore");
 				TryLoad("WebCore");
