@@ -7,8 +7,10 @@ namespace ImpromptuNinjas.UltralightSharp {
 
   [PublicAPI]
   public static unsafe class JavaScriptCore {
-
-    [DllImport("WebCore", CallingConvention = CallingConvention.Cdecl, ExactSpelling = true, EntryPoint = "JSEvaluateScript")]
+#if !NETFRAMEWORK && NETCOREAPP3_0_OR_GREATER
+		static JavaScriptCore() => Utility.NativeOSXFix.Init();
+#endif
+		[DllImport("WebCore", CallingConvention = CallingConvention.Cdecl, ExactSpelling = true, EntryPoint = "JSEvaluateScript")]
     [return: NativeTypeName("JSValueRef")]
     public static extern JsValue* EvaluateScript([NativeTypeName("JSContextRef")] JsContext* ctx, [NativeTypeName("JSStringRef")] JsString* script, [NativeTypeName("JSObjectRef")] JsValue* thisObject,
       [NativeTypeName("JSStringRef")] JsString* sourceUrl, int startingLineNumber, [NativeTypeName("JSValueRef *")] JsValue** exception);

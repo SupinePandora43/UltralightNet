@@ -4,43 +4,12 @@ using System.Runtime.InteropServices;
 using ImpromptuNinjas.UltralightSharp.Enums;
 using JetBrains.Annotations;
 
-#if NET5_0_OR_GREATER
-using System.Runtime.CompilerServices;
-#endif
-#if !NETFRAMEWORK && NETCOREAPP3_0_OR_GREATER && !ULTRALIGHTSHARP_DISABLE_PRELOADING
-using System.Reflection;
-#endif
-
 namespace ImpromptuNinjas.UltralightSharp {
 
   [PublicAPI]
   public static unsafe class Ultralight {
-#if !NETFRAMEWORK && NETCOREAPP3_0_OR_GREATER && !ULTRALIGHTSHARP_DISABLE_PRELOADING
-		private static readonly Assembly assembly = typeof(Ultralight).Assembly;
-#if NET5_0_OR_GREATER
-		[MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
-#endif
-		private static void TryLoad(string lib)
-		{
-			Console.WriteLine($"Loading {lib}");
-			IntPtr library = NativeLibrary.Load(lib, assembly, DllImportSearchPath.AssemblyDirectory);
-			if (library == IntPtr.Zero)
-			{
-				Console.WriteLine($"{lib} not found");
-				throw new DllNotFoundException(lib);
-			}
-			Console.WriteLine($"{lib} was loaded");
-		}
-		static Ultralight()
-		{
-			if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
-			{
-				TryLoad("UltralightCore");
-				TryLoad("WebCore");
-				TryLoad("Ultralight");
-				TryLoad("AppCore");
-			}
-		}
+#if !NETFRAMEWORK && NETCOREAPP3_0_OR_GREATER
+		static Ultralight() => Utility.NativeOSXFix.Init();
 #endif
 	[NativeTypeName("const ULFileHandle")]
     public static readonly UIntPtr InvalidFileHandle = (UIntPtr) (-1);

@@ -3,45 +3,14 @@ using System.Runtime.InteropServices;
 using JetBrains.Annotations;
 using ImpromptuNinjas.UltralightSharp.Enums;
 
-#if NET5_0_OR_GREATER
-using System.Runtime.CompilerServices;
-#endif
-#if !NETFRAMEWORK && NETCOREAPP3_0_OR_GREATER && !ULTRALIGHTSHARP_DISABLE_PRELOADING
-using System.Reflection;
-#endif
-
 namespace ImpromptuNinjas.UltralightSharp {
 
   [PublicAPI]
   public static unsafe class AppCore {
-#if !NETFRAMEWORK && NETCOREAPP3_0_OR_GREATER && !ULTRALIGHTSHARP_DISABLE_PRELOADING
-		private static readonly Assembly assembly = typeof(Ultralight).Assembly;
-#if NET5_0_OR_GREATER
-		[MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
+#if !NETFRAMEWORK && NETCOREAPP3_0_OR_GREATER
+		static AppCore() => Utility.NativeOSXFix.Init();
 #endif
-		private static void TryLoad(string lib)
-		{
-			Console.WriteLine($"Loading {lib}");
-			IntPtr library = NativeLibrary.Load(lib, assembly, DllImportSearchPath.AssemblyDirectory);
-			if (library == IntPtr.Zero)
-			{
-				Console.WriteLine($"{lib} not found");
-				throw new DllNotFoundException(lib);
-			}
-			Console.WriteLine($"{lib} was loaded");
-		}
-		static AppCore()
-		{
-			if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
-			{
-				TryLoad("UltralightCore");
-				TryLoad("WebCore");
-				TryLoad("Ultralight");
-				TryLoad("AppCore");
-			}
-		}
-#endif
-		[DllImport("AppCore", CallingConvention = CallingConvention.Cdecl, EntryPoint = "ulCreateSettings", ExactSpelling = true)]
+	[DllImport("AppCore", CallingConvention = CallingConvention.Cdecl, EntryPoint = "ulCreateSettings", ExactSpelling = true)]
     [return: NativeTypeName("ULSettings")]
     public static extern Settings* CreateSettings();
 
