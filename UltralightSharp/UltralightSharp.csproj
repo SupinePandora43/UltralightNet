@@ -10,6 +10,8 @@
         <GeneratePackageOnBuild Condition="'$(Configuration)'=='Release'">true</GeneratePackageOnBuild>
         <Nullable>enable</Nullable>
         <RootNamespace>ImpromptuNinjas.UltralightSharp</RootNamespace>
+		<PlatformTarget>x64</PlatformTarget>
+		<RuntimeIdentifiers>win-x64;linux-x64;osx-x64</RuntimeIdentifiers>
     </PropertyGroup>
 
     <PropertyGroup>

@@ -54,9 +54,8 @@ namespace ImpromptuNinjas.UltralightSharp
         private static unsafe IntPtr LoadLib(string libName)
         {
             var asm = typeof(Native).Assembly;
-            var baseDir = Path.GetDirectoryName(asm.Location);
+            var baseDir = Path.GetDirectoryName(asm.Location) ?? throw new ArgumentNullException("asm.Location", "can't find base directory");
 
-            // ReSharper disable once RedundantAssignment
             IntPtr lib = default;
 
 #if NETFRAMEWORK
@@ -84,7 +83,6 @@ namespace ImpromptuNinjas.UltralightSharp
             else throw new PlatformNotSupportedException();
 #endif
 
-            // ReSharper disable once InvertIf
             if (lib == default)
             {
                 lib = NativeLibrary.Load(libPath);
@@ -158,7 +156,6 @@ namespace ImpromptuNinjas.UltralightSharp
 
         public static void Init()
         {
-			return;
 #if !NETFRAMEWORK
             if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
             {
@@ -174,10 +171,7 @@ namespace ImpromptuNinjas.UltralightSharp
                     throw new PlatformNotSupportedException("Can't preload LibAppCore");
             }
 #endif
-
-            Debug.Assert(LibUltralight != default);
-            Debug.Assert(LibAppCore != default);
-            Debug.Assert(LibWebCore != default);
+			return;
         }
 
     }

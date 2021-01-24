@@ -4,7 +4,9 @@
         <OutputType>Library</OutputType>
         <TargetFrameworks>net5;net45;netstandard2.0;netstandard2.1;netcoreapp3.1</TargetFrameworks>
         <GeneratePackageOnBuild Condition="'$(Configuration)'=='Release'">true</GeneratePackageOnBuild>
-    </PropertyGroup>
+		<PlatformTarget>x64</PlatformTarget>
+		<RuntimeIdentifiers>win-x64;linux-x64;osx-x64</RuntimeIdentifiers>
+	</PropertyGroup>
     
     <PropertyGroup>
         <PackageId>ImpromptuNinjas.UltralightSharp.Core</PackageId>
