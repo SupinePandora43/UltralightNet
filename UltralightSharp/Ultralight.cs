@@ -35,6 +35,7 @@ namespace ImpromptuNinjas.UltralightSharp {
 				TryLoad("UltralightCore");
 				TryLoad("WebCore");
 				TryLoad("Ultralight");
+				TryLoad("AppCore");
 			}
 		}
 #endif
