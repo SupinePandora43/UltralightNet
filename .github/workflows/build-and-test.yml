@@ -30,7 +30,9 @@ jobs:
       #- name: Install dependencies
       #  run: dotnet restore -f UltralightSharp/UltralightSharp.csproj
       - name: Build
-        run: dotnet publish -c Release
+        run: dotnet build -c Release
+      - name: Publish Build
+        run: dotnet publish -c Release --framework net5
       - name: Run Demo
         run: dotnet run -c Release --project UltralightSharp.SafeDemo/UltralightSharp.SafeDemo.csproj
       - uses: actions/upload-artifact@v2
