@@ -38,16 +38,16 @@ jobs:
         if: matrix.os=='macos-latest'
       - name: Run Demo
         run: dotnet run -c Release --project UltralightSharp.SafeDemo
-      - uses: actions/upload-artifact@v2
-        with:
-          name: NuGet Package(s) built by ${{ matrix.os }}
-          path: '**/*.nupkg'
-          if-no-files-found: error
         continue-on-error: true
       - name: Tree
         if: matrix.os=='macos-latest'
         run: |
           tree
+      - uses: actions/upload-artifact@v2
+        with:
+          name: NuGet Package(s) built by ${{ matrix.os }}
+          path: '**/*.nupkg'
+          if-no-files-found: error
       - name: Build platform specific SilkNetSandbox
         run: dotnet publish -c Release SilkNetSandbox/SilkNetSandbox.csproj -o SilkNetSandboxArtifact
       - uses: actions/upload-artifact@v2
