@@ -6,7 +6,7 @@ using System.Runtime.InteropServices;
 namespace ImpromptuNinjas.UltralightSharp
 {
 
-	public static partial class Native
+	internal static partial class Native
 	{
 
 		private static bool IsMusl()

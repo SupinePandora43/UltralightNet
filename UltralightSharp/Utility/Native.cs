@@ -9,7 +9,7 @@ using System.Threading;
 
 namespace ImpromptuNinjas.UltralightSharp
 {
-	public static partial class Native
+	internal static partial class Native
 	{
 
 		private static readonly Lazy<IntPtr> LazyLoadedLibUltralightCore
