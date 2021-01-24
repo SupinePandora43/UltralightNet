@@ -11,29 +11,6 @@
         <NoWarn>8002</NoWarn>
     </PropertyGroup>
 
-
-    <Choose>
-        <When Condition="$([MSBuild]::IsOsPlatform('Windows'))">
-            <PropertyGroup>
-                <RuntimeIdentifier>win-x64</RuntimeIdentifier>
-            </PropertyGroup>
-        </When>
-        <When Condition="$([MSBuild]::IsOsPlatform('Linux'))">
-            <PropertyGroup>
-                <RuntimeIdentifier>linux-x64</RuntimeIdentifier>
-            </PropertyGroup>
-        </When>
-        <When Condition="$([MSBuild]::IsOsPlatform('OSX'))">
-            <PropertyGroup>
-                <RuntimeIdentifier>osx-x64</RuntimeIdentifier>
-            </PropertyGroup>
-        </When>
-    </Choose>
-
-    <Target Name="CheckRuntimeIdentifier" BeforeTargets="Build" Condition="'$(RuntimeIdentifier)'==''">
-        <Error Text="RuntimeIdentifier property not set." />
-    </Target>
-
     <ItemGroup>
         <ProjectReference Include="../UltralightSharp/UltralightSharp.csproj">
 			<!--<ReferenceOutputAssembly>false</ReferenceOutputAssembly>-->
@@ -43,14 +20,7 @@
 
     <ItemGroup>
         <PackageReference Include="Ansi" Version="1.0.3" />
-		<!--<PackageReference Include="ImpromptuNinjas.UltralightSharp" Version="[$(Version)]" />-->
         <PackageReference Include="SixLabors.ImageSharp" Version="1.0.0-rc0003" />
-    </ItemGroup>
-
-    <ItemGroup>
-        <NuPkgRef Include="$(SolutionDir)\*.nupkg">
-            <Visible>False</Visible>
-        </NuPkgRef>
     </ItemGroup>
 
     <ItemGroup>
