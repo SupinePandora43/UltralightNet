@@ -4,12 +4,41 @@ using System.Runtime.InteropServices;
 using ImpromptuNinjas.UltralightSharp.Enums;
 using JetBrains.Annotations;
 
+#if NET5_0_OR_GREATER
+using System.Runtime.CompilerServices;
+#endif
+#if !NETFRAMEWORK && NETCOREAPP3_0_OR_GREATER && !ULTRALIGHTSHARP_DISABLE_PRELOADING
+using System.Reflection;
+#endif
+
 namespace ImpromptuNinjas.UltralightSharp {
 
   [PublicAPI]
   public static unsafe class Ultralight {
-
-    [NativeTypeName("const ULFileHandle")]
+#if !NETFRAMEWORK && NETCOREAPP3_0_OR_GREATER && !ULTRALIGHTSHARP_DISABLE_PRELOADING
+		private static readonly Assembly assembly = typeof(Ultralight).Assembly;
+#if NET5_0_OR_GREATER
+		[MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
+#endif
+		private static void TryLoad(string lib)
+		{
+			IntPtr library = NativeLibrary.Load(lib, assembly, DllImportSearchPath.AssemblyDirectory);
+			if (library == IntPtr.Zero)
+			{
+				throw new DllNotFoundException(lib);
+			}
+		}
+		static Ultralight()
+		{
+			if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+			{
+				TryLoad("UltralightCore");
+				TryLoad("WebCore");
+				TryLoad("Ultralight");
+			}
+		}
+#endif
+	[NativeTypeName("const ULFileHandle")]
     public static readonly UIntPtr InvalidFileHandle = (UIntPtr) (-1);
 
     [DllImport("Ultralight", CallingConvention = CallingConvention.Cdecl, EntryPoint = "ulVersionString", ExactSpelling = true)]
