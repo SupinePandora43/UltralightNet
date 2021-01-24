@@ -27,21 +27,16 @@ jobs:
       - name: Build Core
         run: |
           dotnet build -c Release UltralightSharp.Core/UltralightSharp.Core.csproj
-      - name: Install dependencies
-        run: dotnet restore -f UltralightSharp/UltralightSharp.csproj
+     # - name: Install dependencies
+     #   run: dotnet restore -f UltralightSharp/UltralightSharp.csproj
       - name: Build
-        run: dotnet build -c Release --no-restore UltralightSharp/UltralightSharp.csproj
+        run: dotnet build -c Release UltralightSharp/UltralightSharp.csproj
+      - name: Build solution
+        run: dotnet build -c Release
       - name: Run Demo
-        run: dotnet run -c Release --project UltralightSharp.SafeDemo --framework net5
+        run: dotnet run -c Release --framework net5 --project UltralightSharp.SafeDemo\UltralightSharp.SafeDemo.csproj
       - uses: actions/upload-artifact@v2
         with:
           name: NuGet Package(s) built by ${{ matrix.os }}
           path: '**/*.nupkg'
-          if-no-files-found: error
-      - name: Build platform specific SilkNetSandbox
-        run: dotnet publish -c Release SilkNetSandbox/SilkNetSandbox.csproj -o SilkNetSandboxArtifact
-      - uses: actions/upload-artifact@v2
-        with:
-          name: SilkNetSandbox for ${{ matrix.os }}
-          path: SilkNetSandboxArtifact/
           if-no-files-found: error
