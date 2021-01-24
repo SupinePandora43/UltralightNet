@@ -9,7 +9,7 @@ using System.Threading;
 
 namespace ImpromptuNinjas.UltralightSharp.Utility
 {
-	internal static class NativeOSXFix
+	public static class NativeOSXFix
 	{
 		private static readonly Lazy<IntPtr> LazyLoadedLibUltralightCore = new Lazy<IntPtr>(() => LoadLib("UltralightCore"), LazyThreadSafetyMode.ExecutionAndPublication);
 		private static readonly Lazy<IntPtr> LazyLoadedLibUltralight = new Lazy<IntPtr>(() => LoadLib("Ultralight"), LazyThreadSafetyMode.ExecutionAndPublication);
