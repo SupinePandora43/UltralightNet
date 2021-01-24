@@ -9,8 +9,6 @@ namespace ImpromptuNinjas.UltralightSharp {
   [PublicAPI]
   public static unsafe class Ultralight {
 
-    static Ultralight() => Native.Init();
-
     [NativeTypeName("const ULFileHandle")]
     public static readonly UIntPtr InvalidFileHandle = (UIntPtr) (-1);
 
