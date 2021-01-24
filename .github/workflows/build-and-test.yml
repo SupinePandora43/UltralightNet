@@ -30,6 +30,11 @@ jobs:
         run: dotnet restore -f UltralightSharp/UltralightSharp.csproj
       - name: Build
         run: dotnet build -c Release --no-restore UltralightSharp/UltralightSharp.csproj
+      - name: Tree
+        run: |
+          brew install tree
+          tree -L 1 --dirsfirst
+        if: matrix.os=="macos-latest"
       - name: Run Demo
         run: dotnet run -c Release --project UltralightSharp.SafeDemo
       - uses: actions/upload-artifact@v2
