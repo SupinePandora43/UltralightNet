@@ -3,7 +3,6 @@ using System;
 #if NET5_0_OR_GREATER
 using System.Runtime.CompilerServices;
 #endif
-using System.Reflection;
 using System.Runtime.InteropServices;
 using System.IO;
 using System.Threading;
@@ -16,14 +15,13 @@ namespace ImpromptuNinjas.UltralightSharp.Utility
 		private static readonly Lazy<IntPtr> LazyLoadedLibUltralight = new Lazy<IntPtr>(() => LoadLib("Ultralight"), LazyThreadSafetyMode.ExecutionAndPublication);
 		private static readonly Lazy<IntPtr> LazyLoadedLibAppCore = new Lazy<IntPtr>(() => LoadLib("AppCore"), LazyThreadSafetyMode.ExecutionAndPublication);
 		private static readonly Lazy<IntPtr> LazyLoadedLibWebCore = new Lazy<IntPtr>(() => LoadLib("WebCore"), LazyThreadSafetyMode.ExecutionAndPublication);
-		private static readonly Assembly assembly = typeof(Ultralight).Assembly;
 #if NET5_0_OR_GREATER
 		[MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
 #endif
 		private static IntPtr LoadLib(string lib)
 		{
 			string libFullName = $"lib{lib}.dylib";
-			string AssmeblyPath = Path.GetDirectoryName(assembly.Location) ?? throw new DllNotFoundException("failed to find myself");
+			string AssmeblyPath = Path.GetDirectoryName(typeof(NativeOSXFix).Assembly.Location) ?? throw new DllNotFoundException("failed to find myself");
 			string libFullPath = Path.Combine(AssmeblyPath, libFullName);
 			if (File.Exists(libFullPath))
 			{

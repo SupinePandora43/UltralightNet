@@ -7,8 +7,8 @@ namespace ImpromptuNinjas.UltralightSharp {
 
   [PublicAPI]
   public static unsafe class AppCore {
-#if !NETFRAMEWORK && NETCOREAPP3_0_OR_GREATER
-		static AppCore() => Utility.NativeOSXFix.Init();
+#if NETCOREAPP3_0_OR_GREATER
+	static AppCore() => Utility.NativeOSXFix.Init();
 #endif
 	[DllImport("AppCore", CallingConvention = CallingConvention.Cdecl, EntryPoint = "ulCreateSettings", ExactSpelling = true)]
     [return: NativeTypeName("ULSettings")]
