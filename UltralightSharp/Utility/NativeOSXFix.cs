@@ -15,6 +15,9 @@ namespace ImpromptuNinjas.UltralightSharp.Utility
 		private static readonly Lazy<IntPtr> LazyLoadedLibUltralight = new Lazy<IntPtr>(() => LoadLib("Ultralight"), LazyThreadSafetyMode.ExecutionAndPublication);
 		private static readonly Lazy<IntPtr> LazyLoadedLibAppCore = new Lazy<IntPtr>(() => LoadLib("AppCore"), LazyThreadSafetyMode.ExecutionAndPublication);
 		private static readonly Lazy<IntPtr> LazyLoadedLibWebCore = new Lazy<IntPtr>(() => LoadLib("WebCore"), LazyThreadSafetyMode.ExecutionAndPublication);
+		private static readonly Lazy<IntPtr> LazyLoadedIcudata = new Lazy<IntPtr>(() => LoadLib("icudata"), LazyThreadSafetyMode.ExecutionAndPublication);
+		private static readonly Lazy<IntPtr> LazyLoadedIcuuc = new Lazy<IntPtr>(() => LoadLib("icuuc"), LazyThreadSafetyMode.ExecutionAndPublication);
+		private static readonly Lazy<IntPtr> LazyLoadedIcui18n = new Lazy<IntPtr>(() => LoadLib("icui18n"), LazyThreadSafetyMode.ExecutionAndPublication);
 #if NET5_0_OR_GREATER
 		[MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
 #endif
@@ -26,11 +29,12 @@ namespace ImpromptuNinjas.UltralightSharp.Utility
 			if (File.Exists(libFullPath))
 			{
 				return NativeLibrary.Load(libFullPath);
-			}else
+			}
+			else
 			{
 				libFullPath = Path.Combine(AssmeblyPath, "runtimes", "osx-x64", libFullName);
-				if(File.Exists(libFullPath))
-				return NativeLibrary.Load(libFullPath);
+				if (File.Exists(libFullPath))
+					return NativeLibrary.Load(libFullPath);
 			}
 			throw new DllNotFoundException($"{lib} was not found");
 		}
