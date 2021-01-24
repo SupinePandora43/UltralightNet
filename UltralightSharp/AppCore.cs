@@ -7,10 +7,10 @@ namespace ImpromptuNinjas.UltralightSharp {
 
   [PublicAPI]
   public static unsafe class AppCore {
-
-    static AppCore() => Native.Init();
-
-    [DllImport("AppCore", CallingConvention = CallingConvention.Cdecl, EntryPoint = "ulCreateSettings", ExactSpelling = true)]
+#if !NETFRAMEWORK
+		static AppCore() => Native.Init();
+#endif
+	[DllImport("AppCore", CallingConvention = CallingConvention.Cdecl, EntryPoint = "ulCreateSettings", ExactSpelling = true)]
     [return: NativeTypeName("ULSettings")]
     public static extern Settings* CreateSettings();
 

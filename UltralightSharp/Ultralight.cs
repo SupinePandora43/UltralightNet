@@ -8,10 +8,10 @@ namespace ImpromptuNinjas.UltralightSharp {
 
   [PublicAPI]
   public static unsafe class Ultralight {
-
-    static Ultralight() => Native.Init();
-
-    [NativeTypeName("const ULFileHandle")]
+#if !NETFRAMEWORK
+		static Ultralight() => Native.Init();
+#endif
+	[NativeTypeName("const ULFileHandle")]
     public static readonly UIntPtr InvalidFileHandle = (UIntPtr) (-1);
 
     [DllImport("Ultralight", CallingConvention = CallingConvention.Cdecl, EntryPoint = "ulVersionString", ExactSpelling = true)]
