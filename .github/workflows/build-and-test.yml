@@ -31,18 +31,8 @@ jobs:
         run: dotnet restore -f UltralightSharp/UltralightSharp.csproj
       - name: Build
         run: dotnet build -c Release --no-restore UltralightSharp/UltralightSharp.csproj
-      - name: Tree
-        run: |
-          brew install tree
-          tree
-        if: matrix.os=='macos-latest'
       - name: Run Demo
         run: dotnet run -c Release --project UltralightSharp.SafeDemo
-        continue-on-error: true
-      - name: Tree
-        if: matrix.os=='macos-latest'
-        run: |
-          tree
       - uses: actions/upload-artifact@v2
         with:
           name: NuGet Package(s) built by ${{ matrix.os }}
