@@ -6,31 +6,35 @@ using System.Runtime.CompilerServices;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using System.IO;
+using System.Threading;
 
 namespace ImpromptuNinjas.UltralightSharp.Utility
 {
 	internal static class NativeOSXFix
 	{
+		private static readonly Lazy<IntPtr> LazyLoadedLibUltralightCore = new Lazy<IntPtr>(() => LoadLib("UltralightCore"), LazyThreadSafetyMode.ExecutionAndPublication);
+		private static readonly Lazy<IntPtr> LazyLoadedLibWebCore = new Lazy<IntPtr>(() => LoadLib("WebCore"), LazyThreadSafetyMode.ExecutionAndPublication);
+		private static readonly Lazy<IntPtr> LazyLoadedLibUltralight = new Lazy<IntPtr>(() => LoadLib("Ultralight"), LazyThreadSafetyMode.ExecutionAndPublication);
+		private static readonly Lazy<IntPtr> LazyLoadedLibAppCore = new Lazy<IntPtr>(() => LoadLib("AppCore"), LazyThreadSafetyMode.ExecutionAndPublication);
 		private static readonly Assembly assembly = typeof(Ultralight).Assembly;
 #if NET5_0_OR_GREATER
 		[MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
 #endif
 		private static IntPtr LoadLib(string lib)
 		{
-			IntPtr library = NativeLibrary.Load(lib, assembly, DllImportSearchPath.AssemblyDirectory);
-			if (library == default)
+			string libFullName = $"lib{lib}.dylib";
+			string AssmeblyPath = Path.GetDirectoryName(assembly.Location) ?? throw new DllNotFoundException("failed to find myself");
+			string libFullPath = Path.Combine(AssmeblyPath, libFullName);
+			if (File.Exists(libFullPath))
 			{
-				string libFullName = $"lib{lib}.dylib";
-				string AssmeblyPath = Path.GetDirectoryName(assembly.Location) ?? throw new DllNotFoundException("failed to find myself");
-				library = NativeLibrary.Load(Path.Combine(AssmeblyPath, libFullName));
-				if (library == default)
-				{
-					library = NativeLibrary.Load(Path.Combine(AssmeblyPath, "runtimes", "osx-x64", libFullName));
-					if (library == default)
-						throw new DllNotFoundException($"failed to find {lib}");
-				}
+				return NativeLibrary.Load(libFullPath);
+			}else
+			{
+				libFullPath = Path.Combine(AssmeblyPath, "runtimes", "osx-x64", libFullName);
+				if(File.Exists(libFullPath))
+				return NativeLibrary.Load(libFullPath);
 			}
-			return library;
+			throw new DllNotFoundException($"{lib} was not found");
 		}
 #if NET5_0_OR_GREATER
 		[MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
@@ -39,13 +43,13 @@ namespace ImpromptuNinjas.UltralightSharp.Utility
 		{
 			if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
 			{
-				if (LoadLib("UltralightCore") == default)
+				if (LazyLoadedLibUltralightCore.Value == default)
 					throw new DllNotFoundException("UltralightCore");
-				if (LoadLib("WebCore") == default)
+				if (LazyLoadedLibWebCore.Value == default)
 					throw new DllNotFoundException("WebCore");
-				if (LoadLib("Ultralight") == default)
+				if (LazyLoadedLibUltralight.Value == default)
 					throw new DllNotFoundException("Ultralight");
-				if (LoadLib("AppCore") == default)
+				if (LazyLoadedLibAppCore.Value == default)
 					throw new DllNotFoundException("AppCore");
 			}
 		}
