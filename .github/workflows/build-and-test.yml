@@ -33,7 +33,7 @@ jobs:
       - name: Tree
         run: |
           brew install tree
-          tree -L 1 --dirsfirst
+          tree
         if: matrix.os=='macos-latest'
       - name: Run Demo
         run: dotnet run -c Release --project UltralightSharp.SafeDemo
