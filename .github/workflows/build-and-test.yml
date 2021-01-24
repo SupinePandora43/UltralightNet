@@ -34,7 +34,7 @@ jobs:
       - name: Build solution
         run: dotnet build -c Release
       - name: Run Demo
-        run: dotnet run -c Release --framework net5 --project UltralightSharp.SafeDemo\UltralightSharp.SafeDemo.csproj
+        run: dotnet run -c Release --framework net5 --project UltralightSharp.SafeDemo/UltralightSharp.SafeDemo.csproj
       - uses: actions/upload-artifact@v2
         with:
           name: NuGet Package(s) built by ${{ matrix.os }}
