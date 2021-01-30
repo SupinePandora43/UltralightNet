@@ -22,21 +22,21 @@ jobs:
       - run: git lfs pull || git lfs pull gitlab
       - uses: satackey/action-docker-layer-caching@v0.0.4
       - name: "Unity: Restore NuGet Packages"
-        uses: ImpromptuNinjas/unity-runner@master
+        uses: Supine/unity-runner@master
         #timeout-minutes: 6
         with:
           projectPath: UltralightSharp.UnityTests
           unityVersion: 2018.4.25f1
           args: -quit -nographics -noUpm -executeMethod ExecutableServices.RestoreNuGetPackages
       - name: "Unity: Probe Ultralight Library"
-        uses: ImpromptuNinjas/unity-runner@master
+        uses: Supine/unity-runner@master
         #timeout-minutes: 6
         with:
           projectPath: UltralightSharp.UnityTests
           unityVersion: 2018.4.25f1
           args: -quit -noUpm -executeMethod ExecutableServices.UltralightLibraryProbe
       - name: "Unity: Run Tests"
-        uses: ImpromptuNinjas/unity-runner@master
+        uses: Supine/unity-runner@master
         #timeout-minutes: 6
         with:
           projectPath: UltralightSharp.UnityTests

@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
 
-namespace ImpromptuNinjas.UltralightSharp.Safe {
+namespace Supine.UltralightSharp.Safe {
 
   public abstract class SafeVertexBuffer : IDisposable {
 

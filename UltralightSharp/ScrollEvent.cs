@@ -1,10 +1,10 @@
 using System;
 using System.ComponentModel;
-using ImpromptuNinjas.UltralightSharp.Enums;
+using Supine.UltralightSharp.Enums;
 using InlineIL;
 using JetBrains.Annotations;
 
-namespace ImpromptuNinjas.UltralightSharp {
+namespace Supine.UltralightSharp {
 
   [PublicAPI]
   public readonly unsafe ref struct ScrollEvent {

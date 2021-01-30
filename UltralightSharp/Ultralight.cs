@@ -1,10 +1,10 @@
 using System;
 using System.Numerics;
 using System.Runtime.InteropServices;
-using ImpromptuNinjas.UltralightSharp.Enums;
+using Supine.UltralightSharp.Enums;
 using JetBrains.Annotations;
 
-namespace ImpromptuNinjas.UltralightSharp {
+namespace Supine.UltralightSharp {
 
   [PublicAPI]
   public static unsafe class Ultralight {

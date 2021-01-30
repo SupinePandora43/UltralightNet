@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using JetBrains.Annotations;
 
-namespace ImpromptuNinjas.UltralightSharp {
+namespace Supine.UltralightSharp {
 
   [PublicAPI]
   public struct FnPtr<TDelegate> where TDelegate : Delegate {

@@ -1,4 +1,4 @@
-using ImpromptuNinjas.UltralightSharp;
+using Supine.UltralightSharp;
 
 public static class ModuleInitializer
 {

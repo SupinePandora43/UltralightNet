@@ -1,7 +1,7 @@
 using System.ComponentModel;
 using JetBrains.Annotations;
 
-namespace ImpromptuNinjas.UltralightSharp {
+namespace Supine.UltralightSharp {
 
   [PublicAPI]
   public readonly ref struct Buffer {

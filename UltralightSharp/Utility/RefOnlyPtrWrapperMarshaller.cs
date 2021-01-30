@@ -1,6 +1,6 @@
 using System;
 
-namespace ImpromptuNinjas.UltralightSharp.Safe {
+namespace Supine.UltralightSharp.Safe {
 
   public sealed class RefOnlyPtrWrapperMarshaller<TClass> : RefWrapperMarshaller<TClass> {
 

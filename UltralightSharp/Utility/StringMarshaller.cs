@@ -1,7 +1,7 @@
 using System;
 using System.Runtime.InteropServices;
 
-namespace ImpromptuNinjas.UltralightSharp.Safe {
+namespace Supine.UltralightSharp.Safe {
 
   public sealed class StringMarshaller : ICustomMarshaler {
 

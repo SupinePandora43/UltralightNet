@@ -1,7 +1,7 @@
 using System;
 using System.IO;
 using System.Runtime.InteropServices;
-using ImpromptuNinjas.UltralightSharp.Safe;
+using Supine.UltralightSharp.Safe;
 using Silk.NET.Core;
 using Silk.NET.Input;
 using Silk.NET.OpenGLES;

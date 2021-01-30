@@ -8,7 +8,7 @@ using System.Runtime.ExceptionServices;
 using System.Runtime.InteropServices;
 using System.Text;
 using CommandLine;
-using ImpromptuNinjas.UltralightSharp.Safe;
+using Supine.UltralightSharp.Safe;
 using InlineIL;
 using Nvidia.Nsight.Injection;
 using Silk.NET.Core;
@@ -18,7 +18,7 @@ using Silk.NET.Windowing.Common;
 using Ultz.SuperInvoke;
 using Ultz.SuperInvoke.Loader;
 using ErrorCode = Silk.NET.GLFW.ErrorCode;
-using Renderer = ImpromptuNinjas.UltralightSharp.Safe.Renderer;
+using Renderer = Supine.UltralightSharp.Safe.Renderer;
 using Window = Silk.NET.Windowing.Window;
 
 partial class Program {

@@ -1,6 +1,6 @@
 using JetBrains.Annotations;
 
-namespace ImpromptuNinjas.UltralightSharp.Enums {
+namespace Supine.UltralightSharp.Enums {
 
   [PublicAPI]
   public enum FaceWinding {

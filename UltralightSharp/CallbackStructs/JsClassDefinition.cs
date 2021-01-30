@@ -3,7 +3,7 @@ using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Text;
-using ImpromptuNinjas.UltralightSharp.Enums;
+using Supine.UltralightSharp.Enums;
 using InlineIL;
 using JetBrains.Annotations;
 #if NETFRAMEWORK || NETSTANDARD2_0
@@ -15,7 +15,7 @@ using System.Buffers;
 using System.Diagnostics;
 #endif
 
-namespace ImpromptuNinjas.UltralightSharp {
+namespace Supine.UltralightSharp {
 
   [PublicAPI]
   [StructLayout(LayoutKind.Sequential)]

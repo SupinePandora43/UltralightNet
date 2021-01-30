@@ -2,7 +2,7 @@ using System;
 using InlineIL;
 using JetBrains.Annotations;
 
-namespace ImpromptuNinjas.UltralightSharp {
+namespace Supine.UltralightSharp {
 
   [PublicAPI]
   public readonly unsafe ref struct String {

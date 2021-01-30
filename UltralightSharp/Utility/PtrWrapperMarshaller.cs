@@ -3,7 +3,7 @@ using System.Linq;
 using System.Reflection;
 using System.Runtime.InteropServices;
 
-namespace ImpromptuNinjas.UltralightSharp.Safe {
+namespace Supine.UltralightSharp.Safe {
 
   public sealed class PtrWrapperMarshaller<TClass> : ICustomMarshaler {
 

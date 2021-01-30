@@ -5,7 +5,7 @@ using System.ComponentModel;
 using InlineIL;
 using JetBrains.Annotations;
 
-namespace ImpromptuNinjas.UltralightSharp {
+namespace Supine.UltralightSharp {
 
   public readonly ref struct JsPropertyNameArray {
 

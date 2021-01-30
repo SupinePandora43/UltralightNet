@@ -7,7 +7,7 @@ using System.Runtime.InteropServices;
 using InlineIL;
 using JetBrains.Annotations;
 
-namespace ImpromptuNinjas.UltralightSharp {
+namespace Supine.UltralightSharp {
 
   [PublicAPI]
   [StructLayout(LayoutKind.Sequential)]
