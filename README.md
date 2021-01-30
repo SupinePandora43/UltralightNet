@@ -1,12 +1,13 @@
-![UltralightSharp](https://gitlab.com/tyler-in/UltralightSharp/raw/master/icon.png)
+![UltralightSharp](https://gitlab.com/SupinePandora43/UltralightSharp/raw/master/icon.png)
 
-[![NuGet](https://img.shields.io/nuget/v/Supine.UltralightSharp.svg)](https://www.nuget.org/packages/Supine.UltralightSharp/) [![Build & Test](https://github.com/Supine/UltralightSharp/workflows/Build%20&%20Test/badge.svg)](https://github.com/Supine/UltralightSharp/actions?query=workflow%3A%22Build+%26+Test%22) [![Sponsor](https://img.shields.io/static/v1?label=Sponsor&message=%E2%9D%A4&logo=GitHub&link=https://github.com/sponsors/Tyler-IN)](https://github.com/sponsors/Tyler-IN)
+[![NuGet](https://img.shields.io/nuget/v/Supine.UltralightSharp.svg)](https://www.nuget.org/packages/Supine.UltralightSharp/) ![Build & Test](https://github.com/SupinePandora43/UltralightSharp/workflows/Build%20&%20Test/badge.svg)
  
 # UltralightSharp
 
 A multi-platform .NET binding of the **Ultralight** project.
 
 ## Supported platforms:
+
 * Windows
   - x64
 * Linux
@@ -19,8 +20,10 @@ Work under Unity, currently testing under 2018.4 LTS.
 Full support for all LTS versions and the latest version of Unity is planned.
 
 ### Known Issues:
-* Currently the native dependencies are shipped with this NuGet package for all platforms.
-  _Separate NuGet runtime packages should be created to provide each specific platform dependency._
+
+* not all api covered
+* * ping me in discord `SupinePandora43#3399` 
+
 * Demo but no tests, no WebCore bindings yet.
 
 

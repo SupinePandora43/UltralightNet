@@ -25,6 +25,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		.editorconfig = .editorconfig
 		.github\workflows\build-and-test.yml = .github\workflows\build-and-test.yml
 		.github\workflows\package-version-tags.yml = .github\workflows\package-version-tags.yml
+		README.md = README.md
 		.github\workflows\unity.yml = .github\workflows\unity.yml
 	EndProjectSection
 EndProject
