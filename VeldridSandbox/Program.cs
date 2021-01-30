@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Numerics;
 using System.Reflection;
 using System.Runtime.InteropServices;
@@ -31,7 +32,7 @@ namespace VeldridSandbox
 							break;
 						case LogLevel.Info:
 						default:
-							Console.WriteLine("");
+							Console.WriteLine(msg);
 							break;
 					}
 				}
@@ -60,13 +61,14 @@ namespace VeldridSandbox
 		private Pipeline _pipeline;
 		private ResourceSet resourceSet;
 
+		private Queue<Command> queuedCommands = new Queue<Command>();
 		private DeviceBuffer uniformBuffer;
 
 		public class GeometryEntry
 		{
-			public uint VertexArray { get; set; }
-			public uint Vertices { get; set; }
-			public uint Indices { get; set; }
+			//public Vector3[] VertexArray { get; set; }
+			public DeviceBuffer VertexBuffer { get; set; }
+			public DeviceBuffer IndicesBuffer { get; set; }
 		}
 		public class RenderBufferEntry
 		{
@@ -118,17 +120,58 @@ namespace VeldridSandbox
 
 		private void UpdateCommandList(Supine.UltralightSharp.Safe.CommandList list)
 		{
-			throw new NotImplementedException();
+			Console.WriteLine("GpuDriver.UpdateCommandList(LIST)");
+			foreach (var cmd in list)
+				queuedCommands.Enqueue(cmd);
 		}
 
 		private void DestroyTexture(uint textureId)
 		{
-			throw new NotImplementedException();
+			Console.WriteLine($"GpuDriver.DestroyTexture({textureId})");
+			var index = (int)textureId - 1;
+			var entry = TextureEntries.RemoveAt(index);
+
+			entry.Texure.Dispose();
 		}
 
 		private void UpdateTexture(uint textureId, Bitmap bitmap)
 		{
-			throw new NotImplementedException();
+			Console.WriteLine($"GpuDriver.UpdateTexture: {textureId}");
+			var index = (int)textureId - 1;
+			var entry = TextureEntries[index];
+
+			var tex = entry.Texure;
+			var texWidth = entry.Width;
+			var texHeight = entry.Height;
+
+			//var pixels = bitmap.LockPixels();
+
+			var format = bitmap.GetFormat();
+			/*switch (format)
+			{
+				case BitmapFormat.A8UNorm:
+					{
+						graphicsDevice.UpdateTexture(tex, bitmap.LockPixels(),
+							texWidth * texHeight * 4,
+							0,
+							0,
+							0,
+							texWidth,
+							texHeight,
+							1,
+							0,
+							0
+						);
+						break;
+					}
+				case BitmapFormat.Bgra8UNormSrgb:
+					{
+						_gl.TexImage2D(TextureTarget.Texture2D, 0, (int)InternalFormat.Srgb8Alpha8, texWidth, texHeight, 0, PixelFormat.Rgba, PixelType.UnsignedByte, (void*)pixels);
+						break;
+					}
+				default: throw new ArgumentOutOfRangeException(nameof(BitmapFormat));
+			}*/
+
 		}
 
 		private void CreateTexture(uint textureId, Bitmap bitmap)
@@ -140,83 +183,46 @@ namespace VeldridSandbox
 			var texHeight = bitmap.GetHeight();
 			entry.Height = texHeight;
 			Console.WriteLine($"GpuDriver.CreateTexture({textureId} {texWidth}x{texHeight})");
-			entry.Texure = factory.CreateTexture(TextureDescription.Texture2D(texWidth, texHeight, 1, 1, PixelFormat.R8_G8_B8_A8_UInt, TextureUsage.Staging));
-			graphicsDevice.UpdateTexture(entry.Texure,
-				bitmap.LockPixels(),
-				texWidth * texHeight * 4,
-				0,
-				0,
-				0,
-				texWidth,
-				texHeight,
-				1,
-				0,
-				0);
-			bitmap.UnlockPixels();
-			/*var tex = _gl.GenTexture();
-			entry.Texure = tex;
-			_gl.ActiveTexture(TextureUnit.Texture0);
-			_gl.BindTexture(TextureTarget.Texture2D, tex);
-
-			var linear = (int)GLEnum.Linear;
-			_gl.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, ref linear);
-			_gl.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, ref linear);
-			CheckGl();
-
-			var clampToEdge = (int)GLEnum.ClampToEdge;
-			_gl.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapS, ref clampToEdge);
-			_gl.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapT, ref clampToEdge);
-			CheckGl();
 
 			if (bitmap.IsEmpty())
 			{
-				LabelObject(ObjectIdentifier.Texture, tex, $"Ultralight Texture {id} (RT)");
-				CheckGl();
-
-				_gl.TexImage2D(TextureTarget.Texture2D, 0, (int)InternalFormat.Rgba8, texWidth, texHeight, 0, PixelFormat.Rgba, PixelType.UnsignedByte, default);
-				CheckGl();
-
-				_gl.GenerateMipmap(TextureTarget.Texture2D);
-				CheckGl();
+				entry.Texure = factory.CreateTexture(
+					TextureDescription.Texture2D(texWidth,
+						texHeight,
+						1,
+						1,
+						PixelFormat.R8_G8_B8_A8_UInt,
+						TextureUsage.RenderTarget | TextureUsage.Sampled | TextureUsage.Storage
+					)
+				);
+				Console.WriteLine("Bitmap.IsEmtpy()==true");
 			}
 			else
 			{
-				LabelObject(ObjectIdentifier.Texture, tex, $"Ultralight Texture {id}");
-				CheckGl();
-
-				_gl.PixelStore(PixelStoreParameter.UnpackAlignment, 1);
-				_gl.PixelStore(PixelStoreParameter.UnpackRowLength, (int)(bitmap.GetRowBytes() / bitmap.GetBpp()));
-				CheckGl();
-
-				var format = bitmap.GetFormat();
-
-				var pixels = (void*)bitmap.LockPixels();
-
-				switch (format)
-				{
-					case BitmapFormat.A8UNorm:
-						{
-							_gl.TexImage2D(TextureTarget.Texture2D, 0, (int)InternalFormat.R8, texWidth, texHeight, 0, PixelFormat.Red, PixelType.UnsignedByte, pixels);
-							if (RenderAnsiTexturePreviews)
-								Utilities.RenderAnsi<L8>(pixels, texWidth, texHeight, 1, 20);
-							break;
-						}
-					case BitmapFormat.Bgra8UNormSrgb:
-						{
-							_gl.TexImage2D(TextureTarget.Texture2D, 0, (int)InternalFormat.Srgb8Alpha8, texWidth, texHeight, 0, PixelFormat.Rgba, PixelType.UnsignedByte, pixels);
-							if (RenderAnsiTexturePreviews)
-								Utilities.RenderAnsi<Rgba32>(pixels, texWidth, texHeight, 1, 20);
-							break;
-						}
-					default: throw new ArgumentOutOfRangeException(nameof(BitmapFormat));
-				}
-
-				CheckGl();
-
+				entry.Texure = factory.CreateTexture(
+					TextureDescription.Texture2D(
+						texWidth,
+						texHeight,
+						1,
+						1,
+						PixelFormat.R8_G8_B8_A8_UInt,
+						TextureUsage.RenderTarget | TextureUsage.Sampled | TextureUsage.Storage
+					)
+				);
+				Console.WriteLine(texWidth * texHeight * 4);
+				graphicsDevice.UpdateTexture(entry.Texure,
+					bitmap.LockPixels(),
+					texWidth * texHeight * 4,
+					0,
+					0,
+					0,
+					texWidth,
+					texHeight,
+					1,
+					0,
+					0);
 				bitmap.UnlockPixels();
-				_gl.GenerateMipmap(TextureTarget.Texture2D);
-				CheckGl();
-			}*/
+			}
 		}
 
 		private uint NextTextureId()
@@ -228,12 +234,39 @@ namespace VeldridSandbox
 
 		private void DestroyRenderBuffer(uint renderBufferId)
 		{
-			throw new NotImplementedException();
+			Console.WriteLine($"GpuDriver.DestroyRenderBuffer({renderBufferId})");
+			var index = (int)renderBufferId - 1;
+			var entry = RenderBufferEntries.RemoveAt(index);
+
+			entry.FrameBuffer.Dispose();
 		}
 
 		private void CreateRenderBuffer(uint renderBufferId, RenderBuffer buffer)
 		{
-			throw new NotImplementedException();
+
+			Console.WriteLine($"CreateRenderBuffer: {renderBufferId}");
+
+			var index = (int)renderBufferId - 1;
+			var entry = RenderBufferEntries[index];
+
+			var texIndex = (int)buffer.TextureId - 1;
+			var texEntry = TextureEntries[texIndex];
+			var tex = texEntry.Texure;
+
+			/*Texture offscreenDepth = factory.CreateTexture(TextureDescription.Texture2D(
+				tex.Width, tex.Height, 1, 1, PixelFormat.R16_UNorm, TextureUsage.DepthStencil));
+
+			FramebufferDescription framebufferDescription = new(offscreenDepth, tex);
+			
+			entry.FrameBuffer = factory.CreateFramebuffer(framebufferDescription);
+			*/
+			entry.FrameBuffer = FrameBufferHelper.CreateFramebuffer(
+				graphicsDevice,
+				tex.Width,
+				tex.Height,
+				PixelFormat.R8_G8_B8_A8_UInt);
+			//entry.FrameBuffer.ColorTargets.Append(new(tex, 0));
+			entry.TextureEntry = texEntry;
 		}
 
 		private uint NextRenderBufferId()
@@ -245,17 +278,52 @@ namespace VeldridSandbox
 
 		private void DestroyGeometry(uint geometryId)
 		{
-			throw new NotImplementedException();
+			Console.WriteLine($"GpuDriver.DestroyGeometry({geometryId})");
+			var index = (int)geometryId - 1;
+			var entry = GeometryEntries.RemoveAt(index);
+
+			entry.IndicesBuffer.Dispose();
+			entry.VertexBuffer.Dispose();
 		}
 
-		private void UpdateGeometry(uint geometryId, VertexBuffer safeVertices, IndexBuffer indices)
+		private unsafe void UpdateGeometry(uint geometryId, VertexBuffer safeVertices, IndexBuffer indices)
 		{
-			throw new NotImplementedException();
+			Console.WriteLine($"GpuDriver.UpdateGeometry({geometryId})");
+			var index = (int)geometryId - 1;
+			var entry = GeometryEntries[index];
+
+			graphicsDevice.UpdateBuffer(entry.VertexBuffer, 0, (IntPtr)safeVertices.AsUnsafe().Data, safeVertices.Size);
+			graphicsDevice.UpdateBuffer(entry.IndicesBuffer, 0, (IntPtr)indices.AsUnsafe().Data, indices.Size);
+
 		}
 
-		private void CreateGeometry(uint geometryId, VertexBuffer safeVertices, IndexBuffer indices)
+		private unsafe void CreateGeometry(uint geometryId, VertexBuffer safeVertices, IndexBuffer indices)
 		{
-			throw new NotImplementedException();
+			Console.WriteLine($"GpuDriver.CreateGeometry: {geometryId}");
+			var index = (int)geometryId - 1;
+			var entry = GeometryEntries[index];
+
+			entry.VertexBuffer = factory.CreateBuffer(new BufferDescription(safeVertices.Size, BufferUsage.VertexBuffer));
+			graphicsDevice.UpdateBuffer(entry.VertexBuffer, 0, (IntPtr)safeVertices.AsUnsafe().Data, safeVertices.Size);
+
+			switch (safeVertices.Format)
+			{
+				case VertexBufferFormat._2F4Ub2F2F28F:
+					{
+
+						break;
+					}
+				case VertexBufferFormat._2F4Ub2F:
+					{
+
+						break;
+					}
+				default: throw new NotImplementedException(safeVertices.Format.ToString());
+			}
+			entry.IndicesBuffer = factory.CreateBuffer(new(
+				indices.Size,
+				BufferUsage.IndexBuffer));
+			graphicsDevice.UpdateBuffer(entry.IndicesBuffer, 0, (IntPtr)indices.AsUnsafe().Data, indices.Size);
 		}
 
 		private uint NextGeometryId()
@@ -265,15 +333,8 @@ namespace VeldridSandbox
 			return (uint)id;
 		}
 
-		private void EndSynchronize()
-		{
-
-		}
-
-		private void BeginSynchronize()
-		{
-
-		}
+		private void EndSynchronize() { }
+		private void BeginSynchronize() { }
 
 		private readonly Assembly assembly = typeof(Program).Assembly;
 		private Shader GetShader(string path, ShaderStages shaderStages)
@@ -541,9 +602,9 @@ void main()
 			{
 				Render();
 				window.PumpEvents();
-				/*renderer.Update();
+				renderer.Update();
 				renderer.Render();
-				*/
+
 			}
 		}
 	}
