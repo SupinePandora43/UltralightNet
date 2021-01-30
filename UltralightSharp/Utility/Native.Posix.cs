@@ -3,7 +3,7 @@ using System;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
 
-namespace ImpromptuNinjas.UltralightSharp
+namespace Supine.UltralightSharp
 {
 
 	internal static partial class Native

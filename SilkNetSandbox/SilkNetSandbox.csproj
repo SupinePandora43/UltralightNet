@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
         <OutputType>Exe</OutputType>
@@ -76,7 +76,7 @@
         <PackageReference Include="CommandLineParser" Version="2.8.0" />
         <PackageReference Include="Fody" Version="6.2.4" PrivateAssets="all" />
         <PackageReference Include="InlineIL.Fody" Version="1.5.0" PrivateAssets="all" />
-		<!--<PackageReference Include="ImpromptuNinjas.UltralightSharp" Version="[$(Version)]" />-->
+		<!--<PackageReference Include="Supine.UltralightSharp" Version="[$(Version)]" />-->
         <PackageReference Include="JetBrains.Annotations" Version="2020.1.0" />
         <PackageReference Include="Silk.NET.Core" Version="2.0.0-preview" />
         <PackageReference Include="Silk.NET.EGL" Version="1.5.0" />

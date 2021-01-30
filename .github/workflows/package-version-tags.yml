@@ -45,8 +45,8 @@ jobs:
         run: dotnet build -c Release -p:IsOfficial=true UltralightSharp/UltralightSharp.csproj
       - name: Push Nupkgs
         run: |
-          dotnet nuget push -s nuget.org -k ${{ secrets.NUGET_API_KEY }} --skip-duplicate ImpromptuNinjas.UltralightSharp.Core.WinX64.${{ steps.tag.outputs.tag }}.nupkg
-          dotnet nuget push -s nuget.org -k ${{ secrets.NUGET_API_KEY }} --skip-duplicate ImpromptuNinjas.UltralightSharp.Core.LinuxX64.${{ steps.tag.outputs.tag }}.nupkg
-          dotnet nuget push -s nuget.org -k ${{ secrets.NUGET_API_KEY }} --skip-duplicate ImpromptuNinjas.UltralightSharp.Core.OsxX64.${{ steps.tag.outputs.tag }}.nupkg
-          dotnet nuget push -s nuget.org -k ${{ secrets.NUGET_API_KEY }} --skip-duplicate ImpromptuNinjas.UltralightSharp.Core.${{ steps.tag.outputs.tag }}.nupkg
-          dotnet nuget push -s nuget.org -k ${{ secrets.NUGET_API_KEY }} --skip-duplicate ImpromptuNinjas.UltralightSharp.${{ steps.tag.outputs.tag }}.nupkg
+          dotnet nuget push -s nuget.org -k ${{ secrets.NUGET_API_KEY }} --skip-duplicate Supine.UltralightSharp.Core.WinX64.${{ steps.tag.outputs.tag }}.nupkg
+          dotnet nuget push -s nuget.org -k ${{ secrets.NUGET_API_KEY }} --skip-duplicate Supine.UltralightSharp.Core.LinuxX64.${{ steps.tag.outputs.tag }}.nupkg
+          dotnet nuget push -s nuget.org -k ${{ secrets.NUGET_API_KEY }} --skip-duplicate Supine.UltralightSharp.Core.OsxX64.${{ steps.tag.outputs.tag }}.nupkg
+          dotnet nuget push -s nuget.org -k ${{ secrets.NUGET_API_KEY }} --skip-duplicate Supine.UltralightSharp.Core.${{ steps.tag.outputs.tag }}.nupkg
+          dotnet nuget push -s nuget.org -k ${{ secrets.NUGET_API_KEY }} --skip-duplicate Supine.UltralightSharp.${{ steps.tag.outputs.tag }}.nupkg

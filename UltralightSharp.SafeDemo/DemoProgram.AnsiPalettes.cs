@@ -3,7 +3,7 @@ using SixLabors.ImageSharp.PixelFormats;
 using SixLabors.ImageSharp.Processing.Processors.Dithering;
 using SixLabors.ImageSharp.Processing.Processors.Quantization;
 
-namespace ImpromptuNinjas.UltralightSharp.Demo {
+namespace Supine.UltralightSharp.Demo {
 
   public static partial class DemoProgram {
 

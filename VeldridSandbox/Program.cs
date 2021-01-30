@@ -1,5 +1,5 @@
-using ImpromptuNinjas.UltralightSharp.Enums;
-using ImpromptuNinjas.UltralightSharp.Safe;
+using Supine.UltralightSharp.Enums;
+using Supine.UltralightSharp.Safe;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -116,7 +116,7 @@ namespace VeldridSandbox
 			view.LoadUrl("https://github.com");
 		}
 
-		private void UpdateCommandList(ImpromptuNinjas.UltralightSharp.Safe.CommandList list)
+		private void UpdateCommandList(Supine.UltralightSharp.Safe.CommandList list)
 		{
 			throw new NotImplementedException();
 		}

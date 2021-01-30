@@ -7,11 +7,11 @@ using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.PixelFormats;
 using SixLabors.ImageSharp.Processing;
 using SixLabors.ImageSharp.Processing.Processors.Transforms;
-using ImpromptuNinjas.UltralightSharp;
-using ImpromptuNinjas.UltralightSharp.Enums;
-using String = ImpromptuNinjas.UltralightSharp.String;
+using Supine.UltralightSharp;
+using Supine.UltralightSharp.Enums;
+using String = Supine.UltralightSharp.String;
 
-namespace ImpromptuNinjas.UltralightSharp.Demo {
+namespace Supine.UltralightSharp.Demo {
 
   public static partial class DemoProgram {
 

@@ -3,7 +3,7 @@ using System.IO;
 using System.Reflection;
 using JetBrains.Annotations;
 
-namespace ImpromptuNinjas.UltralightSharp {
+namespace Supine.UltralightSharp {
 
   [PublicAPI]
   internal static class InternalExtensions {

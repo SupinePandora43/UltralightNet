@@ -1,15 +1,15 @@
 using System;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
-using ImpromptuNinjas.UltralightSharp.Safe;
-using ImpromptuNinjas.UltralightSharp.Enums;
+using Supine.UltralightSharp.Safe;
+using Supine.UltralightSharp.Enums;
 using JetBrains.Annotations;
 using Silk.NET.OpenGLES;
 using Silk.NET.OpenGLES.Extensions.KHR;
 using Silk.NET.Windowing.Common;
 using SixLabors.ImageSharp.PixelFormats;
 using ShaderType = Silk.NET.OpenGLES.ShaderType;
-using ULShaderType = ImpromptuNinjas.UltralightSharp.Enums.ShaderType;
+using ULShaderType = Supine.UltralightSharp.Enums.ShaderType;
 
 public class OpenGlEsGpuDriverSite {
 

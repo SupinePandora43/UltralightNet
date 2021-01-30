@@ -9,20 +9,20 @@
         <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
         <GeneratePackageOnBuild Condition="'$(Configuration)'=='Release'">true</GeneratePackageOnBuild>
         <Nullable>enable</Nullable>
-        <RootNamespace>ImpromptuNinjas.UltralightSharp</RootNamespace>
+        <RootNamespace>Supine.UltralightSharp</RootNamespace>
 		<PlatformTarget>x64</PlatformTarget>
 		<RuntimeIdentifiers>win-x64;linux-x64;osx-x64</RuntimeIdentifiers>
     </PropertyGroup>
 
     <PropertyGroup>
-        <PackageId>ImpromptuNinjas.UltralightSharp</PackageId>
-        <Title>ImpromptuNinjas.UltralightSharp</Title>
+        <PackageId>Supine.UltralightSharp</PackageId>
+        <Title>Supine.UltralightSharp</Title>
         <Description>A multi-platform .NET binding of the Ultralight project.</Description>
         <Authors>Tyler Young</Authors>
         <Copyright>Copyright © 2020 Tyler Young</Copyright>
         <PackageLicenseFile>LICENSE</PackageLicenseFile>
         <PackageOutputDir>$(SolutionDir)</PackageOutputDir>
-        <RepositoryUrl>https://github.com/ImpromptuNinjas/UltralightSharp.git</RepositoryUrl>
+        <RepositoryUrl>https://github.com/Supine/UltralightSharp.git</RepositoryUrl>
         <PackageTags>ultralight webkit webcore appcore ultralight-ux</PackageTags>
         <PackageIcon>icon.png</PackageIcon>
         <IsPackable>True</IsPackable>
@@ -30,7 +30,7 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="ImpromptuNinjas.UltralightSharp.Core" Version="[$(Version)]" IncludeAssets="native;runtime" />
+        <PackageReference Include="Supine.UltralightSharp.Core" Version="[$(Version)]" IncludeAssets="native;runtime" />
         <PackageReference Include="JetBrains.Annotations" Version="2020.1.0" PrivateAssets="all" />
         <PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0" PrivateAssets="all" />
         <PackageReference Include="Fody" Version="6.2.4" PrivateAssets="all" />

@@ -1,6 +1,6 @@
 using System.Runtime.CompilerServices;
 
-namespace ImpromptuNinjas.UltralightSharp.Safe {
+namespace Supine.UltralightSharp.Safe {
 
   public static class VertexBufferExtensions {
 

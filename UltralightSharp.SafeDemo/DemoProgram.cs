@@ -5,9 +5,9 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading;
 using SixLabors.ImageSharp.PixelFormats;
-using ImpromptuNinjas.UltralightSharp.Enums;
+using Supine.UltralightSharp.Enums;
 
-namespace ImpromptuNinjas.UltralightSharp.Demo
+namespace Supine.UltralightSharp.Demo
 {
 
     public static partial class DemoProgram

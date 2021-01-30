@@ -6,7 +6,7 @@ using System.Runtime.CompilerServices;
 using InlineIL;
 using JetBrains.Annotations;
 
-namespace ImpromptuNinjas.UltralightSharp {
+namespace Supine.UltralightSharp {
 
   [PublicAPI]
   public readonly ref struct JsString {

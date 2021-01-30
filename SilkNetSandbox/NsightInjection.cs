@@ -1,6 +1,6 @@
 using System;
 using System.Runtime.InteropServices;
-using ImpromptuNinjas.UltralightSharp;
+using Supine.UltralightSharp;
 
 namespace Nvidia.Nsight.Injection {
 

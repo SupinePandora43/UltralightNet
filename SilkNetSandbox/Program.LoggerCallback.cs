@@ -1,6 +1,6 @@
 using System;
-using ImpromptuNinjas.UltralightSharp.Enums;
-using ImpromptuNinjas.UltralightSharp.Safe;
+using Supine.UltralightSharp.Enums;
+using Supine.UltralightSharp.Safe;
 
 partial class Program {
 

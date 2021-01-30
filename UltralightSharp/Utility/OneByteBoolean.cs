@@ -2,7 +2,7 @@ using System;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
-namespace ImpromptuNinjas.UltralightSharp {
+namespace Supine.UltralightSharp {
 
   [StructLayout(LayoutKind.Sequential, Size = 1)]
   public readonly struct OneByteBoolean : IEquatable<OneByteBoolean>, IEquatable<bool> {

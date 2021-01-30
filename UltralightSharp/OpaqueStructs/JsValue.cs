@@ -1,12 +1,12 @@
 using System;
-using ImpromptuNinjas.UltralightSharp.Enums;
+using Supine.UltralightSharp.Enums;
 using InlineIL;
 using JetBrains.Annotations;
 #if !NETFRAMEWORK && !NETSTANDARD2_0
 using System.Diagnostics.CodeAnalysis;
 #endif
 
-namespace ImpromptuNinjas.UltralightSharp {
+namespace Supine.UltralightSharp {
 
   [PublicAPI]
   public readonly ref struct JsValue {

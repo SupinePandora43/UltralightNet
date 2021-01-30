@@ -1,7 +1,7 @@
 using System.ComponentModel;
 using JetBrains.Annotations;
 
-namespace ImpromptuNinjas.UltralightSharp {
+namespace Supine.UltralightSharp {
 
   public readonly ref struct JsPropertyNameAccumulator {
 

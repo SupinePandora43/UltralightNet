@@ -1,7 +1,7 @@
 using System;
 using JetBrains.Annotations;
 
-namespace ImpromptuNinjas.UltralightSharp.Enums {
+namespace Supine.UltralightSharp.Enums {
 
   [PublicAPI]
   [Flags]

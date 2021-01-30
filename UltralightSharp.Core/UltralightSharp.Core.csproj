@@ -9,14 +9,14 @@
 	</PropertyGroup>
     
     <PropertyGroup>
-        <PackageId>ImpromptuNinjas.UltralightSharp.Core</PackageId>
-        <Title>ImpromptuNinjas.UltralightSharp.Core</Title>
+        <PackageId>Supine.UltralightSharp.Core</PackageId>
+        <Title>Supine.UltralightSharp.Core</Title>
         <Description>Ultralight native rutimes for the UltralightSharp project.</Description>
         <Authors>Tyler Young</Authors>
         <Copyright>Copyright © 2020 Tyler Young</Copyright>
         <PackageLicenseFile>LICENSE</PackageLicenseFile>
         <PackageOutputDir>$(SolutionDir)</PackageOutputDir>
-        <RepositoryUrl>https://github.com/ImpromptuNinjas/UltralightSharp.git</RepositoryUrl>
+        <RepositoryUrl>https://github.com/Supine/UltralightSharp.git</RepositoryUrl>
         <PackageTags>ultralight webkit webcore appcore ultralight-ux</PackageTags>
         <PackageIcon>icon.png</PackageIcon>
         <IsPackable>True</IsPackable>

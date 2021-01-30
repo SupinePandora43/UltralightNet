@@ -1,9 +1,9 @@
 using System;
 using System.Runtime.InteropServices;
 using JetBrains.Annotations;
-using ImpromptuNinjas.UltralightSharp.Enums;
+using Supine.UltralightSharp.Enums;
 
-namespace ImpromptuNinjas.UltralightSharp {
+namespace Supine.UltralightSharp {
 
   [PublicAPI]
   public static unsafe class AppCore {

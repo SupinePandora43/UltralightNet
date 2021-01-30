@@ -7,7 +7,7 @@ using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading;
 
-namespace ImpromptuNinjas.UltralightSharp
+namespace Supine.UltralightSharp
 {
 	internal static partial class Native
 	{
