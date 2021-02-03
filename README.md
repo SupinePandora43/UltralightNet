@@ -4,7 +4,7 @@
  
 # UltralightSharp
 
-A multi-platform .NET binding of the **Ultralight** project.
+A multi-platform .NET binding of the **[Ultralight](https://utralig.ht)** project.
 
 ## Supported platforms:
 
@@ -15,9 +15,6 @@ A multi-platform .NET binding of the **Ultralight** project.
   - AMD64 / Intel x86-64
 * Apple OSX
   - 64-bit only
-
-Work under Unity, currently testing under 2018.4 LTS.
-Full support for all LTS versions and the latest version of Unity is planned.
 
 ### Known Issues:
 
