@@ -8,13 +8,11 @@ A multi-platform .NET binding of the **[Ultralight](https://utralig.ht)** projec
 
 ## Supported platforms:
 
-* Windows
-  - x64
-* Linux
-  - GNU flavors (Debian, Ubuntu, ...)
-  - AMD64 / Intel x86-64
-* Apple OSX
-  - 64-bit only
+|         | x64       | arm64    |
+|---------|-----------|----------|
+| windows | win-x64   | upstream |
+| linux   | linux-x64 | upstream |
+| osx     | osx-x64   | upstream |
 
 ### Known Issues:
 
