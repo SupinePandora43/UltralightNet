@@ -13,7 +13,10 @@ namespace Ultralight.Test
 			//Console.WriteLine(Ultralight.GetVersionStringSafe());
 			//Console.WriteLine(Ultralight.GetVersionStringMarshal());
 
-			var cfg = new Config() { ResourcePath = (ULString)"./resources"};
+			Config cfg = new()
+			{
+				ResourcePath = (ULString)"./resources"
+			};
 		}
 	}
 }

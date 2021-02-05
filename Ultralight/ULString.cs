@@ -89,39 +89,37 @@ namespace Ultralight
 		public static explicit operator ULString(string str) => new ULString(str);
 		public static implicit operator IntPtr(ULString ulString) => ulString.ptr;
 		public static implicit operator string(ULString ulString) => ulString.ToString();
+	}
+	public static partial class Methods
+	{
+		[DllImport("Ultralight", CallingConvention = CallingConvention.Cdecl, ExactSpelling = true)]
+		public static extern IntPtr ulCreateString([MarshalAs(UnmanagedType.LPStr)] string str);
 
-		public static class Methods
-		{
-			[DllImport("Ultralight", CallingConvention = CallingConvention.Cdecl, ExactSpelling = true)]
-			public static extern IntPtr ulCreateString([MarshalAs(UnmanagedType.LPStr)] string str);
+		[DllImport("Ultralight", CallingConvention = CallingConvention.Cdecl, ExactSpelling = true)]
+		public static extern IntPtr ulCreateStringUTF8([MarshalAs(UnmanagedType.LPUTF8Str)] string str, UIntPtr len);
 
-			[DllImport("Ultralight", CallingConvention = CallingConvention.Cdecl, ExactSpelling = true)]
-			public static extern IntPtr ulCreateStringUTF8([MarshalAs(UnmanagedType.LPUTF8Str)] string str, UIntPtr len);
+		[DllImport("Ultralight", CallingConvention = CallingConvention.Cdecl, ExactSpelling = true)]
+		public static extern IntPtr ulCreateStringUTF16([MarshalAs(UnmanagedType.LPWStr)] string str, UIntPtr len);
 
-			[DllImport("Ultralight", CallingConvention = CallingConvention.Cdecl, ExactSpelling = true)]
-			public static extern IntPtr ulCreateStringUTF16([MarshalAs(UnmanagedType.LPWStr)] string str, UIntPtr len);
+		[DllImport("Ultralight", CallingConvention = CallingConvention.Cdecl, ExactSpelling = true)]
+		public static extern IntPtr ulCreateStringFromCopy(IntPtr str);
 
-			[DllImport("Ultralight", CallingConvention = CallingConvention.Cdecl, ExactSpelling = true)]
-			public static extern IntPtr ulCreateStringFromCopy(IntPtr str);
+		[DllImport("Ultralight", CallingConvention = CallingConvention.Cdecl, ExactSpelling = true)]
+		public static extern void ulDestroyString(IntPtr str);
 
-			[DllImport("Ultralight", CallingConvention = CallingConvention.Cdecl, ExactSpelling = true)]
-			public static extern void ulDestroyString(IntPtr str);
+		[DllImport("Ultralight", CallingConvention = CallingConvention.Cdecl, ExactSpelling = true)]
+		public static extern IntPtr ulStringGetData(IntPtr str);
 
-			[DllImport("Ultralight", CallingConvention = CallingConvention.Cdecl, ExactSpelling = true)]
-			public static extern IntPtr ulStringGetData(IntPtr str);
+		[DllImport("Ultralight", CallingConvention = CallingConvention.Cdecl, ExactSpelling = true)]
+		public static extern UIntPtr ulStringGetLength(IntPtr str);
 
-			[DllImport("Ultralight", CallingConvention = CallingConvention.Cdecl, ExactSpelling = true)]
-			public static extern UIntPtr ulStringGetLength(IntPtr str);
+		[DllImport("Ultralight", CallingConvention = CallingConvention.Cdecl, ExactSpelling = true)]
+		public static extern bool ulStringIsEmpty(IntPtr str);
 
-			[DllImport("Ultralight", CallingConvention = CallingConvention.Cdecl, ExactSpelling = true)]
-			public static extern bool ulStringIsEmpty(IntPtr str);
+		[DllImport("Ultralight", CallingConvention = CallingConvention.Cdecl, ExactSpelling = true)]
+		public static extern void ulStringAssignString(IntPtr str, IntPtr new_str);
 
-			[DllImport("Ultralight", CallingConvention = CallingConvention.Cdecl, ExactSpelling = true)]
-			public static extern void ulStringAssignString(IntPtr str, IntPtr new_str);
-
-			[DllImport("Ultralight", CallingConvention = CallingConvention.Cdecl, ExactSpelling = true)]
-			public static extern void ulStringAssignCString(IntPtr str, [MarshalAs(UnmanagedType.LPUTF8Str)] string c_str);
-
-		}
+		[DllImport("Ultralight", CallingConvention = CallingConvention.Cdecl, ExactSpelling = true)]
+		public static extern void ulStringAssignCString(IntPtr str, [MarshalAs(UnmanagedType.LPUTF8Str)] string c_str);
 	}
 }
