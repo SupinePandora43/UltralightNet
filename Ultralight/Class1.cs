@@ -5,6 +5,22 @@ namespace Ultralight
 {
     public class Ultralight
     {
+		[DllImport("Ultralight", CallingConvention = CallingConvention.Cdecl, EntryPoint = "ulVersionString", ExactSpelling = true)]
+		public static unsafe extern IntPtr GetVersionString();
+
+		public static string GetVersionStringSafe()
+		{
+			return Marshal.PtrToStringUTF8(GetVersionString());
+		}
+
+		/// <summary>
+		/// DOESN't WORK!!!
+		/// </summary>
+		/// <returns></returns>
+		[DllImport("Ultralight", CallingConvention = CallingConvention.Cdecl, EntryPoint = "ulVersionString", ExactSpelling = true)]
+		[return: MarshalAs(UnmanagedType.LPUTF8Str)]
+		public static extern string GetVersionStringMarshal();
+
 		[DllImport("Ultralight", CallingConvention = CallingConvention.Cdecl, EntryPoint = "ulCreateConfig", ExactSpelling = true)]
 		public static extern IntPtr CreateConfig();
 

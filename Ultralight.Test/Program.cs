@@ -9,6 +9,8 @@ namespace Ultralight.Test
 			var cfg = Ultralight.CreateConfig();
 			var str = Ultralight.CreateString("./resources");
 			Ultralight.ConfigSetResourcePath(cfg, str);
+
+			Console.WriteLine(Ultralight.GetVersionStringSafe());
 		}
     }
 }
