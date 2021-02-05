@@ -1,4 +1,5 @@
 using Supine.UltralightSharp.Enums;
+using Supine.UltralightSharp.Safe;
 using System;
 using Veldrid;
 
@@ -47,6 +48,15 @@ namespace VeldridSandbox
 			commandList.End();
 			graphicsDevice.SubmitCommands(commandList);
 			graphicsDevice.SwapBuffers();
+			
+			// draw it
+
+			RenderTarget rt = view.GetRenderTarget();
+			var rbIndex = (int)rt.RenderBufferId - 1;
+			RenderBufferEntry rbEntry = RenderBufferEntries[rbIndex];
+			Texture tex = rbEntry.TextureEntry.Texure;
+			MappedResource mappedTex = graphicsDevice.Map(tex, MapMode.Read);
+			
 		}
 	}
 }

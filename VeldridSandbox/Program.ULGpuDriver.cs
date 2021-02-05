@@ -16,7 +16,6 @@ namespace VeldridSandbox
 
 		public class GeometryEntry
 		{
-			//public Vector3[] VertexArray { get; set; }
 			public DeviceBuffer VertexBuffer { get; set; }
 			public DeviceBuffer IndiciesBuffer { get; set; }
 		}
@@ -150,7 +149,7 @@ namespace VeldridSandbox
 						1,
 						1,
 						PixelFormat.R8_G8_B8_A8_UInt,
-						TextureUsage.RenderTarget | TextureUsage.Sampled | TextureUsage.Storage
+						TextureUsage.Staging
 					)
 				);
 			}

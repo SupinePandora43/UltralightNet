@@ -163,7 +163,7 @@ namespace VeldridSandbox
 			graphicsDevice = VeldridStartup.CreateGraphicsDevice(
 				window,
 				options,
-				GraphicsBackend.Vulkan);
+				GraphicsBackend.OpenGL);
 
 			window.Resized += () =>
 			{

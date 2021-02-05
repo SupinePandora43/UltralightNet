@@ -11,6 +11,7 @@ namespace VeldridSandbox
 		private CommandList commandList;
 
 		private Pipeline mainPipeline;
+		private Sampler mainSampler;
 		private Pipeline ultralightPipeline;
 		private Pipeline ultralightPathPipeline;
 
@@ -18,6 +19,7 @@ namespace VeldridSandbox
 		private Texture ultralightOutputTexture;
 		private ResourceSet mainResourceSet;
 		private ResourceSet ultralightResourceSet;
+		private ResourceSet ultralightPathResourceSet;
 
 		Shader mainv;
 		Shader mainf;
@@ -25,6 +27,20 @@ namespace VeldridSandbox
 		Shader fragmentShader;
 		Shader pathVertexShader;
 		Shader pathFragmentShader;
+
+		DeviceBuffer vertexBuffer;
+		DeviceBuffer indexBuffer;
+
+		private static readonly float[] _quadVerts = {
+			1f, 1f, 0f,
+			1f, -1f, 0f,
+			-1f, -1f, 0f,
+			-1f, 1f, 1f
+		};
+		private static readonly uint[] _quadIndices = {
+			0, 1, 3,
+			1, 2, 3
+		};
 
 		private void CreateShaders()
 		{
@@ -36,14 +52,25 @@ namespace VeldridSandbox
 			pathFragmentShader = GetShader("embedded.shader_fill_path.frag.glsl", ShaderStages.Fragment);
 		}
 
+		private void CreateBuffers()
+		{
+			vertexBuffer = factory.CreateBuffer(new(48, BufferUsage.VertexBuffer));
+			graphicsDevice.UpdateBuffer(vertexBuffer, 0, _quadVerts);
+
+			indexBuffer = factory.CreateBuffer(new(sizeof(uint) * 6, BufferUsage.IndexBuffer));
+			graphicsDevice.UpdateBuffer(indexBuffer, 0, _quadIndices);
+		}
+
 		private void CreatePipeline()
 		{
 			CreateShaders();
+			CreateBuffers();
 
 			ResourceLayout mainResourceLayout = factory.CreateResourceLayout(
 				new ResourceLayoutDescription(
 					new ResourceLayoutElementDescription("iTex", ResourceKind.Sampler, ShaderStages.Fragment)));
 
+			mainResourceSet = factory.CreateResourceSet(new ResourceSetDescription(mainResourceLayout, graphicsDevice.Aniso4xSampler));
 
 			ResourceLayout ultralightResourceLayout = factory.CreateResourceLayout(
 				new ResourceLayoutDescription(
@@ -51,7 +78,7 @@ namespace VeldridSandbox
 					new ResourceLayoutElementDescription("Texture2", ResourceKind.Sampler, ShaderStages.Fragment),
 					new ResourceLayoutElementDescription("Texture3", ResourceKind.Sampler, ShaderStages.Fragment)));
 
-			//ultralightResourceSet = factory.CreateResourceSet(new ResourceSetDescription(ultralightResourceLayout));
+			ultralightResourceSet = factory.CreateResourceSet(new ResourceSetDescription(ultralightResourceLayout));
 
 			ResourceLayout ultralightUniformsResourceLayout = factory.CreateResourceLayout(
 					new ResourceLayoutDescription(
@@ -84,18 +111,30 @@ namespace VeldridSandbox
 					new VertexLayoutDescription[] {
 						new VertexLayoutDescription(
 							new VertexElementDescription(
-								"Position",
+								"vPos",
+								VertexElementSemantic.Position, // TextureCoordinate
+								VertexElementFormat.Float3
+							),
+							new VertexElementDescription(
+								"fUv",
+								VertexElementSemantic.TextureCoordinate,
+								VertexElementFormat.Float2
+							)
+						),
+						new VertexLayoutDescription(
+							new VertexElementDescription(
+								"fUv",
 								VertexElementSemantic.TextureCoordinate,
 								VertexElementFormat.Float2
 							)
 						)
 					}, new[] {
-						//mainv,
-						//mainf,
-						vertexShader,
-						fragmentShader,
-						pathVertexShader,
-						pathFragmentShader
+						mainv,
+						mainf,
+						//vertexShader,
+						//fragmentShader,
+						//pathVertexShader,
+						//pathFragmentShader
 					}
 				),
 				new ResourceLayout[] {
@@ -120,6 +159,45 @@ namespace VeldridSandbox
 			{
 				ColorTargets = new[] { new FramebufferAttachmentDescription(ultralightOutputTexture, 0) }
 			});
+
+			GraphicsPipelineDescription ultralightPipelineDescription = new(
+				BlendStateDescription.SingleOverrideBlend,
+				new DepthStencilStateDescription(
+					depthTestEnabled: true,
+					depthWriteEnabled: true,
+					comparisonKind: ComparisonKind.LessEqual),
+				new RasterizerStateDescription(
+					cullMode: FaceCullMode.None,
+					fillMode: PolygonFillMode.Solid,
+					frontFace: FrontFace.Clockwise,
+					depthClipEnabled: true,
+					scissorTestEnabled: false),
+				PrimitiveTopology.TriangleStrip,
+				new ShaderSetDescription(
+					new VertexLayoutDescription[] {
+						new VertexLayoutDescription(
+							new VertexElementDescription(
+								"Position",
+								VertexElementSemantic.TextureCoordinate,
+								VertexElementFormat.Float2
+							)
+						)
+					}, new[] {
+						vertexShader,
+						fragmentShader
+						//pathVertexShader,
+						//pathFragmentShader
+					}
+				),
+				new ResourceLayout[] {
+					mainResourceLayout,
+					ultralightResourceLayout,
+					ultralightUniformsResourceLayout
+				},
+				ultralightOutputBuffer.OutputDescription
+			);
+
+			ultralightPipeline = factory.CreateGraphicsPipeline(ultralightPipelineDescription);
 
 			//pipelineDescription.Outputs = UltralightBuffer.OutputDescription;
 			//UltralightPipeline = factory.CreateGraphicsPipeline(pipelineDescription);
