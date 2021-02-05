@@ -11,6 +11,7 @@ namespace Ultralight.Test
 			Ultralight.ConfigSetResourcePath(cfg, str);
 
 			Console.WriteLine(Ultralight.GetVersionStringSafe());
+			Console.WriteLine(Ultralight.GetVersionStringMarshal());
 		}
     }
 }

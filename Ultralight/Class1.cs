@@ -6,7 +6,7 @@ namespace Ultralight
     public class Ultralight
     {
 		[DllImport("Ultralight", CallingConvention = CallingConvention.Cdecl, EntryPoint = "ulVersionString", ExactSpelling = true)]
-		public static unsafe extern IntPtr GetVersionString();
+		public static extern IntPtr GetVersionString();
 
 		public static string GetVersionStringSafe()
 		{
@@ -17,8 +17,8 @@ namespace Ultralight
 		/// DOESN't WORK!!!
 		/// </summary>
 		/// <returns></returns>
-		[DllImport("Ultralight", CallingConvention = CallingConvention.Cdecl, EntryPoint = "ulVersionString", ExactSpelling = true)]
-		[return: MarshalAs(UnmanagedType.LPUTF8Str)]
+		[DllImport("Ultralight", CallingConvention = CallingConvention.Cdecl, EntryPoint = "ulVersionString", ExactSpelling = true, CharSet = CharSet.Unicode)]
+		[return: MarshalAs(UnmanagedType.LPStr)]
 		public static extern string GetVersionStringMarshal();
 
 		[DllImport("Ultralight", CallingConvention = CallingConvention.Cdecl, EntryPoint = "ulCreateConfig", ExactSpelling = true)]
