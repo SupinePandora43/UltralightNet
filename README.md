@@ -8,7 +8,7 @@ A multi-platform .NET binding of the **[Ultralight](https://utralig.ht)** projec
 
 ## Supported platforms:
 
-|         | x64       | arm64    |
+|         | x86_64    | arm64    |
 |---------|-----------|----------|
 | windows | win-x64   | upstream |
 | linux   | linux-x64 | upstream |
