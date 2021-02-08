@@ -3,17 +3,18 @@ using System.Runtime.InteropServices;
 
 namespace Ultralight
 {
-	public class Config
+	public class Config : IDisposable
 	{
 		public readonly IntPtr ptr;
 
 		public Config()
 		{
+			Console.WriteLine("Config()");
 			ptr = Methods.CreateConfig();
 		}
 		~Config()
 		{
-			Methods.ulDestroyConfig(ptr);
+			Console.WriteLine("~Config()");
 		}
 
 		public ULString ResourcePath
@@ -23,6 +24,13 @@ namespace Ultralight
 				Methods.ulConfigSetResourcePath(ptr, value);
 			}
 		}
+
+		public void Dispose()
+		{
+			Console.WriteLine("Config.Dispose()");
+			Methods.ulDestroyConfig(ptr);
+		}
+
 		public static implicit operator IntPtr(Config config) => config.ptr;
 		public static class Methods
 		{

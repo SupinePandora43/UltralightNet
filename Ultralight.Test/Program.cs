@@ -1,8 +1,6 @@
-using System;
-
 namespace Ultralight.Test
 {
-	class Program
+	public static class Program
 	{
 		static void Main(string[] args)
 		{
@@ -17,6 +15,8 @@ namespace Ultralight.Test
 			{
 				ResourcePath = (ULString)"./resources"
 			};
+
+			Renderer renderer = new(cfg);
 		}
 	}
 }
