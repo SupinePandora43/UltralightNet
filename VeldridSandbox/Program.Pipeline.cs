@@ -16,8 +16,10 @@ namespace VeldridSandbox
 
 		private Framebuffer ultralightOutputBuffer;
 		private Framebuffer ultralightPathOutputBuffer;
+
 		private Texture ultralightOutputTexture;
 		private Texture ultralightPathOutputTexture;
+
 		private ResourceSet mainResourceSet;
 		private ResourceSet ultralightResourceSet;
 		private ResourceSet ultralightPathResourceSet;

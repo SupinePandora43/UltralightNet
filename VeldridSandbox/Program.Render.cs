@@ -97,14 +97,9 @@ namespace VeldridSandbox
 			}
 			queuedCommands.Clear();
 
-			commandList.SetFramebuffer(graphicsDevice.SwapchainFramebuffer);
-
-			commandList.SetFullViewports();
-			//commandList.ClearColorTarget(0, RgbaFloat.DarkRed);
-
 			commandList.End();
 			graphicsDevice.SubmitCommands(commandList);
-			graphicsDevice.SwapBuffers();
+			//graphicsDevice.SwapBuffers();
 
 			// draw it
 
@@ -112,8 +107,27 @@ namespace VeldridSandbox
 			var rbIndex = (int)rt.RenderBufferId - 1;
 			RenderBufferEntry rbEntry = RenderBufferEntries[rbIndex];
 			Texture tex = rbEntry.TextureEntry.Texure;
-			MappedResource mappedTex = graphicsDevice.Map(tex, MapMode.Read);
 
+			commandList.Begin();
+
+			commandList.SetFramebuffer(graphicsDevice.SwapchainFramebuffer);
+			commandList.SetFullViewports();
+			commandList.ClearColorTarget(0, RgbaFloat.Cyan);
+			commandList.SetVertexBuffer(0, vertexBuffer);
+			commandList.SetIndexBuffer(indexBuffer, IndexFormat.UInt16);
+			commandList.SetPipeline(mainPipeline);
+			commandList.SetGraphicsResourceSet(0, mainResourceSet);
+
+			commandList.DrawIndexed(
+				indexCount: 6,
+				instanceCount: 1,
+				indexStart: 0,
+				vertexOffset: 0,
+				instanceStart: 0);
+
+			commandList.End();
+			graphicsDevice.SubmitCommands(commandList);
+			graphicsDevice.SwapBuffers();
 		}
 	}
 }
