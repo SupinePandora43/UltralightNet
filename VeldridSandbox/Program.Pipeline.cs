@@ -34,6 +34,9 @@ namespace VeldridSandbox
 		DeviceBuffer vertexBuffer;
 		DeviceBuffer indexBuffer;
 
+		Uniforms uniforms = new();
+		DeviceBuffer uniformBuffer;
+
 		private static readonly float[] _quadVerts = {
 			1f, 1f, 0f,
 			1f, -1f, 0f,
@@ -62,6 +65,8 @@ namespace VeldridSandbox
 
 			indexBuffer = factory.CreateBuffer(new(sizeof(uint) * 6, BufferUsage.IndexBuffer));
 			graphicsDevice.UpdateBuffer(indexBuffer, 0, _quadIndices);
+
+			uniformBuffer = factory.CreateBuffer(new(768, BufferUsage.UniformBuffer));
 		}
 
 		private void CreatePipeline()
