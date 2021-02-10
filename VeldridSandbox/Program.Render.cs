@@ -113,10 +113,10 @@ namespace VeldridSandbox
 			commandList.SetFramebuffer(graphicsDevice.SwapchainFramebuffer);
 			commandList.SetFullViewports();
 			commandList.ClearColorTarget(0, RgbaFloat.Cyan);
-			commandList.SetVertexBuffer(0, vertexBuffer);
-			commandList.SetIndexBuffer(indexBuffer, IndexFormat.UInt16);
 			commandList.SetPipeline(mainPipeline);
 			commandList.SetGraphicsResourceSet(0, mainResourceSet);
+			commandList.SetVertexBuffer(0, vertexBuffer);
+			commandList.SetIndexBuffer(indexBuffer, IndexFormat.UInt16);
 
 			commandList.DrawIndexed(
 				indexCount: 6,
