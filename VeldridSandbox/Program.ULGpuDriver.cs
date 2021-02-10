@@ -39,7 +39,7 @@ namespace VeldridSandbox
 
 		private void UpdateCommandList(Supine.UltralightSharp.Safe.CommandList list)
 		{
-			Console.WriteLine("GpuDriver.UpdateCommandList(LIST)");
+			//Console.WriteLine("GpuDriver.UpdateCommandList(LIST)");
 			foreach (var cmd in list)
 				queuedCommands.Enqueue(cmd);
 		}
@@ -261,7 +261,7 @@ namespace VeldridSandbox
 
 		private unsafe void UpdateGeometry(uint geometryId, VertexBuffer safeVertices, IndexBuffer indices)
 		{
-			Console.WriteLine($"GpuDriver.UpdateGeometry({geometryId})");
+			//Console.WriteLine($"GpuDriver.UpdateGeometry({geometryId})");
 			var index = (int)geometryId - 1;
 			var entry = GeometryEntries[index];
 

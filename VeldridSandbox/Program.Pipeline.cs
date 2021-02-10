@@ -11,15 +11,18 @@ namespace VeldridSandbox
 		private CommandList commandList;
 
 		private Pipeline mainPipeline;
-		private Sampler mainSampler;
 		private Pipeline ultralightPipeline;
 		private Pipeline ultralightPathPipeline;
 
 		private Framebuffer ultralightOutputBuffer;
+		private Framebuffer ultralightPathOutputBuffer;
 		private Texture ultralightOutputTexture;
+		private Texture ultralightPathOutputTexture;
 		private ResourceSet mainResourceSet;
 		private ResourceSet ultralightResourceSet;
 		private ResourceSet ultralightPathResourceSet;
+
+		Sampler TextureSampler;
 
 		Shader mainv;
 		Shader mainf;
@@ -44,8 +47,8 @@ namespace VeldridSandbox
 
 		private void CreateShaders()
 		{
-			mainv = factory.CreateShader(new ShaderDescription(ShaderStages.Vertex, GetShaderBytes("embedded.basic.vert.glsl"), "main"));
-			mainf = factory.CreateShader(new ShaderDescription(ShaderStages.Fragment, GetShaderBytes("embedded.basic.frag.glsl"), "main"));
+			mainv = GetShader("embedded.basic.vert.glsl", ShaderStages.Vertex);
+			mainf = GetShader("embedded.basic.frag.glsl", ShaderStages.Fragment);
 			vertexShader = GetShader("embedded.shader_v2f_c4f_t2f_t2f_d28f.vert.glsl", ShaderStages.Vertex);
 			fragmentShader = GetShader("embedded.shader_fill.frag.glsl", ShaderStages.Fragment);
 			pathVertexShader = GetShader("embedded.shader_v2f_c4f_t2f.vert.glsl", ShaderStages.Vertex);
@@ -63,34 +66,43 @@ namespace VeldridSandbox
 
 		private void CreatePipeline()
 		{
+			TextureSampler = graphicsDevice.Aniso4xSampler;
+
 			CreateShaders();
 			CreateBuffers();
 
+			#region QUAD
+
 			ResourceLayout mainResourceLayout = factory.CreateResourceLayout(
 				new ResourceLayoutDescription(
-					new ResourceLayoutElementDescription("iTex", ResourceKind.Sampler, ShaderStages.Fragment)));
+					new ResourceLayoutElementDescription("SurfaceTexture",
+						ResourceKind.TextureReadOnly,
+						ShaderStages.Fragment
+					),
+					new ResourceLayoutElementDescription("SurfaceSampler",
+						ResourceKind.Sampler,
+						ShaderStages.Fragment
+					)
+				)
+			);
 
-			mainResourceSet = factory.CreateResourceSet(new ResourceSetDescription(mainResourceLayout, graphicsDevice.Aniso4xSampler));
 
 			ResourceLayout ultralightResourceLayout = factory.CreateResourceLayout(
 				new ResourceLayoutDescription(
 					new ResourceLayoutElementDescription("Texture1", ResourceKind.Sampler, ShaderStages.Fragment),
-					new ResourceLayoutElementDescription("Texture2", ResourceKind.Sampler, ShaderStages.Fragment),
-					new ResourceLayoutElementDescription("Texture3", ResourceKind.Sampler, ShaderStages.Fragment)));
+					new ResourceLayoutElementDescription("Texture2", ResourceKind.Sampler, ShaderStages.Fragment)//,
+																												 //new ResourceLayoutElementDescription("Texture3", ResourceKind.Sampler, ShaderStages.Fragment)
+				)
+			);
 
-			ultralightResourceSet = factory.CreateResourceSet(new ResourceSetDescription(ultralightResourceLayout));
+			//ultralightResourceSet = factory.CreateResourceSet(new ResourceSetDescription(ultralightResourceLayout));
 
-			ResourceLayout ultralightUniformsResourceLayout = factory.CreateResourceLayout(
+			ResourceLayout uniformsResourceLayout = factory.CreateResourceLayout(
 					new ResourceLayoutDescription(
 						new ResourceLayoutElementDescription(
 							"Uniforms",
 							ResourceKind.UniformBuffer,
-							ShaderStages.Vertex
-						),
-						new ResourceLayoutElementDescription(
-							"Uniforms",
-							ResourceKind.UniformBuffer,
-							ShaderStages.Fragment
+							ShaderStages.Vertex | ShaderStages.Fragment
 						)
 					)
 				);
@@ -112,7 +124,7 @@ namespace VeldridSandbox
 						new VertexLayoutDescription(
 							new VertexElementDescription(
 								"vPos",
-								VertexElementSemantic.Position, // TextureCoordinate
+								VertexElementSemantic.TextureCoordinate,
 								VertexElementFormat.Float3
 							),
 							new VertexElementDescription(
@@ -130,21 +142,17 @@ namespace VeldridSandbox
 						)
 					}, new[] {
 						mainv,
-						mainf,
-						//vertexShader,
-						//fragmentShader,
-						//pathVertexShader,
-						//pathFragmentShader
+						mainf
 					}
 				),
 				new ResourceLayout[] {
-					mainResourceLayout,
-					ultralightResourceLayout,
-					ultralightUniformsResourceLayout
+					mainResourceLayout
 				},
 				graphicsDevice.SwapchainFramebuffer.OutputDescription
 			);
 			mainPipeline = factory.CreateGraphicsPipeline(mainPipelineDescription);
+
+			#endregion
 
 			ultralightOutputTexture = factory.CreateTexture(new(
 				512,
@@ -153,12 +161,20 @@ namespace VeldridSandbox
 				1,
 				1,
 				PixelFormat.R8_G8_B8_A8_SInt,
-				TextureUsage.RenderTarget,
+				TextureUsage.Sampled | TextureUsage.Storage | TextureUsage.RenderTarget,
 				TextureType.Texture2D));
+
 			ultralightOutputBuffer = factory.CreateFramebuffer(new FramebufferDescription()
-			{
-				ColorTargets = new[] { new FramebufferAttachmentDescription(ultralightOutputTexture, 0) }
-			});
+				{
+					ColorTargets = new[] {
+							new FramebufferAttachmentDescription(ultralightOutputTexture, 0)
+						}
+				}
+			);
+
+			mainResourceSet = factory.CreateResourceSet(new ResourceSetDescription(mainResourceLayout, factory.CreateTextureView(ultralightOutputTexture), graphicsDevice.Aniso4xSampler));
+
+			#region Ultralight
 
 			GraphicsPipelineDescription ultralightPipelineDescription = new(
 				BlendStateDescription.SingleOverrideBlend,
@@ -177,30 +193,221 @@ namespace VeldridSandbox
 					new VertexLayoutDescription[] {
 						new VertexLayoutDescription(
 							new VertexElementDescription(
-								"Position",
+								"in_Position",
 								VertexElementSemantic.TextureCoordinate,
 								VertexElementFormat.Float2
+							),
+							new VertexElementDescription(
+								"in_Color",
+								VertexElementSemantic.Color,
+								VertexElementFormat.Float4
+							),
+							new VertexElementDescription(
+								"in_TexCoord",
+								VertexElementSemantic.TextureCoordinate,
+								VertexElementFormat.Float2
+							),
+							new VertexElementDescription(
+								"in_ObjCoord",
+								VertexElementSemantic.TextureCoordinate,
+								VertexElementFormat.Float2
+							),
+							new VertexElementDescription(
+								"in_Data0",
+								VertexElementSemantic.Color,
+								VertexElementFormat.Float4
+							),
+							new VertexElementDescription(
+								"in_Data1",
+								VertexElementSemantic.Color,
+								VertexElementFormat.Float4
+							),
+							new VertexElementDescription(
+								"in_Data2",
+								VertexElementSemantic.Color,
+								VertexElementFormat.Float4
+							),
+							new VertexElementDescription(
+								"in_Data3",
+								VertexElementSemantic.Color,
+								VertexElementFormat.Float4
+							),
+							new VertexElementDescription(
+								"in_Data4",
+								VertexElementSemantic.Color,
+								VertexElementFormat.Float4
+							),
+							new VertexElementDescription(
+								"in_Data5",
+								VertexElementSemantic.Color,
+								VertexElementFormat.Float4
+							),
+							new VertexElementDescription(
+								"in_Data6",
+								VertexElementSemantic.Color,
+								VertexElementFormat.Float4
+							)
+						),
+						new VertexLayoutDescription(
+							new VertexElementDescription(
+								"ex_Color",
+								VertexElementSemantic.Color,
+								VertexElementFormat.Float4
+							),
+							new VertexElementDescription(
+								"ex_TexCoord",
+								VertexElementSemantic.TextureCoordinate,
+								VertexElementFormat.Float2
+							),
+							new VertexElementDescription(
+								"ex_ObjectCoord",
+								VertexElementSemantic.TextureCoordinate,
+								VertexElementFormat.Float2
+							),
+							new VertexElementDescription(
+								"ex_ScreenCoord",
+								VertexElementSemantic.TextureCoordinate,
+								VertexElementFormat.Float2
+							),
+							new VertexElementDescription(
+								"ex_Data0",
+								VertexElementSemantic.Color,
+								VertexElementFormat.Float4
+							),
+							new VertexElementDescription(
+								"ex_Data1",
+								VertexElementSemantic.Color,
+								VertexElementFormat.Float4
+							),
+							new VertexElementDescription(
+								"ex_Data2",
+								VertexElementSemantic.Color,
+								VertexElementFormat.Float4
+							),
+							new VertexElementDescription(
+								"ex_Data3",
+								VertexElementSemantic.Color,
+								VertexElementFormat.Float4
+							),
+							new VertexElementDescription(
+								"ex_Data4",
+								VertexElementSemantic.Color,
+								VertexElementFormat.Float4
+							),
+							new VertexElementDescription(
+								"ex_Data5",
+								VertexElementSemantic.Color,
+								VertexElementFormat.Float4
+							),
+							new VertexElementDescription(
+								"ex_Data6",
+								VertexElementSemantic.Color,
+								VertexElementFormat.Float4
 							)
 						)
 					}, new[] {
 						vertexShader,
 						fragmentShader
-						//pathVertexShader,
-						//pathFragmentShader
 					}
 				),
 				new ResourceLayout[] {
-					mainResourceLayout,
 					ultralightResourceLayout,
-					ultralightUniformsResourceLayout
+					uniformsResourceLayout
 				},
 				ultralightOutputBuffer.OutputDescription
 			);
 
 			ultralightPipeline = factory.CreateGraphicsPipeline(ultralightPipelineDescription);
 
-			//pipelineDescription.Outputs = UltralightBuffer.OutputDescription;
-			//UltralightPipeline = factory.CreateGraphicsPipeline(pipelineDescription);
+			#endregion
+
+			#region Ultralight Path
+			ultralightPathOutputTexture = factory.CreateTexture(
+				new(
+					512,
+					512,
+					1,
+					1,
+					1,
+					PixelFormat.R8_G8_B8_A8_SInt,
+					TextureUsage.Sampled | TextureUsage.Storage | TextureUsage.RenderTarget,
+					TextureType.Texture2D
+				)
+			);
+
+			ultralightPathOutputBuffer = factory.CreateFramebuffer(
+				new FramebufferDescription()
+				{
+					ColorTargets = new[] {
+						new FramebufferAttachmentDescription(ultralightPathOutputTexture, 0)
+					}
+				}
+			);
+
+			GraphicsPipelineDescription ultralightPathPipelineDescription = new(
+				BlendStateDescription.SingleOverrideBlend,
+				new DepthStencilStateDescription(
+					depthTestEnabled: true,
+					depthWriteEnabled: true,
+					comparisonKind: ComparisonKind.LessEqual),
+				new RasterizerStateDescription(
+					cullMode: FaceCullMode.None,
+					fillMode: PolygonFillMode.Solid,
+					frontFace: FrontFace.Clockwise,
+					depthClipEnabled: true,
+					scissorTestEnabled: false),
+				PrimitiveTopology.TriangleStrip,
+				new ShaderSetDescription(
+					new VertexLayoutDescription[] {
+						new VertexLayoutDescription(
+							new VertexElementDescription(
+								"in_Position",
+								VertexElementSemantic.TextureCoordinate,
+								VertexElementFormat.Float2
+							),
+							new VertexElementDescription(
+								"in_Color",
+								VertexElementSemantic.Color,
+								VertexElementFormat.Float4
+							),
+							new VertexElementDescription(
+								"in_TexCoord",
+								VertexElementSemantic.TextureCoordinate,
+								VertexElementFormat.Float2
+							)
+						),
+						new VertexLayoutDescription(
+							new VertexElementDescription(
+								"ex_Color",
+								VertexElementSemantic.Color,
+								VertexElementFormat.Float4
+							),
+							new VertexElementDescription(
+								"ex_ObjectCoord",
+								VertexElementSemantic.TextureCoordinate,
+								VertexElementFormat.Float2
+							),
+							new VertexElementDescription(
+								"ex_ScreenCoord",
+								VertexElementSemantic.TextureCoordinate,
+								VertexElementFormat.Float2
+							)
+						)
+					}, new[] {
+						pathVertexShader,
+						pathFragmentShader
+					}
+				),
+				new ResourceLayout[] {
+					ultralightResourceLayout,
+					uniformsResourceLayout
+				},
+				ultralightPathOutputBuffer.OutputDescription
+			);
+
+			ultralightPathPipeline = factory.CreateGraphicsPipeline(ultralightPathPipelineDescription);
+
+			#endregion
 
 			commandList = factory.CreateCommandList();
 		}

@@ -21,7 +21,7 @@ float Scalar(uint i) { if (i < 4u) return Scalar4[0][i]; else return Scalar4[1][
 // Texture Units
 layout(binding = 0) uniform sampler2D Texture1;
 layout(binding = 1) uniform sampler2D Texture2;
-layout(binding = 2) uniform sampler2D Texture3;
+//layout(binding = 2) uniform sampler2D Texture3;
 
 // Vertex Attributes
 layout(location = 0) in vec4 ex_Color;

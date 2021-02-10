@@ -11,7 +11,7 @@ namespace VeldridSandbox
 		{
 			commandList.Begin();
 			commandList.SetPipeline(mainPipeline);
-			commandList.SetGraphicsResourceSet(0, ultralightResourceSet);
+			//commandList.SetGraphicsResourceSet(0, ultralightResourceSet);
 			foreach (var command in queuedCommands)
 			{
 				var index = (int)command.GpuState.RenderBufferId - 1;
