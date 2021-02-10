@@ -139,13 +139,6 @@ namespace VeldridSandbox
 								VertexElementSemantic.TextureCoordinate,
 								VertexElementFormat.Float2
 							)
-						),
-						new VertexLayoutDescription(
-							new VertexElementDescription(
-								"fUv",
-								VertexElementSemantic.TextureCoordinate,
-								VertexElementFormat.Float2
-							)
 						)
 					}, new[] {
 						mainv,
