@@ -171,15 +171,16 @@ namespace VeldridSandbox
 				TextureUsage.Sampled | TextureUsage.Storage | TextureUsage.RenderTarget,
 				TextureType.Texture2D));
 
-			ultralightOutputBuffer = factory.CreateFramebuffer(new FramebufferDescription()
+			ultralightOutputBuffer = factory.CreateFramebuffer(
+				new FramebufferDescription()
 				{
 					ColorTargets = new[] {
-							new FramebufferAttachmentDescription(ultralightOutputTexture, 0)
-						}
+						new FramebufferAttachmentDescription(ultralightOutputTexture, 0)
+					}
 				}
 			);
 
-			mainResourceSet = factory.CreateResourceSet(new ResourceSetDescription(mainResourceLayout, factory.CreateTextureView(ultralightOutputTexture), graphicsDevice.Aniso4xSampler));
+			mainResourceSet = factory.CreateResourceSet(new ResourceSetDescription(mainResourceLayout, factory.CreateTextureView(ultralightOutputTexture), TextureSampler));
 
 			#region Ultralight
 
@@ -318,12 +319,11 @@ namespace VeldridSandbox
 					}
 				),
 				new ResourceLayout[] {
-					ultralightResourceLayout,
-					uniformsResourceLayout
+					uniformsResourceLayout,
+					ultralightResourceLayout
 				},
 				ultralightOutputBuffer.OutputDescription
 			);
-
 			ultralightPipeline = factory.CreateGraphicsPipeline(ultralightPipelineDescription);
 
 			#endregion
@@ -406,11 +406,12 @@ namespace VeldridSandbox
 					}
 				),
 				new ResourceLayout[] {
-					ultralightResourceLayout,
 					uniformsResourceLayout
 				},
 				ultralightPathOutputBuffer.OutputDescription
 			);
+
+			
 
 			ultralightPathPipeline = factory.CreateGraphicsPipeline(ultralightPathPipelineDescription);
 

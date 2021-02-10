@@ -51,7 +51,7 @@ namespace VeldridSandbox
 			var frameBuffDesc = new FramebufferDescription()
 			{
 				ColorTargets = cltTrgs,
-				DepthTarget = depTrg
+				//DepthTarget = depTrg
 			};
 			var offscreenBuffer = device.ResourceFactory.CreateFramebuffer(frameBuffDesc);
 			return offscreenBuffer;

@@ -81,7 +81,7 @@ namespace VeldridSandbox
 							pixels);
 						dBitmap.Save($"./texture_{textureId}_updated.png", ImageFormat.Png);
 						graphicsDevice.UpdateTexture(tex, pixels,
-							texWidth * texHeight * 4,
+							texWidth * texHeight,
 							0,
 							0,
 							0,
