@@ -167,7 +167,7 @@ namespace VeldridSandbox
 				1,
 				1,
 				1,
-				PixelFormat.R8_G8_B8_A8_SInt,
+				PixelFormat.R8_G8_B8_A8_UInt,
 				TextureUsage.Sampled | TextureUsage.Storage | TextureUsage.RenderTarget,
 				TextureType.Texture2D));
 
@@ -336,7 +336,7 @@ namespace VeldridSandbox
 					1,
 					1,
 					1,
-					PixelFormat.R8_G8_B8_A8_SInt,
+					PixelFormat.R8_G8_B8_A8_UInt,
 					TextureUsage.Sampled | TextureUsage.Storage | TextureUsage.RenderTarget,
 					TextureType.Texture2D
 				)

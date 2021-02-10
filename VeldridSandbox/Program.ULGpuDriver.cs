@@ -166,7 +166,7 @@ namespace VeldridSandbox
 								1,
 								1,
 								PixelFormat.R8_UInt,
-								TextureUsage.RenderTarget | TextureUsage.Sampled | TextureUsage.Storage
+								TextureUsage.Sampled | TextureUsage.Storage
 							)
 						);
 						break;
@@ -178,7 +178,7 @@ namespace VeldridSandbox
 								1,
 								1,
 								PixelFormat.R8_G8_B8_A8_UInt,
-								TextureUsage.RenderTarget | TextureUsage.Sampled | TextureUsage.Storage
+								TextureUsage.Sampled | TextureUsage.Storage
 							)
 						);
 						break;
