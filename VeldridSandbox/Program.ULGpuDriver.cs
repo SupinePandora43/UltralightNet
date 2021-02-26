@@ -119,6 +119,15 @@ namespace VeldridSandbox
 			}
 
 			bitmap.UnlockPixels();
+			#region _gl.GenerateMipmap
+			Veldrid.CommandList cl = factory.CreateCommandList();
+			cl.Begin();
+			cl.GenerateMipmaps(tex);
+			cl.End();
+			graphicsDevice.SubmitCommands(cl);
+			cl.Dispose();
+			cl = null;
+			#endregion
 		}
 
 		private void CreateTexture(uint textureId, Bitmap bitmap)
@@ -148,8 +157,8 @@ namespace VeldridSandbox
 						texHeight,
 						1,
 						1,
-						PixelFormat.R8_G8_B8_A8_UInt,
-						TextureUsage.Staging
+						PixelFormat.R8_G8_B8_A8_UNorm,
+						TextureUsage.RenderTarget
 					)
 				);
 			}
@@ -165,8 +174,8 @@ namespace VeldridSandbox
 								texHeight,
 								1,
 								1,
-								PixelFormat.R8_UInt,
-								TextureUsage.Sampled | TextureUsage.Storage
+								PixelFormat.R8_UNorm,
+								TextureUsage.Sampled | TextureUsage.Storage | TextureUsage.GenerateMipmaps
 							)
 						);
 						break;
@@ -177,8 +186,8 @@ namespace VeldridSandbox
 								texHeight,
 								1,
 								1,
-								PixelFormat.R8_G8_B8_A8_UInt,
-								TextureUsage.Sampled | TextureUsage.Storage
+								PixelFormat.R8_G8_B8_A8_UNorm_SRgb,
+								TextureUsage.Sampled | TextureUsage.Storage | TextureUsage.GenerateMipmaps
 							)
 						);
 						break;

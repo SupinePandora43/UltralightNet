@@ -87,9 +87,7 @@ namespace VeldridSandbox
 
 		private Shader GetShader(string path, ShaderStages shaderStages)
 		{
-			//SpirvCompilationResult spirv = SpirvCompilation.CompileGlslToSpirv(shaderCode, "VertexFill", shaderStages, GlslCompileOptions.Default);
 			ShaderDescription shaderDescription = new(shaderStages, GetShaderBytes(path), "main");
-			//ShaderDescription shaderDescription = new(shaderStages, spirv.SpirvBytes, "main");
 			return factory.CreateFromSpirv(shaderDescription);
 			//return factory.CreateShader(shaderDescription);
 		}
