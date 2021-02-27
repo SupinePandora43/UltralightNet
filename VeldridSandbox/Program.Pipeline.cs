@@ -3,6 +3,7 @@ using System.Drawing;
 using System.IO;
 using System.Net;
 using System.Numerics;
+using System.Threading.Tasks;
 using Veldrid;
 using Veldrid.ImageSharp;
 
@@ -178,9 +179,7 @@ namespace VeldridSandbox
 								VertexElementSemantic.TextureCoordinate,
 								VertexElementFormat.Float2
 							)
-						)/*, new(
-							
-						)*/
+						)
 					}, new[] {
 						mainv,
 						mainf
@@ -205,21 +204,11 @@ namespace VeldridSandbox
 				TextureUsage.Sampled | TextureUsage.Storage | TextureUsage.RenderTarget,
 				TextureType.Texture2D));
 
-			Texture stagingTexture = factory.CreateTexture(new(
-				512,
-				512,
-				1,
-				1,
-				1,
-				PixelFormat.R8_G8_B8_A8_UNorm_SRgb,
-				TextureUsage.Staging,
-				TextureType.Texture2D));
-
 			testTexture = factory.CreateTexture(new(
-				128,
-				128,
+				256,
+				256,
 				1,
-				8,
+				9,
 				1,
 				PixelFormat.R8_G8_B8_A8_UNorm,
 				TextureUsage.Sampled,
@@ -234,33 +223,35 @@ namespace VeldridSandbox
 				}
 			);
 
-			//Stream omgStream = assembly.GetManifestResourceStream("VeldridSandbox.embedded.omg.png");
-
-			WebRequest request = HttpWebRequest.CreateHttp("https://emoji.gg/assets/emoji/2446_cursed_flushed.png");
-			
-			ImageSharpTexture imageSharpTexture = new(request.GetResponse().GetResponseStream());
-
-			unsafe
+			#region Async Flushed Image Loading
+			Task.Run(async () =>
 			{
-				/*fixed (byte* pixels = omgRaw.ToArray())
-				{
-					graphicsDevice.UpdateTexture(stagingTexture, (IntPtr)pixels, 4 * 128 * 128, 0, 0, 0, 128, 128, 1, 0, 0);
-				}*/
-			}
+				// fetch
+				WebRequest request = WebRequest.CreateHttp("https://emoji.gg/assets/emoji/2446_cursed_flushed.png");
+				// parse
+				ImageSharpTexture imageSharpTexture = new((await request.GetResponseAsync()).GetResponseStream());
+				// create texture
+				Texture omg = imageSharpTexture.CreateDeviceTexture(graphicsDevice, factory);
 
-			CommandList cl = factory.CreateCommandList();
-			cl.Begin();
+				#region upload to gpu
+				CommandList cl = factory.CreateCommandList();
+				cl.Begin();
+				cl.CopyTexture(omg, testTexture);
+				cl.End();
+				graphicsDevice.SubmitCommands(cl);
+				#endregion
 
-			Texture omg = imageSharpTexture.CreateDeviceTexture(graphicsDevice, factory);
+				#region dispose
+				cl.Dispose();
+				cl = null;
+				omg.Dispose();
+				omg = null;
+				imageSharpTexture = null;
+				request = null;
+				#endregion
+			});
+			#endregion
 
-			testTexture = omg;
-
-			/*cl.CopyTexture(omg, testTexture);
-			cl.End();
-			graphicsDevice.SubmitCommands(cl);
-			cl.Dispose();
-			cl = null;
-			*/
 			mainResourceSet = factory.CreateResourceSet(
 				new ResourceSetDescription(
 					mainResourceLayout,
