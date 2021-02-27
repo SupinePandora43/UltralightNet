@@ -1,23 +1,14 @@
 using Supine.UltralightSharp.Enums;
 using Supine.UltralightSharp.Safe;
 using System;
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.Drawing;
-using System.Drawing.Imaging;
 using System.IO;
-using System.Linq;
-using System.Numerics;
 using System.Reflection;
-using System.Runtime.InteropServices;
 using System.Text;
 using Veldrid;
 using Veldrid.Sdl2;
 using Veldrid.SPIRV;
 using Veldrid.StartupUtilities;
-using Bitmap = Supine.UltralightSharp.Safe.Bitmap;
-using DBitmap = System.Drawing.Bitmap;
-using PixelFormat = Veldrid.PixelFormat;
 
 namespace VeldridSandbox
 {
@@ -176,10 +167,10 @@ namespace VeldridSandbox
 		{
 			while (window.Exists)
 			{
-				window.PumpEvents();
 				renderer.Update();
 				renderer.Render();
 				Render();
+				window.PumpEvents();
 			}
 		}
 	}
