@@ -4,6 +4,7 @@ using System;
 using System.Diagnostics;
 using System.IO;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using System.Text;
 using Veldrid;
 using Veldrid.Sdl2;
@@ -76,11 +77,11 @@ namespace VeldridSandbox
 			return Encoding.UTF8.GetBytes(shaderCode);
 		}
 
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		private Shader GetShader(string path, ShaderStages shaderStages)
 		{
 			ShaderDescription shaderDescription = new(shaderStages, GetShaderBytes(path), "main");
 			return factory.CreateFromSpirv(shaderDescription);
-			//return factory.CreateShader(shaderDescription);
 		}
 
 		private byte[] LoadShaderBytes(string name)
@@ -163,6 +164,7 @@ namespace VeldridSandbox
 			factory = graphicsDevice.ResourceFactory;
 		}
 
+		[MethodImpl(MethodImplOptions.AggressiveOptimization)]
 		private void Run()
 		{
 			while (window.Exists)

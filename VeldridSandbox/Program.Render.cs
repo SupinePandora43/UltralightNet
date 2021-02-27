@@ -1,15 +1,18 @@
 using Supine.UltralightSharp.Enums;
 using Supine.UltralightSharp.Safe;
 using System;
+using System.Runtime.CompilerServices;
 using Veldrid;
 
 namespace VeldridSandbox
 {
 	public partial class Program
 	{
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		private unsafe void Render()
 		{
 			commandList.Begin();
+			/*
 			//commandList.SetPipeline(mainPipeline);
 			//commandList.SetGraphicsResourceSet(0, ultralightResourceSet);
 			foreach (var command in queuedCommands)
@@ -105,7 +108,7 @@ namespace VeldridSandbox
 				}
 			}
 			queuedCommands.Clear();
-
+			
 			//commandList.End();
 			//graphicsDevice.SubmitCommands(commandList);
 			//graphicsDevice.SwapBuffers();
@@ -118,9 +121,10 @@ namespace VeldridSandbox
 			Texture tex = rbEntry.TextureEntry.Texure;
 
 			//commandList.Begin();
-
+			*/
+			
 			commandList.SetFramebuffer(graphicsDevice.SwapchainFramebuffer);
-			commandList.SetFullViewports();
+			//commandList.SetFullViewports();
 			commandList.ClearColorTarget(0, RgbaFloat.Cyan);
 			commandList.SetPipeline(mainPipeline);
 			commandList.SetGraphicsResourceSet(0, mainResourceSet);
@@ -128,7 +132,7 @@ namespace VeldridSandbox
 			commandList.SetIndexBuffer(indexBuffer, IndexFormat.UInt16);
 
 			commandList.DrawIndexed(
-				indexCount: 6,
+				indexCount: 4,
 				instanceCount: 1,
 				indexStart: 0,
 				vertexOffset: 0,
