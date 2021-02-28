@@ -112,10 +112,10 @@ namespace VeldridSandbox
 		{
 			vertexBuffer = factory.CreateBuffer(new(VertexPositionTexture.SizeInBytes * 4, BufferUsage.VertexBuffer));
 			graphicsDevice.UpdateBuffer(vertexBuffer, 0, new VertexPositionTexture[] {
-				new(new(-.75f, .75f), new(1,0)),
-				new(new(.75f, .75f), new(0,0)),
-				new(new(-.75f, -.75f), new(1,1)),
-				new(new(.75f, -.75f), new(0,1)),
+				new(new(-.75f, .75f), new(0,0)),
+				new(new(.75f, .75f), new(1,0)),
+				new(new(-.75f, -.75f), new(0,1)),
+				new(new(.75f, -.75f), new(1,1)),
 			});
 
 			/*vertexBuffer = factory.CreateBuffer(new(32, BufferUsage.VertexBuffer));
