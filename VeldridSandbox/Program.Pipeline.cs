@@ -172,7 +172,7 @@ namespace VeldridSandbox
 			GraphicsPipelineDescription mainPipelineDescription = new(
 				BlendStateDescription.SingleAlphaBlend,
 				new DepthStencilStateDescription(
-					depthTestEnabled: true,
+					depthTestEnabled: false,
 					depthWriteEnabled: true,
 					comparisonKind: ComparisonKind.LessEqual),
 				new RasterizerStateDescription(
