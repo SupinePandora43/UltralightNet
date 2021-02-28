@@ -6,6 +6,7 @@ using System.Numerics;
 using System.Threading.Tasks;
 using Veldrid;
 using Veldrid.ImageSharp;
+using Veldrid.SPIRV;
 
 namespace VeldridSandbox
 {
@@ -84,12 +85,27 @@ namespace VeldridSandbox
 
 		private void CreateShaders()
 		{
-			mainv = GetShader("embedded.basic.vert.glsl", ShaderStages.Vertex);
-			mainf = GetShader("embedded.basic.frag.glsl", ShaderStages.Fragment);
-			vertexShader = GetShader("embedded.shader_v2f_c4f_t2f_t2f_d28f.vert.glsl", ShaderStages.Vertex);
-			fragmentShader = GetShader("embedded.shader_fill.frag.glsl", ShaderStages.Fragment);
-			pathVertexShader = GetShader("embedded.shader_v2f_c4f_t2f.vert.glsl", ShaderStages.Vertex);
-			pathFragmentShader = GetShader("embedded.shader_fill_path.frag.glsl", ShaderStages.Fragment);
+			#region main
+			ShaderDescription mainvShaderDescription = new(ShaderStages.Vertex, GetShaderBytes("embedded.basic.vert.glsl"), "main");
+			ShaderDescription mainfShaderDescription = new(ShaderStages.Fragment, GetShaderBytes("embedded.basic.frag.glsl"), "main");
+			Shader[] mainShaders = factory.CreateFromSpirv(mainvShaderDescription, mainfShaderDescription);
+			mainv = mainShaders[0];
+			mainf = mainShaders[1];
+			#endregion
+			#region fill
+			ShaderDescription vertexShaderShaderDescription = new(ShaderStages.Vertex, GetShaderBytes("embedded.shader_v2f_c4f_t2f_t2f_d28f.vert.glsl"), "main");
+			ShaderDescription fragmentShaderShaderDescription = new(ShaderStages.Fragment, GetShaderBytes("embedded.shader_fill.frag.glsl"), "main");
+			Shader[] shaders = factory.CreateFromSpirv(vertexShaderShaderDescription, fragmentShaderShaderDescription);
+			vertexShader = shaders[0];
+			fragmentShader = shaders[1];
+			#endregion
+			#region fillPath
+			ShaderDescription pathVertexShaderShaderDescription = new(ShaderStages.Vertex, GetShaderBytes("embedded.shader_v2f_c4f_t2f.vert.glsl"), "main");
+			ShaderDescription pathFragmentShaderShaderDescription = new(ShaderStages.Fragment, GetShaderBytes("embedded.shader_fill_path.frag.glsl"), "main");
+			Shader[] pathShaders = factory.CreateFromSpirv(pathVertexShaderShaderDescription, pathFragmentShaderShaderDescription);
+			pathVertexShader = pathShaders[0];
+			pathFragmentShader = pathShaders[1];
+			#endregion
 		}
 
 		private void CreateBuffers()
@@ -269,11 +285,11 @@ namespace VeldridSandbox
 					depthWriteEnabled: true,
 					comparisonKind: ComparisonKind.LessEqual),
 				new RasterizerStateDescription(
-					cullMode: FaceCullMode.None,
+					cullMode: FaceCullMode.Back,
 					fillMode: PolygonFillMode.Solid,
 					frontFace: FrontFace.Clockwise,
 					depthClipEnabled: true,
-					scissorTestEnabled: false),
+					scissorTestEnabled: true),
 				PrimitiveTopology.TriangleStrip,
 				new ShaderSetDescription(
 					new VertexLayoutDescription[] {

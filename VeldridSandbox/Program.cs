@@ -77,13 +77,6 @@ namespace VeldridSandbox
 			return Encoding.UTF8.GetBytes(shaderCode);
 		}
 
-		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		private Shader GetShader(string path, ShaderStages shaderStages)
-		{
-			ShaderDescription shaderDescription = new(shaderStages, GetShaderBytes(path), "main");
-			return factory.CreateFromSpirv(shaderDescription);
-		}
-
 		private byte[] LoadShaderBytes(string name)
 		{
 			string extension = graphicsDevice.BackendType switch
