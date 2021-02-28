@@ -349,63 +349,6 @@ namespace VeldridSandbox
 								VertexElementSemantic.Color,
 								VertexElementFormat.Float4
 							)
-						),
-						new VertexLayoutDescription(
-							new VertexElementDescription(
-								"ex_Color",
-								VertexElementSemantic.Color,
-								VertexElementFormat.Float4
-							),
-							new VertexElementDescription(
-								"ex_TexCoord",
-								VertexElementSemantic.TextureCoordinate,
-								VertexElementFormat.Float2
-							),
-							new VertexElementDescription(
-								"ex_ObjectCoord",
-								VertexElementSemantic.TextureCoordinate,
-								VertexElementFormat.Float2
-							),
-							new VertexElementDescription(
-								"ex_ScreenCoord",
-								VertexElementSemantic.TextureCoordinate,
-								VertexElementFormat.Float2
-							),
-							new VertexElementDescription(
-								"ex_Data0",
-								VertexElementSemantic.Color,
-								VertexElementFormat.Float4
-							),
-							new VertexElementDescription(
-								"ex_Data1",
-								VertexElementSemantic.Color,
-								VertexElementFormat.Float4
-							),
-							new VertexElementDescription(
-								"ex_Data2",
-								VertexElementSemantic.Color,
-								VertexElementFormat.Float4
-							),
-							new VertexElementDescription(
-								"ex_Data3",
-								VertexElementSemantic.Color,
-								VertexElementFormat.Float4
-							),
-							new VertexElementDescription(
-								"ex_Data4",
-								VertexElementSemantic.Color,
-								VertexElementFormat.Float4
-							),
-							new VertexElementDescription(
-								"ex_Data5",
-								VertexElementSemantic.Color,
-								VertexElementFormat.Float4
-							),
-							new VertexElementDescription(
-								"ex_Data6",
-								VertexElementSemantic.Color,
-								VertexElementFormat.Float4
-							)
 						)
 					}, new[] {
 						vertexShader,
@@ -473,23 +416,6 @@ namespace VeldridSandbox
 							),
 							new VertexElementDescription(
 								"in_TexCoord",
-								VertexElementSemantic.TextureCoordinate,
-								VertexElementFormat.Float2
-							)
-						),
-						new VertexLayoutDescription(
-							new VertexElementDescription(
-								"ex_Color",
-								VertexElementSemantic.Color,
-								VertexElementFormat.Float4
-							),
-							new VertexElementDescription(
-								"ex_ObjectCoord",
-								VertexElementSemantic.TextureCoordinate,
-								VertexElementFormat.Float2
-							),
-							new VertexElementDescription(
-								"ex_ScreenCoord",
 								VertexElementSemantic.TextureCoordinate,
 								VertexElementFormat.Float2
 							)
