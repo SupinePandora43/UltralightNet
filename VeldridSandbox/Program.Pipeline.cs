@@ -301,7 +301,7 @@ namespace VeldridSandbox
 							),
 							new VertexElementDescription(
 								"in_Color",
-								VertexElementSemantic.Color,
+								VertexElementSemantic.TextureCoordinate,
 								VertexElementFormat.Float4
 							),
 							new VertexElementDescription(
@@ -316,37 +316,37 @@ namespace VeldridSandbox
 							),
 							new VertexElementDescription(
 								"in_Data0",
-								VertexElementSemantic.Color,
+								VertexElementSemantic.TextureCoordinate,
 								VertexElementFormat.Float4
 							),
 							new VertexElementDescription(
 								"in_Data1",
-								VertexElementSemantic.Color,
+								VertexElementSemantic.TextureCoordinate,
 								VertexElementFormat.Float4
 							),
 							new VertexElementDescription(
 								"in_Data2",
-								VertexElementSemantic.Color,
+								VertexElementSemantic.TextureCoordinate,
 								VertexElementFormat.Float4
 							),
 							new VertexElementDescription(
 								"in_Data3",
-								VertexElementSemantic.Color,
+								VertexElementSemantic.TextureCoordinate,
 								VertexElementFormat.Float4
 							),
 							new VertexElementDescription(
 								"in_Data4",
-								VertexElementSemantic.Color,
+								VertexElementSemantic.TextureCoordinate,
 								VertexElementFormat.Float4
 							),
 							new VertexElementDescription(
 								"in_Data5",
-								VertexElementSemantic.Color,
+								VertexElementSemantic.TextureCoordinate,
 								VertexElementFormat.Float4
 							),
 							new VertexElementDescription(
 								"in_Data6",
-								VertexElementSemantic.Color,
+								VertexElementSemantic.TextureCoordinate,
 								VertexElementFormat.Float4
 							)
 						)
@@ -411,7 +411,7 @@ namespace VeldridSandbox
 							),
 							new VertexElementDescription(
 								"in_Color",
-								VertexElementSemantic.Color,
+								VertexElementSemantic.TextureCoordinate,
 								VertexElementFormat.Float4
 							),
 							new VertexElementDescription(
