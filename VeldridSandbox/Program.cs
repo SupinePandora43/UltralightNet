@@ -121,7 +121,7 @@ namespace VeldridSandbox
 			renderer = new(cfg);
 			Session session = renderer.GetDefaultSession();
 			view = new(renderer, 512, 512, false, session, false);
-			view.LoadUrl("https://github.com");
+			view.LoadUrl("https://youtube.com"); //https://github.com
 			#endregion
 		}
 
@@ -153,6 +153,7 @@ namespace VeldridSandbox
 				graphicsDevice.ResizeMainWindow((uint)window.Width, (uint)window.Height);
 				width = window.Width;
 				height = window.Height;
+				view.Resize((uint)window.Width, (uint)window.Height);
 			};
 			factory = graphicsDevice.ResourceFactory;
 		}
