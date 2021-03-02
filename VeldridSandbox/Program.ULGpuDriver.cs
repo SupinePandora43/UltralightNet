@@ -1,9 +1,13 @@
+using SixLabors.ImageSharp;
+using SixLabors.ImageSharp.PixelFormats;
 using Supine.UltralightSharp.Enums;
 using Supine.UltralightSharp.Safe;
 using System;
 using System.Collections.Generic;
 using System.Drawing.Imaging;
+using System.IO;
 using Veldrid;
+using Veldrid.ImageSharp;
 using Bitmap = Supine.UltralightSharp.Safe.Bitmap;
 using DBitmap = System.Drawing.Bitmap;
 using PixelFormat = Veldrid.PixelFormat;
@@ -28,6 +32,7 @@ namespace VeldridSandbox
 		public class TextureEntry
 		{
 			public Texture Texure { get; set; }
+			public TextureView TextureView { get; set; }
 			public uint Width { get; set; }
 			public uint Height { get; set; }
 		}
@@ -73,13 +78,6 @@ namespace VeldridSandbox
 			{
 				case BitmapFormat.A8UNorm:
 					{
-						DBitmap dBitmap = new DBitmap(
-							(int)texWidth,
-							(int)texHeight,
-							(int)bitmap.GetRowBytes(),
-							System.Drawing.Imaging.PixelFormat.Format8bppIndexed,
-							pixels);
-						dBitmap.Save($"./texture_{textureId}_updated.png", ImageFormat.Png);
 						graphicsDevice.UpdateTexture(tex, pixels,
 							texWidth * texHeight,
 							0,
@@ -91,17 +89,18 @@ namespace VeldridSandbox
 							0,
 							0
 						);
+						unsafe
+						{
+							ReadOnlySpan<byte> span = new(pixels.ToPointer(), (int)(texWidth * texHeight));
+							Image image = Image.LoadPixelData<L8>(span, (int)texWidth, (int)texHeight);
+							FileStream fs = File.Open($"./texture_{textureId}_updated_{Guid.NewGuid()}.png", FileMode.OpenOrCreate);
+							image.SaveAsPng(fs);
+							fs.Close();
+						}
 						break;
 					}
 				case BitmapFormat.Bgra8UNormSrgb:
 					{
-						DBitmap dBitmap = new DBitmap(
-							(int)texWidth,
-							(int)texHeight,
-							(int)bitmap.GetRowBytes(),
-							System.Drawing.Imaging.PixelFormat.Format32bppPArgb,
-							pixels);
-						dBitmap.Save($"./texture_{textureId}_updated.png", ImageFormat.Png);
 						graphicsDevice.UpdateTexture(tex, pixels,
 							texWidth * texHeight * 4,
 							0,
@@ -113,6 +112,14 @@ namespace VeldridSandbox
 							0,
 							0
 						);
+						unsafe
+						{
+							ReadOnlySpan<byte> span = new(pixels.ToPointer(), (int)(texWidth * texHeight * 4));
+							Image image = Image.LoadPixelData<Rgba32>(span, (int)texWidth, (int)texHeight);
+							FileStream fs = File.Open($"./texture_{textureId}_updated_{Guid.NewGuid()}.png", FileMode.OpenOrCreate);
+							image.SaveAsPng(fs);
+							fs.Close();
+						}
 						break;
 					}
 				default: throw new ArgumentOutOfRangeException(nameof(BitmapFormat));
@@ -141,14 +148,6 @@ namespace VeldridSandbox
 			Console.WriteLine($"GpuDriver.CreateTexture({textureId} {texWidth}x{texHeight})");
 			var pixels = bitmap.LockPixels();
 
-			DBitmap dBitmap = new DBitmap(
-				(int)texWidth,
-				(int)texHeight,
-				(int)bitmap.GetRowBytes(),
-				System.Drawing.Imaging.PixelFormat.Format32bppPArgb,
-				pixels);
-			dBitmap.Save($"./texture_{textureId}.png", ImageFormat.Png);
-
 			if (bitmap.IsEmpty())
 			{
 				Console.WriteLine("Bitmap.IsEmtpy()==true");
@@ -158,9 +157,10 @@ namespace VeldridSandbox
 						1,
 						1,
 						PixelFormat.R8_G8_B8_A8_UNorm,
-						TextureUsage.RenderTarget
+						TextureUsage.Sampled | TextureUsage.RenderTarget
 					)
 				);
+				entry.TextureView = factory.CreateTextureView(entry.Texure);
 			}
 			else
 			{
@@ -175,9 +175,17 @@ namespace VeldridSandbox
 								1,
 								1,
 								PixelFormat.R8_UNorm,
-								TextureUsage.Sampled | TextureUsage.Storage | TextureUsage.GenerateMipmaps
+								TextureUsage.Sampled | TextureUsage.GenerateMipmaps
 							)
 						);
+						unsafe
+						{
+							ReadOnlySpan<byte> span = new(pixels.ToPointer(), (int)(texWidth * texHeight));
+							Image image = Image.LoadPixelData<L8>(span, (int)texWidth, (int)texHeight);
+							FileStream fs = File.Open($"./texture_{textureId}_{Guid.NewGuid()}.png", FileMode.OpenOrCreate);
+							image.SaveAsPng(fs);
+							fs.Close();
+						}
 						break;
 					case BitmapFormat.Bgra8UNormSrgb:
 						entry.Texure = factory.CreateTexture(
@@ -186,12 +194,21 @@ namespace VeldridSandbox
 								texHeight,
 								1,
 								1,
-								PixelFormat.R8_G8_B8_A8_UNorm_SRgb,
-								TextureUsage.Sampled | TextureUsage.Storage | TextureUsage.GenerateMipmaps
+								PixelFormat.R8_G8_B8_A8_UNorm,
+								TextureUsage.Sampled | TextureUsage.GenerateMipmaps
 							)
 						);
+						unsafe
+						{
+							ReadOnlySpan<byte> span = new(pixels.ToPointer(), (int)(texWidth * texHeight * 4));
+							Image image = Image.LoadPixelData<Rgba32>(span, (int)texWidth, (int)texHeight);
+							FileStream fs = File.Open($"./texture_{textureId}_{Guid.NewGuid()}.png", FileMode.OpenOrCreate);
+							image.SaveAsPng(fs);
+							fs.Close();
+						}
 						break;
 				}
+				entry.TextureView = factory.CreateTextureView(entry.Texure);
 				graphicsDevice.UpdateTexture(entry.Texure,
 					pixels,
 					texWidth * texHeight * 4,
@@ -242,11 +259,18 @@ namespace VeldridSandbox
 			
 			entry.FrameBuffer = factory.CreateFramebuffer(framebufferDescription);
 			*/
-			entry.FrameBuffer = FrameBufferHelper.CreateFramebuffer(
+
+			FramebufferDescription fd = new();
+			fd.ColorTargets = new[] { new FramebufferAttachmentDescription(tex, 0) };
+
+			/*entry.FrameBuffer = FrameBufferHelper.CreateFramebuffer(
 				graphicsDevice,
 				tex.Width,
 				tex.Height,
-				PixelFormat.R8_G8_B8_A8_UInt);
+				PixelFormat.R8_G8_B8_A8_UInt);*/
+
+			entry.FrameBuffer = factory.CreateFramebuffer(fd);
+
 			//entry.FrameBuffer.ColorTargets.Append(new(tex, 0));
 			entry.TextureEntry = texEntry;
 		}

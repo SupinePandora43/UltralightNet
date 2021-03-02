@@ -127,7 +127,7 @@ namespace VeldridSandbox
 
 			uniformBuffer = factory.CreateBuffer(new(768, BufferUsage.UniformBuffer));
 		}
-
+		ResourceLayout mainResourceLayout = null;
 		private void CreatePipeline()
 		{
 			TextureSampler = graphicsDevice.Aniso4xSampler;
@@ -137,7 +137,7 @@ namespace VeldridSandbox
 
 			#region QUAD
 
-			ResourceLayout mainResourceLayout = factory.CreateResourceLayout(
+			mainResourceLayout = factory.CreateResourceLayout(
 				new ResourceLayoutDescription(
 					new ResourceLayoutElementDescription("iTex",
 						ResourceKind.TextureReadOnly,
@@ -213,7 +213,7 @@ namespace VeldridSandbox
 				1,
 				1,
 				1,
-				PixelFormat.R8_G8_B8_A8_UInt,
+				PixelFormat.R8_G8_B8_A8_UNorm,
 				TextureUsage.Sampled | TextureUsage.Storage | TextureUsage.RenderTarget,
 				TextureType.Texture2D));
 
@@ -268,19 +268,19 @@ namespace VeldridSandbox
 			#endregion
 
 
-			mainResourceSet = factory.CreateResourceSet(
+			/*mainResourceSet = factory.CreateResourceSet(
 				new ResourceSetDescription(
 					mainResourceLayout,
 					tv
 				)
-			);
+			);*/
 
 			#region Ultralight
 
 			GraphicsPipelineDescription ultralightPipelineDescription = new(
 				BlendStateDescription.SingleOverrideBlend,
 				new DepthStencilStateDescription(
-					depthTestEnabled: true,
+					depthTestEnabled: false,
 					depthWriteEnabled: true,
 					comparisonKind: ComparisonKind.LessEqual),
 				new RasterizerStateDescription(
@@ -365,7 +365,7 @@ namespace VeldridSandbox
 			#endregion
 
 			#region Ultralight Path
-			ultralightPathOutputTexture = factory.CreateTexture(
+			/*ultralightPathOutputTexture = factory.CreateTexture(
 				new(
 					512,
 					512,
@@ -376,21 +376,21 @@ namespace VeldridSandbox
 					TextureUsage.Sampled | TextureUsage.Storage | TextureUsage.RenderTarget,
 					TextureType.Texture2D
 				)
-			);
+			);*/
 
-			ultralightPathOutputBuffer = factory.CreateFramebuffer(
+			/*ultralightPathOutputBuffer = factory.CreateFramebuffer(
 				new FramebufferDescription()
 				{
 					ColorTargets = new[] {
 						new FramebufferAttachmentDescription(ultralightPathOutputTexture, 0)
 					}
 				}
-			);
+			);*/
 
 			GraphicsPipelineDescription ultralightPathPipelineDescription = new(
 				BlendStateDescription.SingleOverrideBlend,
 				new DepthStencilStateDescription(
-					depthTestEnabled: true,
+					depthTestEnabled: false,
 					depthWriteEnabled: true,
 					comparisonKind: ComparisonKind.LessEqual),
 				new RasterizerStateDescription(
@@ -423,11 +423,7 @@ namespace VeldridSandbox
 						pathVertexShader,
 						pathFragmentShader
 					}
-				),
-				new ResourceLayout[] {
-					uniformsResourceLayout
-				},
-				ultralightPathOutputBuffer.OutputDescription
+				), uniformsResourceLayout, ultralightOutputBuffer.OutputDescription
 			);
 
 
