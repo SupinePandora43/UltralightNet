@@ -128,6 +128,7 @@ namespace VeldridSandbox
 			uniformBuffer = factory.CreateBuffer(new(768, BufferUsage.UniformBuffer));
 		}
 		ResourceLayout mainResourceLayout = null;
+		ResourceLayout ultralightResourceLayout = null;
 		private void CreatePipeline()
 		{
 			TextureSampler = graphicsDevice.Aniso4xSampler;
@@ -147,10 +148,10 @@ namespace VeldridSandbox
 			);
 
 
-			ResourceLayout ultralightResourceLayout = factory.CreateResourceLayout(
+			ultralightResourceLayout = factory.CreateResourceLayout(
 				new ResourceLayoutDescription(
-					new ResourceLayoutElementDescription("Texture1", ResourceKind.Sampler, ShaderStages.Fragment),
-					new ResourceLayoutElementDescription("Texture2", ResourceKind.Sampler, ShaderStages.Fragment)//,
+					new ResourceLayoutElementDescription("Texture1", ResourceKind.TextureReadOnly, ShaderStages.Fragment),
+					new ResourceLayoutElementDescription("Texture2", ResourceKind.TextureReadOnly, ShaderStages.Fragment)//,
 																												 //new ResourceLayoutElementDescription("Texture3", ResourceKind.Sampler, ShaderStages.Fragment)
 				)
 			);
@@ -267,7 +268,7 @@ namespace VeldridSandbox
 			});
 			#endregion
 
-
+			// uncomment to see flushed (~0_0~)
 			/*mainResourceSet = factory.CreateResourceSet(
 				new ResourceSetDescription(
 					mainResourceLayout,
@@ -278,17 +279,17 @@ namespace VeldridSandbox
 			#region Ultralight
 
 			GraphicsPipelineDescription ultralightPipelineDescription = new(
-				BlendStateDescription.SingleOverrideBlend,
+				BlendStateDescription.SingleAlphaBlend,
 				new DepthStencilStateDescription(
 					depthTestEnabled: false,
 					depthWriteEnabled: true,
-					comparisonKind: ComparisonKind.LessEqual),
+					comparisonKind: ComparisonKind.Never),
 				new RasterizerStateDescription(
 					cullMode: FaceCullMode.Back,
 					fillMode: PolygonFillMode.Solid,
 					frontFace: FrontFace.Clockwise,
 					depthClipEnabled: true,
-					scissorTestEnabled: true),
+					scissorTestEnabled: false),
 				PrimitiveTopology.TriangleStrip,
 				new ShaderSetDescription(
 					new VertexLayoutDescription[] {
@@ -388,11 +389,11 @@ namespace VeldridSandbox
 			);*/
 
 			GraphicsPipelineDescription ultralightPathPipelineDescription = new(
-				BlendStateDescription.SingleOverrideBlend,
+				BlendStateDescription.SingleAlphaBlend,
 				new DepthStencilStateDescription(
 					depthTestEnabled: false,
 					depthWriteEnabled: true,
-					comparisonKind: ComparisonKind.LessEqual),
+					comparisonKind: ComparisonKind.Never),
 				new RasterizerStateDescription(
 					cullMode: FaceCullMode.None,
 					fillMode: PolygonFillMode.Solid,
@@ -423,7 +424,8 @@ namespace VeldridSandbox
 						pathVertexShader,
 						pathFragmentShader
 					}
-				), uniformsResourceLayout, ultralightOutputBuffer.OutputDescription
+				), uniformsResourceLayout,
+				ultralightOutputBuffer.OutputDescription
 			);
 
 

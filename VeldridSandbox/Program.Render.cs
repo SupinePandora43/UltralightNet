@@ -21,7 +21,6 @@ namespace VeldridSandbox
 
 			if (mainResourceSet != null)
 			{
-
 				commandList.SetPipeline(mainPipeline);
 				commandList.SetGraphicsResourceSet(0, mainResourceSet);
 				commandList.SetVertexBuffer(0, vertexBuffer);
@@ -39,9 +38,9 @@ namespace VeldridSandbox
 				RenderTarget rt = view.GetRenderTarget();
 				var rbIndex = (int)rt.RenderBufferId - 1;
 				RenderBufferEntry rbEntry = RenderBufferEntries[rbIndex];
-				TextureView tv = rbEntry.TextureEntry.TextureView;
+				TextureView tvRT = rbEntry.TextureEntry.TextureView;
 
-				mainResourceSet = factory.CreateResourceSet(new ResourceSetDescription(mainResourceLayout, tv));
+				mainResourceSet = factory.CreateResourceSet(new ResourceSetDescription(mainResourceLayout, tvRT));
 			}
 			commandList.End();
 			graphicsDevice.SubmitCommands(commandList);

@@ -75,7 +75,11 @@ namespace VeldridSandbox
 						break;
 					case Supine.UltralightSharp.Enums.CommandType.DrawGeometry:
 						commandList.SetFramebuffer(rb.FrameBuffer);
+						commandList.SetFullViewports();
+						//commandList.SetViewport(0, new Viewport(0, 0, state.ViewportWidth, state.ViewportHeight, 0, 1));
 						var entry = GeometryEntries[(int)command.GeometryId - 1];
+
+						bool fill = true;
 
 						switch (command.GpuState.ShaderType)
 						{
@@ -84,12 +88,34 @@ namespace VeldridSandbox
 								break;
 							case Supine.UltralightSharp.Enums.ShaderType.FillPath:
 								commandList.SetPipeline(ultralightPathPipeline);
+								fill = false;
 								break;
 							default: throw new ArgumentOutOfRangeException(nameof(ShaderType));
 						}
 
+
+						if (fill)
+						{
+							var texIndex1 = (int)state.Texture1Id - 1;
+							var texIndex2 = (int)state.Texture2Id - 1;
+
+							ResourceSet rs = factory.CreateResourceSet(
+								new ResourceSetDescription(
+									ultralightResourceLayout,
+									tv,
+									tv
+								)
+							);
+							commandList.SetGraphicsResourceSet(1, rs);
+						}
 						commandList.SetVertexBuffer(0, entry.VertexBuffer);
-						commandList.SetIndexBuffer(entry.IndiciesBuffer, IndexFormat.UInt16);
+						if (state.EnableScissor)
+						{
+							ref readonly var r = ref state.ScissorRect;
+							commandList.SetScissorRect(0, (uint)r.Left, (uint)r.Top, (uint)(r.Right - r.Left), (uint)(r.Bottom - r.Top));
+						}
+
+						commandList.SetIndexBuffer(entry.IndiciesBuffer, IndexFormat.UInt32);
 
 						commandList.DrawIndexed(
 							command.IndicesCount,
@@ -103,7 +129,7 @@ namespace VeldridSandbox
 				}
 			}
 			queuedCommands.Clear();
-			
+
 			//commandList.End();
 			//graphicsDevice.SubmitCommands(commandList);
 			//graphicsDevice.SwapBuffers();
