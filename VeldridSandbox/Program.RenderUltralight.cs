@@ -94,6 +94,8 @@ namespace VeldridSandbox
 						}
 
 
+						commandList.SetGraphicsResourceSet(0, uniformResourceSet);
+
 						if (fill)
 						{
 							var texIndex1 = (int)state.Texture1Id - 1;

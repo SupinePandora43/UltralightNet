@@ -28,6 +28,7 @@ namespace VeldridSandbox
 		private Texture ultralightPathOutputTexture;
 
 		private ResourceSet mainResourceSet;
+		private ResourceSet uniformResourceSet;
 		private ResourceSet ultralightResourceSet;
 		private ResourceSet ultralightPathResourceSet;
 
@@ -152,7 +153,7 @@ namespace VeldridSandbox
 				new ResourceLayoutDescription(
 					new ResourceLayoutElementDescription("Texture1", ResourceKind.TextureReadOnly, ShaderStages.Fragment),
 					new ResourceLayoutElementDescription("Texture2", ResourceKind.TextureReadOnly, ShaderStages.Fragment)//,
-																												 //new ResourceLayoutElementDescription("Texture3", ResourceKind.Sampler, ShaderStages.Fragment)
+																														 //new ResourceLayoutElementDescription("Texture3", ResourceKind.Sampler, ShaderStages.Fragment)
 				)
 			);
 
@@ -167,6 +168,12 @@ namespace VeldridSandbox
 						)
 					)
 				);
+
+			uniformResourceSet = factory.CreateResourceSet(new ResourceSetDescription(
+				uniformsResourceLayout,
+				uniformBuffer
+			));
+
 			GraphicsPipelineDescription mainPipelineDescription = new(
 				BlendStateDescription.SingleAlphaBlend,
 				new DepthStencilStateDescription(
