@@ -47,6 +47,7 @@ namespace VeldridSandbox
 		DeviceBuffer uniformBuffer;
 
 		Texture testTexture;
+		TextureView tv;
 
 		private static readonly float[] _quadVerts = {
 			/*1f, 1f, 0f,
@@ -138,12 +139,8 @@ namespace VeldridSandbox
 
 			ResourceLayout mainResourceLayout = factory.CreateResourceLayout(
 				new ResourceLayoutDescription(
-					new ResourceLayoutElementDescription("SurfaceTexture",
+					new ResourceLayoutElementDescription("iTex",
 						ResourceKind.TextureReadOnly,
-						ShaderStages.Fragment
-					),
-					new ResourceLayoutElementDescription("SurfaceSampler",
-						ResourceKind.Sampler,
 						ShaderStages.Fragment
 					)
 				)
@@ -238,6 +235,7 @@ namespace VeldridSandbox
 					}
 				}
 			);
+			tv = factory.CreateTextureView(testTexture);
 
 			#region Async Flushed Image Loading
 			Task.Run(async () =>
@@ -252,10 +250,11 @@ namespace VeldridSandbox
 				#region upload to gpu
 				CommandList cl = factory.CreateCommandList();
 				cl.Begin();
-				cl.CopyTexture(omg, testTexture);
+				cl.CopyTexture(omg, tv.Target);
 				cl.End();
 				graphicsDevice.SubmitCommands(cl);
 				#endregion
+
 
 				#region dispose
 				cl.Dispose();
@@ -268,11 +267,11 @@ namespace VeldridSandbox
 			});
 			#endregion
 
+
 			mainResourceSet = factory.CreateResourceSet(
 				new ResourceSetDescription(
 					mainResourceLayout,
-					testTexture,
-					TextureSampler
+					tv
 				)
 			);
 
