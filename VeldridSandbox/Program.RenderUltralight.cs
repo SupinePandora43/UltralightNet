@@ -2,14 +2,20 @@
 using Supine.UltralightSharp.Enums;
 using Supine.UltralightSharp.Safe;
 using System;
+using System.Collections.Generic;
+using System.Threading;
 using Veldrid;
 
 namespace VeldridSandbox
 {
 	partial class Program
 	{
+		readonly List<ResourceSet> textureResourceSets = new();
 		private void RenderUltralight()
 		{
+			foreach (var rs in textureResourceSets) rs.Dispose();
+			textureResourceSets.Clear();
+
 			foreach (var command in queuedCommands)
 			{
 				ref readonly var state = ref command.GpuState;
@@ -70,46 +76,61 @@ namespace VeldridSandbox
 				switch (command.CommandType)
 				{
 					case Supine.UltralightSharp.Enums.CommandType.ClearRenderBuffer:
-						commandList.SetFramebuffer(rb.FrameBuffer);
-						commandList.ClearColorTarget(0, RgbaFloat.Blue);
+						//commandList.SetFramebuffer(rb.FrameBuffer);
+						//commandList.ClearColorTarget(0, RgbaFloat.Blue);
+						Console.WriteLine("cleared buffer");
 						break;
 					case Supine.UltralightSharp.Enums.CommandType.DrawGeometry:
-						commandList.SetFramebuffer(rb.FrameBuffer);
-						commandList.SetFullViewports();
-						//commandList.SetViewport(0, new Viewport(0, 0, state.ViewportWidth, state.ViewportHeight, 0, 1));
-						var entry = GeometryEntries[(int)command.GeometryId - 1];
 
 						bool fill = true;
-
 						switch (command.GpuState.ShaderType)
 						{
 							case Supine.UltralightSharp.Enums.ShaderType.Fill:
+								commandList.SetFramebuffer(ultralightOutputBuffer);
 								commandList.SetPipeline(ultralightPipeline);
 								break;
 							case Supine.UltralightSharp.Enums.ShaderType.FillPath:
+								commandList.SetFramebuffer(ultralightPathOutputBuffer);
 								commandList.SetPipeline(ultralightPathPipeline);
 								fill = false;
 								break;
 							default: throw new ArgumentOutOfRangeException(nameof(ShaderType));
 						}
 
+						//if (command.GpuState.ShaderType == Supine.UltralightSharp.Enums.ShaderType.FillPath) continue;
+						//commandList.SetFramebuffer(rb.FrameBuffer);
+						//commandList.SetFullViewports();
+						commandList.SetViewport(0, new Viewport(0, 0, state.ViewportWidth, state.ViewportHeight, 0, 1));
+						var entry = GeometryEntries[(int)command.GeometryId - 1];
 
 						commandList.SetGraphicsResourceSet(0, uniformResourceSet);
 
 						if (fill)
 						{
+							TextureView textureView1;
+							TextureView textureView2;
+
 							var texIndex1 = (int)state.Texture1Id - 1;
 							var texIndex2 = (int)state.Texture2Id - 1;
+
+							if (texIndex1 < 0) textureView1 = tv;
+							else textureView1 = TextureEntries[texIndex1].TextureView;
+							if (texIndex2 < 0) textureView2 = tv;
+							else textureView2 = TextureEntries[texIndex2].TextureView;
 
 							ResourceSet rs = factory.CreateResourceSet(
 								new ResourceSetDescription(
 									ultralightResourceLayout,
-									tv,
-									tv
+									textureView1,
+									textureView2
 								)
 							);
+							textureResourceSets.Add(rs);
+
 							commandList.SetGraphicsResourceSet(1, rs);
+
 						}
+
 						commandList.SetVertexBuffer(0, entry.VertexBuffer);
 						if (state.EnableScissor)
 						{
@@ -118,14 +139,16 @@ namespace VeldridSandbox
 						}
 
 						commandList.SetIndexBuffer(entry.IndiciesBuffer, IndexFormat.UInt32);
-
-						commandList.DrawIndexed(
-							command.IndicesCount,
-							1,
-							0,
-							0,
-							command.IndicesOffset
-						);
+						unsafe
+						{
+							commandList.DrawIndexed(
+								command.IndicesCount,
+								0,
+								0,
+								0,
+								command.IndicesOffset
+							);
+						}
 
 						break;
 				}

@@ -6,6 +6,7 @@ using System.IO;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Text;
+using System.Threading;
 using Veldrid;
 using Veldrid.Sdl2;
 using Veldrid.SPIRV;
@@ -121,7 +122,15 @@ namespace VeldridSandbox
 			renderer = new(cfg);
 			Session session = renderer.GetDefaultSession();
 			view = new(renderer, 512, 512, false, session, false);
+			bool loaded = false;
+			view.SetFinishLoadingCallback((IntPtr userData, View caller, ulong frameId, bool isMainFrame,
+	  string? url) => { loaded = true; }, default);
 			view.LoadUrl("https://youtube.com"); //https://github.com
+			while (!loaded)
+			{
+				renderer.Update();
+				Thread.Sleep(10);
+			}
 			#endregion
 		}
 
@@ -140,13 +149,13 @@ namespace VeldridSandbox
 			GraphicsDeviceOptions options = new()
 			{
 				PreferStandardClipSpaceYDirection = true,
-				PreferDepthRangeZeroToOne = true
+				PreferDepthRangeZeroToOne = false
 			};
 
 			graphicsDevice = VeldridStartup.CreateGraphicsDevice(
 				window,
 				options,
-				GraphicsBackend.Vulkan);
+				GraphicsBackend.OpenGL);
 
 			window.Resized += () =>
 			{
@@ -158,7 +167,6 @@ namespace VeldridSandbox
 			factory = graphicsDevice.ResourceFactory;
 		}
 
-		[MethodImpl(MethodImplOptions.AggressiveOptimization)]
 		private void Run()
 		{
 			while (window.Exists)

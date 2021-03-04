@@ -41,8 +41,11 @@ namespace VeldridSandbox
 		Shader pathVertexShader;
 		Shader pathFragmentShader;
 
-		DeviceBuffer vertexBuffer;
-		DeviceBuffer indexBuffer;
+		DeviceBuffer rtVertexBuffer;
+		DeviceBuffer quadIndexBuffer;
+
+		DeviceBuffer ultralightVertexBuffer;
+		DeviceBuffer ultralightPathVertexBuffer;
 
 		Uniforms uniforms = new();
 		DeviceBuffer uniformBuffer;
@@ -112,23 +115,35 @@ namespace VeldridSandbox
 
 		private void CreateBuffers()
 		{
-			vertexBuffer = factory.CreateBuffer(new(VertexPositionTexture.SizeInBytes * 4, BufferUsage.VertexBuffer));
-			graphicsDevice.UpdateBuffer(vertexBuffer, 0, new VertexPositionTexture[] {
-				new(new(-.75f, .75f), new(0,0)),
-				new(new(.75f, .75f), new(1,0)),
-				new(new(-.75f, -.75f), new(0,1)),
-				new(new(.75f, -.75f), new(1,1)),
+			BufferDescription quadBufferDescription = new(VertexPositionTexture.SizeInBytes * 4, BufferUsage.VertexBuffer);
+			#region RenderTarget
+			rtVertexBuffer = factory.CreateBuffer(quadBufferDescription);
+			graphicsDevice.UpdateBuffer(rtVertexBuffer, 0, new VertexPositionTexture[] {
+				new(new(-.6f, .9f), new(0,0)),
+				new(new(.6f, .9f), new(1,0)),
+				new(new(-.6f, -.3f), new(0,1)),
+				new(new(.6f, -.3f), new(1,1)),
 			});
-
-			/*vertexBuffer = factory.CreateBuffer(new(32, BufferUsage.VertexBuffer));
-			graphicsDevice.UpdateBuffer(vertexBuffer, 0, _quadVerts);
-			*/
-			indexBuffer = factory.CreateBuffer(new(/*sizeof(uint) * 6*/ 4 * sizeof(short), BufferUsage.IndexBuffer));
-			graphicsDevice.UpdateBuffer(indexBuffer, 0, _quadIndices);
-
+			quadIndexBuffer = factory.CreateBuffer(new(/*sizeof(uint) * 6*/ 4 * sizeof(short), BufferUsage.IndexBuffer));
+			graphicsDevice.UpdateBuffer(quadIndexBuffer, 0, _quadIndices);
+			#endregion
+			ultralightVertexBuffer = factory.CreateBuffer(quadBufferDescription);
+			graphicsDevice.UpdateBuffer(ultralightVertexBuffer, 0, new VertexPositionTexture[] {
+				new(new(-.7f, -.4f), new(0,0)),
+				new(new(-.3f, -.4f), new(1,0)),
+				new(new(-.7f, -.8f), new(0,1)),
+				new(new(-.3f, -.8f), new(1,1)),
+			});
+			ultralightPathVertexBuffer = factory.CreateBuffer(quadBufferDescription);
+			graphicsDevice.UpdateBuffer(ultralightPathVertexBuffer, 0, new VertexPositionTexture[] {
+				new(new(.3f, -.4f), new(0,0)),
+				new(new(.7f, -.4f), new(1,0)),
+				new(new(.3f, -.8f), new(0,1)),
+				new(new(.7f, -.8f), new(1,1)),
+			});
 			uniformBuffer = factory.CreateBuffer(new(768, BufferUsage.UniformBuffer));
 		}
-		ResourceLayout mainResourceLayout = null;
+		ResourceLayout basicQuadResourceLayout = null;
 		ResourceLayout ultralightResourceLayout = null;
 		private void CreatePipeline()
 		{
@@ -139,7 +154,7 @@ namespace VeldridSandbox
 
 			#region QUAD
 
-			mainResourceLayout = factory.CreateResourceLayout(
+			basicQuadResourceLayout = factory.CreateResourceLayout(
 				new ResourceLayoutDescription(
 					new ResourceLayoutElementDescription("iTex",
 						ResourceKind.TextureReadOnly,
@@ -152,8 +167,8 @@ namespace VeldridSandbox
 			ultralightResourceLayout = factory.CreateResourceLayout(
 				new ResourceLayoutDescription(
 					new ResourceLayoutElementDescription("Texture1", ResourceKind.TextureReadOnly, ShaderStages.Fragment),
-					new ResourceLayoutElementDescription("Texture2", ResourceKind.TextureReadOnly, ShaderStages.Fragment)//,
-																														 //new ResourceLayoutElementDescription("Texture3", ResourceKind.Sampler, ShaderStages.Fragment)
+					new ResourceLayoutElementDescription("Texture2", ResourceKind.TextureReadOnly, ShaderStages.Fragment)
+				// new ResourceLayoutElementDescription("Texture3", ResourceKind.TextureReadOnly, ShaderStages.Fragment)
 				)
 			);
 
@@ -175,7 +190,7 @@ namespace VeldridSandbox
 			));
 
 			GraphicsPipelineDescription mainPipelineDescription = new(
-				BlendStateDescription.SingleAlphaBlend,
+				BlendStateDescription.SingleOverrideBlend,
 				new DepthStencilStateDescription(
 					depthTestEnabled: false,
 					depthWriteEnabled: true,
@@ -207,7 +222,7 @@ namespace VeldridSandbox
 					}
 				),
 				new ResourceLayout[] {
-					mainResourceLayout
+					basicQuadResourceLayout
 				},
 				graphicsDevice.SwapchainFramebuffer.OutputDescription
 			);
@@ -225,6 +240,19 @@ namespace VeldridSandbox
 				TextureUsage.Sampled | TextureUsage.Storage | TextureUsage.RenderTarget,
 				TextureType.Texture2D));
 
+			ultralightPathOutputTexture = factory.CreateTexture(new(
+				512,
+				512,
+				1,
+				1,
+				1,
+				PixelFormat.R8_G8_B8_A8_UNorm,
+				TextureUsage.Sampled | TextureUsage.Storage | TextureUsage.RenderTarget,
+				TextureType.Texture2D));
+
+			ultralightResourceSet = factory.CreateResourceSet(new(basicQuadResourceLayout, factory.CreateTextureView(ultralightOutputTexture)));
+			ultralightPathResourceSet = factory.CreateResourceSet(new(basicQuadResourceLayout, factory.CreateTextureView(ultralightPathOutputTexture)));
+			
 			testTexture = factory.CreateTexture(new(
 				256,
 				256,
@@ -243,6 +271,26 @@ namespace VeldridSandbox
 					}
 				}
 			);
+			ultralightPathOutputBuffer = factory.CreateFramebuffer(
+				new FramebufferDescription()
+				{
+					ColorTargets = new[] {
+						new FramebufferAttachmentDescription(ultralightPathOutputTexture, 0)
+					}
+				}
+			);
+			#region Clear Buffers
+			CommandList clearBufferCommandList = factory.CreateCommandList();
+			clearBufferCommandList.Begin();
+			clearBufferCommandList.SetFramebuffer(ultralightOutputBuffer);
+			clearBufferCommandList.ClearColorTarget(0, RgbaFloat.Cyan);
+			clearBufferCommandList.SetFramebuffer(ultralightPathOutputBuffer);
+			clearBufferCommandList.ClearColorTarget(0, RgbaFloat.Cyan);
+			clearBufferCommandList.End();
+			graphicsDevice.SubmitCommands(clearBufferCommandList);
+			clearBufferCommandList.Dispose();
+			clearBufferCommandList = null;
+			#endregion
 			tv = factory.CreateTextureView(testTexture);
 
 			#region Async Flushed Image Loading
@@ -286,7 +334,7 @@ namespace VeldridSandbox
 			#region Ultralight
 
 			GraphicsPipelineDescription ultralightPipelineDescription = new(
-				BlendStateDescription.SingleAlphaBlend,
+				BlendStateDescription.SingleOverrideBlend,
 				new DepthStencilStateDescription(
 					depthTestEnabled: false,
 					depthWriteEnabled: true,
@@ -301,6 +349,7 @@ namespace VeldridSandbox
 				new ShaderSetDescription(
 					new VertexLayoutDescription[] {
 						new VertexLayoutDescription(
+							//140,
 							new VertexElementDescription(
 								"in_Position",
 								VertexElementSemantic.TextureCoordinate,
@@ -309,7 +358,7 @@ namespace VeldridSandbox
 							new VertexElementDescription(
 								"in_Color",
 								VertexElementSemantic.TextureCoordinate,
-								VertexElementFormat.Float4
+								VertexElementFormat.Byte4
 							),
 							new VertexElementDescription(
 								"in_TexCoord",
@@ -396,7 +445,7 @@ namespace VeldridSandbox
 			);*/
 
 			GraphicsPipelineDescription ultralightPathPipelineDescription = new(
-				BlendStateDescription.SingleAlphaBlend,
+				BlendStateDescription.SingleOverrideBlend,
 				new DepthStencilStateDescription(
 					depthTestEnabled: false,
 					depthWriteEnabled: true,
@@ -411,6 +460,7 @@ namespace VeldridSandbox
 				new ShaderSetDescription(
 					new VertexLayoutDescription[] {
 						new VertexLayoutDescription(
+							//20,
 							new VertexElementDescription(
 								"in_Position",
 								VertexElementSemantic.TextureCoordinate,
@@ -419,7 +469,7 @@ namespace VeldridSandbox
 							new VertexElementDescription(
 								"in_Color",
 								VertexElementSemantic.TextureCoordinate,
-								VertexElementFormat.Float4
+								VertexElementFormat.Byte4
 							),
 							new VertexElementDescription(
 								"in_TexCoord",
@@ -432,9 +482,8 @@ namespace VeldridSandbox
 						pathFragmentShader
 					}
 				), uniformsResourceLayout,
-				ultralightOutputBuffer.OutputDescription
+				ultralightPathOutputBuffer.OutputDescription
 			);
-
 
 
 			ultralightPathPipeline = factory.CreateGraphicsPipeline(ultralightPathPipelineDescription);

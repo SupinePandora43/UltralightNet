@@ -8,7 +8,7 @@ namespace VeldridSandbox
 {
 	public partial class Program
 	{
-		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		TextureView rttv;
 		private unsafe void Render()
 		{
 			commandList.Begin();
@@ -17,31 +17,57 @@ namespace VeldridSandbox
 
 			commandList.SetFramebuffer(graphicsDevice.SwapchainFramebuffer);
 			//commandList.SetFullViewports();
-			commandList.ClearColorTarget(0, RgbaFloat.Cyan);
+			commandList.ClearColorTarget(0, RgbaFloat.Orange);
 
-			if (mainResourceSet != null)
+			#region RenderTarget
+			RenderTarget rt = view.GetRenderTarget();
+			var rbIndex = (int)rt.RenderBufferId - 1;
+			RenderBufferEntry rbEntry = RenderBufferEntries[rbIndex];
+			TextureView tvRT = rbEntry.TextureEntry.TextureView;
+
+			if (rttv != tvRT)
 			{
-				commandList.SetPipeline(mainPipeline);
-				commandList.SetGraphicsResourceSet(0, mainResourceSet);
-				commandList.SetVertexBuffer(0, vertexBuffer);
-				commandList.SetIndexBuffer(indexBuffer, IndexFormat.UInt16);
-
-				commandList.DrawIndexed(
-					indexCount: 4,
-					instanceCount: 1,
-					indexStart: 0,
-					vertexOffset: 0,
-					instanceStart: 0);
+				rttv = tvRT;
+				if (rttv != null) rttv.Dispose();
+				if (mainResourceSet != null) mainResourceSet.Dispose();
+				mainResourceSet = factory.CreateResourceSet(new ResourceSetDescription(basicQuadResourceLayout, rttv));
 			}
-			else
-			{
-				RenderTarget rt = view.GetRenderTarget();
-				var rbIndex = (int)rt.RenderBufferId - 1;
-				RenderBufferEntry rbEntry = RenderBufferEntries[rbIndex];
-				TextureView tvRT = rbEntry.TextureEntry.TextureView;
+			commandList.SetPipeline(mainPipeline);
+			commandList.SetGraphicsResourceSet(0, mainResourceSet);
+			commandList.SetVertexBuffer(0, rtVertexBuffer);
+			commandList.SetIndexBuffer(quadIndexBuffer, IndexFormat.UInt16);
 
-				mainResourceSet = factory.CreateResourceSet(new ResourceSetDescription(mainResourceLayout, tvRT));
-			}
+			commandList.DrawIndexed(
+				indexCount: 4,
+				instanceCount: 1,
+				indexStart: 0,
+				vertexOffset: 0,
+				instanceStart: 0);
+			#endregion
+			#region Ultralight output
+			commandList.SetGraphicsResourceSet(0, ultralightResourceSet);
+			commandList.SetVertexBuffer(0, ultralightVertexBuffer);
+			commandList.SetIndexBuffer(quadIndexBuffer, IndexFormat.UInt16);
+
+			commandList.DrawIndexed(
+				indexCount: 4,
+				instanceCount: 1,
+				indexStart: 0,
+				vertexOffset: 0,
+				instanceStart: 0);
+			#endregion
+			#region Ultralight Path output
+			commandList.SetGraphicsResourceSet(0, ultralightPathResourceSet);
+			commandList.SetVertexBuffer(0, ultralightPathVertexBuffer);
+			commandList.SetIndexBuffer(quadIndexBuffer, IndexFormat.UInt16);
+
+			commandList.DrawIndexed(
+				indexCount: 4,
+				instanceCount: 1,
+				indexStart: 0,
+				vertexOffset: 0,
+				instanceStart: 0);
+			#endregion
 			commandList.End();
 			graphicsDevice.SubmitCommands(commandList);
 			graphicsDevice.SwapBuffers();

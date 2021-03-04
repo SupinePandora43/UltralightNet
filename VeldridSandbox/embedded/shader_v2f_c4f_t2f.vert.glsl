@@ -29,7 +29,7 @@ layout(location = 0) out vec4 ex_Color;
 layout(location = 1) out vec2 ex_ObjectCoord;
 layout(location = 2) out vec2 ex_ScreenCoord;
 
-void main(void)
+void main()
 {
   ex_ObjectCoord = in_TexCoord;
   gl_Position = Transform * vec4(in_Position, 0.0, 1.0);

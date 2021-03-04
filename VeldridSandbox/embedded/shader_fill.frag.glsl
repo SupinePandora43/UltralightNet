@@ -19,8 +19,8 @@ float ScreenScale() { return State[3]; }
 float Scalar(uint i) { if (i < 4u) return Scalar4[0][i]; else return Scalar4[1][i - 4u]; }
 
 // Texture Units
-layout(binding = 0) uniform sampler2D Texture1;
-layout(binding = 1) uniform sampler2D Texture2;
+layout(set=1, binding = 0) uniform sampler2D Texture1;
+layout(set=1, binding = 1) uniform sampler2D Texture2;
 //layout(binding = 2) uniform sampler2D Texture3;
 
 // Vertex Attributes
@@ -733,7 +733,7 @@ void applyClip() {
   }
 }
 
-void main(void) {
+void main() {
   const uint FillType_Solid = 0u;
   const uint FillType_Image = 1u;
   const uint FillType_Pattern_Image = 2u;

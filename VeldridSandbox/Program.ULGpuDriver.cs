@@ -1,15 +1,13 @@
+using Assimp;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.PixelFormats;
 using Supine.UltralightSharp.Enums;
 using Supine.UltralightSharp.Safe;
 using System;
 using System.Collections.Generic;
-using System.Drawing.Imaging;
 using System.IO;
 using Veldrid;
-using Veldrid.ImageSharp;
 using Bitmap = Supine.UltralightSharp.Safe.Bitmap;
-using DBitmap = System.Drawing.Bitmap;
 using PixelFormat = Veldrid.PixelFormat;
 
 namespace VeldridSandbox
@@ -54,8 +52,10 @@ namespace VeldridSandbox
 			Console.WriteLine($"GpuDriver.DestroyTexture({textureId})");
 			var index = (int)textureId - 1;
 			var entry = TextureEntries.RemoveAt(index);
-
+			entry.TextureView.Dispose();
+			entry.TextureView = null;
 			entry.Texure.Dispose();
+			entry.Texure = null;
 		}
 
 		private void UpdateTexture(uint textureId, Bitmap bitmap)
@@ -115,7 +115,7 @@ namespace VeldridSandbox
 						unsafe
 						{
 							ReadOnlySpan<byte> span = new(pixels.ToPointer(), (int)(texWidth * texHeight * 4));
-							Image image = Image.LoadPixelData<Rgba32>(span, (int)texWidth, (int)texHeight);
+							Image image = Image.LoadPixelData<Bgra32>(span, (int)texWidth, (int)texHeight);
 							FileStream fs = File.Open($"./texture_{textureId}_updated_{Guid.NewGuid()}.png", FileMode.OpenOrCreate);
 							image.SaveAsPng(fs);
 							fs.Close();
@@ -194,14 +194,14 @@ namespace VeldridSandbox
 								texHeight,
 								1,
 								1,
-								PixelFormat.R8_G8_B8_A8_UNorm,
+								PixelFormat.B8_G8_R8_A8_UNorm,
 								TextureUsage.Sampled | TextureUsage.GenerateMipmaps
 							)
 						);
 						unsafe
 						{
 							ReadOnlySpan<byte> span = new(pixels.ToPointer(), (int)(texWidth * texHeight * 4));
-							Image image = Image.LoadPixelData<Rgba32>(span, (int)texWidth, (int)texHeight);
+							Image image = Image.LoadPixelData<Bgra32>(span, (int)texWidth, (int)texHeight);
 							FileStream fs = File.Open($"./texture_{textureId}_{Guid.NewGuid()}.png", FileMode.OpenOrCreate);
 							image.SaveAsPng(fs);
 							fs.Close();
@@ -238,6 +238,7 @@ namespace VeldridSandbox
 			var entry = RenderBufferEntries.RemoveAt(index);
 
 			entry.FrameBuffer.Dispose();
+			entry.FrameBuffer = null;
 		}
 
 		private void CreateRenderBuffer(uint renderBufferId, RenderBuffer buffer)
@@ -271,6 +272,15 @@ namespace VeldridSandbox
 
 			entry.FrameBuffer = factory.CreateFramebuffer(fd);
 
+			Veldrid.CommandList clearBufferCommandList = factory.CreateCommandList();
+			clearBufferCommandList.Begin();
+			clearBufferCommandList.SetFramebuffer(entry.FrameBuffer);
+			clearBufferCommandList.ClearColorTarget(0, RgbaFloat.Green);
+			clearBufferCommandList.End();
+			graphicsDevice.SubmitCommands(clearBufferCommandList);
+			clearBufferCommandList.Dispose();
+			clearBufferCommandList = null;
+
 			//entry.FrameBuffer.ColorTargets.Append(new(tex, 0));
 			entry.TextureEntry = texEntry;
 		}
@@ -289,7 +299,9 @@ namespace VeldridSandbox
 			var entry = GeometryEntries.RemoveAt(index);
 
 			entry.IndiciesBuffer.Dispose();
+			entry.IndiciesBuffer = null;
 			entry.VertexBuffer.Dispose();
+			entry.VertexBuffer = null;
 		}
 
 		private unsafe void UpdateGeometry(uint geometryId, VertexBuffer safeVertices, IndexBuffer indices)
@@ -309,27 +321,46 @@ namespace VeldridSandbox
 			var index = (int)geometryId - 1;
 			var entry = GeometryEntries[index];
 
-			entry.VertexBuffer = factory.CreateBuffer(new BufferDescription(safeVertices.Size, BufferUsage.VertexBuffer));
-			graphicsDevice.UpdateBuffer(entry.VertexBuffer, 0, (IntPtr)safeVertices.AsUnsafe().Data, safeVertices.Size);
 
 			switch (safeVertices.Format)
 			{
 				case VertexBufferFormat._2F4Ub2F2F28F:
 					{
+						entry.VertexBuffer = factory.CreateBuffer(
+							new BufferDescription(
+								safeVertices.Size,
+								BufferUsage.VertexBuffer
+							)
+						);
+						graphicsDevice.UpdateBuffer(
+							entry.VertexBuffer,
+							0,
+							(IntPtr)(safeVertices.Data as Vertex2F4Ub2F2F28F).Pointer,
+							safeVertices.Size);
 
 						break;
 					}
 				case VertexBufferFormat._2F4Ub2F:
 					{
-
+						entry.VertexBuffer = factory.CreateBuffer(
+							new BufferDescription(
+								safeVertices.Size,
+								BufferUsage.VertexBuffer
+							)
+						);
+						graphicsDevice.UpdateBuffer(
+							entry.VertexBuffer,
+							0,
+							(IntPtr)(safeVertices.Data as Vertex2F4Ub2F).Pointer,
+							safeVertices.Size);
 						break;
 					}
 				default: throw new NotImplementedException(safeVertices.Format.ToString());
 			}
 			entry.IndiciesBuffer = factory.CreateBuffer(new(
-				indicies.Size,
+				(uint)(indicies.Size * sizeof(void*)),
 				BufferUsage.IndexBuffer));
-			graphicsDevice.UpdateBuffer(entry.IndiciesBuffer, 0, (IntPtr)indicies.AsUnsafe().Data, indicies.Size);
+			graphicsDevice.UpdateBuffer(entry.IndiciesBuffer, 0, (IntPtr)indicies.AsUnsafe().Data, (uint)(indicies.Size * sizeof(void*)));
 		}
 
 		private uint NextGeometryId()
