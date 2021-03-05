@@ -13,7 +13,7 @@ namespace VeldridSandbox
 		{
 			commandList.Begin();
 
-			RenderUltralight();
+			//RenderUltralight();
 
 			commandList.SetFramebuffer(graphicsDevice.SwapchainFramebuffer);
 			//commandList.SetFullViewports();
@@ -68,6 +68,28 @@ namespace VeldridSandbox
 				vertexOffset: 0,
 				instanceStart: 0);
 			#endregion
+
+			#region UL Shader Test
+
+			commandList.SetPipeline(ultralightPipeline);
+
+			commandList.SetGraphicsResourceSet(0, uniformResourceSet);
+			commandList.SetGraphicsResourceSet(1, flushedTextureViewResourceSet);
+
+			commandList.SetIndexBuffer(ultralightVertexTestIndex, IndexFormat.UInt16);
+			commandList.SetVertexBuffer(0, ultralightVertexTest);
+
+			commandList.SetFramebuffer(ultralightOutputBuffer);
+
+			/*commandList.DrawIndexed(
+				indexCount: 4,
+				instanceCount: 1,
+				indexStart: 0,
+				vertexOffset: 0,
+				instanceStart: 0);*/
+			commandList.DrawIndexed(6);
+			#endregion
+
 			commandList.End();
 			graphicsDevice.SubmitCommands(commandList);
 			graphicsDevice.SwapBuffers();

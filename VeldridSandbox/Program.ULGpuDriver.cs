@@ -310,7 +310,7 @@ namespace VeldridSandbox
 			var index = (int)geometryId - 1;
 			var entry = GeometryEntries[index];
 
-			graphicsDevice.UpdateBuffer(entry.VertexBuffer, 0, (IntPtr)safeVertices.AsUnsafe().Data, safeVertices.Size);
+			graphicsDevice.UpdateBuffer(entry.VertexBuffer, 0, (IntPtr)safeVertices.Data.Pointer, safeVertices.Size);
 			graphicsDevice.UpdateBuffer(entry.IndiciesBuffer, 0, (IntPtr)indices.AsUnsafe().Data, indices.Size);
 
 		}
@@ -358,9 +358,9 @@ namespace VeldridSandbox
 				default: throw new NotImplementedException(safeVertices.Format.ToString());
 			}
 			entry.IndiciesBuffer = factory.CreateBuffer(new(
-				(uint)(indicies.Size * sizeof(void*)),
+				(uint)(indicies.Size),
 				BufferUsage.IndexBuffer));
-			graphicsDevice.UpdateBuffer(entry.IndiciesBuffer, 0, (IntPtr)indicies.AsUnsafe().Data, (uint)(indicies.Size * sizeof(void*)));
+			graphicsDevice.UpdateBuffer(entry.IndiciesBuffer, 0, (IntPtr)indicies.AsUnsafe().Data, (uint)(indicies.Size));
 		}
 
 		private uint NextGeometryId()

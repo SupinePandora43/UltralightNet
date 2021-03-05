@@ -47,6 +47,10 @@ namespace VeldridSandbox
 		DeviceBuffer ultralightVertexBuffer;
 		DeviceBuffer ultralightPathVertexBuffer;
 
+		DeviceBuffer ultralightVertexTest;
+		ResourceSet flushedTextureViewResourceSet;
+		DeviceBuffer ultralightVertexTestIndex;
+
 		Uniforms uniforms = new();
 		DeviceBuffer uniformBuffer;
 
@@ -142,6 +146,27 @@ namespace VeldridSandbox
 				new(new(.7f, -.8f), new(1,1)),
 			});
 			uniformBuffer = factory.CreateBuffer(new(768, BufferUsage.UniformBuffer));
+
+			ultralightVertexTest = factory.CreateBuffer(new(608, BufferUsage.VertexBuffer));
+
+			VertexUltralightData _get_data(float x, float y, float u, float v)
+			{
+				return new VertexUltralightData()
+				{
+					in_Position = new(x / 512f, y / 512f),
+					in_Color = new(1,1,1,1),
+					in_TexCoord = new(u, v),
+					in_Data0 = new(0.5f,0f,0f,0f)
+				};
+			}
+			graphicsDevice.UpdateBuffer(ultralightVertexTest, 0, new[] {
+				_get_data(-512,512,0,0), _get_data(512,512,1,0),
+				_get_data(-512,-512,0,1), _get_data(512,-512, 1,1),
+			});
+			ultralightVertexTestIndex = factory.CreateBuffer(new(
+				6 * sizeof(ushort), BufferUsage.IndexBuffer
+			));
+			graphicsDevice.UpdateBuffer(ultralightVertexTestIndex, 0, new ushort[] { 0, 1, 3, 0, 2, 3 });
 		}
 		ResourceLayout basicQuadResourceLayout = null;
 		ResourceLayout ultralightResourceLayout = null;
@@ -252,7 +277,7 @@ namespace VeldridSandbox
 
 			ultralightResourceSet = factory.CreateResourceSet(new(basicQuadResourceLayout, factory.CreateTextureView(ultralightOutputTexture)));
 			ultralightPathResourceSet = factory.CreateResourceSet(new(basicQuadResourceLayout, factory.CreateTextureView(ultralightPathOutputTexture)));
-			
+
 			testTexture = factory.CreateTexture(new(
 				256,
 				256,
@@ -262,6 +287,7 @@ namespace VeldridSandbox
 				PixelFormat.R8_G8_B8_A8_UNorm,
 				TextureUsage.Sampled,
 				TextureType.Texture2D));
+
 
 			ultralightOutputBuffer = factory.CreateFramebuffer(
 				new FramebufferDescription()
@@ -292,6 +318,14 @@ namespace VeldridSandbox
 			clearBufferCommandList = null;
 			#endregion
 			tv = factory.CreateTextureView(testTexture);
+
+			flushedTextureViewResourceSet = factory.CreateResourceSet(
+				new ResourceSetDescription(
+					ultralightResourceLayout,
+					tv,
+					tv
+				)
+			);
 
 			#region Async Flushed Image Loading
 			Task.Run(async () =>
@@ -358,7 +392,7 @@ namespace VeldridSandbox
 							new VertexElementDescription(
 								"in_Color",
 								VertexElementSemantic.TextureCoordinate,
-								VertexElementFormat.Byte4
+								VertexElementFormat.Float4
 							),
 							new VertexElementDescription(
 								"in_TexCoord",
@@ -469,7 +503,7 @@ namespace VeldridSandbox
 							new VertexElementDescription(
 								"in_Color",
 								VertexElementSemantic.TextureCoordinate,
-								VertexElementFormat.Byte4
+								VertexElementFormat.Float4
 							),
 							new VertexElementDescription(
 								"in_TexCoord",
