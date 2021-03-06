@@ -48,8 +48,7 @@ layout(location = 10)out vec2 ex_ScreenCoord;
 void main()
 {
   ex_ObjectCoord = in_ObjCoord;
-  //gl_Position = Transform * vec4(in_Position, 0.0, 1.0);
-  gl_Position = vec4(in_Position, 0.0, 1.0);
+  gl_Position = Transform * vec4(in_Position, 0.0, 1.0);
   ex_Color = sRGBToLinear(in_Color);
   ex_TexCoord = in_TexCoord;
   ex_Data0 = in_Data0;

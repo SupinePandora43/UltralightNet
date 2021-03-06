@@ -124,7 +124,8 @@ namespace VeldridSandbox
 			view = new(renderer, 512, 512, false, session, false);
 			bool loaded = false;
 			view.SetFinishLoadingCallback((IntPtr userData, View caller, ulong frameId, bool isMainFrame,
-	  string? url) => { loaded = true; }, default);
+	  string? url) =>
+			{ loaded = true; }, default);
 			view.LoadUrl("https://youtube.com"); //https://github.com
 			while (!loaded)
 			{
@@ -149,7 +150,7 @@ namespace VeldridSandbox
 			GraphicsDeviceOptions options = new()
 			{
 				PreferStandardClipSpaceYDirection = true,
-				PreferDepthRangeZeroToOne = false
+				PreferDepthRangeZeroToOne = true
 			};
 
 			graphicsDevice = VeldridStartup.CreateGraphicsDevice(
@@ -163,6 +164,14 @@ namespace VeldridSandbox
 				width = window.Width;
 				height = window.Height;
 				view.Resize((uint)window.Width, (uint)window.Height);
+			};
+			window.MouseDown += (me) =>
+			{
+				view.FireMouseEvent(new Supine.UltralightSharp.Safe.MouseEvent(MouseEventType.MouseDown, (int)window.MouseDelta.X, (int)window.MouseDelta.Y, Supine.UltralightSharp.Enums.MouseButton.Left));
+			};
+			window.MouseWheel += (mw) =>
+			{
+				view.FireScrollEvent(new ScrollEvent(ScrollEventType.ScrollByPixel, 0, (int)mw.WheelDelta));
 			};
 			factory = graphicsDevice.ResourceFactory;
 		}

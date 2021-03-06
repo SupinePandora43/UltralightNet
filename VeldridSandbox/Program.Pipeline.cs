@@ -124,8 +124,8 @@ namespace VeldridSandbox
 			rtVertexBuffer = factory.CreateBuffer(quadBufferDescription);
 			graphicsDevice.UpdateBuffer(rtVertexBuffer, 0, new VertexPositionTexture[] {
 				new(new(-.6f, .9f), new(0,0)),
-				new(new(.6f, .9f), new(1,0)),
-				new(new(-.6f, -.3f), new(0,1)),
+				new(new(.6f, .9f),  new(1,0)),
+				new(new(-.6f, -.3f),new(0,1)),
 				new(new(.6f, -.3f), new(1,1)),
 			});
 			quadIndexBuffer = factory.CreateBuffer(new(/*sizeof(uint) * 6*/ 4 * sizeof(short), BufferUsage.IndexBuffer));
@@ -153,14 +153,14 @@ namespace VeldridSandbox
 			{
 				return new VertexUltralightData()
 				{
-					in_Position = new(x / 512f, y / 512f),
-					in_Color = new(1,1,1,1),
+					in_Position = new(x/512, y/512),
+					in_Color = new(255, 255, 255, 255),
 					in_TexCoord = new(u, v),
-					in_Data0 = new(0.5f,0f,0f,0f)
+					in_Data0 = new(0.5f, 0f, 0f, 0f)
 				};
 			}
 			graphicsDevice.UpdateBuffer(ultralightVertexTest, 0, new[] {
-				_get_data(-512,512,0,0), _get_data(512,512,1,0),
+				_get_data(-512, 512,0,0), _get_data(512,512,1,0),
 				_get_data(-512,-512,0,1), _get_data(512,-512, 1,1),
 			});
 			ultralightVertexTestIndex = factory.CreateBuffer(new(
@@ -215,7 +215,7 @@ namespace VeldridSandbox
 			));
 
 			GraphicsPipelineDescription mainPipelineDescription = new(
-				BlendStateDescription.SingleOverrideBlend,
+				BlendStateDescription.SingleAlphaBlend,
 				new DepthStencilStateDescription(
 					depthTestEnabled: false,
 					depthWriteEnabled: true,
@@ -368,7 +368,7 @@ namespace VeldridSandbox
 			#region Ultralight
 
 			GraphicsPipelineDescription ultralightPipelineDescription = new(
-				BlendStateDescription.SingleOverrideBlend,
+				BlendStateDescription.SingleAlphaBlend,
 				new DepthStencilStateDescription(
 					depthTestEnabled: false,
 					depthWriteEnabled: true,
@@ -383,7 +383,7 @@ namespace VeldridSandbox
 				new ShaderSetDescription(
 					new VertexLayoutDescription[] {
 						new VertexLayoutDescription(
-							//140,
+							140,
 							new VertexElementDescription(
 								"in_Position",
 								VertexElementSemantic.TextureCoordinate,
@@ -392,7 +392,7 @@ namespace VeldridSandbox
 							new VertexElementDescription(
 								"in_Color",
 								VertexElementSemantic.TextureCoordinate,
-								VertexElementFormat.Float4
+								VertexElementFormat.Byte4_Norm
 							),
 							new VertexElementDescription(
 								"in_TexCoord",
@@ -479,7 +479,7 @@ namespace VeldridSandbox
 			);*/
 
 			GraphicsPipelineDescription ultralightPathPipelineDescription = new(
-				BlendStateDescription.SingleOverrideBlend,
+				BlendStateDescription.SingleAlphaBlend,
 				new DepthStencilStateDescription(
 					depthTestEnabled: false,
 					depthWriteEnabled: true,
@@ -494,7 +494,7 @@ namespace VeldridSandbox
 				new ShaderSetDescription(
 					new VertexLayoutDescription[] {
 						new VertexLayoutDescription(
-							//20,
+							20,
 							new VertexElementDescription(
 								"in_Position",
 								VertexElementSemantic.TextureCoordinate,
@@ -503,7 +503,7 @@ namespace VeldridSandbox
 							new VertexElementDescription(
 								"in_Color",
 								VertexElementSemantic.TextureCoordinate,
-								VertexElementFormat.Float4
+								VertexElementFormat.Byte4_Norm
 							),
 							new VertexElementDescription(
 								"in_TexCoord",

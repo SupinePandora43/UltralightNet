@@ -8,15 +8,16 @@ namespace VeldridSandbox
 {
 	public partial class Program
 	{
-		TextureView rttv;
+		TextureView rttv = null;
 		private unsafe void Render()
 		{
 			commandList.Begin();
 
-			//RenderUltralight();
+			RenderUltralight();
 
+			commandList.SetPipeline(mainPipeline);
 			commandList.SetFramebuffer(graphicsDevice.SwapchainFramebuffer);
-			//commandList.SetFullViewports();
+			commandList.SetFullViewports();
 			commandList.ClearColorTarget(0, RgbaFloat.Orange);
 
 			#region RenderTarget
@@ -32,7 +33,6 @@ namespace VeldridSandbox
 				if (mainResourceSet != null) mainResourceSet.Dispose();
 				mainResourceSet = factory.CreateResourceSet(new ResourceSetDescription(basicQuadResourceLayout, rttv));
 			}
-			commandList.SetPipeline(mainPipeline);
 			commandList.SetGraphicsResourceSet(0, mainResourceSet);
 			commandList.SetVertexBuffer(0, rtVertexBuffer);
 			commandList.SetIndexBuffer(quadIndexBuffer, IndexFormat.UInt16);
@@ -72,14 +72,13 @@ namespace VeldridSandbox
 			#region UL Shader Test
 
 			commandList.SetPipeline(ultralightPipeline);
-
+			commandList.SetFramebuffer(ultralightOutputBuffer);
 			commandList.SetGraphicsResourceSet(0, uniformResourceSet);
 			commandList.SetGraphicsResourceSet(1, flushedTextureViewResourceSet);
 
 			commandList.SetIndexBuffer(ultralightVertexTestIndex, IndexFormat.UInt16);
 			commandList.SetVertexBuffer(0, ultralightVertexTest);
 
-			commandList.SetFramebuffer(ultralightOutputBuffer);
 
 			/*commandList.DrawIndexed(
 				indexCount: 4,
@@ -93,6 +92,8 @@ namespace VeldridSandbox
 			commandList.End();
 			graphicsDevice.SubmitCommands(commandList);
 			graphicsDevice.SwapBuffers();
+
+			graphicsDevice.WaitForIdle();
 		}
 	}
 }

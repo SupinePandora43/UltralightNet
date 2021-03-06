@@ -36,7 +36,7 @@ namespace Supine.UltralightSharp {
 
       public uint Size;
 
-      private void* _Data;
+      public void* _Data;
 
       public Span<float> Data {
         [MethodImpl(MethodImplOptions.AggressiveInlining)]

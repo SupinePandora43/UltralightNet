@@ -6,6 +6,7 @@ using Supine.UltralightSharp.Safe;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Runtime.InteropServices;
 using Veldrid;
 using Bitmap = Supine.UltralightSharp.Safe.Bitmap;
 using PixelFormat = Veldrid.PixelFormat;
@@ -310,8 +311,8 @@ namespace VeldridSandbox
 			var index = (int)geometryId - 1;
 			var entry = GeometryEntries[index];
 
-			graphicsDevice.UpdateBuffer(entry.VertexBuffer, 0, (IntPtr)safeVertices.Data.Pointer, safeVertices.Size);
-			graphicsDevice.UpdateBuffer(entry.IndiciesBuffer, 0, (IntPtr)indices.AsUnsafe().Data, indices.Size);
+			graphicsDevice.UpdateBuffer(entry.VertexBuffer, 0, (IntPtr)safeVertices._Data, safeVertices.Size);
+			graphicsDevice.UpdateBuffer(entry.IndiciesBuffer, 0, (IntPtr)indices._Data, indices.Size);
 
 		}
 
@@ -335,7 +336,7 @@ namespace VeldridSandbox
 						graphicsDevice.UpdateBuffer(
 							entry.VertexBuffer,
 							0,
-							(IntPtr)(safeVertices.Data as Vertex2F4Ub2F2F28F).Pointer,
+							(IntPtr)safeVertices._Data,
 							safeVertices.Size);
 
 						break;
@@ -351,16 +352,16 @@ namespace VeldridSandbox
 						graphicsDevice.UpdateBuffer(
 							entry.VertexBuffer,
 							0,
-							(IntPtr)(safeVertices.Data as Vertex2F4Ub2F).Pointer,
+							(IntPtr)safeVertices._Data,
 							safeVertices.Size);
 						break;
 					}
 				default: throw new NotImplementedException(safeVertices.Format.ToString());
 			}
 			entry.IndiciesBuffer = factory.CreateBuffer(new(
-				(uint)(indicies.Size),
+				indicies.Size,
 				BufferUsage.IndexBuffer));
-			graphicsDevice.UpdateBuffer(entry.IndiciesBuffer, 0, (IntPtr)indicies.AsUnsafe().Data, (uint)(indicies.Size));
+			graphicsDevice.UpdateBuffer(entry.IndiciesBuffer, 0, (IntPtr)indicies._Data, indicies.Size);
 		}
 
 		private uint NextGeometryId()
