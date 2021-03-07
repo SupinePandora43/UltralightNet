@@ -7,7 +7,7 @@ layout(set=0, binding=0) uniform Uniforms {
 	uniform mat4 Transform;
 	uniform vec4 Scalar4[2];
 	uniform vec4 Vector[8];
-	uniform float fClipSize;
+	uniform uint fClipSize;
 	uniform mat4 Clip[8];
 };
 
@@ -30,7 +30,6 @@ float sdRect(vec2 p, vec2 size) {
     vec2 d = abs(p) - size;
     return min(max(d.x,d.y),0.0) + length(max(d,0.0));
 }
-
 // The below function "sdEllipse" is MIT licensed with following text:
 //
 // The MIT License
@@ -49,11 +48,9 @@ float sdRect(vec2 p, vec2 size) {
 // OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
 // FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 // THE SOFTWARE.
-
 float sdEllipse( vec2 p, in vec2 ab ) {
   if (abs(ab.x - ab.y) < 0.1)
     return length(p) - ab.x;
-
     p = abs(p); if (p.x > p.y) { p=p.yx; ab=ab.yx; }
     
     float l = ab.y*ab.y - ab.x*ab.x;
@@ -65,13 +62,10 @@ float sdEllipse( vec2 p, in vec2 ab ) {
     
   float c = (m2 + n2 - 1.0)/3.0; 
     float c3 = c*c*c;
-
   float q = c3 + m2*n2*2.0;
   float d = c3 + m2*n2;
   float g = m + m*n2;
-
   float co;
-
   if (d < 0.0)
   {
     float p = acos(q/c3)/3.0;
@@ -90,60 +84,47 @@ float sdEllipse( vec2 p, in vec2 ab ) {
     float p = ry/sqrt(rm-rx);
     co = (p + 2.0*g/rm - m)/2.0;
   }
-
   float si = sqrt(1.0 - co*co);
  
   vec2 r = vec2(ab.x*co, ab.y*si);
     
   return length(r - p) * sign(p.y-r.y);
 }
-
 float sdRoundRect(vec2 p, vec2 size, vec4 rx, vec4 ry) {
   size *= 0.5;
   vec2 corner;
-
   corner = vec2(-size.x+rx.x, -size.y+ry.x);  // Top-Left
   vec2 local = p - corner;
   if (dot(rx.x, ry.x) > 0.0 && p.x < corner.x && p.y <= corner.y)
     return sdEllipse(local, vec2(rx.x, ry.x));
-
   corner = vec2(size.x-rx.y, -size.y+ry.y);   // Top-Right
   local = p - corner;
   if (dot(rx.y, ry.y) > 0.0 && p.x >= corner.x && p.y <= corner.y)
     return sdEllipse(local, vec2(rx.y, ry.y));
-
   corner = vec2(size.x-rx.z, size.y-ry.z);  // Bottom-Right
   local = p - corner;
   if (dot(rx.z, ry.z) > 0.0 && p.x >= corner.x && p.y >= corner.y)
     return sdEllipse(local, vec2(rx.z, ry.z));
-
   corner = vec2(-size.x+rx.w, size.y-ry.w); // Bottom-Left
   local = p - corner;
   if (dot(rx.w, ry.w) > 0.0 && p.x < corner.x && p.y > corner.y) 
     return sdEllipse(local, vec2(rx.w, ry.w));
-
   return sdRect(p, size);
 }
-
 vec2 transformAffine(vec2 val, vec2 a, vec2 b, vec2 c) {
   return val.x * a + val.y * b + c;
 }
-
 void Unpack(vec4 x, out vec4 a, out vec4 b) {
   const float s = 65536.0;
   a = floor(x / s);
   b = floor(x - a * s);
 }
-
 #define AA_WIDTH 0.354
-
 float antialias(in float d, in float width, in float median) {
   return smoothstep(median - width, median + width, d);
 }
-
 void applyClip() {
-  int ClipSize = int(fClipSize);
-  for (int i = 0; i < ClipSize; i++) {
+  for (uint i = 0u; i < fClipSize; i++) {
     mat4 data = Clip[i];
     vec2 origin = data[0].xy;
     vec2 size = data[0].zw;
@@ -163,7 +144,6 @@ void applyClip() {
     // out_Color = vec4(0.9, 1.0, 0.0, 1.0);
   }
 }
-
 void main(void) {
   out_Color = ex_Color;
   applyClip();

@@ -11,8 +11,12 @@ namespace VeldridSandbox
 		readonly List<ResourceSet> textureResourceSets = new();
 		private void RenderUltralight()
 		{
+			graphicsDevice.WaitForIdle();
+
 			foreach (var rs in textureResourceSets) rs.Dispose();
 			textureResourceSets.Clear();
+
+			graphicsDevice.WaitForIdle();
 
 			foreach (var command in queuedCommands)
 			{
@@ -78,8 +82,6 @@ namespace VeldridSandbox
 						uniforms.Clip_7 = state.Clip[7];
 						#endregion
 						graphicsDevice.UpdateBuffer(uniformBuffer, 0, uniforms);
-
-						graphicsDevice.WaitForIdle();
 
 						bool fill = true;
 						switch (command.GpuState.ShaderType)

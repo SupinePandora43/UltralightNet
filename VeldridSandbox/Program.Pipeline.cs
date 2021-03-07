@@ -1,6 +1,3 @@
-using System;
-using System.Drawing;
-using System.IO;
 using System.Net;
 using System.Numerics;
 using System.Threading.Tasks;
@@ -182,7 +179,11 @@ namespace VeldridSandbox
 
 			basicQuadResourceLayout = factory.CreateResourceLayout(
 				new ResourceLayoutDescription(
-					new ResourceLayoutElementDescription("iTex",
+					new ResourceLayoutElementDescription("_sampler",
+						ResourceKind.Sampler,
+						ShaderStages.Fragment
+					),
+					new ResourceLayoutElementDescription("_texture",
 						ResourceKind.TextureReadOnly,
 						ShaderStages.Fragment
 					)
@@ -262,7 +263,7 @@ namespace VeldridSandbox
 				1,
 				1,
 				1,
-				PixelFormat.R8_G8_B8_A8_UNorm,
+				PixelFormat.R8_G8_B8_A8_UNorm_SRgb,
 				TextureUsage.RenderTarget,
 				TextureType.Texture2D));
 
@@ -272,7 +273,7 @@ namespace VeldridSandbox
 				1,
 				1,
 				1,
-				PixelFormat.R8_G8_B8_A8_UNorm,
+				PixelFormat.R8_G8_B8_A8_UNorm_SRgb,
 				TextureUsage.RenderTarget,
 				TextureType.Texture2D));
 
