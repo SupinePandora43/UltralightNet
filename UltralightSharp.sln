@@ -33,7 +33,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Ultralight", "Ultralight\Ul
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Ultralight.Test", "Ultralight.Test\Ultralight.Test.csproj", "{B99158A6-7623-41DC-A55D-EE35E4195C48}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UltralightSharp.Veldrid", "UltralightSharp.Veldrid\UltralightSharp.Veldrid.csproj", "{83971783-6E3E-4211-BB1C-AFFDA599591B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UltralightSharp.Veldrid", "UltralightSharp.Veldrid\UltralightSharp.Veldrid.csproj", "{83971783-6E3E-4211-BB1C-AFFDA599591B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UltralightNet.Generator", "UltralightNet.Generator\UltralightNet.Generator.csproj", "{11892949-C16E-4E22-B273-CC460BDD5F42}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -77,6 +79,10 @@ Global
 		{83971783-6E3E-4211-BB1C-AFFDA599591B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{83971783-6E3E-4211-BB1C-AFFDA599591B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{83971783-6E3E-4211-BB1C-AFFDA599591B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{11892949-C16E-4E22-B273-CC460BDD5F42}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{11892949-C16E-4E22-B273-CC460BDD5F42}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{11892949-C16E-4E22-B273-CC460BDD5F42}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{11892949-C16E-4E22-B273-CC460BDD5F42}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
