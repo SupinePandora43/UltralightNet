@@ -22,7 +22,7 @@ namespace VeldridSandbox
 		public Vector4 Vector_6; // 16
 		public Vector4 Vector_7; // 16
 
-		public float fClipSize;  // 4
+		public uint fClipSize;  // 4
 
 		public Matrix4x4 Clip_0; // 64
 		public Matrix4x4 Clip_1; // 64

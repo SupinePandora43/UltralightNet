@@ -7,7 +7,7 @@ layout(set=0, binding=0) uniform Uniforms {
 	uniform mat4 Transform;
 	uniform vec4 Scalar4[2];
 	uniform vec4 Vector[8];
-	uniform float fClipSize;
+	uniform uint fClipSize;
 	uniform mat4 Clip[8];
 };
 
@@ -33,5 +33,5 @@ void main(void)
 {
   ex_ObjectCoord = in_TexCoord;
   gl_Position = Transform * vec4(in_Position, 0.0, 1.0);
-  ex_Color = sRGBToLinear(in_Color);
+  ex_Color = in_Color;
 }

@@ -1,4 +1,3 @@
-using Assimp;
 using SixLabors.ImageSharp;
 using SixLabors.ImageSharp.PixelFormats;
 using Supine.UltralightSharp.Enums;
@@ -6,7 +5,6 @@ using Supine.UltralightSharp.Safe;
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Runtime.InteropServices;
 using Veldrid;
 using Bitmap = Supine.UltralightSharp.Safe.Bitmap;
 using PixelFormat = Veldrid.PixelFormat;
@@ -15,7 +13,7 @@ namespace VeldridSandbox
 {
 	public partial class Program
 	{
-		private Queue<Command> queuedCommands = new();
+		private readonly Queue<Command> queuedCommands = new();
 
 		public class GeometryEntry
 		{
@@ -157,7 +155,7 @@ namespace VeldridSandbox
 						texHeight,
 						1,
 						1,
-						PixelFormat.R8_G8_B8_A8_UNorm,
+						PixelFormat.R8_G8_B8_A8_UNorm_SRgb,
 						TextureUsage.Sampled | TextureUsage.RenderTarget
 					)
 				);
@@ -195,7 +193,7 @@ namespace VeldridSandbox
 								texHeight,
 								1,
 								1,
-								PixelFormat.B8_G8_R8_A8_UNorm,
+								PixelFormat.B8_G8_R8_A8_UNorm_SRgb,
 								TextureUsage.Sampled | TextureUsage.GenerateMipmaps
 							)
 						);

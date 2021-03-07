@@ -1,11 +1,14 @@
 using Supine.UltralightSharp.Safe;
+using System;
+using System.Collections.Generic;
 using Veldrid;
 
 namespace VeldridSandbox
 {
 	public partial class Program
 	{
-		TextureView rttv = null;
+		readonly Dictionary<uint, Tuple<ResourceSet, Texture>> resourceSets = new();
+
 		private unsafe void Render()
 		{
 			commandList.Begin();
@@ -19,18 +22,24 @@ namespace VeldridSandbox
 
 			#region RenderTarget
 			RenderTarget rt = view.GetRenderTarget();
-			var rbIndex = (int)rt.RenderBufferId - 1;
-			RenderBufferEntry rbEntry = RenderBufferEntries[rbIndex];
-			TextureView tvRT = rbEntry.TextureEntry.TextureView;
 
-			if (rttv != tvRT)
+
+			if ((!resourceSets.TryGetValue(rt.RenderBufferId, out Tuple<ResourceSet, Texture> resourceSet)) || resourceSet.Item2 == null || resourceSet.Item2.IsDisposed)
 			{
-				if (rttv != null) rttv.Dispose();
-				rttv = tvRT;
-				if (mainResourceSet != null) mainResourceSet.Dispose();
-				mainResourceSet = factory.CreateResourceSet(new ResourceSetDescription(basicQuadResourceLayout, rttv));
+				foreach (var disposeTuple in resourceSets)
+				{
+					disposeTuple.Value.Item1.Dispose();
+					disposeTuple.Value.Item2?.Dispose();
+				}
+				resourceSets.Clear();
+
+				var rbIndex = (int)rt.RenderBufferId - 1;
+				RenderBufferEntry rbEntry = RenderBufferEntries[rbIndex];
+				resourceSet = new(factory.CreateResourceSet(new ResourceSetDescription(basicQuadResourceLayout, TextureSampler, rbEntry.TextureEntry.Texure)), rbEntry.TextureEntry.Texure);
+				resourceSets.Add(rt.RenderBufferId, resourceSet);
 			}
-			commandList.SetGraphicsResourceSet(0, mainResourceSet);
+
+			commandList.SetGraphicsResourceSet(0, resourceSet.Item1);
 			commandList.SetVertexBuffer(0, rtVertexBuffer);
 			commandList.SetIndexBuffer(quadIndexBuffer, IndexFormat.UInt16);
 
@@ -41,7 +50,7 @@ namespace VeldridSandbox
 				vertexOffset: 0,
 				instanceStart: 0);
 			#endregion
-			
+
 			commandList.End();
 			graphicsDevice.SubmitCommands(commandList);
 			graphicsDevice.SwapBuffers();

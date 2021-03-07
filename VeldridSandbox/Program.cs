@@ -14,8 +14,7 @@ namespace VeldridSandbox
 {
 	public partial class Program
 	{
-		const GraphicsBackend BACKEND = GraphicsBackend.Direct3D11;
-
+		private const GraphicsBackend BACKEND = GraphicsBackend.Direct3D11;
 
 		public static void Main()
 		{
@@ -50,7 +49,7 @@ namespace VeldridSandbox
 			program = null;
 		}
 
-		private int width = 512;
+		private int width = 1024;
 		private int height = 512;
 
 		private Sdl2Window window;
@@ -122,15 +121,15 @@ namespace VeldridSandbox
 			cfg.SetUseGpuRenderer(true);
 			renderer = new(cfg);
 			Session session = renderer.GetDefaultSession();
-			view = new(renderer, 512, 512, false, session, false);
+			view = new(renderer, (uint)width, (uint)height, false, session, false);
 			bool loaded = false;
 			view.SetFinishLoadingCallback((IntPtr userData, View caller, ulong frameId, bool isMainFrame,
 	  string? url) =>
 			{ loaded = true; }, default);
-			view.LoadUrl("https://github.com"); //https://github.com
+			view.LoadUrl("https://youtube.com"); //https://github.com
 			Stream html = assembly.GetManifestResourceStream("VeldridSandbox.embedded.index.html");
 			StreamReader htmlReader = new(html, Encoding.UTF8);
-			//view.LoadHtml(htmlReader.ReadToEnd());
+			view.LoadHtml(htmlReader.ReadToEnd());
 			while (!loaded)
 			{
 				renderer.Update();
@@ -145,8 +144,8 @@ namespace VeldridSandbox
 			{
 				X = 100,
 				Y = 100,
-				WindowWidth = 512,
-				WindowHeight = 512,
+				WindowWidth = width,
+				WindowHeight = height,
 				WindowTitle = "Veldrid Ultralight"
 			};
 			window = VeldridStartup.CreateWindow(ref windowCI);
