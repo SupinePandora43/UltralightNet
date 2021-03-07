@@ -1,3 +1,4 @@
+using System;
 using System.Net;
 using System.Numerics;
 using System.Threading.Tasks;
@@ -171,8 +172,11 @@ namespace VeldridSandbox
 		private void CreatePipeline()
 		{
 			TextureSampler = graphicsDevice.Aniso4xSampler;
-
+			stopwatch.Restart();
 			CreateShaders();
+			Console.WriteLine($"Shader - {stopwatch.ElapsedMilliseconds} ms");
+			stopwatch.Restart();
+			Console.WriteLine($"DeviceBuffer - {stopwatch.ElapsedMilliseconds} ms");
 			CreateBuffers();
 
 			#region QUAD
@@ -215,6 +219,8 @@ namespace VeldridSandbox
 				uniformsResourceLayout,
 				uniformBuffer
 			));
+
+			stopwatch.Restart();
 
 			GraphicsPipelineDescription mainPipelineDescription = new(
 				BlendStateDescription.SingleAlphaBlend,
@@ -510,6 +516,8 @@ namespace VeldridSandbox
 			ultralightPathPipeline = factory.CreateGraphicsPipeline(ultralightPathPipelineDescription);
 
 			#endregion
+
+			Console.WriteLine($"Pipeline - {stopwatch.ElapsedMilliseconds} ms");
 
 			commandList = factory.CreateCommandList();
 		}

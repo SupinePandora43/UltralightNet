@@ -15,6 +15,8 @@ namespace VeldridSandbox
 	public partial class Program
 	{
 		private const GraphicsBackend BACKEND = GraphicsBackend.Direct3D11;
+		private const bool SAVE_IMAGES = false;
+		private const bool MIPMAPS = false;
 
 		public static void Main()
 		{
@@ -94,6 +96,7 @@ namespace VeldridSandbox
 
 		public void InitUltralight()
 		{
+			stopwatch.Restart();
 			#region GpuDriver
 			GpuDriver gpuDriver = new()
 			{
@@ -129,17 +132,19 @@ namespace VeldridSandbox
 			view.LoadUrl("https://youtube.com"); //https://github.com
 			Stream html = assembly.GetManifestResourceStream("VeldridSandbox.embedded.index.html");
 			StreamReader htmlReader = new(html, Encoding.UTF8);
-			view.LoadHtml(htmlReader.ReadToEnd());
+			//view.LoadHtml(htmlReader.ReadToEnd());
 			while (!loaded)
 			{
 				renderer.Update();
 				Thread.Sleep(10);
 			}
 			#endregion
+			Console.WriteLine($"Ultralight - {stopwatch.ElapsedMilliseconds} ms");
 		}
 
 		private void Init()
 		{
+			stopwatch.Restart();
 			WindowCreateInfo windowCI = new()
 			{
 				X = 100,
@@ -186,17 +191,18 @@ namespace VeldridSandbox
 				view.FireScrollEvent(new ScrollEvent(ScrollEventType.ScrollByPage, 0, (int)mw.WheelDelta));
 			};
 			factory = graphicsDevice.ResourceFactory;
+			Console.WriteLine($"GraphicsDevice- {stopwatch.ElapsedMilliseconds} ms");
 		}
 
 		private void Run()
 		{
-			stopwatch.Start();
+			stopwatch.Restart();
 			ulong frames = 0;
 			while (window.Exists)
 			{
 				if (stopwatch.ElapsedMilliseconds >= 1000)
 				{
-					Console.WriteLine(frames);
+					Console.WriteLine($"FPS: {frames}");
 					frames = 0;
 					stopwatch.Restart();
 				}
