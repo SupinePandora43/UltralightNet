@@ -219,7 +219,7 @@ namespace VeldridSandbox
 				new DepthStencilStateDescription(
 					depthTestEnabled: false,
 					depthWriteEnabled: true,
-					comparisonKind: ComparisonKind.LessEqual),
+					comparisonKind: ComparisonKind.Never),
 				new RasterizerStateDescription(
 					cullMode: FaceCullMode.Back,
 					fillMode: PolygonFillMode.Solid,
@@ -379,7 +379,7 @@ namespace VeldridSandbox
 					frontFace: FrontFace.Clockwise,
 					depthClipEnabled: true,
 					scissorTestEnabled: false),
-				PrimitiveTopology.TriangleStrip,
+				PrimitiveTopology.TriangleList,
 				new ShaderSetDescription(
 					new VertexLayoutDescription[] {
 						new VertexLayoutDescription(
@@ -490,7 +490,7 @@ namespace VeldridSandbox
 					frontFace: FrontFace.Clockwise,
 					depthClipEnabled: true,
 					scissorTestEnabled: false),
-				PrimitiveTopology.TriangleStrip,
+				PrimitiveTopology.TriangleList,
 				new ShaderSetDescription(
 					new VertexLayoutDescription[] {
 						new VertexLayoutDescription(
