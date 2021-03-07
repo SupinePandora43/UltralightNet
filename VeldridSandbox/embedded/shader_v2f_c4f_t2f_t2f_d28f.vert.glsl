@@ -45,7 +45,7 @@ layout(location = 8)out vec4 ex_Data6;
 layout(location = 9)out vec2 ex_ObjectCoord;
 layout(location = 10)out vec2 ex_ScreenCoord;
 
-void main()
+void main(void)
 {
   ex_ObjectCoord = in_ObjCoord;
   gl_Position = Transform * vec4(in_Position, 0.0, 1.0);

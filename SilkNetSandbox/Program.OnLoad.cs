@@ -7,6 +7,7 @@ using Silk.NET.Input;
 using Silk.NET.OpenGLES;
 using Silk.NET.Windowing.Common;
 using Ultz.SuperInvoke;
+using System.Threading;
 
 partial class Program {
 
@@ -223,6 +224,16 @@ partial class Program {
 
     Console.WriteLine("Loading index.html");
     _ulView.LoadUrl("file:///index.html");
-  }
+		
+		bool loaded = false;
+		_ulView.SetFinishLoadingCallback((IntPtr userData, View caller, ulong frameId, bool isMainFrame,
+  string? url) =>
+		{ loaded = true; }, default);
+		while (!loaded)
+		{
+			_ulRenderer.Update();
+			Thread.Sleep(100);
+		}
+	}
 
 }

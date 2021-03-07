@@ -11,10 +11,17 @@
 	<ItemGroup>
 	  <None Remove="embedded\basic.frag.glsl" />
 	  <None Remove="embedded\basic.vert.glsl" />
+	  <None Remove="embedded\index.html" />
 	  <None Remove="embedded\shader_fill.frag.glsl" />
 	  <None Remove="embedded\shader_fill_path.frag.glsl" />
 	  <None Remove="embedded\shader_v2f_c4f_t2f.vert.glsl" />
 	  <None Remove="embedded\shader_v2f_c4f_t2f_t2f_d28f.vert.glsl" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <EmbeddedResource Include="embedded\index.html">
+	    <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+	  </EmbeddedResource>
 	</ItemGroup>
 
 	<ItemGroup>

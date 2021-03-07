@@ -219,7 +219,7 @@ namespace VeldridSandbox
 				new DepthStencilStateDescription(
 					depthTestEnabled: false,
 					depthWriteEnabled: true,
-					comparisonKind: ComparisonKind.Never),
+					comparisonKind: ComparisonKind.LessEqual),
 				new RasterizerStateDescription(
 					cullMode: FaceCullMode.Back,
 					fillMode: PolygonFillMode.Solid,
@@ -372,9 +372,9 @@ namespace VeldridSandbox
 				new DepthStencilStateDescription(
 					depthTestEnabled: false,
 					depthWriteEnabled: true,
-					comparisonKind: ComparisonKind.Never),
+					comparisonKind: ComparisonKind.LessEqual),
 				new RasterizerStateDescription(
-					cullMode: FaceCullMode.Back,
+					cullMode: FaceCullMode.None,
 					fillMode: PolygonFillMode.Solid,
 					frontFace: FrontFace.Clockwise,
 					depthClipEnabled: true,
@@ -483,7 +483,7 @@ namespace VeldridSandbox
 				new DepthStencilStateDescription(
 					depthTestEnabled: false,
 					depthWriteEnabled: true,
-					comparisonKind: ComparisonKind.Never),
+					comparisonKind: ComparisonKind.LessEqual),
 				new RasterizerStateDescription(
 					cullMode: FaceCullMode.None,
 					fillMode: PolygonFillMode.Solid,
@@ -521,7 +521,7 @@ namespace VeldridSandbox
 
 
 			ultralightPathPipeline = factory.CreateGraphicsPipeline(ultralightPathPipelineDescription);
-
+			
 			#endregion
 
 			commandList = factory.CreateCommandList();

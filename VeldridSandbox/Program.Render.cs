@@ -1,7 +1,4 @@
-using Supine.UltralightSharp.Enums;
 using Supine.UltralightSharp.Safe;
-using System;
-using System.Runtime.CompilerServices;
 using Veldrid;
 
 namespace VeldridSandbox
@@ -28,8 +25,8 @@ namespace VeldridSandbox
 
 			if (rttv != tvRT)
 			{
-				rttv = tvRT;
 				if (rttv != null) rttv.Dispose();
+				rttv = tvRT;
 				if (mainResourceSet != null) mainResourceSet.Dispose();
 				mainResourceSet = factory.CreateResourceSet(new ResourceSetDescription(basicQuadResourceLayout, rttv));
 			}
@@ -43,50 +40,6 @@ namespace VeldridSandbox
 				indexStart: 0,
 				vertexOffset: 0,
 				instanceStart: 0);
-			#endregion
-			#region Ultralight output
-			commandList.SetGraphicsResourceSet(0, ultralightResourceSet);
-			commandList.SetVertexBuffer(0, ultralightVertexBuffer);
-			commandList.SetIndexBuffer(quadIndexBuffer, IndexFormat.UInt16);
-
-			commandList.DrawIndexed(
-				indexCount: 4,
-				instanceCount: 1,
-				indexStart: 0,
-				vertexOffset: 0,
-				instanceStart: 0);
-			#endregion
-			#region Ultralight Path output
-			commandList.SetGraphicsResourceSet(0, ultralightPathResourceSet);
-			commandList.SetVertexBuffer(0, ultralightPathVertexBuffer);
-			commandList.SetIndexBuffer(quadIndexBuffer, IndexFormat.UInt16);
-
-			commandList.DrawIndexed(
-				indexCount: 4,
-				instanceCount: 1,
-				indexStart: 0,
-				vertexOffset: 0,
-				instanceStart: 0);
-			#endregion
-
-			#region UL Shader Test
-
-			commandList.SetPipeline(ultralightPipeline);
-			commandList.SetFramebuffer(ultralightOutputBuffer);
-			commandList.SetGraphicsResourceSet(0, uniformResourceSet);
-			commandList.SetGraphicsResourceSet(1, flushedTextureViewResourceSet);
-
-			commandList.SetIndexBuffer(ultralightVertexTestIndex, IndexFormat.UInt16);
-			commandList.SetVertexBuffer(0, ultralightVertexTest);
-
-
-			/*commandList.DrawIndexed(
-				indexCount: 4,
-				instanceCount: 1,
-				indexStart: 0,
-				vertexOffset: 0,
-				instanceStart: 0);*/
-			commandList.DrawIndexed(6);
 			#endregion
 
 			commandList.End();

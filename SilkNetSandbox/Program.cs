@@ -1,4 +1,4 @@
-﻿using Silk.NET.OpenGLES;
+using Silk.NET.OpenGLES;
 using System;
 using System.Diagnostics;
 using System.Drawing;
@@ -62,11 +62,11 @@ partial class Program {
 
   private static string _storagePath = null!;
 
-  private static bool _useOpenGl;
+  private static bool _useOpenGl = true;
 
   private static bool _automaticFallback = true;
 
-  private static bool _useEgl = true;
+  private static bool _useEgl = false;
 
   private static int _glMaj = 3;
 

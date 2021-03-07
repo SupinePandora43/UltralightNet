@@ -126,7 +126,10 @@ namespace VeldridSandbox
 			view.SetFinishLoadingCallback((IntPtr userData, View caller, ulong frameId, bool isMainFrame,
 	  string? url) =>
 			{ loaded = true; }, default);
-			view.LoadUrl("https://youtube.com"); //https://github.com
+			view.LoadUrl("https://github.com"); //https://github.com
+			//Stream html = assembly.GetManifestResourceStream("VeldridSandbox.embedded.index.html");
+			//StreamReader htmlReader = new(html, Encoding.UTF8);
+			//view.LoadHtml(htmlReader.ReadToEnd());
 			while (!loaded)
 			{
 				renderer.Update();
@@ -156,7 +159,7 @@ namespace VeldridSandbox
 			graphicsDevice = VeldridStartup.CreateGraphicsDevice(
 				window,
 				options,
-				GraphicsBackend.OpenGL);
+				GraphicsBackend.Vulkan);
 
 			window.Resized += () =>
 			{
@@ -169,9 +172,17 @@ namespace VeldridSandbox
 			{
 				view.FireMouseEvent(new Supine.UltralightSharp.Safe.MouseEvent(MouseEventType.MouseDown, (int)window.MouseDelta.X, (int)window.MouseDelta.Y, Supine.UltralightSharp.Enums.MouseButton.Left));
 			};
+			window.MouseUp += (me) =>
+			{
+				view.FireMouseEvent(new Supine.UltralightSharp.Safe.MouseEvent(MouseEventType.MouseUp, (int)window.MouseDelta.X, (int)window.MouseDelta.Y, Supine.UltralightSharp.Enums.MouseButton.Left));
+			};
+			window.MouseMove += (mouseMove) =>
+			{
+				view.FireMouseEvent(new Supine.UltralightSharp.Safe.MouseEvent(MouseEventType.MouseMoved, (int)mouseMove.MousePosition.X, (int)mouseMove.MousePosition.Y, Supine.UltralightSharp.Enums.MouseButton.None));
+			};
 			window.MouseWheel += (mw) =>
 			{
-				view.FireScrollEvent(new ScrollEvent(ScrollEventType.ScrollByPixel, 0, (int)mw.WheelDelta));
+				view.FireScrollEvent(new ScrollEvent(ScrollEventType.ScrollByPage, 0, (int)mw.WheelDelta));
 			};
 			factory = graphicsDevice.ResourceFactory;
 		}

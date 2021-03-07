@@ -1,9 +1,7 @@
-
 using Supine.UltralightSharp.Enums;
 using Supine.UltralightSharp.Safe;
 using System;
 using System.Collections.Generic;
-using System.Threading;
 using Veldrid;
 
 namespace VeldridSandbox
@@ -26,8 +24,8 @@ namespace VeldridSandbox
 				{
 					case Supine.UltralightSharp.Enums.CommandType.ClearRenderBuffer:
 						commandList.SetFramebuffer(rb.FrameBuffer);
-						commandList.ClearColorTarget(0, RgbaFloat.Clear);
-						Console.WriteLine("cleared buffer");
+						commandList.ClearColorTarget(0, RgbaFloat.CornflowerBlue);
+						//Console.WriteLine("cleared buffer");
 						break;
 					case Supine.UltralightSharp.Enums.CommandType.DrawGeometry:
 						#region State
@@ -88,18 +86,18 @@ namespace VeldridSandbox
 						{
 							case Supine.UltralightSharp.Enums.ShaderType.Fill:
 								commandList.SetPipeline(ultralightPipeline);
-								commandList.SetFramebuffer(ultralightOutputBuffer);
+								//commandList.SetFramebuffer(ultralightOutputBuffer);
 								break;
 							case Supine.UltralightSharp.Enums.ShaderType.FillPath:
 								commandList.SetPipeline(ultralightPathPipeline);
-								commandList.SetFramebuffer(ultralightPathOutputBuffer);
+								//commandList.SetFramebuffer(ultralightPathOutputBuffer);
 								fill = false;
 								break;
 							default: throw new ArgumentOutOfRangeException(nameof(ShaderType));
 						}
 
 						//if (command.GpuState.ShaderType == Supine.UltralightSharp.Enums.ShaderType.FillPath) continue;
-						//commandList.SetFramebuffer(rb.FrameBuffer);
+						commandList.SetFramebuffer(rb.FrameBuffer);
 						//commandList.SetFullViewports();
 						commandList.SetViewport(0, new Viewport(0, 0, state.ViewportWidth, state.ViewportHeight, 0, 1));
 						var entry = GeometryEntries[(int)command.GeometryId - 1];
@@ -142,14 +140,13 @@ namespace VeldridSandbox
 						commandList.SetIndexBuffer(entry.IndiciesBuffer, IndexFormat.UInt32);
 						unsafe
 						{
-							commandList.DrawIndexed(command.IndicesCount);
-							/*commandList.DrawIndexed(
+							commandList.DrawIndexed(
 								command.IndicesCount,
+								1,
+								command.IndicesOffset,
 								0,
-								0,
-								0,
-								command.IndicesOffset
-							);*/
+								0
+							);
 						}
 
 						break;

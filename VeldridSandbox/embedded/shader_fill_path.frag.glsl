@@ -164,7 +164,7 @@ void applyClip() {
   }
 }
 
-void main() {
+void main(void) {
   out_Color = ex_Color;
   applyClip();
 }

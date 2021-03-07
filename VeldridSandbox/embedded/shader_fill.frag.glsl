@@ -733,7 +733,7 @@ void applyClip() {
   }
 }
 
-void main() {
+void main(void) {
   const uint FillType_Solid = 0u;
   const uint FillType_Image = 1u;
   const uint FillType_Pattern_Image = 2u;
