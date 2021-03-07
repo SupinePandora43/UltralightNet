@@ -24,7 +24,7 @@ namespace VeldridSandbox
 				{
 					case Supine.UltralightSharp.Enums.CommandType.ClearRenderBuffer:
 						commandList.SetFramebuffer(rb.FrameBuffer);
-						commandList.ClearColorTarget(0, RgbaFloat.CornflowerBlue);
+						commandList.ClearColorTarget(0, RgbaFloat.Clear);
 						//Console.WriteLine("cleared buffer");
 						break;
 					case Supine.UltralightSharp.Enums.CommandType.DrawGeometry:

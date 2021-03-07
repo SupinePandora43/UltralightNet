@@ -4,18 +4,19 @@ using System;
 using System.Diagnostics;
 using System.IO;
 using System.Reflection;
-using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading;
 using Veldrid;
 using Veldrid.Sdl2;
-using Veldrid.SPIRV;
 using Veldrid.StartupUtilities;
 
 namespace VeldridSandbox
 {
 	public partial class Program
 	{
+		const GraphicsBackend BACKEND = GraphicsBackend.Direct3D11;
+
+
 		public static void Main()
 		{
 			Ultralight.SetLogger(new Logger
@@ -60,7 +61,7 @@ namespace VeldridSandbox
 
 		public Program()
 		{
-			stopwatch = Stopwatch.StartNew();
+			stopwatch = new Stopwatch();
 		}
 
 		~Program()
@@ -127,8 +128,8 @@ namespace VeldridSandbox
 	  string? url) =>
 			{ loaded = true; }, default);
 			view.LoadUrl("https://github.com"); //https://github.com
-			//Stream html = assembly.GetManifestResourceStream("VeldridSandbox.embedded.index.html");
-			//StreamReader htmlReader = new(html, Encoding.UTF8);
+			Stream html = assembly.GetManifestResourceStream("VeldridSandbox.embedded.index.html");
+			StreamReader htmlReader = new(html, Encoding.UTF8);
 			//view.LoadHtml(htmlReader.ReadToEnd());
 			while (!loaded)
 			{
@@ -159,10 +160,11 @@ namespace VeldridSandbox
 			graphicsDevice = VeldridStartup.CreateGraphicsDevice(
 				window,
 				options,
-				GraphicsBackend.Vulkan);
+				BACKEND);
 
 			window.Resized += () =>
 			{
+				Console.WriteLine("~~~~~RESIZED~~~~~");
 				graphicsDevice.ResizeMainWindow((uint)window.Width, (uint)window.Height);
 				width = window.Width;
 				height = window.Height;
@@ -189,12 +191,21 @@ namespace VeldridSandbox
 
 		private void Run()
 		{
+			stopwatch.Start();
+			ulong frames = 0;
 			while (window.Exists)
 			{
+				if (stopwatch.ElapsedMilliseconds >= 1000)
+				{
+					Console.WriteLine(frames);
+					frames = 0;
+					stopwatch.Restart();
+				}
 				renderer.Update();
 				renderer.Render();
 				Render();
 				window.PumpEvents();
+				frames++;
 			}
 		}
 	}

@@ -80,7 +80,7 @@ namespace VeldridSandbox
 				case BitmapFormat.A8UNorm:
 					{
 						graphicsDevice.UpdateTexture(tex, pixels,
-							texWidth * texHeight,
+							bitmap.GetSize().ToUInt32(),
 							0,
 							0,
 							0,
@@ -103,7 +103,7 @@ namespace VeldridSandbox
 				case BitmapFormat.Bgra8UNormSrgb:
 					{
 						graphicsDevice.UpdateTexture(tex, pixels,
-							texWidth * texHeight * 4,
+							bitmap.GetSize().ToUInt32(),
 							0,
 							0,
 							0,
@@ -212,7 +212,7 @@ namespace VeldridSandbox
 				entry.TextureView = factory.CreateTextureView(entry.Texure);
 				graphicsDevice.UpdateTexture(entry.Texure,
 					pixels,
-					texWidth * texHeight * 4,
+					bitmap.GetSize().ToUInt32(),
 					0,
 					0,
 					0,
@@ -221,6 +221,14 @@ namespace VeldridSandbox
 					1,
 					0,
 					0);
+				var cl = factory.CreateCommandList();
+				cl.Begin();
+				cl.GenerateMipmaps(entry.Texure);
+				cl.End();
+				graphicsDevice.SubmitCommands(cl);
+				graphicsDevice.WaitForIdle();
+				cl.Dispose();
+				cl = null;
 			}
 			bitmap.UnlockPixels();
 		}
@@ -244,7 +252,6 @@ namespace VeldridSandbox
 
 		private void CreateRenderBuffer(uint renderBufferId, RenderBuffer buffer)
 		{
-
 			Console.WriteLine($"CreateRenderBuffer: {renderBufferId}");
 
 			var index = (int)renderBufferId - 1;
@@ -254,29 +261,15 @@ namespace VeldridSandbox
 			var texEntry = TextureEntries[texIndex];
 			var tex = texEntry.Texure;
 
-			/*Texture offscreenDepth = factory.CreateTexture(TextureDescription.Texture2D(
-				tex.Width, tex.Height, 1, 1, PixelFormat.R16_UNorm, TextureUsage.DepthStencil));
-
-			FramebufferDescription framebufferDescription = new(offscreenDepth, tex);
-			
-			entry.FrameBuffer = factory.CreateFramebuffer(framebufferDescription);
-			*/
-
 			FramebufferDescription fd = new();
 			fd.ColorTargets = new[] { new FramebufferAttachmentDescription(tex, 0) };
-
-			/*entry.FrameBuffer = FrameBufferHelper.CreateFramebuffer(
-				graphicsDevice,
-				tex.Width,
-				tex.Height,
-				PixelFormat.R8_G8_B8_A8_UInt);*/
 
 			entry.FrameBuffer = factory.CreateFramebuffer(fd);
 
 			Veldrid.CommandList clearBufferCommandList = factory.CreateCommandList();
 			clearBufferCommandList.Begin();
 			clearBufferCommandList.SetFramebuffer(entry.FrameBuffer);
-			clearBufferCommandList.ClearColorTarget(0, RgbaFloat.Green);
+			clearBufferCommandList.ClearColorTarget(0, RgbaFloat.Clear);
 			clearBufferCommandList.End();
 			graphicsDevice.SubmitCommands(clearBufferCommandList);
 			clearBufferCommandList.Dispose();

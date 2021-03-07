@@ -15,7 +15,7 @@ namespace VeldridSandbox
 			commandList.SetPipeline(mainPipeline);
 			commandList.SetFramebuffer(graphicsDevice.SwapchainFramebuffer);
 			commandList.SetFullViewports();
-			commandList.ClearColorTarget(0, RgbaFloat.Orange);
+			commandList.ClearColorTarget(0, RgbaFloat.Clear);
 
 			#region RenderTarget
 			RenderTarget rt = view.GetRenderTarget();
@@ -41,7 +41,7 @@ namespace VeldridSandbox
 				vertexOffset: 0,
 				instanceStart: 0);
 			#endregion
-
+			
 			commandList.End();
 			graphicsDevice.SubmitCommands(commandList);
 			graphicsDevice.SwapBuffers();

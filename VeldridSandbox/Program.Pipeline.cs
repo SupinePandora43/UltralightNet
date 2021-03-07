@@ -94,6 +94,7 @@ namespace VeldridSandbox
 
 		private void CreateShaders()
 		{
+			CrossCompileOptions crossCompileOptions = new(false, BACKEND == GraphicsBackend.OpenGL || BACKEND == GraphicsBackend.OpenGLES);
 			#region main
 			ShaderDescription mainvShaderDescription = new(ShaderStages.Vertex, GetShaderBytes("embedded.basic.vert.glsl"), "main");
 			ShaderDescription mainfShaderDescription = new(ShaderStages.Fragment, GetShaderBytes("embedded.basic.frag.glsl"), "main");
@@ -104,14 +105,14 @@ namespace VeldridSandbox
 			#region fill
 			ShaderDescription vertexShaderShaderDescription = new(ShaderStages.Vertex, GetShaderBytes("embedded.shader_v2f_c4f_t2f_t2f_d28f.vert.glsl"), "main");
 			ShaderDescription fragmentShaderShaderDescription = new(ShaderStages.Fragment, GetShaderBytes("embedded.shader_fill.frag.glsl"), "main");
-			Shader[] shaders = factory.CreateFromSpirv(vertexShaderShaderDescription, fragmentShaderShaderDescription);
+			Shader[] shaders = factory.CreateFromSpirv(vertexShaderShaderDescription, fragmentShaderShaderDescription, crossCompileOptions);
 			vertexShader = shaders[0];
 			fragmentShader = shaders[1];
 			#endregion
 			#region fillPath
 			ShaderDescription pathVertexShaderShaderDescription = new(ShaderStages.Vertex, GetShaderBytes("embedded.shader_v2f_c4f_t2f.vert.glsl"), "main");
 			ShaderDescription pathFragmentShaderShaderDescription = new(ShaderStages.Fragment, GetShaderBytes("embedded.shader_fill_path.frag.glsl"), "main");
-			Shader[] pathShaders = factory.CreateFromSpirv(pathVertexShaderShaderDescription, pathFragmentShaderShaderDescription);
+			Shader[] pathShaders = factory.CreateFromSpirv(pathVertexShaderShaderDescription, pathFragmentShaderShaderDescription, crossCompileOptions);
 			pathVertexShader = pathShaders[0];
 			pathFragmentShader = pathShaders[1];
 			#endregion
@@ -123,10 +124,10 @@ namespace VeldridSandbox
 			#region RenderTarget
 			rtVertexBuffer = factory.CreateBuffer(quadBufferDescription);
 			graphicsDevice.UpdateBuffer(rtVertexBuffer, 0, new VertexPositionTexture[] {
-				new(new(-.6f, .9f), new(0,0)),
-				new(new(.6f, .9f),  new(1,0)),
-				new(new(-.6f, -.3f),new(0,1)),
-				new(new(.6f, -.3f), new(1,1)),
+				new(new(-1, 1), new(0,0)),
+				new(new(1, 1),  new(1,0)),
+				new(new(-1, -1),new(0,1)),
+				new(new(1, -1), new(1,1)),
 			});
 			quadIndexBuffer = factory.CreateBuffer(new(/*sizeof(uint) * 6*/ 4 * sizeof(short), BufferUsage.IndexBuffer));
 			graphicsDevice.UpdateBuffer(quadIndexBuffer, 0, _quadIndices);
@@ -153,7 +154,7 @@ namespace VeldridSandbox
 			{
 				return new VertexUltralightData()
 				{
-					in_Position = new(x/512, y/512),
+					in_Position = new(x / 512, y / 512),
 					in_Color = new(255, 255, 255, 255),
 					in_TexCoord = new(u, v),
 					in_Data0 = new(0.5f, 0f, 0f, 0f)
@@ -262,7 +263,7 @@ namespace VeldridSandbox
 				1,
 				1,
 				PixelFormat.R8_G8_B8_A8_UNorm,
-				TextureUsage.Sampled | TextureUsage.Storage | TextureUsage.RenderTarget,
+				TextureUsage.RenderTarget,
 				TextureType.Texture2D));
 
 			ultralightPathOutputTexture = factory.CreateTexture(new(
@@ -272,11 +273,8 @@ namespace VeldridSandbox
 				1,
 				1,
 				PixelFormat.R8_G8_B8_A8_UNorm,
-				TextureUsage.Sampled | TextureUsage.Storage | TextureUsage.RenderTarget,
+				TextureUsage.RenderTarget,
 				TextureType.Texture2D));
-
-			ultralightResourceSet = factory.CreateResourceSet(new(basicQuadResourceLayout, factory.CreateTextureView(ultralightOutputTexture)));
-			ultralightPathResourceSet = factory.CreateResourceSet(new(basicQuadResourceLayout, factory.CreateTextureView(ultralightPathOutputTexture)));
 
 			testTexture = factory.CreateTexture(new(
 				256,
@@ -305,18 +303,7 @@ namespace VeldridSandbox
 					}
 				}
 			);
-			#region Clear Buffers
-			CommandList clearBufferCommandList = factory.CreateCommandList();
-			clearBufferCommandList.Begin();
-			clearBufferCommandList.SetFramebuffer(ultralightOutputBuffer);
-			clearBufferCommandList.ClearColorTarget(0, RgbaFloat.Cyan);
-			clearBufferCommandList.SetFramebuffer(ultralightPathOutputBuffer);
-			clearBufferCommandList.ClearColorTarget(0, RgbaFloat.Cyan);
-			clearBufferCommandList.End();
-			graphicsDevice.SubmitCommands(clearBufferCommandList);
-			clearBufferCommandList.Dispose();
-			clearBufferCommandList = null;
-			#endregion
+
 			tv = factory.CreateTextureView(testTexture);
 
 			flushedTextureViewResourceSet = factory.CreateResourceSet(
@@ -452,7 +439,6 @@ namespace VeldridSandbox
 				ultralightOutputBuffer.OutputDescription
 			);
 			ultralightPipeline = factory.CreateGraphicsPipeline(ultralightPipelineDescription);
-
 			#endregion
 
 			#region Ultralight Path
@@ -521,7 +507,7 @@ namespace VeldridSandbox
 
 
 			ultralightPathPipeline = factory.CreateGraphicsPipeline(ultralightPathPipelineDescription);
-			
+
 			#endregion
 
 			commandList = factory.CreateCommandList();
