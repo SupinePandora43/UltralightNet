@@ -35,7 +35,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Ultralight.Test", "Ultralig
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UltralightSharp.Veldrid", "UltralightSharp.Veldrid\UltralightSharp.Veldrid.csproj", "{83971783-6E3E-4211-BB1C-AFFDA599591B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UltralightNet.Generator", "UltralightNet.Generator\UltralightNet.Generator.csproj", "{11892949-C16E-4E22-B273-CC460BDD5F42}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UltralightNet.Generator", "UltralightNet.Generator\UltralightNet.Generator.csproj", "{11892949-C16E-4E22-B273-CC460BDD5F42}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UltralightNet", "UltralightNet\UltralightNet.csproj", "{1F8BE9AC-A40B-4F00-BA41-F1A28C197F1F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UltralightNet.Test", "UltralightNet.Test\UltralightNet.Test.csproj", "{73B85E50-C001-424A-A26F-F94ACAAD2978}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -83,6 +87,14 @@ Global
 		{11892949-C16E-4E22-B273-CC460BDD5F42}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{11892949-C16E-4E22-B273-CC460BDD5F42}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{11892949-C16E-4E22-B273-CC460BDD5F42}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1F8BE9AC-A40B-4F00-BA41-F1A28C197F1F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1F8BE9AC-A40B-4F00-BA41-F1A28C197F1F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1F8BE9AC-A40B-4F00-BA41-F1A28C197F1F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1F8BE9AC-A40B-4F00-BA41-F1A28C197F1F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{73B85E50-C001-424A-A26F-F94ACAAD2978}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{73B85E50-C001-424A-A26F-F94ACAAD2978}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{73B85E50-C001-424A-A26F-F94ACAAD2978}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{73B85E50-C001-424A-A26F-F94ACAAD2978}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

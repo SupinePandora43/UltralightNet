@@ -7,14 +7,15 @@ using System.Net;
 
 namespace UltralightNet.Generator
 {
-    public static class Program
-    {
+	public static class Program
+	{
 		private const string UltralightApi = "https://github.com/ultralight-ux/Ultralight-API/archive/master.zip";
 
 		public static void Main(string[] args)
 		{
 			#region download headers
-			Directory.Delete("./Ultralight-API-master", true);
+			if (Directory.Exists("./Ultralight-API-master"))
+				Directory.Delete("./Ultralight-API-master", true);
 			WebRequest request = WebRequest.CreateHttp(UltralightApi);
 			WebResponse response = request.GetResponse();
 
@@ -23,8 +24,8 @@ namespace UltralightNet.Generator
 
 			archive.ExtractToDirectory("./");
 			#endregion
-			ClangSharpUltralightGenerator.Generate();
-			return;
+			//ClangSharpUltralightGenerator.Generate();
+			//return;
 			ConsoleDriver.Run(new UltralightLibrary());
 		}
 	}
@@ -32,12 +33,12 @@ namespace UltralightNet.Generator
 	{
 		public override void Postprocess(Driver driver, ASTContext ctx)
 		{
-			
+
 		}
 
 		public override void Preprocess(Driver driver, ASTContext ctx)
 		{
-			
+
 		}
 
 		public override void Setup(Driver driver)
@@ -47,13 +48,13 @@ namespace UltralightNet.Generator
 
 			var module = options.AddModule("Ultralight");
 			module.IncludeDirs.Add("./Ultralight-API-master");
-			module.Headers.Add("Ultralight/CAPI.h");
-			module.Headers.Add("JavaScriptCore/JavaScript.h");
+			module.Headers.Add("Ultralight/String.h");
+			//module.Headers.Add("JavaScriptCore/JavaScript.h");
 		}
 
 		public override void SetupPasses(Driver driver)
 		{
-			
+
 		}
 	}
 }
