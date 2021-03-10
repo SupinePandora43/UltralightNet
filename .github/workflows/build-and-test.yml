@@ -32,7 +32,7 @@ jobs:
       - name: Build
         run: dotnet build -c Release
       - name: Publish Build
-        run: dotnet publish -c Release --framework net5
+        run: dotnet publish -c Release
       - name: Run Demo
         run: dotnet run -c Release --project UltralightSharp.SafeDemo/UltralightSharp.SafeDemo.csproj
       - uses: actions/upload-artifact@v2
