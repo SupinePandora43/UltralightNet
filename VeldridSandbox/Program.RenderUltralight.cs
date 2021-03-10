@@ -13,7 +13,7 @@ namespace VeldridSandbox
 			graphicsDevice.WaitForIdle();
 
 			graphicsDevice.WaitForIdle();
-
+			
 			foreach (var command in queuedCommands)
 			{
 				ref readonly var state = ref command.GpuState;
@@ -108,7 +108,9 @@ namespace VeldridSandbox
 						if (state.ShaderType == ShaderType.Fill)
 						{
 							if (texIndex1 > 0) commandList.SetGraphicsResourceSet(1, TextureEntries[texIndex1].textureResource);
+							else commandList.SetGraphicsResourceSet(1, flushedTextureViewResourceSet);
 							if (texIndex2 > 0) commandList.SetGraphicsResourceSet(2, TextureEntries[texIndex2].textureResource);
+							else commandList.SetGraphicsResourceSet(2, flushedTextureViewResourceSet);
 						}
 						commandList.SetVertexBuffer(0, entry.VertexBuffer);
 						if (state.EnableScissor)

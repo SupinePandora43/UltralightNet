@@ -27,7 +27,6 @@ namespace VeldridSandbox
 
 		private ResourceSet mainResourceSet;
 		private ResourceSet uniformResourceSet;
-		private ResourceSet ultralightResourceSet;
 		private ResourceSet ultralightPathResourceSet;
 
 		Sampler TextureSampler;
@@ -306,8 +305,9 @@ namespace VeldridSandbox
 					}
 				}
 			);
+			flushedTextureViewResourceSet = factory.CreateResourceSet(new(textureLayout, testTexture));
 
-			/*#region Async Flushed Image Loading
+			#region Async Flushed Image Loading
 			Task.Run(async () =>
 			{
 				// fetch
@@ -320,7 +320,7 @@ namespace VeldridSandbox
 				#region upload to gpu
 				CommandList cl = factory.CreateCommandList();
 				cl.Begin();
-				cl.CopyTexture(omg, tv.Target);
+				cl.CopyTexture(omg, testTexture);
 				cl.End();
 				graphicsDevice.SubmitCommands(cl);
 				#endregion
@@ -336,7 +336,7 @@ namespace VeldridSandbox
 				#endregion
 			});
 			#endregion
-			*/
+			
 			#region Ultralight
 
 			GraphicsPipelineDescription ultralightPipelineDescription = new(
