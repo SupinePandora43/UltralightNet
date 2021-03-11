@@ -88,14 +88,15 @@ namespace VeldridSandbox
 							0,
 							0
 						);
-						unsafe
-						{
-							ReadOnlySpan<byte> span = new(pixels.ToPointer(), (int)(texWidth * texHeight));
-							Image image = Image.LoadPixelData<L8>(span, (int)texWidth, (int)texHeight);
-							FileStream fs = File.Open($"./texture_{textureId}_updated_{Guid.NewGuid()}.png", FileMode.OpenOrCreate);
-							image.SaveAsPng(fs);
-							fs.Close();
-						}
+						if (SAVE_IMAGES)
+							unsafe
+							{
+								ReadOnlySpan<byte> span = new(pixels.ToPointer(), (int)(texWidth * texHeight));
+								Image image = Image.LoadPixelData<L8>(span, (int)texWidth, (int)texHeight);
+								FileStream fs = File.Open($"./texture_{textureId}_updated_{Guid.NewGuid()}.png", FileMode.OpenOrCreate);
+								image.SaveAsPng(fs);
+								fs.Close();
+							}
 						break;
 					}
 				case BitmapFormat.Bgra8UNormSrgb:
@@ -111,29 +112,34 @@ namespace VeldridSandbox
 							0,
 							0
 						);
-						unsafe
-						{
-							ReadOnlySpan<byte> span = new(pixels.ToPointer(), (int)(texWidth * texHeight * 4));
-							Image image = Image.LoadPixelData<Bgra32>(span, (int)texWidth, (int)texHeight);
-							FileStream fs = File.Open($"./texture_{textureId}_updated_{Guid.NewGuid()}.png", FileMode.OpenOrCreate);
-							image.SaveAsPng(fs);
-							fs.Close();
-						}
+						if (SAVE_IMAGES)
+							unsafe
+							{
+								ReadOnlySpan<byte> span = new(pixels.ToPointer(), (int)(texWidth * texHeight * 4));
+								Image image = Image.LoadPixelData<Bgra32>(span, (int)texWidth, (int)texHeight);
+								FileStream fs = File.Open($"./texture_{textureId}_updated_{Guid.NewGuid()}.png", FileMode.OpenOrCreate);
+								image.SaveAsPng(fs);
+								fs.Close();
+							}
 						break;
 					}
 				default: throw new ArgumentOutOfRangeException(nameof(BitmapFormat));
 			}
 
 			bitmap.UnlockPixels();
-			#region _gl.GenerateMipmap
-			Veldrid.CommandList cl = factory.CreateCommandList();
-			cl.Begin();
-			cl.GenerateMipmaps(tex);
-			cl.End();
-			graphicsDevice.SubmitCommands(cl);
-			cl.Dispose();
-			cl = null;
-			#endregion
+
+			if (MIPMAPS)
+			{
+				#region _gl.GenerateMipmap
+				Veldrid.CommandList cl = factory.CreateCommandList();
+				cl.Begin();
+				cl.GenerateMipmaps(tex);
+				cl.End();
+				graphicsDevice.SubmitCommands(cl);
+				cl.Dispose();
+				cl = null;
+				#endregion
+			}
 		}
 
 		private void CreateTexture(uint textureId, Bitmap bitmap)
@@ -177,14 +183,15 @@ namespace VeldridSandbox
 								TextureUsage.Sampled | TextureUsage.GenerateMipmaps
 							)
 						);
-						unsafe
-						{
-							ReadOnlySpan<byte> span = new(pixels.ToPointer(), (int)(texWidth * texHeight));
-							Image image = Image.LoadPixelData<L8>(span, (int)texWidth, (int)texHeight);
-							FileStream fs = File.Open($"./texture_{textureId}_{Guid.NewGuid()}.png", FileMode.OpenOrCreate);
-							image.SaveAsPng(fs);
-							fs.Close();
-						}
+						if (SAVE_IMAGES)
+							unsafe
+							{
+								ReadOnlySpan<byte> span = new(pixels.ToPointer(), (int)(texWidth * texHeight));
+								Image image = Image.LoadPixelData<L8>(span, (int)texWidth, (int)texHeight);
+								FileStream fs = File.Open($"./texture_{textureId}_{Guid.NewGuid()}.png", FileMode.OpenOrCreate);
+								image.SaveAsPng(fs);
+								fs.Close();
+							}
 						break;
 					case BitmapFormat.Bgra8UNormSrgb:
 						entry.Texure = factory.CreateTexture(
@@ -197,14 +204,15 @@ namespace VeldridSandbox
 								TextureUsage.Sampled | TextureUsage.GenerateMipmaps
 							)
 						);
-						unsafe
-						{
-							ReadOnlySpan<byte> span = new(pixels.ToPointer(), (int)(texWidth * texHeight * 4));
-							Image image = Image.LoadPixelData<Bgra32>(span, (int)texWidth, (int)texHeight);
-							FileStream fs = File.Open($"./texture_{textureId}_{Guid.NewGuid()}.png", FileMode.OpenOrCreate);
-							image.SaveAsPng(fs);
-							fs.Close();
-						}
+						if (SAVE_IMAGES)
+							unsafe
+							{
+								ReadOnlySpan<byte> span = new(pixels.ToPointer(), (int)(texWidth * texHeight * 4));
+								Image image = Image.LoadPixelData<Bgra32>(span, (int)texWidth, (int)texHeight);
+								FileStream fs = File.Open($"./texture_{textureId}_{Guid.NewGuid()}.png", FileMode.OpenOrCreate);
+								image.SaveAsPng(fs);
+								fs.Close();
+							}
 						break;
 				}
 				entry.TextureView = factory.CreateTextureView(entry.Texure);
@@ -219,14 +227,17 @@ namespace VeldridSandbox
 					1,
 					0,
 					0);
-				var cl = factory.CreateCommandList();
-				cl.Begin();
-				cl.GenerateMipmaps(entry.Texure);
-				cl.End();
-				graphicsDevice.SubmitCommands(cl);
-				graphicsDevice.WaitForIdle();
-				cl.Dispose();
-				cl = null;
+				if (MIPMAPS)
+				{
+					var cl = factory.CreateCommandList();
+					cl.Begin();
+					cl.GenerateMipmaps(entry.Texure);
+					cl.End();
+					graphicsDevice.SubmitCommands(cl);
+					graphicsDevice.WaitForIdle();
+					cl.Dispose();
+					cl = null;
+				}
 			}
 			bitmap.UnlockPixels();
 		}
