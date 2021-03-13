@@ -4,7 +4,7 @@ namespace UltralightNet.Test
 {
     class Program
     {
-        static void Main()
+        static void _Main()
         {
 			ULString uLString = new("тестим :D");
 			Console.WriteLine(uLString.IsEmpty());

@@ -58,10 +58,11 @@ namespace UltralightNet
 		public ULString16 ULString16 => Marshal.PtrToStructure<ULString16>(Ptr);
 
 		public ULString(IntPtr ptr) => Ptr = ptr;
-		public ULString(string str) => Ptr = Methods.ulCreateStringUTF16(str, (uint)str.Length);
+		public ULString(string str = null) => Ptr = Methods.ulCreateStringUTF16(str ?? "", str is null ?0  : (uint)str.Length);
 
-		public bool IsEmpty() => Methods.ulStringIsEmpty(Ptr);
 		public string GetData() => Methods.ulStringGetData(Ptr);
+		public uint GetLength() => Methods.ulStringGetLength(Ptr);
+		public bool IsEmpty() => Methods.ulStringIsEmpty(Ptr);
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public override string ToString() => GetData();
