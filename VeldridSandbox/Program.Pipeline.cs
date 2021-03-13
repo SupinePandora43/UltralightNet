@@ -27,7 +27,6 @@ namespace VeldridSandbox
 
 		private ResourceSet mainResourceSet;
 		private ResourceSet uniformResourceSet;
-		private ResourceSet ultralightResourceSet;
 		private ResourceSet ultralightPathResourceSet;
 
 		Sampler TextureSampler;
@@ -168,10 +167,11 @@ namespace VeldridSandbox
 			graphicsDevice.UpdateBuffer(ultralightVertexTestIndex, 0, new ushort[] { 0, 1, 3, 0, 2, 3 });
 		}
 		ResourceLayout basicQuadResourceLayout = null;
-		ResourceLayout ultralightResourceLayout = null;
+		ResourceLayout textureLayout;
+
 		private void CreatePipeline()
 		{
-			TextureSampler = graphicsDevice.Aniso4xSampler;
+			TextureSampler = graphicsDevice.PointSampler;
 			stopwatch.Restart();
 			CreateShaders();
 			Console.WriteLine($"Shader - {stopwatch.ElapsedMilliseconds} ms");
@@ -180,7 +180,7 @@ namespace VeldridSandbox
 			CreateBuffers();
 
 			#region QUAD
-
+			
 			basicQuadResourceLayout = factory.CreateResourceLayout(
 				new ResourceLayoutDescription(
 					new ResourceLayoutElementDescription("_sampler",
@@ -194,16 +194,11 @@ namespace VeldridSandbox
 				)
 			);
 
-
-			ultralightResourceLayout = factory.CreateResourceLayout(
+			textureLayout = factory.CreateResourceLayout(
 				new ResourceLayoutDescription(
-					new ResourceLayoutElementDescription("Texture1", ResourceKind.TextureReadOnly, ShaderStages.Fragment),
-					new ResourceLayoutElementDescription("Texture2", ResourceKind.TextureReadOnly, ShaderStages.Fragment)
-				// new ResourceLayoutElementDescription("Texture3", ResourceKind.TextureReadOnly, ShaderStages.Fragment)
+					new ResourceLayoutElementDescription("texture", ResourceKind.TextureReadOnly, ShaderStages.Fragment)
 				)
 			);
-
-			//ultralightResourceSet = factory.CreateResourceSet(new ResourceSetDescription(ultralightResourceLayout));
 
 			ResourceLayout uniformsResourceLayout = factory.CreateResourceLayout(
 					new ResourceLayoutDescription(
@@ -310,16 +305,7 @@ namespace VeldridSandbox
 					}
 				}
 			);
-
-			tv = factory.CreateTextureView(testTexture);
-
-			flushedTextureViewResourceSet = factory.CreateResourceSet(
-				new ResourceSetDescription(
-					ultralightResourceLayout,
-					tv,
-					tv
-				)
-			);
+			flushedTextureViewResourceSet = factory.CreateResourceSet(new(textureLayout, testTexture));
 
 			#region Async Flushed Image Loading
 			Task.Run(async () =>
@@ -334,7 +320,7 @@ namespace VeldridSandbox
 				#region upload to gpu
 				CommandList cl = factory.CreateCommandList();
 				cl.Begin();
-				cl.CopyTexture(omg, tv.Target);
+				cl.CopyTexture(omg, testTexture);
 				cl.End();
 				graphicsDevice.SubmitCommands(cl);
 				#endregion
@@ -350,15 +336,7 @@ namespace VeldridSandbox
 				#endregion
 			});
 			#endregion
-
-			// uncomment to see flushed (~0_0~)
-			/*mainResourceSet = factory.CreateResourceSet(
-				new ResourceSetDescription(
-					mainResourceLayout,
-					tv
-				)
-			);*/
-
+			
 			#region Ultralight
 
 			GraphicsPipelineDescription ultralightPipelineDescription = new(
@@ -441,7 +419,8 @@ namespace VeldridSandbox
 				),
 				new ResourceLayout[] {
 					uniformsResourceLayout,
-					ultralightResourceLayout
+					textureLayout,
+					textureLayout
 				},
 				ultralightOutputBuffer.OutputDescription
 			);

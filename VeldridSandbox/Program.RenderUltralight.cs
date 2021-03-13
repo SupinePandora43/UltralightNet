@@ -8,16 +8,12 @@ namespace VeldridSandbox
 {
 	partial class Program
 	{
-		readonly List<ResourceSet> textureResourceSets = new();
 		private void RenderUltralight()
 		{
 			graphicsDevice.WaitForIdle();
 
-			foreach (var rs in textureResourceSets) rs.Dispose();
-			textureResourceSets.Clear();
-
 			graphicsDevice.WaitForIdle();
-
+			
 			foreach (var command in queuedCommands)
 			{
 				ref readonly var state = ref command.GpuState;
@@ -106,32 +102,16 @@ namespace VeldridSandbox
 
 						commandList.SetGraphicsResourceSet(0, uniformResourceSet);
 
-						if (fill)
+						var texIndex1 = (int)state.Texture1Id - 1;
+						var texIndex2 = (int)state.Texture2Id - 1;
+
+						if (state.ShaderType == ShaderType.Fill)
 						{
-							TextureView textureView1;
-							TextureView textureView2;
-
-							var texIndex1 = (int)state.Texture1Id - 1;
-							var texIndex2 = (int)state.Texture2Id - 1;
-
-							if (texIndex1 < 0) textureView1 = tv;
-							else textureView1 = TextureEntries[texIndex1].TextureView;
-							if (texIndex2 < 0) textureView2 = tv;
-							else textureView2 = TextureEntries[texIndex2].TextureView;
-
-							ResourceSet rs = factory.CreateResourceSet(
-								new ResourceSetDescription(
-									ultralightResourceLayout,
-									textureView1,
-									textureView2
-								)
-							);
-							textureResourceSets.Add(rs);
-
-							commandList.SetGraphicsResourceSet(1, rs);
-
+							if (texIndex1 > 0) commandList.SetGraphicsResourceSet(1, TextureEntries[texIndex1].textureResource);
+							else commandList.SetGraphicsResourceSet(1, flushedTextureViewResourceSet);
+							if (texIndex2 > 0) commandList.SetGraphicsResourceSet(2, TextureEntries[texIndex2].textureResource);
+							else commandList.SetGraphicsResourceSet(2, flushedTextureViewResourceSet);
 						}
-
 						commandList.SetVertexBuffer(0, entry.VertexBuffer);
 						if (state.EnableScissor)
 						{

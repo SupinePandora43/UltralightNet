@@ -30,6 +30,7 @@ namespace VeldridSandbox
 		{
 			public Texture Texure { get; set; }
 			public TextureView TextureView { get; set; }
+			public ResourceSet textureResource { get; set; }
 			public uint Width { get; set; }
 			public uint Height { get; set; }
 		}
@@ -51,6 +52,8 @@ namespace VeldridSandbox
 			Console.WriteLine($"GpuDriver.DestroyTexture({textureId})");
 			var index = (int)textureId - 1;
 			var entry = TextureEntries.RemoveAt(index);
+			entry.textureResource.Dispose();
+			entry.textureResource = null;
 			entry.TextureView.Dispose();
 			entry.TextureView = null;
 			entry.Texure.Dispose();
@@ -240,6 +243,9 @@ namespace VeldridSandbox
 				}
 			}
 			bitmap.UnlockPixels();
+			entry.textureResource = factory.CreateResourceSet(
+				new ResourceSetDescription(textureLayout, entry.Texure)
+			);
 		}
 
 		private uint NextTextureId()
