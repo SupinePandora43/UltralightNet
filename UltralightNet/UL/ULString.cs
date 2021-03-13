@@ -1,98 +1,90 @@
 using System;
-using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
-using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace UltralightNet.UL
+namespace UltralightNet
 {
-	public sealed unsafe class ULString : ICloneable, IEquatable<ULString>
+	[System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE1006:Naming Styles", Justification = "<Pending>")]
+	[System.Diagnostics.CodeAnalysis.SuppressMessage("Interoperability", "CA1401:P/Invokes should not be visible", Justification = "<Pending>")]
+	public static partial class Methods
 	{
-		public readonly C_String* ptr;
+		/// <summary>Create string from null-terminated ASCII C-string.</summary>
+		[GeneratedDllImport("Ultralight", CharSet = CharSet.Ansi)]
+		public static partial IntPtr ulCreateString([MarshalAs(UnmanagedType.LPStr)] string str);
 
-		public ULString(C_String* ptr) => this.ptr = ptr;
-		public ULString(IntPtr ptr) : this((C_String*)ptr) { }
+		/// <summary>Create string from UTF-8 buffer.</summary>
+		[GeneratedDllImport("Ultralight")]
+		[Obsolete("Unexpected behaviour")]
+		public static partial IntPtr ulCreateStringUTF8([MarshalAs(UnmanagedType.LPUTF8Str)] string str, uint len);
 
-		public ULString(string str)
-		{
-			IntPtr strPtr = Marshal.StringToHGlobalUni(str);
-			ptr = Methods.ulCreateStringUTF16((ushort*)strPtr, (UIntPtr)str.Length);
-			Marshal.FreeHGlobal(strPtr);
-		}
-		/// <remarks>
-		///	Ultralight handles strings in unicode (UTF16)
-		/// </remarks>
-		/// <seealso cref="CreateUTF16(string)"/>
-		public static ULString CreateAnsi(string str)
-		{
-			return new ULString(Methods.ulCreateString(str));
-		}
-		/// <summary>
-		/// do not use
-		/// </summary>
-		/// <remarks>
-		/// doesn't work as excepted on my machine
-		/// </remarks>
-		/// <seealso cref="CreateUTF16(string)"/>
-		public static ULString CreateUTF8(string str)
-		{
-			return new ULString(Methods.ulCreateStringUTF8(str, (UIntPtr)str.Length));
-		}
-		/// <summary>
-		/// Creates Unicode (UTF16) ULString
-		/// </summary>
-		public static ULString CreateUTF16(string str)
-		{
-			return new ULString(Methods.ulCreateStringUTF16(str, (UIntPtr)str.Length));
-		}
+		/// <summary>Create string from UTF-16 buffer.</summary>
+		[GeneratedDllImport("Ultralight", CharSet = CharSet.Unicode)]
+		public static partial IntPtr ulCreateStringUTF16([MarshalAs(UnmanagedType.LPWStr)] string str, uint len);
 
-		public void AssingULString(ULString ulString)
-		{
-			Methods.ulStringAssignString(ptr, ulString.ptr);
-		}
-		public void AssingString(string str)
-		{
-			Methods.ulStringAssignCString(ptr, str);
-		}
+		/// <summary>Create string from copy of existing string.</summary>
+		[DllImport("Ultralight")]
+		public static extern IntPtr ulCreateStringFromCopy(IntPtr str);
 
-		public override string ToString()
-		{
-			return Marshal.PtrToStringUni(Methods.ulStringGetData(ptr), (int)Methods.ulStringGetLength(ptr));
-		}
+		/// <summary>Destroy string (you should destroy any strings you explicitly Create).</summary>
+		[DllImport("Ultralight")]
+		public static extern void ulDestroyString(IntPtr str);
 
-		public object Clone()
-		{
-			return new ULString(Methods.ulCreateStringFromCopy(ptr));
-		}
+		/// <summary>Get internal UTF-16 buffer data.</summary>
+		[GeneratedDllImport("Ultralight", CharSet = CharSet.Unicode)]
+		[return: MarshalAs(UnmanagedType.LPWStr)]
+		public static partial string ulStringGetData(IntPtr str);
 
-		public bool Equals(ULString? other)
-		{
-			if (ptr == other?.ptr) return true;
+		/// <summary>Get length in UTF-16 characters.</summary>
+		[DllImport("Ultralight")]
+		public static extern uint ulStringGetLength(IntPtr str);
 
-			return ToString().Equals(other?.ToString());
-		}
-		public static bool ReferenceEquals(ULString? objA, ULString? objB)
-		{
-			if (objA == objB) return true;
-			if (objA == null || objB == null) return false;
-			return objA.ptr == objB.ptr;
-		}
-		~ULString()
-		{
-			Methods.ulDestroyString(ptr);
-		}
-		public static bool IsNullOrEmpty([NotNullWhen(false)] ULString? ulString)
-		{
-			if (ulString == null) return true;
-			if (ulString.ptr == null) return true;
-			if (ulString.ptr == default) return true;
-			if (Methods.ulStringIsEmpty(ulString.ptr)) return true;
-			return string.IsNullOrEmpty(ulString.ToString());
-		}
-		public static explicit operator ULString(string str) => new ULString(str);
-		public static implicit operator C_String*(ULString ulString) => ulString.ptr;
-		public static implicit operator IntPtr(ULString ulString) => (IntPtr)ulString.ptr;
-		public static implicit operator string(ULString ulString) => ulString.ToString();
+		/// <summary>Whether this string is empty or not.</summary>
+		[DllImport("Ultralight")]
+		public static extern bool ulStringIsEmpty(IntPtr str);
 	}
+
+	[StructLayout(LayoutKind.Sequential)]
+	public struct ULString16
+	{
+		[MarshalAs(UnmanagedType.LPWStr)]
+		public string data_;
+		public uint length_;
+	}
+
+	public class ULString : IDisposable
+	{
+		internal IntPtr Ptr { get; private set; }
+
+		public ULString16 ULString16 => Marshal.PtrToStructure<ULString16>(Ptr);
+
+		public ULString(IntPtr ptr) => Ptr = ptr;
+		public ULString(string str) => Ptr = Methods.ulCreateStringUTF16(str, (uint)str.Length);
+
+		public bool IsEmpty() => Methods.ulStringIsEmpty(Ptr);
+		public string GetData() => Methods.ulStringGetData(Ptr);
+
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		public override string ToString() => GetData();
+
+		#region Disposing
+
+		~ULString() => Dispose();
+
+		public bool IsDisposed { get; private set; } = false;
+
+		public void Dispose()
+		{
+			Console.WriteLine("disposing");
+
+			if (IsDisposed) return;
+
+			Methods.ulDestroyString(Ptr);
+
+			IsDisposed = true;
+
+			GC.SuppressFinalize(this);
+		}
+
+		#endregion Disposing
+	}
+}

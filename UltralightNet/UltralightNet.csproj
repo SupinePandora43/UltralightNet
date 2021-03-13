@@ -1,6 +1,24 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 	<PropertyGroup>
-		<TargetFramework>net5.0</TargetFramework>
+		<TargetFrameworks>net5.0</TargetFrameworks>
 		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+		<EmitCompilerGeneratedFiles>true</EmitCompilerGeneratedFiles>
+		<LangVersion>preview</LangVersion>
+		<UseAppHost>true</UseAppHost>
+		<IsPackable>false</IsPackable>
+		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+		<RuntimeIdentifiers>win-x64;linux-x64;osx-x64</RuntimeIdentifiers>
 	</PropertyGroup>
+	<ItemGroup>
+		<None Remove="Ultralight.g._cs" />
+		<None Remove="Ultralight._cs" />
+	</ItemGroup>
+	<ItemGroup>
+		<!--<Compile Include="Ultralight.g._cs" />-->
+		<!--<Compile Include="Ultralight._cs" />-->
+	</ItemGroup>
+	<ItemGroup>
+		<PackageReference Include="Ancillary.Interop" Version="1.0.0-alpha.20604.3" />
+		<PackageReference Include="DllImportGenerator" Version="1.0.0-alpha.20604.3" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
+	</ItemGroup>
 </Project>

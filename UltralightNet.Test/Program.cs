@@ -6,7 +6,9 @@ namespace UltralightNet.Test
     {
         static void Main()
         {
-            
-        }
+			ULString uLString = new("тестим :D");
+			Console.WriteLine(uLString.IsEmpty());
+			Console.WriteLine(uLString.GetData());
+		}
     }
 }
