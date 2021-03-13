@@ -35,12 +35,19 @@ namespace UltralightNet
 		public static partial string ulStringGetData(IntPtr str);
 
 		/// <summary>Get length in UTF-16 characters.</summary>
-		[DllImport("Ultralight")]
-		public static extern uint ulStringGetLength(IntPtr str);
+		[GeneratedDllImport("Ultralight")]
+		public static partial uint ulStringGetLength(IntPtr str);
 
 		/// <summary>Whether this string is empty or not.</summary>
+		[GeneratedDllImport("Ultralight")]
+		public static partial bool ulStringIsEmpty(IntPtr str);
+
+		/// <summary>Replaces the contents of 'str' with the contents of 'new_str'</summary>
 		[DllImport("Ultralight")]
-		public static extern bool ulStringIsEmpty(IntPtr str);
+		public static extern void ulStringAssignString(IntPtr str, IntPtr newStr);
+
+		[GeneratedDllImport("Ultralight", CharSet = CharSet.Ansi)]
+		public static partial void ulStringAssignCString(IntPtr str, [MarshalAs(UnmanagedType.LPUTF8Str)] string c_str);
 	}
 
 	[StructLayout(LayoutKind.Sequential)]
@@ -51,18 +58,20 @@ namespace UltralightNet
 		public uint length_;
 	}
 
-	public class ULString : IDisposable
+	public class ULString : IDisposable, ICloneable, IEquatable<ULString>
 	{
 		internal IntPtr Ptr { get; private set; }
 
 		public ULString16 ULString16 => Marshal.PtrToStructure<ULString16>(Ptr);
 
 		public ULString(IntPtr ptr) => Ptr = ptr;
-		public ULString(string str = null) => Ptr = Methods.ulCreateStringUTF16(str ?? "", str is null ?0  : (uint)str.Length);
+		public ULString(string str = null) => Ptr = Methods.ulCreateStringUTF16(str ?? "", str is null ? 0 : (uint)str.Length);
 
 		public string GetData() => Methods.ulStringGetData(Ptr);
 		public uint GetLength() => Methods.ulStringGetLength(Ptr);
 		public bool IsEmpty() => Methods.ulStringIsEmpty(Ptr);
+		public void Assign(ULString newStr) => Methods.ulStringAssignString(Ptr, newStr.Ptr);
+		public void Assign(string newStr) => Methods.ulStringAssignCString(Ptr, newStr ?? "");
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public override string ToString() => GetData();
@@ -87,5 +96,29 @@ namespace UltralightNet
 		}
 
 		#endregion Disposing
+
+		public object Clone()
+		{
+			return new ULString(Methods.ulCreateStringFromCopy(Ptr));
+		}
+
+		public bool Equals(ULString other) => other is not null && (Ptr == other.Ptr || GetData() == other.GetData());
+
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		public override bool Equals(object obj) => Equals(obj as ULString);
+
+#nullable enable
+
+		public static bool operator ==(ULString? a, ULString? b)
+		{
+			if ((a is null) && (b is null)) return true;
+			else if ((a is null) || (b is null)) return false;
+			return a.Equals(b);
+		}
+
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		public static bool operator !=(ULString? a, ULString? b) => !(a == b);
+
+		public override int GetHashCode() => base.GetHashCode();
 	}
 }
