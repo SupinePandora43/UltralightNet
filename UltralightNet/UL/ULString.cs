@@ -89,14 +89,10 @@ namespace UltralightNet
 
 		public void Dispose()
 		{
-			Console.WriteLine("disposing");
-
 			if (IsDisposed) return;
-
 			Methods.ulDestroyString(Ptr);
 
 			IsDisposed = true;
-			
 			GC.SuppressFinalize(this);
 		}
 

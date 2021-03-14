@@ -108,8 +108,11 @@ namespace UltralightNet
 
 		public void Dispose()
 		{
+			if (IsDisposed) return;
+			//todo
 
 			IsDisposed = true;
+			GC.SuppressFinalize(this);
 		}
 	}
 }
