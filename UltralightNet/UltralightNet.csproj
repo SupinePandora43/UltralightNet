@@ -23,10 +23,6 @@
 		<None Remove="Ultralight._cs" />
 	</ItemGroup>
 	<ItemGroup>
-		<!--<Compile Include="Ultralight.g._cs" />-->
-		<!--<Compile Include="Ultralight._cs" />-->
-	</ItemGroup>
-	<ItemGroup>
 		<PackageReference Include="Ancillary.Interop" Version="1.0.0-alpha.20604.3" />
 		<PackageReference Include="DllImportGenerator" Version="1.0.0-alpha.20604.3" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
 	</ItemGroup>
