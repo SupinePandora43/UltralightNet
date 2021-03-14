@@ -1,3 +1,4 @@
+using System.IO;
 using System.Runtime.InteropServices;
 
 namespace UltralightNet
@@ -18,9 +19,17 @@ namespace UltralightNet
 			// so it will not work for ios, i'm sure 100%%%
 			if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
 			{
-				NativeLibrary.Load("UltralightCore");
-				NativeLibrary.Load("WebCore");
-				NativeLibrary.Load("Ultralight");
+				string[] libs = new[] { "libUltralightCore.dylib", "libWebCore.dylib", "libUltralight.dylib" };
+				foreach(string lib in libs)
+				{
+					string path = $"runtimes/osx-x64/native/{lib}";
+					if (File.Exists(path))
+					{
+						NativeLibrary.Load(path);
+						continue;
+					}
+					NativeLibrary.Load(lib);
+				}
 			}
 		}
 	}
