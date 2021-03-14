@@ -76,6 +76,7 @@ namespace UltralightNet
 		public uint GetLength() => Methods.ulStringGetLength(Ptr);
 		public bool IsEmpty() => Methods.ulStringIsEmpty(Ptr);
 		public void Assign(ULString newStr) => Methods.ulStringAssignString(Ptr, newStr.Ptr);
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public void Assign(string newStr) => Assign(new ULString(newStr));
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]

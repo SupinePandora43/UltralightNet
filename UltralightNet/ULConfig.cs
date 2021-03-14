@@ -74,7 +74,7 @@ namespace UltralightNet
 	}
 
 	/// <summary>Configuration settings for Ultralight.</summary>
-	public class ULConfig: IDisposable
+	public class ULConfig : IDisposable
 	{
 		internal IntPtr Ptr { get; private set; }
 		public ULConfig_C ULConfig_C => Marshal.PtrToStructure<ULConfig_C>(Ptr);
@@ -82,8 +82,20 @@ namespace UltralightNet
 		public ULConfig() => Ptr = Methods.ulCreateConfig();
 
 		/// <summary>The file path to the directory that contains Ultralight's bundled resources (eg, cacert.pem and other localized resources).</summary>
-		public string ResourcePath { get => ULConfig_C.resource_path.data_; set => Methods.ulConfigSetResourcePath(Ptr, ((ULString)value).Ptr); }
-		public string CachePath { get => ULConfig_C.cache_path.data_; set => Methods.ulConfigSetCachePath(Ptr, ((ULString)value).Ptr); }
+		public string ResourcePath
+		{
+			[MethodImpl(MethodImplOptions.AggressiveInlining)]
+			get => ULConfig_C.resource_path.data_;
+			[MethodImpl(MethodImplOptions.AggressiveInlining)]
+			set => Methods.ulConfigSetResourcePath(Ptr, ((ULString)value).Ptr);
+		}
+		public string CachePath
+		{
+			[MethodImpl(MethodImplOptions.AggressiveInlining)]
+			get => ULConfig_C.cache_path.data_;
+			[MethodImpl(MethodImplOptions.AggressiveInlining)]
+			set => Methods.ulConfigSetCachePath(Ptr, ((ULString)value).Ptr);
+		}
 
 		/// <remarks>
 		/// When enabled, each View will be rendered to an offscreen GPU texture<br/>
@@ -94,13 +106,43 @@ namespace UltralightNet
 		/// pixel buffer. This pixel buffer can optionally be provided by the user--<br/>
 		/// for more info see ulViewGetSurface.
 		/// </remarks>
-		public bool UseGpu { get => ULConfig_C.use_gpu_renderer; set => Methods.ulConfigSetUseGPURenderer(Ptr, value); }
-		public double DeviceScale { get => ULConfig_C.device_scale; set => Methods.ulConfigSetDeviceScale(Ptr, value); }
+		public bool UseGpu
+		{
+			[MethodImpl(MethodImplOptions.AggressiveInlining)]
+			get => ULConfig_C.use_gpu_renderer;
+			[MethodImpl(MethodImplOptions.AggressiveInlining)]
+			set => Methods.ulConfigSetUseGPURenderer(Ptr, value);
+		}
+		public double DeviceScale
+		{
+			[MethodImpl(MethodImplOptions.AggressiveInlining)]
+			get => ULConfig_C.device_scale;
+			[MethodImpl(MethodImplOptions.AggressiveInlining)]
+			set => Methods.ulConfigSetDeviceScale(Ptr, value);
+		}
 
-		public ULFaceWinding FaceWinding { get => ULConfig_C.face_winding; set => Methods.ulConfigSetFaceWinding(Ptr, value); }
+		public ULFaceWinding FaceWinding
+		{
+			[MethodImpl(MethodImplOptions.AggressiveInlining)]
+			get => ULConfig_C.face_winding;
+			[MethodImpl(MethodImplOptions.AggressiveInlining)]
+			set => Methods.ulConfigSetFaceWinding(Ptr, value);
+		}
 
-		public bool EnableImages { get => ULConfig_C.enable_images; set => Methods.ulConfigSetEnableImages(Ptr, value); }
-		public bool EnableJavaScript { get => ULConfig_C.enable_javascript; set => Methods.ulConfigSetEnableJavaScript(Ptr, value); }
+		public bool EnableImages
+		{
+			[MethodImpl(MethodImplOptions.AggressiveInlining)]
+			get => ULConfig_C.enable_images;
+			[MethodImpl(MethodImplOptions.AggressiveInlining)]
+			set => Methods.ulConfigSetEnableImages(Ptr, value);
+		}
+		public bool EnableJavaScript
+		{
+			[MethodImpl(MethodImplOptions.AggressiveInlining)]
+			get => ULConfig_C.enable_javascript;
+			[MethodImpl(MethodImplOptions.AggressiveInlining)]
+			set => Methods.ulConfigSetEnableJavaScript(Ptr, value);
+		}
 
 		public bool IsDisposed { get; private set; }
 
