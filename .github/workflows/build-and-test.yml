@@ -46,7 +46,7 @@ jobs:
         with:
           reports: 'UltralightNet.Test/TestResults/*/coverage.opencover.xml' # REQUIRED # The coverage reports that should be parsed (separated by semicolon). Globbing is supported.
           targetdir: 'coveragereport' # REQUIRED # The directory where the generated report should be saved.
-          reporttypes: 'Badges,Html,HtmlChart,HtmlInline,HtmlSummary,PngChart' # The output formats and scope (separated by semicolon) Values: Badges, Clover, Cobertura, CsvSummary, Html, HtmlChart, HtmlInline, HtmlInline_AzurePipelines, HtmlInline_AzurePipelines_Dark, HtmlSummary, JsonSummary, Latex, LatexSummary, lcov, MHtml, PngChart, SonarQube, TeamCitySummary, TextSummary, Xml, XmlSummary
+          reporttypes: 'Badges;Html;HtmlChart;HtmlInline;HtmlSummary;PngChart' # The output formats and scope (separated by semicolon) Values: Badges, Clover, Cobertura, CsvSummary, Html, HtmlChart, HtmlInline, HtmlInline_AzurePipelines, HtmlInline_AzurePipelines_Dark, HtmlSummary, JsonSummary, Latex, LatexSummary, lcov, MHtml, PngChart, SonarQube, TeamCitySummary, TextSummary, Xml, XmlSummary
       - name: Upload coverage report artifact
         uses: actions/upload-artifact@v1.0.0
         with:
