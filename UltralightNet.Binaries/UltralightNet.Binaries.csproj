@@ -6,7 +6,7 @@
 		<IncludeBuildOutput>false</IncludeBuildOutput>
 		<DisableImplicitFrameworkReferences>true</DisableImplicitFrameworkReferences>
 		<Platform>x64</Platform>
-		
+
 		<PackageId>UltralightNet.Binaries</PackageId>
 		<Version>1.2.1</Version>
 		<Authors>SupinePandora43</Authors>
@@ -16,22 +16,20 @@
 		<RepositoryType>git</RepositoryType>
 		<iconUrl>https://ultralig.ht/logo_modern2.png</iconUrl>
 	</PropertyGroup>
-	<Target Name="BeforePackage" BeforeTargets="AssignTargetPaths">
-		<ItemGroup>
-			<_NativeAssetName Include="runtimes/win-x64/native/Ultralight.dll" PackagePath="runtimes/win-x64/native" />
-			<_NativeAssetName Include="runtimes/win-x64/native/UltralightCore.dll" PackagePath="runtimes/win-x64/native" />
-			<_NativeAssetName Include="runtimes/win-x64/native/WebCore.dll" PackagePath="runtimes/win-x64/native" />
+	<ItemGroup>
+		<_NativeAssetName Include="runtimes/win-x64/native/Ultralight.dll" PackagePath="runtimes/win-x64/native" />
+		<_NativeAssetName Include="runtimes/win-x64/native/UltralightCore.dll" PackagePath="runtimes/win-x64/native" />
+		<_NativeAssetName Include="runtimes/win-x64/native/WebCore.dll" PackagePath="runtimes/win-x64/native" />
 
-			<_NativeAssetName Include="runtimes/osx-x64/native/libUltralight.dylib" PackagePath="runtimes/osx-x64/native" />
-			<_NativeAssetName Include="runtimes/osx-x64/native/libUltralightCore.dylib" PackagePath="runtimes/osx-x64/native" />
-			<_NativeAssetName Include="runtimes/osx-x64/native/libWebCore.dylib" PackagePath="runtimes/osx-x64/native" />
+		<_NativeAssetName Include="runtimes/osx-x64/native/libUltralight.dylib" PackagePath="runtimes/osx-x64/native" />
+		<_NativeAssetName Include="runtimes/osx-x64/native/libUltralightCore.dylib" PackagePath="runtimes/osx-x64/native" />
+		<_NativeAssetName Include="runtimes/osx-x64/native/libWebCore.dylib" PackagePath="runtimes/osx-x64/native" />
 
-			<_NativeAssetName Include="runtimes/linux-x64/native/libUltralight.so" PackagePath="runtimes/linux-x64/native" />
-			<_NativeAssetName Include="runtimes/linux-x64/native/libUltralightCore.so" PackagePath="runtimes/linux-x64/native" />
-			<_NativeAssetName Include="runtimes/linux-x64/native/libWebCore.so" PackagePath="runtimes/linux-x64/native" />
+		<_NativeAssetName Include="runtimes/linux-x64/native/libUltralight.so" PackagePath="runtimes/linux-x64/native" />
+		<_NativeAssetName Include="runtimes/linux-x64/native/libUltralightCore.so" PackagePath="runtimes/linux-x64/native" />
+		<_NativeAssetName Include="runtimes/linux-x64/native/libWebCore.so" PackagePath="runtimes/linux-x64/native" />
 
-			<_ExistingAssets Include="@(_NativeAssetName)" Condition="Exists('$(NativeAssetsPath)/%(Identity)')" />
-			<Content Include="@(_ExistingAssets->'$(NativeAssetsPath)/%(Identity)')" CopyToOutputDirectory="PreserveNewest" PackagePath="%(PackagePath)" Pack="true" />
-		</ItemGroup>
-	</Target>
+		<_ExistingAssets Include="@(_NativeAssetName)" />
+		<Content Include="@(_ExistingAssets->'%(Identity)')" CopyToOutputDirectory="PreserveNewest" PackagePath="%(PackagePath)" Pack="true" />
+	</ItemGroup>
 </Project>
