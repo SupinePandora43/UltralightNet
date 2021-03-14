@@ -11,6 +11,7 @@
 
 		<IncludeSymbols>true</IncludeSymbols>
 		<SymbolPackageFormat>snupkg</SymbolPackageFormat>
+		<DebugType>portable</DebugType>
 		
 		<PackageId>UltralightNet</PackageId>
 		<Version>1.2.1</Version>
