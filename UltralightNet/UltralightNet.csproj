@@ -23,10 +23,6 @@
 		<iconUrl>https://ultralig.ht/logo_modern2.png</iconUrl>
 	</PropertyGroup>
 	<ItemGroup>
-		<None Remove="Ultralight.g._cs" />
-		<None Remove="Ultralight._cs" />
-	</ItemGroup>
-	<ItemGroup>
 		<PackageReference Include="Ancillary.Interop" Version="1.0.0-alpha.20604.3" />
 		<PackageReference Include="DllImportGenerator" Version="1.0.0-alpha.20604.3" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
 	</ItemGroup>
