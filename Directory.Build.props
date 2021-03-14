@@ -4,39 +4,4 @@
         <SolutionDir>$(MSBuildThisFileDirectory)</SolutionDir>
         <PackageOutputPath>$(SolutionDir)</PackageOutputPath>
     </PropertyGroup>
-    
-    <Target Name="UpdatePackageCacheForDependencies" AfterTargets="Pack">
-        <PropertyGroup>
-            <LowerCasePackageId>$([System.String]::Copy('$(PackageId)').ToLowerInvariant())</LowerCasePackageId>
-        </PropertyGroup>
-        <Message Importance="high" Text="Updating package cache for $(PackageId) $(Version)"/>
-        <Unzip SourceFiles="$(PackageOutputPath)\$(PackageId).$(Version).nupkg"
-               DestinationFolder="$(NuGetPackageRoot)$(LowerCasePackageId)\$(Version)\"
-               SkipUnchangedFiles="true" ContinueOnError="true">
-        </Unzip>
-    </Target>
-
-    <PropertyGroup Condition="!$(ProjectTypeGuids.Contains('{E097FAD1-6243-4DAD-9C02-E9B9EFC3FFC1}'))">
-        <SignAssembly>True</SignAssembly>
-        <AssemblyOriginatorKeyFile Condition=" '$(IsOfficial)' == 'True' ">$(MSBuildThisFileDirectory)official.snk</AssemblyOriginatorKeyFile>
-        <AssemblyOriginatorKeyFile Condition=" '$(IsOfficial)' != 'True' AND '$(IsOfficialCompatible)' != 'True' ">$(MSBuildThisFileDirectory)unofficial.snk</AssemblyOriginatorKeyFile>
-        <AssemblyOriginatorKeyFile Condition=" '$(IsOfficial)' != 'True' AND '$(IsOfficialCompatible)' == 'True' ">$(MSBuildThisFileDirectory)official-public.snk</AssemblyOriginatorKeyFile>
-        <PublicSign Condition=" '$(IsOfficial)' == 'True' AND '$(IsOfficialCompatible)' != 'True' ">False</PublicSign>
-        <PublicSign Condition=" '$(IsOfficial)' != 'True' OR '$(IsOfficialCompatible)' == 'True' ">True</PublicSign>
-    </PropertyGroup>
-
-
-    <PropertyGroup Condition=" '$(IsOfficial)' == 'True' ">
-        <DefineConstants Condition=" '$(DefineConstants)' != '' ">$(DefineConstants);OFFICIAL</DefineConstants>
-        <DefineConstants Condition=" '$(DefineConstants)' == '' ">OFFICIAL</DefineConstants>
-    </PropertyGroup>
-
-    <Target Name="PackageAssemblySigningReport" AfterTargets="Pack" Condition=" '$(IsPackable)' != 'False' ">
-        <Message Importance="high" Text="IsOfficial: $(IsOfficial)"/>
-        <Message Importance="high" Text="IsOfficialCompatible: $(IsOfficialCompatible)"/>
-        <Message Importance="high" Text="SignAssembly: $(SignAssembly)"/>
-        <Message Importance="high" Text="PublicSign: $(PublicSign)"/>
-        <Message Importance="high" Text="AssemblyOriginatorKeyFile: $(AssemblyOriginatorKeyFile)"/>
-        <Message Importance="high" Text="DefineConstants: $(DefineConstants)"/>
-    </Target>
 </Project>

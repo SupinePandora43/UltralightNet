@@ -23,6 +23,7 @@ namespace UltralightNet
 
 		/// <summary>Create string from copy of existing string.</summary>
 		[DllImport("Ultralight")]
+		[Obsolete("missing")]
 		public static extern IntPtr ulCreateStringFromCopy(IntPtr str);
 
 		/// <summary>Destroy string (you should destroy any strings you explicitly Create).</summary>
@@ -58,7 +59,11 @@ namespace UltralightNet
 		public uint length_;
 	}
 
+#pragma warning disable CS0659 // Type overrides Object.Equals(object o) but does not override Object.GetHashCode()
+#pragma warning disable CS0661 // Type defines operator == or operator != but does not override Object.GetHashCode()
 	public class ULString : IDisposable, ICloneable, IEquatable<ULString>
+#pragma warning restore CS0661 // Type defines operator == or operator != but does not override Object.GetHashCode()
+#pragma warning restore CS0659 // Type overrides Object.Equals(object o) but does not override Object.GetHashCode()
 	{
 		internal IntPtr Ptr { get; private set; }
 
@@ -71,7 +76,7 @@ namespace UltralightNet
 		public uint GetLength() => Methods.ulStringGetLength(Ptr);
 		public bool IsEmpty() => Methods.ulStringIsEmpty(Ptr);
 		public void Assign(ULString newStr) => Methods.ulStringAssignString(Ptr, newStr.Ptr);
-		public void Assign(string newStr) => Methods.ulStringAssignCString(Ptr, newStr ?? "");
+		public void Assign(string newStr) => Assign(new ULString(newStr));
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public override string ToString() => GetData();
@@ -91,16 +96,13 @@ namespace UltralightNet
 			Methods.ulDestroyString(Ptr);
 
 			IsDisposed = true;
-
+			
 			GC.SuppressFinalize(this);
 		}
 
 		#endregion Disposing
 
-		public object Clone()
-		{
-			return new ULString(Methods.ulCreateStringFromCopy(Ptr));
-		}
+		public object Clone() => new ULString(GetData());
 
 		public bool Equals(ULString other) => other is not null && (Ptr == other.Ptr || GetData() == other.GetData());
 
@@ -118,7 +120,5 @@ namespace UltralightNet
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public static bool operator !=(ULString? a, ULString? b) => !(a == b);
-
-		public override int GetHashCode() => base.GetHashCode();
 	}
 }

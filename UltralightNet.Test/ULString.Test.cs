@@ -23,11 +23,10 @@ namespace UltralightNet.Test
 		[InlineData(100000)]
 		public void GetLength(uint strLength)
 		{
-			Random random = new(0);
 			char[] chars = new char[strLength];
 			Parallel.For(0, strLength, index =>
 			{
-				chars[index] = (char)random.Next(char.MinValue, char.MaxValue);
+				chars[index] = 'ы';
 			});
 			string @string = new(chars);
 			Assert.Equal(strLength, (uint)@string.Length);
@@ -37,9 +36,11 @@ namespace UltralightNet.Test
 
 		[Theory]
 		[InlineData(null, null)]
-		[InlineData("123456", null)]
-		[InlineData(null, "123456")]
-		[InlineData("123456", "123456")]
+		[InlineData("123456 юникод", null)]
+		[InlineData("123456 юникод", "")]
+		[InlineData(null, "123456 юникод")]
+		[InlineData("", "123456 юникод")]
+		[InlineData("123456 юникод", "123456 юникод")]
 		public void AssignUL(string str, string newStr)
 		{
 			ULString ulString = new(str);
@@ -54,9 +55,10 @@ namespace UltralightNet.Test
 
 		[Theory]
 		[InlineData(null, null)]
-		[InlineData("123456", null)]
-		[InlineData(null, "123456")]
-		[InlineData("123456", "123456")]
+		[InlineData("123456 юникод", null)]
+		[InlineData("123456 юникод", "")]
+		[InlineData(null, "123456 юникод")]
+		[InlineData("123456 юникод", "123456 юникод")]
 		public void AssignCStr(string str, string newStr)
 		{
 			ULString ulString = new(str);
@@ -65,6 +67,32 @@ namespace UltralightNet.Test
 
 			Assert.Equal(newStr ?? "", ulString.GetData());
 			Assert.Equal(string.IsNullOrEmpty(newStr), ulString.IsEmpty());
+		}
+
+		[Theory]
+		[InlineData("")]
+		[InlineData("юникод")]
+		public void MarshalStruct(string str)
+		{
+			ULString uLString = new(str);
+
+			Assert.Equal(str, uLString.ULString16.data_);
+			Assert.Equal(str.Length, (int)uLString.ULString16.length_);
+		}
+
+		[Fact]
+		public void CloneTest()
+		{
+			ULString ulString1 = new("юникод");
+			ULString ulString2 = ulString1.Clone() as ULString;
+
+			Assert.Equal(ulString1, ulString2);
+			Assert.True(ulString1 == ulString2);
+			Assert.True(ulString1.Equals(ulString2));
+			Assert.True(ulString1.Equals(ulString2 as object));
+			Assert.False(ulString1 != ulString2);
+			Assert.Equal(ulString1.ToString(), ulString2.ToString());
+			Assert.Equal(ulString1.ULString16, ulString2.ULString16);
 		}
 	}
 }

@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 	<PropertyGroup>
 		<TargetFrameworks>net5.0</TargetFrameworks>
 		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
@@ -8,6 +8,15 @@
 		<IsPackable>false</IsPackable>
 		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
 		<RuntimeIdentifiers>win-x64;linux-x64;osx-x64</RuntimeIdentifiers>
+		
+		<PackageId>UltralightNet</PackageId>
+		<Version>1.2.1</Version>
+		<Authors>SupinePandora43</Authors>
+		<Description>Ultralight .NET bindings</Description>
+		<PackageProjectUrl>https://github.com/SupinePandora43/UltralightSharp</PackageProjectUrl>
+		<RepositoryUrl>https://github.com/SupinePandora43/UltralightSharp</RepositoryUrl>
+		<RepositoryType>git</RepositoryType>
+		<iconUrl>https://ultralig.ht/logo_modern2.png</iconUrl>
 	</PropertyGroup>
 	<ItemGroup>
 		<None Remove="Ultralight.g._cs" />

@@ -1,0 +1,41 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<TargetFrameworks>net5;netstandard1</TargetFrameworks>
+		<NoBuild>true</NoBuild>
+		<IncludeBuildOutput>false</IncludeBuildOutput>
+		<DisableImplicitFrameworkReferences>true</DisableImplicitFrameworkReferences>
+		<Platform>x64</Platform>
+		
+		<PackageId>UltralightNet.Binaries</PackageId>
+		<Version>1.2.1</Version>
+		<Authors>SupinePandora43</Authors>
+		<Description>Ultralight's binaries</Description>
+		<PackageProjectUrl>https://github.com/SupinePandora43/UltralightSharp</PackageProjectUrl>
+		<RepositoryUrl>https://github.com/SupinePandora43/UltralightSharp</RepositoryUrl>
+		<RepositoryType>git</RepositoryType>
+		<iconUrl>https://ultralig.ht/logo_modern2.png</iconUrl>
+	</PropertyGroup>
+	<Target Name="BeforePackage" BeforeTargets="AssignTargetPaths">
+		<ItemGroup>
+			<_NativeAssetName Include="runtimes/win-x64/native/Ultralight.dll" PackagePath="runtimes/win-x64/native" />
+			<_NativeAssetName Include="runtimes/win-x64/native/UltralightCore.dll" PackagePath="runtimes/win-x64/native" />
+			<_NativeAssetName Include="runtimes/win-x64/native/WebCore.dll" PackagePath="runtimes/win-x64/native" />
+
+			<_ExistingAssets Include="@(_NativeAssetName)" Condition="Exists('$(NativeAssetsPath)/%(Identity)')" />
+			<Content Include="@(_ExistingAssets->'$(NativeAssetsPath)/%(Identity)')" CopyToOutputDirectory="PreserveNewest" PackagePath="%(PackagePath)" Pack="true" />
+		</ItemGroup>
+	</Target>
+	<ItemGroup>
+		<None Include="runtimes\win-x64\native\Ultralight.dll;runtimes\win-x64\native\UltralightCore.dll;runtimes\win-x64\native\WebCore.dll;runtimes\win-x64\native\AppCore.dll">
+			<Pack>True</Pack>
+			<PackagePath>%(Identity)</PackagePath>
+			<PackageCopyToOutput>False</PackageCopyToOutput>
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+			<CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+			<Link>%(Identity)</Link>
+		</None>
+		<Content Remove="runtimes\*\**" />
+	</ItemGroup>
+
+</Project>
