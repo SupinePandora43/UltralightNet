@@ -1,4 +1,5 @@
 using System;
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
 namespace UltralightNet
@@ -27,26 +28,63 @@ namespace UltralightNet
 		/// <summary>Set the amount that the application DPI has been scaled, used for scaling device coordinates to pixels and oversampling raster shapes (Default = 1.0).</summary>
 		[GeneratedDllImport("Ultralight")]
 		public static partial void ulConfigSetDeviceScale(IntPtr config, double value = 1.0);
+
+		/// <summary>The winding order for front-facing triangles.</summary>
+		/// <see cref="ULFaceWinding"/>
+		/// <remarks>This is only used with custom GPUDrivers</remarks>
+		[GeneratedDllImport("Ultralight")]
+		public static partial void ulConfigSetFaceWinding(IntPtr config, ULFaceWinding winding);
+
+		/// <summary>Set whether images should be enabled (Default = True).</summary>
+		[GeneratedDllImport("Ultralight")]
+		public static partial void ulConfigSetEnableImages(IntPtr config, bool enabled);
+
+		/// <summary>Set whether JavaScript should be eanbled (Default = True).</summary>
+		[GeneratedDllImport("Ultralight")]
+		public static partial void ulConfigSetEnableJavaScript(IntPtr config, bool enabled);
 	}
 
+	/// <summary>Configuration settings for Ultralight.</summary>
 	[StructLayout(LayoutKind.Sequential)]
 	public struct ULConfig_C
 	{
+		/// <summary>The file path to the directory that contains Ultralight's bundled resources (eg, cacert.pem and other localized resources).</summary>
 		public ULString16 resource_path;
+		/// <summary>The file path to a writable directory that will be used to store cookies, cached resources, and other persistent data.</summary>
 		public ULString16 cache_path;
 
+		/// <remarks>
+		/// When enabled, each View will be rendered to an offscreen GPU texture<br/>
+		/// using the GPU driver set in ulPlatformSetGPUDriver. You can fetch<br/>
+		/// details for the texture via ulViewGetRenderTarget.<br/>
+		/// <br/>
+		/// When disabled (the default), each View will be rendered to an offscreen<br/>
+		/// pixel buffer. This pixel buffer can optionally be provided by the user--<br/>
+		/// for more info see ulViewGetSurface.
+		/// </remarks>
 		public bool use_gpu_renderer;
 		public double device_scale;
+
+		public ULFaceWinding face_winding;
+
+		/// <summary>Whether or not images should be enabled.</summary>
+		public bool enable_images;
+		/// <summary>Whether or not JavaScript should be enabled.</summary>
+		public bool enable_javascript;
 	}
-	public class ULConfig
+
+	/// <summary>Configuration settings for Ultralight.</summary>
+	public class ULConfig: IDisposable
 	{
 		internal IntPtr Ptr { get; private set; }
 		public ULConfig_C ULConfig_C => Marshal.PtrToStructure<ULConfig_C>(Ptr);
 
 		public ULConfig() => Ptr = Methods.ulCreateConfig();
 
+		/// <summary>The file path to the directory that contains Ultralight's bundled resources (eg, cacert.pem and other localized resources).</summary>
 		public string ResourcePath { get => ULConfig_C.resource_path.data_; set => Methods.ulConfigSetResourcePath(Ptr, ((ULString)value).Ptr); }
 		public string CachePath { get => ULConfig_C.cache_path.data_; set => Methods.ulConfigSetCachePath(Ptr, ((ULString)value).Ptr); }
+
 		/// <remarks>
 		/// When enabled, each View will be rendered to an offscreen GPU texture<br/>
 		/// using the GPU driver set in ulPlatformSetGPUDriver. You can fetch<br/>
@@ -58,5 +96,20 @@ namespace UltralightNet
 		/// </remarks>
 		public bool UseGpu { get => ULConfig_C.use_gpu_renderer; set => Methods.ulConfigSetUseGPURenderer(Ptr, value); }
 		public double DeviceScale { get => ULConfig_C.device_scale; set => Methods.ulConfigSetDeviceScale(Ptr, value); }
+
+		public ULFaceWinding FaceWinding { get => ULConfig_C.face_winding; set => Methods.ulConfigSetFaceWinding(Ptr, value); }
+
+		public bool EnableImages { get => ULConfig_C.enable_images; set => Methods.ulConfigSetEnableImages(Ptr, value); }
+		public bool EnableJavaScript { get => ULConfig_C.enable_javascript; set => Methods.ulConfigSetEnableJavaScript(Ptr, value); }
+
+		public bool IsDisposed { get; private set; }
+
+		~ULConfig() => Dispose();
+
+		public void Dispose()
+		{
+
+			IsDisposed = true;
+		}
 	}
 }
