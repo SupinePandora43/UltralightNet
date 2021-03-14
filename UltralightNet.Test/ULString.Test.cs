@@ -173,6 +173,8 @@ namespace UltralightNet.Test
 			Assert.False(ULString.ReferenceEquals(u1, null));
 			Assert.False(ULString.ReferenceEquals(u1, u2));
 			Assert.False(u1 == null);
+			Assert.False(null == u2);
+			Assert.True(u1 == u2);
 		}
 	}
 }
