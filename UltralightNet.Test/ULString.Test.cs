@@ -94,5 +94,14 @@ namespace UltralightNet.Test
 			Assert.Equal(ulString1.ToString(), ulString2.ToString());
 			Assert.Equal(ulString1.ULString16, ulString2.ULString16);
 		}
+
+		[Fact]
+		public void Conversion()
+		{
+			ULString ulString = new("юникод");
+
+			Assert.Equal("юникод", ulString);
+			Assert.Equal((ULString)"юникод", ulString);
+		}
 	}
 }

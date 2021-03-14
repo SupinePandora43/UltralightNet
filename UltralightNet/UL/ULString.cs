@@ -120,5 +120,11 @@ namespace UltralightNet
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public static bool operator !=(ULString? a, ULString? b) => !(a == b);
+
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		public static explicit operator ULString(string str) => new(str);
+		public static implicit operator IntPtr(ULString ulString) => ulString.Ptr;
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		public static implicit operator string(ULString ulString) => ulString.GetData();
 	}
 }
