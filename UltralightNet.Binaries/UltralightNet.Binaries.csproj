@@ -22,20 +22,16 @@
 			<_NativeAssetName Include="runtimes/win-x64/native/UltralightCore.dll" PackagePath="runtimes/win-x64/native" />
 			<_NativeAssetName Include="runtimes/win-x64/native/WebCore.dll" PackagePath="runtimes/win-x64/native" />
 
+			<_NativeAssetName Include="runtimes/osx-x64/native/libUltralight.dylib" PackagePath="runtimes/osx-x64/native" />
+			<_NativeAssetName Include="runtimes/osx-x64/native/libUltralightCore.dylib" PackagePath="runtimes/osx-x64/native" />
+			<_NativeAssetName Include="runtimes/osx-x64/native/libWebCore.dylib" PackagePath="runtimes/osx-x64/native" />
+
+			<_NativeAssetName Include="runtimes/linux-x64/native/libUltralight.so" PackagePath="runtimes/linux-x64/native" />
+			<_NativeAssetName Include="runtimes/linux-x64/native/libUltralightCore.so" PackagePath="runtimes/linux-x64/native" />
+			<_NativeAssetName Include="runtimes/linux-x64/native/libWebCore.so" PackagePath="runtimes/linux-x64/native" />
+
 			<_ExistingAssets Include="@(_NativeAssetName)" Condition="Exists('$(NativeAssetsPath)/%(Identity)')" />
 			<Content Include="@(_ExistingAssets->'$(NativeAssetsPath)/%(Identity)')" CopyToOutputDirectory="PreserveNewest" PackagePath="%(PackagePath)" Pack="true" />
 		</ItemGroup>
 	</Target>
-	<ItemGroup>
-		<None Include="runtimes\win-x64\native\Ultralight.dll;runtimes\win-x64\native\UltralightCore.dll;runtimes\win-x64\native\WebCore.dll;runtimes\win-x64\native\AppCore.dll">
-			<Pack>True</Pack>
-			<PackagePath>%(Identity)</PackagePath>
-			<PackageCopyToOutput>False</PackageCopyToOutput>
-			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-			<CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
-			<Link>%(Identity)</Link>
-		</None>
-		<Content Remove="runtimes\*\**" />
-	</ItemGroup>
-
 </Project>
