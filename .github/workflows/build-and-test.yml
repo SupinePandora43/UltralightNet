@@ -48,13 +48,13 @@ jobs:
           targetdir: 'coveragereport' # REQUIRED # The directory where the generated report should be saved.
           reporttypes: 'Badges;Html;HtmlChart;HtmlInline;HtmlSummary;PngChart' # The output formats and scope (separated by semicolon) Values: Badges, Clover, Cobertura, CsvSummary, Html, HtmlChart, HtmlInline, HtmlInline_AzurePipelines, HtmlInline_AzurePipelines_Dark, HtmlSummary, JsonSummary, Latex, LatexSummary, lcov, MHtml, PngChart, SonarQube, TeamCitySummary, TextSummary, Xml, XmlSummary
 
-      - uses: actions/setup-node@v2
-        with:
-          node-version: '14'
-      - name: Install gh-pages
-        run: npm install -g gh-pages
-      - name: Push to GitHub Pages
-        run: 'gh-pages -d coveragereport'
+      - name: Deploy
+        uses: s0/git-publish-subdir-action@develop
+        env:
+          REPO: self
+          BRANCH: gh-pages
+          FOLDER: build
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Upload coverage report artifact
         uses: actions/upload-artifact@v1.0.0
         with:
