@@ -8,6 +8,8 @@
 		<IsPackable>false</IsPackable>
 		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
 		<RuntimeIdentifiers>win-x64;linux-x64;osx-x64</RuntimeIdentifiers>
+
+		<DebugSymbols>Portable</DebugSymbols>
 		
 		<PackageId>UltralightNet</PackageId>
 		<Version>1.2.1</Version>
