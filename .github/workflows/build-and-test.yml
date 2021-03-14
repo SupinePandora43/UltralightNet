@@ -23,9 +23,9 @@ jobs:
         uses: actions/setup-dotnet@v1
         with:
           dotnet-version: 5.0.100
-      - name: Build Core
+      - name: pack Binaries
         run: |
-          dotnet build -c Release UltralightNet.Binaries/UltralightNet.Binaries.csproj
+          dotnet pack -c Release UltralightNet.Binaries/UltralightNet.Binaries.csproj
       #- name: Install dependencies
       #  run: dotnet restore -f UltralightSharp/UltralightSharp.csproj
       - name: Build
