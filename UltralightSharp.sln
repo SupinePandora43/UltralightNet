@@ -24,6 +24,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 	ProjectSection(SolutionItems) = preProject
 		.editorconfig = .editorconfig
 		.github\workflows\build-and-test.yml = .github\workflows\build-and-test.yml
+		nuget.config = nuget.config
 		.github\workflows\package-version-tags.yml = .github\workflows\package-version-tags.yml
 		README.md = README.md
 		.github\workflows\unity.yml = .github\workflows\unity.yml
@@ -39,7 +40,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UltralightNet", "Ultralight
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UltralightNet.Test", "UltralightNet.Test\UltralightNet.Test.csproj", "{73B85E50-C001-424A-A26F-F94ACAAD2978}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UltralightNet.Binaries", "UltralightNet.Binaries\UltralightNet.Binaries.csproj", "{0CC47EDC-9CA4-411A-B8B9-656491BE8B07}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UltralightNet.Binaries", "UltralightNet.Binaries\UltralightNet.Binaries.csproj", "{0CC47EDC-9CA4-411A-B8B9-656491BE8B07}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
