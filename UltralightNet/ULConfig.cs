@@ -77,7 +77,11 @@ namespace UltralightNet
 	public class ULConfig : IDisposable
 	{
 		internal IntPtr Ptr { get; private set; }
-		public ULConfig_C ULConfig_C => Marshal.PtrToStructure<ULConfig_C>(Ptr);
+		public ULConfig_C ULConfig_C
+		{
+			[MethodImpl(MethodImplOptions.AggressiveInlining)]
+			get => Marshal.PtrToStructure<ULConfig_C>(Ptr);
+		}
 
 		public ULConfig() => Ptr = Methods.ulCreateConfig();
 
