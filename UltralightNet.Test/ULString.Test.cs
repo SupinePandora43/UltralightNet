@@ -104,5 +104,13 @@ namespace UltralightNet.Test
 			Assert.Equal("юникод", ulString);
 			Assert.Equal((ULString)"юникод", ulString);
 		}
+
+		[Fact]
+		public void Disposing()
+		{
+			ULString ulString = new("юникод");
+			ulString.Dispose();
+			Assert.True(ulString.IsDisposed);
+		}
 	}
 }

@@ -76,7 +76,13 @@ namespace UltralightNet
 	/// <summary>Configuration settings for Ultralight.</summary>
 	public class ULConfig : IDisposable
 	{
-		public IntPtr Ptr { get; private set; }
+		public IntPtr Ptr
+		{
+			[MethodImpl(MethodImplOptions.AggressiveInlining)]
+			get;
+			[MethodImpl(MethodImplOptions.AggressiveInlining)]
+			private set;
+		}
 		public ULConfig_C ULConfig_C
 		{
 			[MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -149,7 +155,13 @@ namespace UltralightNet
 			set => Methods.ulConfigSetEnableJavaScript(Ptr, value);
 		}
 
-		public bool IsDisposed { get; private set; }
+		public bool IsDisposed
+		{
+			[MethodImpl(MethodImplOptions.AggressiveInlining)]
+			get;
+			[MethodImpl(MethodImplOptions.AggressiveInlining)]
+			private set;
+		}
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		~ULConfig() => Dispose();

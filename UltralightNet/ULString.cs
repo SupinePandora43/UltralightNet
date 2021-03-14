@@ -65,7 +65,13 @@ namespace UltralightNet
 #pragma warning restore CS0661 // Type defines operator == or operator != but does not override Object.GetHashCode()
 #pragma warning restore CS0659 // Type overrides Object.Equals(object o) but does not override Object.GetHashCode()
 	{
-		internal IntPtr Ptr { get; private set; }
+		public IntPtr Ptr
+		{
+			[MethodImpl(MethodImplOptions.AggressiveInlining)]
+			get;
+			[MethodImpl(MethodImplOptions.AggressiveInlining)]
+			private set;
+		}
 
 		public ULString16 ULString16
 		{
@@ -88,12 +94,16 @@ namespace UltralightNet
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public override string ToString() => GetData();
 
-		#region Disposing
-
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		~ULString() => Dispose();
 
-		public bool IsDisposed { get; private set; }
+		public bool IsDisposed
+		{
+			[MethodImpl(MethodImplOptions.AggressiveInlining)]
+			get;
+			[MethodImpl(MethodImplOptions.AggressiveInlining)]
+			private set;
+		}
 
 		public void Dispose()
 		{
@@ -104,10 +114,10 @@ namespace UltralightNet
 			GC.SuppressFinalize(this);
 		}
 
-		#endregion Disposing
-
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public object Clone() => new ULString(GetData());
 
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public bool Equals(ULString other) => other is not null && (Ptr == other.Ptr || GetData() == other.GetData());
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -127,6 +137,7 @@ namespace UltralightNet
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public static explicit operator ULString(string str) => new(str);
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public static implicit operator IntPtr(ULString ulString) => ulString.Ptr;
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public static implicit operator string(ULString ulString) => ulString.GetData();
