@@ -54,7 +54,7 @@ jobs:
       - name: Install gh-pages
         run: npm install -g gh-pages
       - name: Push to GitHub Pages
-        run: gh-pages -d coveragereport
+        run: 'gh-pages -d coveragereport'
       - name: Upload coverage report artifact
         uses: actions/upload-artifact@v1.0.0
         with:
