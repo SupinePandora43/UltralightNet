@@ -67,9 +67,15 @@ namespace UltralightNet
 	{
 		internal IntPtr Ptr { get; private set; }
 
-		public ULString16 ULString16 => Marshal.PtrToStructure<ULString16>(Ptr);
+		public ULString16 ULString16
+		{
+			[MethodImpl(MethodImplOptions.AggressiveInlining)]
+			get => Marshal.PtrToStructure<ULString16>(Ptr);
+		}
 
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public ULString(IntPtr ptr) => Ptr = ptr;
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public ULString(string str = null) => Ptr = Methods.ulCreateStringUTF16(str ?? "", str is null ? 0 : (uint)str.Length);
 
 		public string GetData() => Methods.ulStringGetData(Ptr);
@@ -84,9 +90,10 @@ namespace UltralightNet
 
 		#region Disposing
 
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		~ULString() => Dispose();
 
-		public bool IsDisposed { get; private set; } = false;
+		public bool IsDisposed { get; private set; }
 
 		public void Dispose()
 		{
