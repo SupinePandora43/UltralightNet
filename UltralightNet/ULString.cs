@@ -84,9 +84,13 @@ namespace UltralightNet
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public ULString(string str = null) => Ptr = Methods.ulCreateStringUTF16(str ?? "", str is null ? 0 : (uint)str.Length);
 
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public string GetData() => Methods.ulStringGetData(Ptr);
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public uint GetLength() => Methods.ulStringGetLength(Ptr);
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public bool IsEmpty() => Methods.ulStringIsEmpty(Ptr);
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public void Assign(ULString newStr) => Methods.ulStringAssignString(Ptr, newStr.Ptr);
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public void Assign(string newStr) => Assign(new ULString(newStr));
