@@ -66,7 +66,7 @@ namespace UltralightNet.Test
 			ulString.Assign(newStr);
 
 			Assert.Equal(newStr ?? "", ulString.GetData());
-			Assert.Equal(string.IsNullOrEmpty(newStr), ulString.IsEmpty());
+			Assert.Equal((newStr ?? "") == "", ulString.IsEmpty());
 		}
 
 		[Theory]
