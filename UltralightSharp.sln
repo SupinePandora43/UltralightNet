@@ -23,11 +23,10 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{F0B30069-69C2-4DE7-BBD1-71A4D62B5C29}"
 	ProjectSection(SolutionItems) = preProject
 		.editorconfig = .editorconfig
-		.github\workflows\build-and-test.yml = .github\workflows\build-and-test.yml
+		.github\workflows\build.yml = .github\workflows\build.yml
+		.github\workflows\coverage.yml = .github\workflows\coverage.yml
 		nuget.config = nuget.config
-		.github\workflows\package-version-tags.yml = .github\workflows\package-version-tags.yml
 		README.md = README.md
-		.github\workflows\unity.yml = .github\workflows\unity.yml
 	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Ultralight", "Ultralight\Ultralight.csproj", "{5F2F13D6-9A21-43FC-B932-A4B423967B2B}"

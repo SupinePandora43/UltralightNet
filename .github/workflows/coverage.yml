@@ -1,27 +1,8 @@
-name: Build & Test
+name: Test Coverage
 on:
   push:
-    branches: [ '*' ]
-  pull_request:
-    branches: [ master ]
+    branches: [ 'master', 'UltralightNet' ]
 jobs:
-  build:
-    name: Build
-    runs-on: ubuntu-latest
-    env:
-      DOTNET_NOLOGO: 1
-      DOTNET_CLI_TELEMETRY_OPTOUT: 1
-      HOMEBREW_NO_INSTALL_CLEANUP: 1
-    steps:
-      - uses: actions/checkout@v2
-      - name: Setup .NET Core
-        uses: actions/setup-dotnet@v1
-        with:
-          dotnet-version: 5.0.100
-      - name: pack Binaries
-        run: dotnet pack -c Release UltralightNet.Binaries/UltralightNet.Binaries.csproj
-      - name: Build
-        run: dotnet build -c Release UltralightNet/UltralightNet.csproj
   coverage:
     runs-on: ubuntu-latest
     steps:
@@ -30,7 +11,7 @@ jobs:
         uses: actions/setup-dotnet@v1
         with:
           dotnet-version: 5.0.100
-      - name: Pack Binaries
+      - name: Pack UltralightNet.Binaries
         run: dotnet pack -c Release UltralightNet.Binaries/UltralightNet.Binaries.csproj
       - name: Build UltralightNet
         run: dotnet build -c Release UltralightNet/UltralightNet.csproj
@@ -38,7 +19,6 @@ jobs:
       - name: Test
         continue-on-error: true
         run: dotnet test UltralightNet.Test/UltralightNet.Test.csproj --collect:"XPlat Code Coverage" -- DataCollectionRunSettings.DataCollectors.DataCollector.Configuration.Format=cobertura,opencover
-      - run: tree
       - name: Install ReportGenerator
         run: dotnet tool install -g dotnet-reportgenerator-globaltool
       - name: Generate Badge
@@ -55,9 +35,3 @@ jobs:
           BRANCH: gh-pages
           FOLDER: coveragereport
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      - name: Upload coverage report artifact
-        uses: actions/upload-artifact@v1.0.0
-        with:
-          name: CoverageReport # Artifact name        
-          path: coveragereport # Directory containing files to upload
-      - run: tree
