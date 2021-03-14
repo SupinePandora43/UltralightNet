@@ -11,6 +11,15 @@ jobs:
         uses: actions/setup-dotnet@v1
         with:
           dotnet-version: 5.0.100
+      - uses: actions/cache@v2
+        with:
+          path: |
+            ~/.nuget/packages
+            '*/bin/'
+            '*/obj/'
+          key: ${{ runner.os }}
+          restore-keys: |
+            ${{ runner.os }}
       - name: Pack UltralightNet.Binaries
         run: dotnet pack -c Release UltralightNet.Binaries/UltralightNet.Binaries.csproj
       - name: Build UltralightNet
