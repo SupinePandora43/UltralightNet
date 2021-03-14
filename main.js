@@ -226,7 +226,7 @@ var assemblies = [
     "classes": [
       { "name": "UltralightNet.Methods", "rp": "UltralightNet_Methods.html", "cl": 30, "ucl": 136, "cal": 166, "tl": 0, "ct": "LineCoverage", "mc": "-", "cb": 2, "tb": 30, "lch": [], "bch": [], "hc": [] },
       { "name": "UltralightNet.ULConfig", "rp": "UltralightNet_ULConfig.html", "cl": 4, "ucl": 11, "cal": 15, "tl": 115, "ct": "LineCoverage", "mc": "-", "cb": 0, "tb": 0, "lch": [], "bch": [], "hc": [] },
-      { "name": "UltralightNet.ULString", "rp": "UltralightNet_ULString.html", "cl": 26, "ucl": 5, "cal": 31, "tl": 130, "ct": "LineCoverage", "mc": "-", "cb": 11, "tb": 18, "lch": [], "bch": [], "hc": [] },
+      { "name": "UltralightNet.ULString", "rp": "UltralightNet_ULString.html", "cl": 24, "ucl": 7, "cal": 31, "tl": 130, "ct": "LineCoverage", "mc": "-", "cb": 10, "tb": 18, "lch": [], "bch": [], "hc": [] },
     ]},
 ];
 
