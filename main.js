@@ -225,8 +225,8 @@ var assemblies = [
     "name": "UltralightNet",
     "classes": [
       { "name": "UltralightNet.Methods", "rp": "UltralightNet_Methods.html", "cl": 30, "ucl": 136, "cal": 166, "tl": 0, "ct": "LineCoverage", "mc": "-", "cb": 2, "tb": 30, "lch": [], "bch": [], "hc": [] },
-      { "name": "UltralightNet.ULConfig", "rp": "UltralightNet_ULConfig.html", "cl": 18, "ucl": 12, "cal": 30, "tl": 178, "ct": "LineCoverage", "mc": "-", "cb": 2, "tb": 2, "lch": [], "bch": [], "hc": [] },
-      { "name": "UltralightNet.ULString", "rp": "UltralightNet_ULString.html", "cl": 34, "ucl": 2, "cal": 36, "tl": 149, "ct": "LineCoverage", "mc": "-", "cb": 12, "tb": 18, "lch": [], "bch": [], "hc": [] },
+      { "name": "UltralightNet.ULConfig", "rp": "UltralightNet_ULConfig.html", "cl": 8, "ucl": 22, "cal": 30, "tl": 178, "ct": "LineCoverage", "mc": "-", "cb": 0, "tb": 2, "lch": [], "bch": [], "hc": [] },
+      { "name": "UltralightNet.ULString", "rp": "UltralightNet_ULString.html", "cl": 33, "ucl": 3, "cal": 36, "tl": 149, "ct": "LineCoverage", "mc": "-", "cb": 12, "tb": 18, "lch": [], "bch": [], "hc": [] },
     ]},
 ];
 
