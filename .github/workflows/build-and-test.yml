@@ -5,8 +5,8 @@ on:
   pull_request:
     branches: [ master ]
 jobs:
-  build-and-test:
-    name: Build & Test
+  build:
+    name: Build
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
@@ -24,12 +24,23 @@ jobs:
         with:
           dotnet-version: 5.0.100
       - name: pack Binaries
-        run: |
-          dotnet pack -c Release UltralightNet.Binaries/UltralightNet.Binaries.csproj
-      #- name: Install dependencies
-      #  run: dotnet restore -f UltralightSharp/UltralightSharp.csproj
+        run: dotnet pack -c Release UltralightNet.Binaries/UltralightNet.Binaries.csproj
       - name: Build
+        run: dotnet build -c Release UltralightNet/UltralightNet.csproj
+  coverage:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Setup .NET Core
+        uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: 5.0.100
+      - name: Pack Binaries
+        run: dotnet pack -c Release UltralightNet.Binaries/UltralightNet.Binaries.csproj
+      - name: Build UltralightNet
         run: dotnet build -c Release UltralightNet/UltralightNet.csproj
 
       - name: Test
-        run: dotnet test UltralightNet.Test/UltralightNet.Test.csproj
+        continue-on-error: true
+        run: dotnet test UltralightNet.Test/UltralightNet.Test.csproj -- DataCollectionRunSettings.DataCollectors.DataCollector.Configuration.Format=opencover
+      - run: tree
