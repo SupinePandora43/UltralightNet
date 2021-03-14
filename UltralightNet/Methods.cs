@@ -18,9 +18,9 @@ namespace UltralightNet
 			// so it will not work for ios, i'm sure 100%%%
 			if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
 			{
-				NativeLibrary.Load("libUltralightCore.dylib");
-				NativeLibrary.Load("libWebCore.dylib");
-				NativeLibrary.Load("libUltralight.dylib");
+				NativeLibrary.Load("UltralightCore");
+				NativeLibrary.Load("WebCore");
+				NativeLibrary.Load("Ultralight");
 			}
 		}
 	}
