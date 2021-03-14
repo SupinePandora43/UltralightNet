@@ -62,11 +62,12 @@ namespace UltralightNet.Test
 		public void AssignCStr(string str, string newStr)
 		{
 			ULString ulString = new(str);
+			ULString newULString = new(newStr);
 
-			ulString.Assign(newStr);
+			ulString.Assign(newULString.GetData());
 
-			Assert.Equal(newStr ?? "", ulString.GetData());
-			Assert.Equal((newStr ?? "") == "", ulString.IsEmpty());
+			Assert.Equal(newULString.GetData(), ulString.GetData());
+			Assert.Equal(newULString.IsEmpty(), ulString.IsEmpty());
 		}
 
 		[Theory]
