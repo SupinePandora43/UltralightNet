@@ -77,8 +77,11 @@ namespace UltralightNet
 			get => Marshal.PtrToStructure<ULString16>(Ptr);
 		}
 
-		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		public ULString(IntPtr ptr) => Ptr = ptr;
+		public ULString(IntPtr ptr, bool dispose = false)
+		{
+			Ptr = ptr;
+			IsDisposed = !dispose;
+		}
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public ULString(string str = null) => Ptr = Methods.ulCreateStringUTF16(str ?? "", str is null ? 0 : (uint)str.Length);
 
@@ -118,6 +121,13 @@ namespace UltralightNet
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public object Clone() => new ULString(GetData());
+
+#nullable enable
+
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		public static bool ReferenceEquals(ULString? objA, ULString? objB) => ((objA is null) && (objB is null)) ? true : (((objA is null) || (objB is null)) ? false : objA.Ptr == objB.Ptr);
+
+#nullable restore
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public bool Equals(ULString other) => other is not null && (Ptr == other.Ptr || GetData() == other.GetData());

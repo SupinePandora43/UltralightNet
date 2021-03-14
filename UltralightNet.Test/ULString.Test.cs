@@ -1,4 +1,5 @@
 using System;
+using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using Xunit;
 
@@ -92,6 +93,7 @@ namespace UltralightNet.Test
 			Assert.True(ulString1.Equals(ulString2));
 			Assert.True(ulString1.Equals(ulString2 as object));
 			Assert.False(ulString1 != ulString2);
+			Assert.False(ULString.ReferenceEquals(ulString1, ulString2));
 			Assert.Equal(ulString1.ToString(), ulString2.ToString());
 			Assert.Equal(ulString1.ULString16, ulString2.ULString16);
 		}
@@ -111,6 +113,66 @@ namespace UltralightNet.Test
 			ULString ulString = new("юникод");
 			ulString.Dispose();
 			Assert.True(ulString.IsDisposed);
+		}
+
+		[Fact]
+		public void Finalizing()
+		{
+			ULString ulString = new("юникод");
+			ulString = null;
+			GC.WaitForPendingFinalizers();
+		}
+
+		[Fact]
+		public void CreateFromPtr()
+		{
+			IntPtr ptr = Methods.ulCreateStringUTF16("test", 4);
+
+			ULString ulString = new(ptr);
+
+			Assert.Equal(ptr, ulString.Ptr);
+
+			ulString.Dispose(); // doesn't dispose anything
+
+			Assert.Equal(ptr, ulString.Ptr);
+		}
+
+		[Fact]
+		public void DisposeFromPtr()
+		{
+			IntPtr ptr = Methods.ulCreateStringUTF16("test", 4);
+			ULString ulString = new(ptr, true);
+
+			Assert.Equal(ptr, ulString.Ptr);
+
+			ulString.Dispose();
+		}
+
+		[Fact]
+		public void PtrTest()
+		{
+			ULString ulString = new("юникод");
+			ULString uLStringClone = new((IntPtr)ulString);
+			Assert.Equal(ulString, uLStringClone);
+			Assert.Equal((IntPtr)ulString, (IntPtr)uLStringClone);
+			Assert.Equal(ulString.Ptr, uLStringClone.Ptr);
+		}
+
+		[Fact]
+		public void Equality()
+		{
+			ULString u1 = new("");
+			ULString u2 = new("");
+
+			Assert.False(u1.Equals(null));
+			Assert.True(u1.Equals(u1));
+			Assert.True(u1.Equals(u2));
+			Assert.True((ULString)null == (ULString)null);
+			Assert.True(ULString.ReferenceEquals(null, null));
+			Assert.False(ULString.ReferenceEquals(null, u2));
+			Assert.False(ULString.ReferenceEquals(u1, null));
+			Assert.False(ULString.ReferenceEquals(u1, u2));
+			Assert.False(u1 == null);
 		}
 	}
 }
