@@ -45,7 +45,7 @@ jobs:
         run: dotnet test --collect:"XPlat Code Coverage" -- DataCollectionRunSettings.DataCollectors.DataCollector.Configuration.Format=cobertura,opencover
       - run: tree
       - name: ReportGenerator
-      - uses: danielpalme/ReportGenerator-GitHub-Action@4.8.7
+        uses: danielpalme/ReportGenerator-GitHub-Action@4.8.7
         with:
           reports: 'UltralightNet.Test/TestResults/**/coverage.xml' # REQUIRED # The coverage reports that should be parsed (separated by semicolon). Globbing is supported.
           targetdir: 'coveragereport' # REQUIRED # The directory where the generated report should be saved.
