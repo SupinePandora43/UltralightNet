@@ -257,6 +257,7 @@ namespace UltralightNet
 			[MethodImpl(MethodImplOptions.AggressiveInlining)]
 			set => Methods.ulConfigSetEnableJavaScript(Ptr, value);
 		}
+
 		public ULFontHinting FontHinting
 		{
 			[MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -264,6 +265,7 @@ namespace UltralightNet
 			[MethodImpl(MethodImplOptions.AggressiveInlining)]
 			set => Methods.ulConfigSetFontHinting(Ptr, value);
 		}
+
 		public double FontGamma
 		{
 			[MethodImpl(MethodImplOptions.AggressiveInlining)]
