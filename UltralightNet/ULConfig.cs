@@ -46,7 +46,7 @@ namespace UltralightNet
 		/// <summary>The hinting algorithm to use when rendering fonts.</summary>
 		/// <see cref="ULFontHinting"/>
 		[GeneratedDllImport("Ultralight")]
-		public static partial void ulConfigSetFontHinting(IntPtr config, ULFontHinting font_hinting = ULFontHinting.kFontHinting_Normal);
+		public static partial void ulConfigSetFontHinting(IntPtr config, ULFontHinting font_hinting = ULFontHinting.Normal);
 
 		/// <summary>The gamma to use when compositing font glyphs, change this value to adjust contrast (Adobe and Apple prefer 1.8, others may prefer 2.2).</summary>
 		[GeneratedDllImport("Ultralight")]
@@ -203,6 +203,7 @@ namespace UltralightNet
 			[MethodImpl(MethodImplOptions.AggressiveInlining)]
 			set => Methods.ulConfigSetResourcePath(Ptr, ((ULString)value).Ptr);
 		}
+		/// <summary>The file path to a writable directory that will be used to store cookies, cached resources, and other persistent data.</summary>
 		public string CachePath
 		{
 			[MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -227,6 +228,9 @@ namespace UltralightNet
 			[MethodImpl(MethodImplOptions.AggressiveInlining)]
 			set => Methods.ulConfigSetUseGPURenderer(Ptr, value);
 		}
+
+		/// <summary>The amount that the application DPI has been scaled (200% = 2.0).<br/>This should match the device scale set for the current monitor.</summary>
+		/// <remarks>Device scales are rounded to nearest 1/8th (eg, 0.125).</remarks>
 		public double DeviceScale
 		{
 			[MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -235,6 +239,8 @@ namespace UltralightNet
 			set => Methods.ulConfigSetDeviceScale(Ptr, value);
 		}
 
+		/// <summary>The winding order for front-facing triangles. <see cref="ULFaceWinding"/></summary>
+		/// <remarks>This is only used when the GPU renderer is enabled.</remarks>
 		public ULFaceWinding FaceWinding
 		{
 			[MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -243,6 +249,7 @@ namespace UltralightNet
 			set => Methods.ulConfigSetFaceWinding(Ptr, value);
 		}
 
+		/// <summary>Whether or not images should be enabled.</summary>
 		public bool EnableImages
 		{
 			[MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -250,6 +257,7 @@ namespace UltralightNet
 			[MethodImpl(MethodImplOptions.AggressiveInlining)]
 			set => Methods.ulConfigSetEnableImages(Ptr, value);
 		}
+		/// <summary>Whether or not JavaScript should be enabled.</summary>
 		public bool EnableJavaScript
 		{
 			[MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -258,6 +266,7 @@ namespace UltralightNet
 			set => Methods.ulConfigSetEnableJavaScript(Ptr, value);
 		}
 
+		/// <summary>The hinting algorithm to use when rendering fonts. <see cref="ULFontHinting"/></summary>
 		public ULFontHinting FontHinting
 		{
 			[MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -266,6 +275,7 @@ namespace UltralightNet
 			set => Methods.ulConfigSetFontHinting(Ptr, value);
 		}
 
+		/// <summary>The gamma to use when compositing font glyphs, change this value to adjust contrast (Adobe and Apple prefer 1.8, others may prefer 2.2).</summary>
 		public double FontGamma
 		{
 			[MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -273,6 +283,7 @@ namespace UltralightNet
 			[MethodImpl(MethodImplOptions.AggressiveInlining)]
 			set => Methods.ulConfigSetFontGamma(Ptr, value);
 		}
+		/// <summary>Default font-family to use.</summary>
 		public string FontFamilyStandard
 		{
 			[MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -280,6 +291,7 @@ namespace UltralightNet
 			[MethodImpl(MethodImplOptions.AggressiveInlining)]
 			set => Methods.ulConfigSetFontFamilyStandard(Ptr, ((ULString)value).Ptr);
 		}
+		/// <summary>Default font-family to use for fixed fonts. (pre/code)</summary>
 		public string FontFamilyFixed
 		{
 			[MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -287,6 +299,7 @@ namespace UltralightNet
 			[MethodImpl(MethodImplOptions.AggressiveInlining)]
 			set => Methods.ulConfigSetFontFamilyFixed(Ptr, ((ULString)value).Ptr);
 		}
+		/// <summary>Default font-family to use for serif fonts.</summary>
 		public string FontFamilySerif
 		{
 			[MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -294,6 +307,7 @@ namespace UltralightNet
 			[MethodImpl(MethodImplOptions.AggressiveInlining)]
 			set => Methods.ulConfigSetFontFamilySerif(Ptr, ((ULString)value).Ptr);
 		}
+		/// <summary>Default font-family to use for sans-serif fonts.</summary>
 		public string FontFamilySansSerif
 		{
 			[MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -301,6 +315,7 @@ namespace UltralightNet
 			[MethodImpl(MethodImplOptions.AggressiveInlining)]
 			set => Methods.ulConfigSetFontFamilySansSerif(Ptr, ((ULString)value).Ptr);
 		}
+		/// <summary>Default user-agent string.</summary>
 		public string UserAgent
 		{
 			[MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -308,6 +323,11 @@ namespace UltralightNet
 			[MethodImpl(MethodImplOptions.AggressiveInlining)]
 			set => Methods.ulConfigSetUserAgent(Ptr, ((ULString)value).Ptr);
 		}
+		/// <summary>
+		/// Default user stylesheet. You should set this to your own custom CSS
+		/// string to define default styles for various DOM elements, scrollbars,
+		/// and platform input widgets.
+		/// </summary>
 		public string UserStylesheet
 		{
 			[MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -316,6 +336,11 @@ namespace UltralightNet
 			set => Methods.ulConfigSetUserStylesheet(Ptr, ((ULString)value).Ptr);
 		}
 
+		/// <summary>
+		/// Whether or not we should continuously repaint any Views or compositor
+		/// layers, regardless if they are dirty or not. This is mainly used to
+		/// diagnose painting/shader issues.
+		/// </summary>
 		public bool ForceRepaint
 		{
 			[MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -324,6 +349,10 @@ namespace UltralightNet
 			set => Methods.ulConfigSetForceRepaint(Ptr, value);
 		}
 
+		/// <summary>
+		/// When a CSS animation is active, the amount of time (in seconds) to wait
+		/// before triggering another repaint. Default is 60 Hz.
+		/// </summary>
 		public double AnimationTimerDelay
 		{
 			[MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -331,6 +360,10 @@ namespace UltralightNet
 			[MethodImpl(MethodImplOptions.AggressiveInlining)]
 			set => Methods.ulConfigSetAnimationTimerDelay(Ptr, value);
 		}
+		/// <summary>
+		/// When a smooth scroll animation is active, the amount of time (in seconds)
+		/// to wait before triggering another repaint. Default is 60 Hz.
+		/// </summary>
 		public double ScrollTimerDelay
 		{
 			[MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -338,6 +371,10 @@ namespace UltralightNet
 			[MethodImpl(MethodImplOptions.AggressiveInlining)]
 			set => Methods.ulConfigSetScrollTimerDelay(Ptr, value);
 		}
+		/// <summary>
+		/// The amount of time (in seconds) to wait before running the recycler (will
+		/// attempt to return excess memory back to the system).
+		/// </summary>
 		public double RecycleDelay
 		{
 			[MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -346,6 +383,13 @@ namespace UltralightNet
 			set => Methods.ulConfigSetRecycleDelay(Ptr, value);
 		}
 
+		/// <summary>
+		/// Size of WebCore's memory cache in bytes. 
+		/// </summary>
+		/// <remarks>
+		/// You should increase this if you anticipate handling pages with
+		/// large resources, Safari typically uses 128+ MiB for its cache.
+		/// </remarks>
 		public uint MemoryCacheSize
 		{
 			[MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -353,6 +397,14 @@ namespace UltralightNet
 			[MethodImpl(MethodImplOptions.AggressiveInlining)]
 			set => Methods.ulConfigSetMemoryCacheSize(Ptr, value);
 		}
+		/// <summary>
+		/// Number of pages to keep in the cache. Defaults to 0 (none).
+		/// </summary>
+		/// <remarks>
+		/// Safari typically caches about 5 pages and maintains an on-disk
+		/// cache to support typical web-browsing activities. If you increase
+		/// this, you should probably increase the memory cache size as well.
+		/// </remarks>
 		public uint PageCacheSize
 		{
 			[MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -360,6 +412,15 @@ namespace UltralightNet
 			[MethodImpl(MethodImplOptions.AggressiveInlining)]
 			set => Methods.ulConfigSetPageCacheSize(Ptr, value);
 		}
+		/// <summary>
+		/// JavaScriptCore tries to detect the system's physical RAM size to set
+		/// reasonable allocation limits. Set this to anything other than 0 to
+		/// override the detected value. Size is in bytes.
+		/// </summary>
+		/// <remarks>
+		/// This can be used to force JavaScriptCore to be more conservative with
+		/// its allocation strategy (at the cost of some performance).
+		/// </remarks>
 		public uint OverrideRAMSize
 		{
 			[MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -367,6 +428,10 @@ namespace UltralightNet
 			[MethodImpl(MethodImplOptions.AggressiveInlining)]
 			set => Methods.ulConfigSetOverrideRAMSize(Ptr, value);
 		}
+		/// <summary>
+		/// The minimum size of large VM heaps in JavaScriptCore. Set this to a
+		/// lower value to make these heaps start with a smaller initial value.
+		/// </summary>
 		public uint MinLargeHeapSize
 		{
 			[MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -374,6 +439,10 @@ namespace UltralightNet
 			[MethodImpl(MethodImplOptions.AggressiveInlining)]
 			set => Methods.ulConfigSetMinLargeHeapSize(Ptr, value);
 		}
+		/// <summary>
+		/// The minimum size of small VM heaps in JavaScriptCore. Set this to a
+		/// lower value to make these heaps start with a smaller initial value.
+		/// </summary>
 		public uint MinSmallHeapSize
 		{
 			[MethodImpl(MethodImplOptions.AggressiveInlining)]
