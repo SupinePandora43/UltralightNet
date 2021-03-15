@@ -39,8 +39,11 @@ namespace UltralightNet
 			private set;
 		}
 
-		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		public Renderer(IntPtr ptr) => Ptr = ptr;
+		public Renderer(IntPtr ptr, bool dispose = false)
+		{
+			Ptr = ptr;
+			IsDisposed = !dispose;
+		}
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public Renderer(ULConfig config) => Ptr = Methods.ulCreateRenderer(config.Ptr);
 
