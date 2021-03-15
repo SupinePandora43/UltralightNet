@@ -129,18 +129,134 @@ a.percentagebar {
 .ct-chart .ct-series.ct-series-a .ct-line, .ct-chart .ct-series.ct-series-a .ct-point { stroke: #c00 !important;}
 .ct-chart .ct-series.ct-series-b .ct-line, .ct-chart .ct-series.ct-series-b .ct-point { stroke: #1c2298 !important;}
 
-.tinylinecoveragechart, .tinybranchcoverag: '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line1"></a><code>1</code></td><td></td><td class="lightgray"><code>using&nbsp;System;</code></td></tr>
-<tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line2"></a><code>2</code></td><td></td><td class="lightgray"><code>using&nbsp;System.Runtime.CompilerServices;</code></td></tr>
-<tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line3"></a><code>3</code></td><td></td><td class="lightgray"><code>using&nbsp;System.Runtime.InteropServices;</code></td></tr>
-<tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line4"></a><code>4</code></td><td></td><td class="lightgray"><code></code></td></tr>
-<tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line5"></a><code>5</code></td><td></td><td class="lightgray"><code>namespace&nbsp;UltralightNet</code></td></tr>
-<tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line6"></a><code>6</code></td><td></td><td class="lightgray"><code>{</code></td></tr>
-<tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line7"></a><code>7</code></td><td></td><td class="lightgray"><code>&nbsp;&nbsp;public&nbsp;static&nbsp;partial&nbsp;class&nbsp;Methods</code></td></tr>
-<tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line8"></a><code>8</code></td><td></td><td class="lightgray"><code>&nbsp;&nbsp;{</code></td></tr>
-<tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line9"></a><code>9</code></td><td></td><td class="lightgray"><code>&nbsp;&nbsp;&nbsp;&nbsp;///&nbsp;&lt;summary&gt;Create&nbsp;string&nbsp;from&nbsp;null-terminated&nbsp;ASCII&nbsp;C-string.&lt;/summary&gt;</code></td></tr>
-<tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line10"></a><code>10</code></td><td></td><td class="lightgray"><code>&nbsp;&nbsp;&nbsp;&nbsp;[GeneratedDllImport(&quot;Ultralight&quot;,&nbsp;CharSet&nbsp;=&nbsp;CharSet.Ansi)]</code></td></tr>
-<tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line11"></a><code>11</code></td><td></td><td class="lightgray"><code>&nbsp;&nbsp;&nbsp;&nbsp;public&nbsp;static&nbsp;partial&nbsp;IntPtr&nbsp;ulCreateString([MarshalAs(UnmanagedType.LPStr)]&nbsp;string&nbsp;str);</code></td></tr>
-<tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line12"></a><code>12</code></td><td></td><td class="lightgray"><code></code></td></tr>
+.tinylinecoveragechart, .tinybranchcoveragechart { background-color: #fff; margin-left: -3px; float: left; border: solid 1px #c1c1c1; width: 30px; height: 18px; }
+.historiccoverageoffset { margin-top: 7px; }
+
+.tinylinecoveragechart .ct-line, .tinybranchcoveragechart .ct-line { stroke-width: 1px !important; }
+.tinybranchcoveragechart .ct-series.ct-series-a .ct-line { stroke: #1c2298 !important; }
+
+.linecoverage { background-color: #c00; width: 10px; height: 8px; border: 1px solid #000; display: inline-block; }
+.branchcoverage { background-color: #1c2298; width: 10px; height: 8px; border: 1px solid #000; display: inline-block; }
+
+.tooltip { position: absolute; display: none; padding: 5px; background: #F4C63D; color: #453D3F; pointer-events: none; z-index: 1; min-width: 250px; }
+
+.column1324 { max-width: 1324px; }
+.column674 { max-width: 674px; }
+.column60 { width: 60px; }
+.column70 { width: 70px; }
+.column90 { width: 90px; }
+.column98 { width: 98px; }
+.column100 { width: 100px; }
+.column105 { width: 105px; }
+.column112 { width: 112px; }
+.column135 { width: 135px; }
+.column150 { width: 150px; }
+
+.covered0 { width: 0px; }
+.covered1 { width: 1px; }
+.covered2 { width: 2px; }
+.covered3 { width: 3px; }
+.covered4 { width: 4px; }
+.covered5 { width: 5px; }
+.covered6 { width: 6px; }
+.covered7 { width: 7px; }
+.covered8 { width: 8px; }
+.covered9 { width: 9px; }
+.covered10 { width: 10px; }
+.covered11 { width: 11px; }
+.covered12 { width: 12px; }
+.covered13 { width: 13px; }
+.covered14 { width: 14px; }
+.covered15 { width: 15px; }
+.covered16 { width: 16px; }
+.covered17 { width: 17px; }
+.covered18 { width: 18px; }
+.covered19 { width: 19px; }
+.covered20 { width: 20px; }
+.covered21 { width: 21px; }
+.covered22 { width: 22px; }
+.covered23 { width: 23px; }
+.covered24 { width: 24px; }
+.covered25 { width: 25px; }
+.covered26 { width: 26px; }
+.covered27 { width: 27px; }
+.covered28 { width: 28px; }
+.covered29 { width: 29px; }
+.covered30 { width: 30px; }
+.covered31 { width: 31px; }
+.covered32 { width: 32px; }
+.covered33 { width: 33px; }
+.covered34 { width: 34px; }
+.covered35 { width: 35px; }
+.covered36 { width: 36px; }
+.covered37 { width: 37px; }
+.covered38 { width: 38px; }
+.covered39 { width: 39px; }
+.covered40 { width: 40px; }
+.covered41 { width: 41px; }
+.covered42 { width: 42px; }
+.covered43 { width: 43px; }
+.covered44 { width: 44px; }
+.covered45 { width: 45px; }
+.covered46 { width: 46px; }
+.covered47 { width: 47px; }
+.covered48 { width: 48px; }
+.covered49 { width: 49px; }
+.covered50 { width: 50px; }
+.covered51 { width: 51px; }
+.covered52 { width: 52px; }
+.covered53 { width: 53px; }
+.covered54 { width: 54px; }
+.covered55 { width: 55px; }
+.covered56 { width: 56px; }
+.covered57 { width: 57px; }
+.covered58 { width: 58px; }
+.covered59 { width: 59px; }
+.covered60 { width: 60px; }
+.covered61 { width: 61px; }
+.covered62 { width: 62px; }
+.covered63 { width: 63px; }
+.covered64 { width: 64px; }
+.covered65 { width: 65px; }
+.covered66 { width: 66px; }
+.covered67 { width: 67px; }
+.covered68 { width: 68px; }
+.covered69 { width: 69px; }
+.covered70 { width: 70px; }
+.covered71 { width: 71px; }
+.covered72 { width: 72px; }
+.covered73 { width: 73px; }
+.covered74 { width: 74px; }
+.covered75 { width: 75px; }
+.covered76 { width: 76px; }
+.covered77 { width: 77px; }
+.covered78 { width: 78px; }
+.covered79 { width: 79px; }
+.covered80 { width: 80px; }
+.covered81 { width: 81px; }
+.covered82 { width: 82px; }
+.covered83 { width: 83px; }
+.covered84 { width: 84px; }
+.covered85 { width: 85px; }
+.covered86 { width: 86px; }
+.covered87 { width: 87px; }
+.covered88 { width: 88px; }
+.covered89 { width: 89px; }
+.covered90 { width: 90px; }
+.covered91 { width: 91px; }
+.covered92 { width: 92px; }
+.covered93 { width: 93px; }
+.covered94 { width: 94px; }
+.covered95 { width: 95px; }
+.covered96 { width: 96px; }
+.covered97 { width: 97px; }
+.covered98 { width: 98px; }
+.covered99 { width: 99px; }
+.covered100 { width: 100px; }
+
+ @media print {
+    html, body { background-color: #fff; }
+    .container { max-width: 100y"><code></code></td></tr>
 <tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line13"></a><code>13</code></td><td></td><td class="lightgray"><code>&nbsp;&nbsp;&nbsp;&nbsp;///&nbsp;&lt;summary&gt;Create&nbsp;string&nbsp;from&nbsp;UTF-8&nbsp;buffer.&lt;/summary&gt;</code></td></tr>
 <tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line14"></a><code>14</code></td><td></td><td class="lightgray"><code>&nbsp;&nbsp;&nbsp;&nbsp;[GeneratedDllImport(&quot;Ultralight&quot;)]</code></td></tr>
 <tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line15"></a><code>15</code></td><td></td><td class="lightgray"><code>&nbsp;&nbsp;&nbsp;&nbsp;[Obsolete(&quot;Unexpected&nbsp;behaviour&quot;)]</code></td></tr>
@@ -194,24 +310,42 @@ a.percentagebar {
 <tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line63"></a><code>63</code></td><td></td><td class="lightgray"><code>#pragma&nbsp;warning&nbsp;restore&nbsp;CS0661&nbsp;//&nbsp;Type&nbsp;defines&nbsp;operator&nbsp;==&nbsp;or&nbsp;operator&nbsp;!=&nbsp;but&nbsp;does&nbsp;not&nbsp;override&nbsp;Object.GetHashCode()</code></td></tr>
 <tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line64"></a><code>64</code></td><td></td><td class="lightgray"><code>#pragma&nbsp;warning&nbsp;restore&nbsp;CS0659&nbsp;//&nbsp;Type&nbsp;overrides&nbsp;Object.Equals(object&nbsp;o)&nbsp;but&nbsp;does&nbsp;not&nbsp;override&nbsp;Object.GetHashCode()</code></td></tr>
 <tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line65"></a><code>65</code></td><td></td><td class="lightgray"><code>&nbsp;&nbsp;{</code></td></tr>
-<tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line66"></a><code>66</code></td><td></td><td class="lightgray"><code>&nbsp;&nbsp;&nbsp;&nbsp;public&nbsp;IntPtr&nbsp;Ptr</code></td></tr>
-<tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line67"></a><code>67</code></td><td></td><td class="lightgray"><code>&nbsp;&nbsp;&nbsp;&nbsp;{</code></td></tr>
-<tr class="coverableline" title="Covered (163 visits)" data-coverage="{'AllTestMethods': {'VC': '163', 'LVS': 'green'}}"><td class="green">&nbsp;</td><td class="leftmargin rightmargin right">163</td><td class="rightmargin right"><a id="file0_line68"></a><code>68</code></td><td></td><td class="lightgreen"><code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[MethodImpl(MethodImplOptions.AggressiveInlining)]</code></td></tr>
-<tr class="coverableline" title="Covered (163 visits)" data-coverage="{'AllTestMethods': {'VC': '163', 'LVS': 'green'}}"><td class="green">&nbsp;</td><td class="leftmargin rightmargin right">163</td><td class="rightmargin right"><a id="file0_line69"></a><code>69</code></td><td></td><td class="lightgreen"><code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;get;</code></td></tr>
-<tr class="coverableline" title="Covered (49 visits)" data-coverage="{'AllTestMethods': {'VC': '49', 'LVS': 'green'}}"><td class="green">&nbsp;</td><td class="leftmargin rightmargin right">49</td><td class="rightmargin right"><a id="file0_line70"></a><code>70</code></td><td></td><td class="lightgreen"><code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[MethodImpl(MethodImplOptions.AggressiveInlining)]</code></td></tr>
-<tr class="coverableline" title="Covered (49 visits)" data-coverage="{'AllTestMethods': {'VC': '49', 'LVS': 'green'}}"><td class="green">&nbsp;</td><td class="leftmargin rightmargin right">49</td><td class="rightmargin right"><a id="file0_line71"></a><code>71</code></td><td></td><td class="lightgreen"><code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;private&nbsp;set;</code></td></tr>
-<tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line72"></a><code>72</code></td><td></td><td class="lightgray"><code>&nbsp;&nbsp;&nbsp;&nbsp;}</code></td></tr>
-<tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line73"></a><code>73</code></td><td></td><td class="lightgray"><code></code></td></tr>
-<tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line74"></a><code>74</code></td><td></td><td class="lightgray"><code>&nbsp;&nbsp;&nbsp;&nbsp;public&nbsp;ULString16&nbsp;ULString16</code></td></tr>
-<tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line75"></a><code>75</code></td><td></td><td class="lightgray"><code>&nbsp;&nbsp;&nbsp;&nbsp;{</code></td></tr>
-<tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line76"></a><code>76</code></td><td></td><td class="lightgray"><code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[MethodImpl(MethodImplOptions.AggressiveInlining)]</code></td></tr>
-<tr class="coverableline" title="Covered (6 visits)" data-coverage="{'AllTestMethods': {'VC': '6', 'LVS': 'green'}}"><td class="green">&nbsp;</td><td class="leftmargin rightmargin right">6</td><td class="rightmargin right"><a id="file0_line77"></a><code>77</code></td><td></ne89" class="navigatetohash">GetData()</a></td><td>100%</td><td>1</td><td>0</td><td>100%</td></tr>
+<tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="ay:block;float:left;content:"";width:0;height:0;padding-bottom:60%}.ct-major-sixth:after{display:table}.ct-major-sixth>svg{display:block;position:absolute;top:0;left:0}.ct-minor-seventh{display:block;position:relative;width:100%}.ct-minor-seventh:before{display:block;float:left;content:"";width:0;height:0;padding-bottom:56.25%}.ct-minor-seventh:after{display:table}.ct-minor-seventh>svg{display:block;position:absolute;top:0;left:0}.ct-major-seventh{display:block;position:relative;width:100%}.ct-major-seventh:before{display:block;float:left;content:"";width:0;height:0;padding-bottom:53.3333333333%}.ct-major-seventh:after{display:table}.ct-major-seventh>svg{display:block;position:absolute;top:0;left:0}.ct-octave{display:block;position:relative;width:100%}.ct-octave:before{display:block;float:left;content:"";width:0;height:0;padding-bottom:50%}.ct-octave:after{display:table}.ct-octave>svg{display:block;position:absolute;top:0;left:0}.ct-major-tenth{display:block;position:relative;width:100%}.ct-major-tenth:before{display:block;float:left;content:"";width:0;height:0;padding-bottom:40%}.ct-major-tenth:after{display:table}.ct-major-tenth>svg{display:block;position:absolute;top:0;left:0}.ct-major-eleventh{display:block;position:relative;width:100%}.ct-major-eleventh:before{display:block;float:left;content:"";width:0;height:0;padding-bottom:37.5%}.ct-major-eleventh:after{display:table}.ct-major-eleventh>svg{display:block;position:absolute;top:0;left:0}.ct-major-twelfth{display:block;position:relative;width:100%}.ct-major-twelfth:before{display:block;float:left;content:"";width:0;height:0;padding-bottom:33.3333333333%}.ct-major-twelfth:after{display:table}.ct-major-twelfth>svg{display:block;position:absolute;top:0;left:0}.ct-double-octave{display:block;position:relative;width:100%}.ct-double-octave:before{display:block;float:left;content:"";width:0;height:0;padding-bottom:25%}.ct-double-octave:after{display:table}.ct-double-octave>svg{display:block;position:absolute;top:0;left:0}</style>
+</head><body><div class="container"><div class="containerleft">
+<h1><a href="index.html" class="back">&lt;</a> Summary</h1>
+<table class="overview table-fixed">
+<colgroup>
+<col class="column150" />
+<col />
+</colgroup>
+<tbody>
+<tr><th>Class:</th><td>UltralightNet.ULString</td></tr>
+<tr><th>Assembly:</th><td>UltralightNet</td></tr>
+<tr><th>File(s):</th><td><a href="#homerunnerworkUltralightSharpUltralightSharpUltralightNetULStringcs" class="navigatetohash">/home/runner/work/UltralightSharp/UltralightSharp/UltralightNet/ULString.cs</a></td></tr>
+<tr><th>Covered lines:</th><td>41</td></tr>
+<tr><th>Uncovered lines:</th><td>0</td></tr>
+<tr><th>Coverable lines:</th><td>41</td></tr>
+<tr><th>Total lines:</th><td>157</td></tr>
+<tr><th>Line coverage:</th><td>100% (41 of 41)</td></tr>
+<tr><th>Covered branches:</th><td>26</td></tr>
+<tr><th>Total branches:</th><td>26</td></tr>
+<tr><th>Branch coverage:</th><td>100% (26 of 26)</td></tr>
+<tr><th>Tag:</th><td>10_652857947</td></tr>
+</tbody>
+</table>
+<h1>Metrics</h1>
+<table class="overview table-fixed">
+<thead><tr><th>Method</th><th>Branch coverage <a href="https://en.wikipedia.org/wiki/Code_coverage"><i class="icon-info-circled"></i></a></th><th>Cyclomatic complexity <a href="https://en.wikipedia.org/wiki/Cyclomatic_complexity"><i class="icon-info-circled"></i></a></th><th>NPath complexity <a href="https://modess.io/npath-complexity-cyclomatic-complexity-explained"><i class="icon-info-circled"></i></a></th><th>Sequence coverage <a href="https://en.wikipedia.org/wiki/Code_coverage"><i class="icon-info-circled"></i></a></th></tr></thead>
+<tbody>
+<tr><td title="System.Void UltralightNet.ULString::.ctor(System.IntPtr,System.Boolean)"><a href="#file0_line80" class="navigatetohash">.ctor(...)</a></td><td>100%</td><td>1</td><td>0</td><td>100%</td></tr>
+<tr><td title="System.Void UltralightNet.ULString::.ctor(System.String)"><a href="#file0_line86" class="navigatetohash">.ctor(...)</a></td><td>100%</td><td>4</td><td>0</td><td>100%</td></tr>
+<tr><td title="System.String UltralightNet.ULString::GetData()"><a href="#file0_line89" class="navigatetohash">GetData()</a></td><td>100%</td><td>1</td><td>0</td><td>100%</td></tr>
 <tr><td title="System.UInt32 UltralightNet.ULString::GetLength()"><a href="#file0_line91" class="navigatetohash">GetLength()</a></td><td>100%</td><td>1</td><td>0</td><td>100%</td></tr>
 <tr><td title="System.Boolean UltralightNet.ULString::IsEmpty()"><a href="#file0_line93" class="navigatetohash">IsEmpty()</a></td><td>100%</td><td>1</td><td>0</td><td>100%</td></tr>
 <tr><td title="System.Void UltralightNet.ULString::Assign(UltralightNet.ULString)"><a href="#file0_line95" class="navigatetohash">Assign(...)</a></td><td>100%</td><td>1</td><td>0</td><td>100%</td></tr>
 <tr><td title="System.Void UltralightNet.ULString::Assign(System.String)"><a href="#file0_line97" class="navigatetohash">Assign(...)</a></td><td>100%</td><td>1</td><td>0</td><td>100%</td></tr>
 <tr><td title="System.String UltralightNet.ULString::ToString()"><a href="#file0_line100" class="navigatetohash">ToString()</a></td><td>100%</td><td>1</td><td>0</td><td>100%</td></tr>
-<tr><td title="System.Void UltralightNet.ULString::Finalize()"><a href="#file0_line103" class="navigatetohash">Finalize()</a></td><td>100%</td><td>1</td><td>0</td><td>0%</td></tr>
+<tr><td title="System.Void UltralightNet.ULString::Finalize()"><a href="#file0_line103" class="navigatetohash">Finalize()</a></td><td>100%</td><td>1</td><td>0</td><td>100%</td></tr>
 <tr><td title="System.Void UltralightNet.ULString::Dispose()"><a href="#file0_line114" class="navigatetohash">Dispose()</a></td><td>100%</td><td>2</td><td>0</td><td>100%</td></tr>
 <tr><td title="System.Object UltralightNet.ULString::Clone()"><a href="#file0_line123" class="navigatetohash">Clone()</a></td><td>100%</td><td>1</td><td>0</td><td>100%</td></tr>
 <tr><td title="System.Boolean UltralightNet.ULString::ReferenceEquals(UltralightNet.ULString,UltralightNet.ULString)"><a href="#file0_line128" class="navigatetohash">ReferenceEquals(...)</a></td><td>100%</td><td>8</td><td>0</td><td>100%</td></tr>
@@ -296,8 +430,8 @@ a.percentagebar {
 <tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line65"></a><code>65</code></td><td></td><td class="lightgray"><code>&nbsp;&nbsp;{</code></td></tr>
 <tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line66"></a><code>66</code></td><td></td><td class="lightgray"><code>&nbsp;&nbsp;&nbsp;&nbsp;public&nbsp;IntPtr&nbsp;Ptr</code></td></tr>
 <tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line67"></a><code>67</code></td><td></td><td class="lightgray"><code>&nbsp;&nbsp;&nbsp;&nbsp;{</code></td></tr>
-<tr class="coverableline" title="Covered (163 visits)" data-coverage="{'AllTestMethods': {'VC': '163', 'LVS': 'green'}}"><td class="green">&nbsp;</td><td class="leftmargin rightmargin right">163</td><td class="rightmargin right"><a id="file0_line68"></a><code>68</code></td><td></td><td class="lightgreen"><code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[MethodImpl(MethodImplOptions.AggressiveInlining)]</code></td></tr>
-<tr class="coverableline" title="Covered (163 visits)" data-coverage="{'AllTestMethods': {'VC': '163', 'LVS': 'green'}}"><td class="green">&nbsp;</td><td class="leftmargin rightmargin right">163</td><td class="rightmargin right"><a id="file0_line69"></a><code>69</code></td><td></td><td class="lightgreen"><code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;get;</code></td></tr>
+<tr class="coverableline" title="Covered (208 visits)" data-coverage="{'AllTestMethods': {'VC': '208', 'LVS': 'green'}}"><td class="green">&nbsp;</td><td class="leftmargin rightmargin right">208</td><td class="rightmargin right"><a id="file0_line68"></a><code>68</code></td><td></td><td class="lightgreen"><code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[MethodImpl(MethodImplOptions.AggressiveInlining)]</code></td></tr>
+<tr class="coverableline" title="Covered (208 visits)" data-coverage="{'AllTestMethods': {'VC': '208', 'LVS': 'green'}}"><td class="green">&nbsp;</td><td class="leftmargin rightmargin right">208</td><td class="rightmargin right"><a id="file0_line69"></a><code>69</code></td><td></td><td class="lightgreen"><code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;get;</code></td></tr>
 <tr class="coverableline" title="Covered (49 visits)" data-coverage="{'AllTestMethods': {'VC': '49', 'LVS': 'green'}}"><td class="green">&nbsp;</td><td class="leftmargin rightmargin right">49</td><td class="rightmargin right"><a id="file0_line70"></a><code>70</code></td><td></td><td class="lightgreen"><code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[MethodImpl(MethodImplOptions.AggressiveInlining)]</code></td></tr>
 <tr class="coverableline" title="Covered (49 visits)" data-coverage="{'AllTestMethods': {'VC': '49', 'LVS': 'green'}}"><td class="green">&nbsp;</td><td class="leftmargin rightmargin right">49</td><td class="rightmargin right"><a id="file0_line71"></a><code>71</code></td><td></td><td class="lightgreen"><code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;private&nbsp;set;</code></td></tr>
 <tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line72"></a><code>72</code></td><td></td><td class="lightgray"><code>&nbsp;&nbsp;&nbsp;&nbsp;}</code></td></tr>
@@ -331,24 +465,24 @@ a.percentagebar {
 <tr class="coverableline" title="Covered (2 visits)" data-coverage="{'AllTestMethods': {'VC': '2', 'LVS': 'green'}}"><td class="green">&nbsp;</td><td class="leftmargin rightmargin right">2</td><td class="rightmargin right"><a id="file0_line100"></a><code>100</code></td><td></td><td class="lightgreen"><code>&nbsp;&nbsp;&nbsp;&nbsp;public&nbsp;override&nbsp;string&nbsp;ToString()&nbsp;=&gt;&nbsp;GetData();</code></td></tr>
 <tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line101"></a><code>101</code></td><td></td><td class="lightgray"><code></code></td></tr>
 <tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line102"></a><code>102</code></td><td></td><td class="lightgray"><code>&nbsp;&nbsp;&nbsp;&nbsp;[MethodImpl(MethodImplOptions.AggressiveInlining)]</code></td></tr>
-<tr class="coverableline" title="Not covered (0 visits)" data-coverage="{'AllTestMethods': {'VC': '0', 'LVS': 'red'}}"><td class="red">&nbsp;</td><td class="leftmargin rightmargin right">0</td><td class="rightmargin right"><a id="file0_line103"></a><code>103</code></td><td></td><td class="lightred"><code>&nbsp;&nbsp;&nbsp;&nbsp;~ULString()&nbsp;=&gt;&nbsp;Dispose();</code></td></tr>
+<tr class="coverableline" title="Covered (47 visits)" data-coverage="{'AllTestMethods': {'VC': '47', 'LVS': 'green'}}"><td class="green">&nbsp;</td><td class="leftmargin rightmargin right">47</td><td class="rightmargin right"><a id="file0_line103"></a><code>103</code></td><td></td><td class="lightgreen"><code>&nbsp;&nbsp;&nbsp;&nbsp;~ULString()&nbsp;=&gt;&nbsp;Dispose();</code></td></tr>
 <tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line104"></a><code>104</code></td><td></td><td class="lightgray"><code></code></td></tr>
 <tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line105"></a><code>105</code></td><td></td><td class="lightgray"><code>&nbsp;&nbsp;&nbsp;&nbsp;public&nbsp;bool&nbsp;IsDisposed</code></td></tr>
 <tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line106"></a><code>106</code></td><td></td><td class="lightgray"><code>&nbsp;&nbsp;&nbsp;&nbsp;{</code></td></tr>
-<tr class="coverableline" title="Covered (4 visits)" data-coverage="{'AllTestMethods': {'VC': '4', 'LVS': 'green'}}"><td class="green">&nbsp;</td><td class="leftmargin rightmargin right">4</td><td class="rightmargin right"><a id="file0_line107"></a><code>107</code></td><td></td><td class="lightgreen"><code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[MethodImpl(MethodImplOptions.AggressiveInlining)]</code></td></tr>
-<tr class="coverableline" title="Covered (4 visits)" data-coverage="{'AllTestMethods': {'VC': '4', 'LVS': 'green'}}"><td class="green">&nbsp;</td><td class="leftmargin rightmargin right">4</td><td class="rightmargin right"><a id="file0_line108"></a><code>108</code></td><td></td><td class="lightgreen"><code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;get;</code></td></tr>
-<tr class="coverableline" title="Covered (5 visits)" data-coverage="{'AllTestMethods': {'VC': '5', 'LVS': 'green'}}"><td class="green">&nbsp;</td><td class="leftmargin rightmargin right">5</td><td class="rightmargin right"><a id="file0_line109"></a><code>109</code></td><td></td><td class="lightgreen"><code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[MethodImpl(MethodImplOptions.AggressiveInlining)]</code></td></tr>
-<tr class="coverableline" title="Covered (5 visits)" data-coverage="{'AllTestMethods': {'VC': '5', 'LVS': 'green'}}"><td class="green">&nbsp;</td><td class="leftmargin rightmargin right">5</td><td class="rightmargin right"><a id="file0_line110"></a><code>110</code></td><td></td><td class="lightgreen"><code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;private&nbsp;set;</code></td></tr>
+<tr class="coverableline" title="Covered (51 visits)" data-coverage="{'AllTestMethods': {'VC': '51', 'LVS': 'green'}}"><td class="green">&nbsp;</td><td class="leftmargin rightmargin right">51</td><td class="rightmargin right"><a id="file0_line107"></a><code>107</code></td><td></td><td class="lightgreen"><code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[MethodImpl(MethodImplOptions.AggressiveInlining)]</code></td></tr>
+<tr class="coverableline" title="Covered (51 visits)" data-coverage="{'AllTestMethods': {'VC': '51', 'LVS': 'green'}}"><td class="green">&nbsp;</td><td class="leftmargin rightmargin right">51</td><td class="rightmargin right"><a id="file0_line108"></a><code>108</code></td><td></td><td class="lightgreen"><code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;get;</code></td></tr>
+<tr class="coverableline" title="Covered (50 visits)" data-coverage="{'AllTestMethods': {'VC': '50', 'LVS': 'green'}}"><td class="green">&nbsp;</td><td class="leftmargin rightmargin right">50</td><td class="rightmargin right"><a id="file0_line109"></a><code>109</code></td><td></td><td class="lightgreen"><code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[MethodImpl(MethodImplOptions.AggressiveInlining)]</code></td></tr>
+<tr class="coverableline" title="Covered (50 visits)" data-coverage="{'AllTestMethods': {'VC': '50', 'LVS': 'green'}}"><td class="green">&nbsp;</td><td class="leftmargin rightmargin right">50</td><td class="rightmargin right"><a id="file0_line110"></a><code>110</code></td><td></td><td class="lightgreen"><code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;private&nbsp;set;</code></td></tr>
 <tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line111"></a><code>111</code></td><td></td><td class="lightgray"><code>&nbsp;&nbsp;&nbsp;&nbsp;}</code></td></tr>
 <tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line112"></a><code>112</code></td><td></td><td class="lightgray"><code></code></td></tr>
 <tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line113"></a><code>113</code></td><td></td><td class="lightgray"><code>&nbsp;&nbsp;&nbsp;&nbsp;public&nbsp;void&nbsp;Dispose()</code></td></tr>
-<tr class="coverableline" title="Covered (3 visits)" data-coverage="{'AllTestMethods': {'VC': '3', 'LVS': 'green'}}"><td class="green">&nbsp;</td><td class="leftmargin rightmargin right">3</td><td class="rightmargin right"><a id="file0_line114"></a><code>114</code></td><td></td><td class="lightgreen"><code>&nbsp;&nbsp;&nbsp;&nbsp;{</code></td></tr>
-<tr class="coverableline" title="Covered (4 visits, 2 of 2 branches are covered)" data-coverage="{'AllTestMethods': {'VC': '4', 'LVS': 'green'}}"><td class="green">&nbsp;</td><td class="leftmargin rightmargin right">4</td><td class="rightmargin right"><a id="file0_line115"></a><code>115</code></td><td class="percentagebar percentagebar100"><i class="icon-fork"></i></td><td class="lightgreen"><code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;if&nbsp;(IsDisposed)&nbsp;return;</code></td></tr>
-<tr class="coverableline" title="Covered (2 visits)" data-coverage="{'AllTestMethods': {'VC': '2', 'LVS': 'green'}}"><td class="green">&nbsp;</td><td class="leftmargin rightmargin right">2</td><td class="rightmargin right"><a id="file0_line116"></a><code>116</code></td><td></td><td class="lightgreen"><code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Methods.ulDestroyString(Ptr);</code></td></tr>
+<tr class="coverableline" title="Covered (50 visits)" data-coverage="{'AllTestMethods': {'VC': '50', 'LVS': 'green'}}"><td class="green">&nbsp;</td><td class="leftmargin rightmargin right">50</td><td class="rightmargin right"><a id="file0_line114"></a><code>114</code></td><td></td><td class="lightgreen"><code>&nbsp;&nbsp;&nbsp;&nbsp;{</code></td></tr>
+<tr class="coverableline" title="Covered (53 visits, 2 of 2 branches are covered)" data-coverage="{'AllTestMethods': {'VC': '53', 'LVS': 'green'}}"><td class="green">&nbsp;</td><td class="leftmargin rightmargin right">53</td><td class="rightmargin right"><a id="file0_line115"></a><code>115</code></td><td class="percentagebar percentagebar100"><i class="icon-fork"></i></td><td class="lightgreen"><code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;if&nbsp;(IsDisposed)&nbsp;return;</code></td></tr>
+<tr class="coverableline" title="Covered (47 visits)" data-coverage="{'AllTestMethods': {'VC': '47', 'LVS': 'green'}}"><td class="green">&nbsp;</td><td class="leftmargin rightmargin right">47</td><td class="rightmargin right"><a id="file0_line116"></a><code>116</code></td><td></td><td class="lightgreen"><code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Methods.ulDestroyString(Ptr);</code></td></tr>
 <tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line117"></a><code>117</code></td><td></td><td class="lightgray"><code></code></td></tr>
-<tr class="coverableline" title="Covered (2 visits)" data-coverage="{'AllTestMethods': {'VC': '2', 'LVS': 'green'}}"><td class="green">&nbsp;</td><td class="leftmargin rightmargin right">2</td><td class="rightmargin right"><a id="file0_line118"></a><code>118</code></td><td></td><td class="lightgreen"><code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;IsDisposed&nbsp;=&nbsp;true;</code></td></tr>
-<tr class="coverableline" title="Covered (2 visits)" data-coverage="{'AllTestMethods': {'VC': '2', 'LVS': 'green'}}"><td class="green">&nbsp;</td><td class="leftmargin rightmargin right">2</td><td class="rightmargin right"><a id="file0_line119"></a><code>119</code></td><td></td><td class="lightgreen"><code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;GC.SuppressFinalize(this);</code></td></tr>
-<tr class="coverableline" title="Covered (3 visits)" data-coverage="{'AllTestMethods': {'VC': '3', 'LVS': 'green'}}"><td class="green">&nbsp;</td><td class="leftmargin rightmargin right">3</td><td class="rightmargin right"><a id="file0_line120"></a><code>120</code></td><td></td><td class="lightgreen"><code>&nbsp;&nbsp;&nbsp;&nbsp;}</code></td></tr>
+<tr class="coverableline" title="Covered (47 visits)" data-coverage="{'AllTestMethods': {'VC': '47', 'LVS': 'green'}}"><td class="green">&nbsp;</td><td class="leftmargin rightmargin right">47</td><td class="rightmargin right"><a id="file0_line118"></a><code>118</code></td><td></td><td class="lightgreen"><code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;IsDisposed&nbsp;=&nbsp;true;</code></td></tr>
+<tr class="coverableline" title="Covered (47 visits)" data-coverage="{'AllTestMethods': {'VC': '47', 'LVS': 'green'}}"><td class="green">&nbsp;</td><td class="leftmargin rightmargin right">47</td><td class="rightmargin right"><a id="file0_line119"></a><code>119</code></td><td></td><td class="lightgreen"><code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;GC.SuppressFinalize(this);</code></td></tr>
+<tr class="coverableline" title="Covered (50 visits)" data-coverage="{'AllTestMethods': {'VC': '50', 'LVS': 'green'}}"><td class="green">&nbsp;</td><td class="leftmargin rightmargin right">50</td><td class="rightmargin right"><a id="file0_line120"></a><code>120</code></td><td></td><td class="lightgreen"><code>&nbsp;&nbsp;&nbsp;&nbsp;}</code></td></tr>
 <tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line121"></a><code>121</code></td><td></td><td class="lightgray"><code></code></td></tr>
 <tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line122"></a><code>122</code></td><td></td><td class="lightgray"><code>&nbsp;&nbsp;&nbsp;&nbsp;[MethodImpl(MethodImplOptions.AggressiveInlining)]</code></td></tr>
 <tr class="coverableline" title="Covered (1 visits)" data-coverage="{'AllTestMethods': {'VC': '1', 'LVS': 'green'}}"><td class="green">&nbsp;</td><td class="leftmargin rightmargin right">1</td><td class="rightmargin right"><a id="file0_line123"></a><code>123</code></td><td></td><td class="lightgreen"><code>&nbsp;&nbsp;&nbsp;&nbsp;public&nbsp;object&nbsp;Clone()&nbsp;=&gt;&nbsp;new&nbsp;ULString(GetData());</code></td></tr>
@@ -388,7 +522,7 @@ a.percentagebar {
 <tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line157"></a><code>157</code></td><td></td><td class="lightgray"><code>}</code></td></tr>
 </tbody>
 </table>
-<div class="footer">Generated by: ReportGenerator 4.8.7.0<br />03/15/2021 - 03:15:22<br /><a href="https://github.com/danielpalme/ReportGenerator">GitHub</a> | <a href="http://www.palmmedia.de">www.palmmedia.de</a></div></div>
+<div class="footer">Generated by: ReportGenerator 4.8.7.0<br />03/15/2021 - 03:32:47<br /><a href="https://github.com/danielpalme/ReportGenerator">GitHub</a> | <a href="http://www.palmmedia.de">www.palmmedia.de</a></div></div>
 <div class="containerright">
 <div class="containerrightfixed">
 <h1>Methods/Properties</h1>
@@ -403,7 +537,7 @@ a.percentagebar {
 <a href="#file0_line95" class="navigatetohash percentagebar percentagebar100" title="Line coverage: 100% - Assign(UltralightNet.ULString)"><i class="icon-cube"></i>Assign(UltralightNet.ULString)</a><br />
 <a href="#file0_line97" class="navigatetohash percentagebar percentagebar100" title="Line coverage: 100% - Assign(System.String)"><i class="icon-cube"></i>Assign(System.String)</a><br />
 <a href="#file0_line100" class="navigatetohash percentagebar percentagebar100" title="Line coverage: 100% - ToString()"><i class="icon-cube"></i>ToString()</a><br />
-<a href="#file0_line103" class="navigatetohash percentagebar percentagebar0" title="Line coverage: 0% - Finalize()"><i class="icon-cube"></i>Finalize()</a><br />
+<a href="#file0_line103" class="navigatetohash percentagebar percentagebar100" title="Line coverage: 100% - Finalize()"><i class="icon-cube"></i>Finalize()</a><br />
 <a href="#file0_line107" class="navigatetohash percentagebar percentagebar100" title="Line coverage: 100% - IsDisposed()"><i class="icon-wrench"></i>IsDisposed()</a><br />
 <a href="#file0_line109" class="navigatetohash percentagebar percentagebar100" title="Line coverage: 100% - IsDisposed(System.Boolean)"><i class="icon-wrench"></i>IsDisposed(System.Boolean)</a><br />
 <a href="#file0_line114" class="navigatetohash percentagebar percentagebar100" title="Line coverage: 100% - Dispose()"><i class="icon-cube"></i>Dispose()</a><br />
