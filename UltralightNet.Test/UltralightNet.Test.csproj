@@ -7,6 +7,10 @@
 	</PropertyGroup>
 
 	<ItemGroup>
+		<Content Include="xunit.runner.json" CopyToOutputDirectory="PreserveNewest" />
+	</ItemGroup>
+
+	<ItemGroup>
 		<PackageReference Include="UltralightNet.Binaries" Version="1.2.1" />
 
 		<PackageReference Include="coverlet.collector" Version="3.0.3">

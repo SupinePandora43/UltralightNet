@@ -1,3 +1,4 @@
+using System;
 using Xunit;
 
 namespace UltralightNet.Test
@@ -6,13 +7,9 @@ namespace UltralightNet.Test
 	{
 		private readonly View view;
 
-		static ViewTest()
-		{
-			AppCore.AppCore.EnablePlatformFontLoader();
-		}
-
 		public ViewTest()
 		{
+			Console.WriteLine("Creating view");
 			view = new View(RendererTest.renderer, 512, 512, false, Session.DefaultSession(RendererTest.renderer), true);
 		}
 

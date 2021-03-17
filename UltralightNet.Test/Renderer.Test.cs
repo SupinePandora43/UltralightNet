@@ -10,6 +10,7 @@ namespace UltralightNet.Test
 
 		static RendererTest()
 		{
+			AppCore.AppCore.EnablePlatformFontLoader();
 			config = new(false);
 			renderer = new(config, false);
 		}
