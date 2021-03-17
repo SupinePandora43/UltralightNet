@@ -225,7 +225,7 @@ var assemblies = [
     "name": "UltralightNet",
     "classes": [
       { "name": "UltralightNet.Methods", "rp": "UltralightNet_Methods.html", "cl": 0, "ucl": 360, "cal": 360, "tl": 36, "ct": "LineCoverage", "mc": "-", "cb": 0, "tb": 52, "lch": [], "bch": [], "hc": [] },
-      { "name": "UltralightNet.Renderer", "rp": "UltralightNet_Renderer.html", "cl": 0, "ucl": 25, "cal": 25, "tl": 77, "ct": "LineCoverage", "mc": "-", "cb": 0, "tb": 2, "lch": [], "bch": [], "hc": [] },
+      { "name": "UltralightNet.Renderer", "rp": "UltralightNet_Renderer.html", "cl": 0, "ucl": 29, "cal": 29, "tl": 81, "ct": "LineCoverage", "mc": "-", "cb": 0, "tb": 2, "lch": [], "bch": [], "hc": [] },
       { "name": "UltralightNet.RenderTargetNative", "rp": "UltralightNet_RenderTargetNative.html", "cl": 0, "ucl": 23, "cal": 23, "tl": 68, "ct": "LineCoverage", "mc": "-", "cb": 0, "tb": 2, "lch": [], "bch": [], "hc": [] },
       { "name": "UltralightNet.Session", "rp": "UltralightNet_Session.html", "cl": 0, "ucl": 20, "cal": 20, "tl": 75, "ct": "LineCoverage", "mc": "-", "cb": 0, "tb": 2, "lch": [], "bch": [], "hc": [] },
       { "name": "UltralightNet.ULBitmap", "rp": "UltralightNet_ULBitmap.html", "cl": 0, "ucl": 31, "cal": 31, "tl": 135, "ct": "LineCoverage", "mc": "-", "cb": 0, "tb": 2, "lch": [], "bch": [], "hc": [] },
