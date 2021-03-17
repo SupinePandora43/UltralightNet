@@ -3,7 +3,7 @@ using Xunit;
 
 namespace UltralightNet.Test
 {
-	public class ViewTest
+	/*public class ViewTest
 	{
 		private readonly View view;
 
@@ -24,5 +24,5 @@ namespace UltralightNet.Test
 		{
 			Assert.Equal(512u, view.Height);
 		}
-	}
+	}*/
 }
