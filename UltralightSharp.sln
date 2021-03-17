@@ -41,6 +41,10 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UltralightNet.Test", "Ultra
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UltralightNet.Binaries", "UltralightNet.Binaries\UltralightNet.Binaries.csproj", "{0CC47EDC-9CA4-411A-B8B9-656491BE8B07}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UltralightNet.TestApplication", "UltralightNet.TestApplication\UltralightNet.TestApplication.csproj", "{5DBC49D4-D5FB-4E35-907D-99003CFEDBDC}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UltralightNet.AppCore", "UltralightNet.AppCore\UltralightNet.AppCore.csproj", "{C7D7C608-DC96-4CA8-8843-F512D9E74528}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -95,6 +99,14 @@ Global
 		{0CC47EDC-9CA4-411A-B8B9-656491BE8B07}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0CC47EDC-9CA4-411A-B8B9-656491BE8B07}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{0CC47EDC-9CA4-411A-B8B9-656491BE8B07}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5DBC49D4-D5FB-4E35-907D-99003CFEDBDC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5DBC49D4-D5FB-4E35-907D-99003CFEDBDC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5DBC49D4-D5FB-4E35-907D-99003CFEDBDC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5DBC49D4-D5FB-4E35-907D-99003CFEDBDC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C7D7C608-DC96-4CA8-8843-F512D9E74528}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C7D7C608-DC96-4CA8-8843-F512D9E74528}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C7D7C608-DC96-4CA8-8843-F512D9E74528}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C7D7C608-DC96-4CA8-8843-F512D9E74528}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
