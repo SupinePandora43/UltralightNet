@@ -192,9 +192,11 @@ namespace UltralightNet
 			get => Marshal.PtrToStructure<ULConfig_C>(Ptr);
 		}
 
-		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		public ULConfig() => Ptr = Methods.ulCreateConfig();
-
+		public ULConfig(bool dispose = true)
+		{
+			Ptr = Methods.ulCreateConfig();
+			IsDisposed = !dispose;
+		}
 		/// <summary>The file path to the directory that contains Ultralight's bundled resources (eg, cacert.pem and other localized resources).</summary>
 		public string ResourcePath
 		{

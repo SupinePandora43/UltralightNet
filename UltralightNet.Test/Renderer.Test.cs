@@ -5,11 +5,12 @@ namespace UltralightNet.Test
 {
 	public class RendererTest
 	{
+		internal static ULConfig config;
 		internal static Renderer renderer;
 
 		static RendererTest()
 		{
-			ULConfig config = new();
+			config = new(false);
 			renderer = new(config, false);
 		}
 
