@@ -17,14 +17,17 @@ namespace UltralightNet
 		[DllImport("Ultralight")]
 		public static extern IntPtr ulViewGetTitle(IntPtr view);
 
-		[GeneratedDllImport("Ultralight")]
-		public static partial uint ulViewGetWidth(IntPtr view);
+		[DllImport("Ultralight")]
+		public static extern uint ulViewGetWidth(IntPtr view);
 
-		[GeneratedDllImport("Ultralight")]
-		public static partial uint ulViewGetHeight(IntPtr view);
+		[DllImport("Ultralight")]
+		public static extern uint ulViewGetHeight(IntPtr view);
 
 		[GeneratedDllImport("Ultralight")]
 		public static partial bool ulViewIsLoading(IntPtr view);
+
+		[GeneratedDllImport("Ultralight")]
+		public static partial RenderTarget ulViewGetRenderTarget(IntPtr view);
 
 		// to be continued https://github.com/ultralight-ux/Ultralight-API/blob/7f9de24ca1c7ec8b385e895c4899b9d96626da58/Ultralight/CAPI.h#L601
 	}
@@ -46,6 +49,8 @@ namespace UltralightNet
 		public uint Height => Methods.ulViewGetHeight(Ptr);
 
 		public bool IsLoading => Methods.ulViewIsLoading(Ptr);
+
+		public RenderTarget RenderTarget => Methods.ulViewGetRenderTarget(Ptr);
 
 		~View() => Dispose();
 		public void Dispose()
