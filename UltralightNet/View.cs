@@ -29,6 +29,9 @@ namespace UltralightNet
 		[GeneratedDllImport("Ultralight")]
 		public static partial RenderTarget ulViewGetRenderTarget(IntPtr view);
 
+		[DllImport("Ultralight")]
+		public static extern IntPtr ulViewGetSurface(IntPtr view);
+
 		// to be continued https://github.com/ultralight-ux/Ultralight-API/blob/7f9de24ca1c7ec8b385e895c4899b9d96626da58/Ultralight/CAPI.h#L601
 	}
 
@@ -51,6 +54,8 @@ namespace UltralightNet
 		public bool IsLoading => Methods.ulViewIsLoading(Ptr);
 
 		public RenderTarget RenderTarget => Methods.ulViewGetRenderTarget(Ptr);
+
+		public ULSurface Surface => new(Methods.ulViewGetSurface(Ptr));
 
 		~View() => Dispose();
 		public void Dispose()
