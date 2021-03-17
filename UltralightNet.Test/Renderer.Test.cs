@@ -5,12 +5,17 @@ namespace UltralightNet.Test
 {
 	public class RendererTest
 	{
+		internal static Renderer renderer;
+
+		static RendererTest()
+		{
+			ULConfig config = new();
+			renderer = new(config, false);
+		}
+
 		[Fact]
 		public void RendererEmptyTest()
 		{
-			ULConfig config = new();
-			Renderer renderer = new(config, false);
-
 			renderer.Update();
 			renderer.Render();
 		}
@@ -18,29 +23,20 @@ namespace UltralightNet.Test
 		[Fact]
 		public void RendererPurgeMemoryTest()
 		{
-			ULConfig config = new();
-			Renderer renderer = new(config, false);
-
 			renderer.PurgeMemory();
 		}
 
 		[Fact]
 		public void RendererLogMemoryUsageTest()
 		{
-			ULConfig config = new();
-			Renderer renderer = new(config, false);
-
 			renderer.LogMemoryUsage();
 		}
 
 		[Fact]
 		public void RendererDisposeTest()
 		{
-			ULConfig config = new();
-			Renderer renderer = new(config, false);
-
 			//Assert.False(renderer.IsDisposed);
-			renderer.Dispose();
+			//renderer.Dispose();
 			//Assert.True(renderer.IsDisposed);
 		}
 
@@ -53,7 +49,7 @@ namespace UltralightNet.Test
 			Assert.Equal(ptr, renderer.Ptr);
 		}
 #pragma warning disable IDE0059 // Unnecessary assignment of a value
-		[Fact]
+		/*[Fact]
 		public void RendererFinalizeTest()
 		{
 			ULConfig config = new();
@@ -61,7 +57,7 @@ namespace UltralightNet.Test
 
 			renderer = null;
 			GC.WaitForPendingFinalizers();
-		}
+		}*/
 #pragma warning restore IDE0059 // Unnecessary assignment of a value
 	}
 }

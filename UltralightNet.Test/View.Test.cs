@@ -4,14 +4,16 @@ namespace UltralightNet.Test
 {
 	public class ViewTest
 	{
-		private readonly Renderer renderer;
 		private readonly View view;
+
+		static ViewTest()
+		{
+			AppCore.AppCore.EnablePlatformFontLoader();
+		}
 
 		public ViewTest()
 		{
-			renderer = new(new ULConfig(), false);
-			AppCore.AppCore.EnablePlatformFontLoader();
-			view = new View(renderer, 512, 512, false, Session.DefaultSession(renderer), true);
+			view = new View(RendererTest.renderer, 512, 512, false, Session.DefaultSession(RendererTest.renderer), true);
 		}
 
 		[Fact]
