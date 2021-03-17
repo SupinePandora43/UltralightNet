@@ -5,6 +5,8 @@ namespace UltralightNet.AppCore
 {
     public static class AppCoreMethods
     {
+		static AppCoreMethods() => Methods.Preload();
+
 		[DllImport("AppCore")]
 		public static extern void ulEnablePlatformFontLoader();
 
