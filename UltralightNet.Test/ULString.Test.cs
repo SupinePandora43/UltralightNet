@@ -119,6 +119,7 @@ namespace UltralightNet.Test
 		public void Finalizing()
 		{
 			ULString ulString = new("юникод");
+			ulString.GetData();
 			ulString = null;
 			GC.WaitForPendingFinalizers();
 		}
