@@ -9,7 +9,7 @@ namespace UltralightNet.Test
 		public void RendererEmptyTest()
 		{
 			ULConfig config = new();
-			Renderer renderer = new(config);
+			Renderer renderer = new(config, false);
 
 			renderer.Update();
 			renderer.Render();
@@ -19,7 +19,7 @@ namespace UltralightNet.Test
 		public void RendererPurgeMemoryTest()
 		{
 			ULConfig config = new();
-			Renderer renderer = new(config);
+			Renderer renderer = new(config, false);
 
 			renderer.PurgeMemory();
 		}
@@ -28,7 +28,7 @@ namespace UltralightNet.Test
 		public void RendererLogMemoryUsageTest()
 		{
 			ULConfig config = new();
-			Renderer renderer = new(config);
+			Renderer renderer = new(config, false);
 
 			renderer.LogMemoryUsage();
 		}
@@ -37,7 +37,7 @@ namespace UltralightNet.Test
 		public void RendererDisposeTest()
 		{
 			ULConfig config = new();
-			Renderer renderer = new(config);
+			Renderer renderer = new(config, false);
 
 			Assert.False(renderer.IsDisposed);
 			renderer.Dispose();
@@ -57,7 +57,7 @@ namespace UltralightNet.Test
 		public void RendererFinalizeTest()
 		{
 			ULConfig config = new();
-			Renderer renderer = new(config);
+			Renderer renderer = new(config, false);
 
 			renderer = null;
 			GC.WaitForPendingFinalizers();

@@ -9,7 +9,7 @@ namespace UltralightNet.Test
 
 		public ViewTest()
 		{
-			renderer = new(new ULConfig());
+			renderer = new(new ULConfig(), false);
 			AppCore.AppCore.EnablePlatformFontLoader();
 			view = new View(renderer, 512, 512, false, Session.DefaultSession(renderer), true);
 		}

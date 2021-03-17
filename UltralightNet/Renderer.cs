@@ -45,7 +45,11 @@ namespace UltralightNet
 			IsDisposed = !dispose;
 		}
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		public Renderer(ULConfig config) => Ptr = Methods.ulCreateRenderer(config.Ptr);
+		public Renderer(ULConfig config, bool dispose = true)
+		{
+			Ptr = Methods.ulCreateRenderer(config.Ptr);
+			IsDisposed = !dispose;
+		}
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public void Update() => Methods.ulUpdate(Ptr);
