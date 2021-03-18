@@ -7,12 +7,12 @@ namespace UltralightNet.Test
 	{
 		internal static ULConfig config;
 		internal static Renderer renderer;
-
+		
 		static RendererTest()
 		{
 			AppCore.AppCore.EnablePlatformFontLoader();
-			config = new(false);
-			renderer = new(config, false);
+			config = new();
+			renderer = new(config);
 		}
 
 		[Fact]
@@ -37,9 +37,12 @@ namespace UltralightNet.Test
 		[Fact]
 		public void RendererDisposeTest()
 		{
-			//Assert.False(renderer.IsDisposed);
-			//renderer.Dispose();
-			//Assert.True(renderer.IsDisposed);
+			ULConfig config = new();
+			Renderer renderer = new(config);
+
+			Assert.False(renderer.IsDisposed);
+			renderer.Dispose();
+			Assert.True(renderer.IsDisposed);
 		}
 
 		[Fact]
@@ -50,16 +53,46 @@ namespace UltralightNet.Test
 
 			Assert.Equal(ptr, renderer.Ptr);
 		}
+
 #pragma warning disable IDE0059 // Unnecessary assignment of a value
-		/*[Fact]
+		[Fact]
+		[Trait("Priority", "last")]
 		public void RendererFinalizeTest()
 		{
 			ULConfig config = new();
-			Renderer renderer = new(config, false);
+			Renderer renderer = new(config);
 
 			renderer = null;
 			GC.WaitForPendingFinalizers();
-		}*/
+		}
 #pragma warning restore IDE0059 // Unnecessary assignment of a value
+
+		[Fact]
+		public void ViewWidthTest()
+		{
+			View view = new(renderer, 512, 512, false, Session.DefaultSession(renderer), true);
+			Assert.Equal(512u, view.Width);
+		}
+
+		[Fact]
+		public void ViewHeightTest()
+		{
+			View view = new(renderer, 512, 512, false, Session.DefaultSession(renderer), true);
+			Assert.Equal(512u, view.Height);
+		}
+
+		[Fact]
+		public void ViewIsLoadingTest()
+		{
+			View view = new(renderer, 512, 512, false, Session.DefaultSession(renderer), true);
+			view.HTML = (ULString)"";
+			renderer.Update();
+			renderer.Update();
+			renderer.Update();
+			renderer.Update();
+			renderer.Update();
+			renderer.Update();
+			Assert.True(view.IsLoading);
+		}
 	}
 }
