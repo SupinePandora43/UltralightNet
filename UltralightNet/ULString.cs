@@ -33,6 +33,10 @@ namespace UltralightNet
 		[return: MarshalAs(UnmanagedType.LPWStr)]
 		public static partial string ulStringGetData(IntPtr str);
 
+		/// <summary>Get internal UTF-16 buffer data.</summary>
+		[DllImport("Ultralight", EntryPoint = "ulStringGetData")]
+		public static extern IntPtr ulStringGetDataPtr(IntPtr str);
+
 		/// <summary>Get length in UTF-16 characters.</summary>
 		[GeneratedDllImport("Ultralight")]
 		public static partial uint ulStringGetLength(IntPtr str);
@@ -187,5 +191,93 @@ namespace UltralightNet
 		public static implicit operator IntPtr(ULString ulString) => ulString.Ptr;
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public static implicit operator string(ULString ulString) => ulString.GetData();
+	}
+
+	public class ULStringMarshaler : ICustomMarshaler
+	{
+		private static ICustomMarshaler? static_instance;
+
+		public static ICustomMarshaler GetInstance(string cookie)
+		{
+			if (static_instance is null)
+			{
+				return static_instance = new ULStringMarshaler();
+			}
+			return static_instance;
+		}
+
+		public void CleanUpManagedData(object ManagedObj) { }
+		public void CleanUpNativeData(IntPtr pNativeData)
+		{
+			//Marshal.DestroyStructure<ULString16Native>(pNativeData);
+		}
+
+		public int GetNativeDataSize()
+		{
+			unsafe
+			{
+				return 1000000;
+			}
+		}
+		[StructLayout(LayoutKind.Sequential)]
+		private struct ULString16Native
+		{
+			[MarshalAs(UnmanagedType.LPWStr)]
+			public string data_;
+			public uint length_;
+		}
+		[StructLayout(LayoutKind.Sequential)]
+		private struct ULString16NativeResult
+		{
+			public IntPtr data_;
+			public uint length_;
+		}
+
+		public IntPtr MarshalManagedToNative(object ManagedObj) => MarshalManagedToNative((string)ManagedObj);
+		public IntPtr MarshalManagedToNative(string managedString)
+		{
+			/*unsafe
+			{
+				IntPtr ptr = Marshal.AllocHGlobal(sizeof(char*) + sizeof(uint));
+				ULString16Native nativeStruct = new ULString16Native()
+				{
+					data_ = managedString,
+					length_ = (uint)managedString.Length
+				};
+				Marshal.StructureToPtr(
+					nativeStruct,
+					ptr,
+					false
+				);
+				//IntPtr nativeString = Marshal.StringToHGlobalUni(managedString);
+				//Marshal.WriteIntPtr(ptr, 0, nativeString);
+				//Marshal.WriteInt32(ptr, 1, managedString.Length);
+				return ptr;
+			}*/
+			return Methods.ulCreateStringUTF16(managedString, (uint)managedString.Length);
+		}
+
+		public object MarshalNativeToManaged(IntPtr ptr)
+		{
+			//return Marshal.PtrToStructure<ULString16Native>(pNativeData).data_;
+			//IntPtr nativeStrPtr = Marshal.ReadIntPtr(pNativeData, 0);
+			//int length = Marshal.ReadInt32(pNativeData, 1);
+
+			//IntPtr iLenPtr = Marshal.ReadIntPtr(pNativeData, 1);
+
+
+			//UIntPtr uIntPtr = (UIntPtr)(void*)iLenPtr;
+			//int len = Marshal.ReadInt32(pNativeData, 1);
+
+			//IntPtr ulStrPtr = Methods.ulStringGetDataPtr(ptr);
+			//uint len = Methods.ulStringGetLength(ptr);
+			//return Marshal.PtrToStringUni(ulStrPtr, (int)len);
+
+			// use PtrToStructure
+#if true
+			ULString16NativeResult result = Marshal.PtrToStructure<ULString16NativeResult>(ptr);
+			return Marshal.PtrToStringUni(result.data_, (int)result.length_);
+#endif
+		}
 	}
 }

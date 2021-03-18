@@ -12,8 +12,9 @@ namespace UltralightNet
 		[DllImport("Ultralight")]
 		public static extern void ulDestroyView(IntPtr view);
 
-		[DllImport("Ultralight")]
-		public static extern IntPtr ulViewGetURL(IntPtr view);
+		[DllImport("Ultralight", CharSet = CharSet.Unicode)]
+		[return: MarshalAs(UnmanagedType.CustomMarshaler, MarshalTypeRef = typeof(ULStringMarshaler))]
+		public static extern string ulViewGetURL(IntPtr view);
 
 		[DllImport("Ultralight")]
 		public static extern IntPtr ulViewGetTitle(IntPtr view);
@@ -37,7 +38,7 @@ namespace UltralightNet
 		public static extern void ulViewLoadHTML(IntPtr view, IntPtr html_string);
 
 		[DllImport("Ultralight")]
-		public static extern void ulViewLoadURL(IntPtr view, IntPtr url_string);
+		public static extern void ulViewLoadURL(IntPtr view, [MarshalAs(UnmanagedType.CustomMarshaler,MarshalTypeRef =typeof(ULStringMarshaler))]string url_string);
 
 		[DllImport("Ultralight")]
 		public static extern void ulViewResize(IntPtr view, uint width, uint height);
@@ -123,7 +124,7 @@ namespace UltralightNet
 			Ptr = Methods.ulCreateView(renderer.Ptr, width, height, transparent, session.Ptr, force_cpu_renderer);
 		}
 
-		public ULString URL { get => new(Methods.ulViewGetURL(Ptr)); set => Methods.ulViewLoadURL(Ptr, value.Ptr); }
+		public string URL { get => Methods.ulViewGetURL(Ptr); set => Methods.ulViewLoadURL(Ptr, value); }
 		public ULString HTML { set => Methods.ulViewLoadHTML(Ptr, value.Ptr); }
 		public ULString Title { get => new(Methods.ulViewGetTitle(Ptr)); }
 
