@@ -1,4 +1,5 @@
 using System;
+using System.IO;
 using Xunit;
 
 namespace UltralightNet.Test
@@ -85,14 +86,15 @@ namespace UltralightNet.Test
 		public void ViewIsLoadingTest()
 		{
 			View view = new(renderer, 512, 512, false, Session.DefaultSession(renderer), true);
-			view.HTML = (ULString)"";
-			renderer.Update();
-			renderer.Update();
-			renderer.Update();
-			renderer.Update();
-			renderer.Update();
-			renderer.Update();
 			Assert.True(view.IsLoading);
+		}
+
+		[Fact]
+		public void ViewEvaluateScriptTest()
+		{
+			View view = new(renderer, 512, 512, false, Session.DefaultSession(renderer), true);
+			ULString result = view.EvaluateScript((ULString)"1+2", out _);
+			File.WriteAllText("./test.txt", result.ToString());
 		}
 	}
 }
