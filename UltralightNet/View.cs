@@ -1,5 +1,6 @@
 using System;
 using System.Runtime.InteropServices;
+using UltralightNet.Structs;
 
 namespace UltralightNet
 {
@@ -107,6 +108,8 @@ namespace UltralightNet
 		[GeneratedDllImport("Ultralight")]
 		public static partial bool ulViewHasInputFocus(IntPtr view);
 
+		[GeneratedDllImport("Ultralight")]
+		public static partial void ulViewFireKeyEvent(IntPtr view, ULKeyEvent key_event);
 		// to be continued https://github.com/ultralight-ux/Ultralight-API/blob/7f9de24ca1c7ec8b385e895c4899b9d96626da58/Ultralight/CAPI.h#L744
 	}
 
@@ -159,6 +162,8 @@ namespace UltralightNet
 		public void Unfocus() => Methods.ulViewUnfocus(Ptr);
 		public bool HasFocus() => Methods.ulViewHasFocus(Ptr);
 		public bool HasInputFocus() => Methods.ulViewHasInputFocus(Ptr);
+
+		public void FireKeyEvent(ULKeyEvent keyEvent) => Methods.ulViewFireKeyEvent(Ptr, keyEvent);
 
 		~View() => Dispose();
 		public void Dispose()

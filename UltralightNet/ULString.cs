@@ -50,13 +50,47 @@ namespace UltralightNet
 	}
 
 	[StructLayout(LayoutKind.Sequential)]
+	[NativeMarshalling(typeof(ULString16Native))]
 	public struct ULString16
 	{
 		[MarshalAs(UnmanagedType.LPWStr)]
 		public string data_;
 		public uint length_;
 	}
+	[BlittableType]
+	internal struct ULString16Native
+	{
+		public IntPtr data_;
+		public uint length_;
 
+		public ULString16Native(ULString16 ulString16)
+		{
+			unsafe
+			{
+				fixed (void* data = ulString16.data_)
+				{
+					data_ = (IntPtr)data;
+				}
+			}
+			length_ = ulString16.length_;
+		}
+		public ULString16Native(string str)
+		{
+			unsafe
+			{
+				fixed (void* data = str)
+				{
+					data_ = (IntPtr)data;
+				}
+			}
+			length_ = (uint)str.Length;
+		}
+		public ULString16 ToManaged() => new()
+		{
+			data_ = Marshal.PtrToStringUni(data_, (int)length_),
+			length_ = length_
+		};
+	}
 #pragma warning disable CS0659 // Type overrides Object.Equals(object o) but does not override Object.GetHashCode()
 #pragma warning disable CS0661 // Type defines operator == or operator != but does not override Object.GetHashCode()
 	public class ULString : IDisposable, ICloneable, IEquatable<ULString>
