@@ -15,7 +15,7 @@ namespace UltralightNet.Test
 		private static extern void GetKeyOut(
 			int i,
 			[MarshalAs(UnmanagedType.CustomMarshaler,MarshalTypeRef =typeof(ULStringMarshaler))]
-			out string id
+			ref string id
 		);
 
 		[Fact]
@@ -56,12 +56,13 @@ namespace UltralightNet.Test
 			ULString str = new("");
 			GetKey(ULKeyCodes.GK_VOLUME_MUTE, str.Ptr);
 
+			//string i = "ok";
 			// error
-			//GetKeyOut(ULKeyCodes.GK_VOLUME_MUTE, out string i);
+			//GetKeyOut(ULKeyCodes.GK_VOLUME_MUTE, ref i);
 
 			Console.WriteLine(str.ToString());
 
-			Assert.Equal("https://github.com", view.URL);
+			Assert.Equal("https://github.com/", view.URL);
 		}
 	}
 }
