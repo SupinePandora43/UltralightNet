@@ -27,6 +27,7 @@
 
 	<ItemGroup>
 		<ProjectReference Include="..\UltralightNet.AppCore\UltralightNet.AppCore.csproj" />
+		<ProjectReference Include="..\UltralightNet.Resources\UltralightNet.Resources.csproj" />
 		<ProjectReference Include="..\UltralightNet\UltralightNet.csproj" />
 	</ItemGroup>
 
