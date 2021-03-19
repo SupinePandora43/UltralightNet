@@ -1,21 +1,31 @@
 <Project Sdk="Microsoft.NET.Sdk">
-
-  <PropertyGroup>
-    <TargetFramework>net5.0</TargetFramework>
-  </PropertyGroup>
-
-  <ItemGroup>
-    <None Remove="resources\cacert.pem" />
-    <None Remove="resources\icudt67l.dat" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Content Include="resources\cacert.pem">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-    <Content Include="resources\icudt67l.dat">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
-  </ItemGroup>
-
+	<PropertyGroup>
+		<TargetFrameworks>net5;netstandard1</TargetFrameworks>
+		<NoBuild>true</NoBuild>
+		<IncludeBuildOutput>false</IncludeBuildOutput>
+		<DisableImplicitFrameworkReferences>true</DisableImplicitFrameworkReferences>
+		
+		<PackageId>UltralightNet.Resources</PackageId>
+		<Version>1.2.1</Version>
+		<Authors>SupinePandora43</Authors>
+		<Description>Ultralight 'resources' folder</Description>
+		<PackageProjectUrl>https://github.com/SupinePandora43/UltralightSharp</PackageProjectUrl>
+		<RepositoryUrl>https://github.com/SupinePandora43/UltralightSharp</RepositoryUrl>
+		<RepositoryType>git</RepositoryType>
+		<iconUrl>https://ultralig.ht/logo_modern2.png</iconUrl>
+		
+		<GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+	</PropertyGroup>
+	<ItemGroup>
+		<None Remove="resources\cacert.pem" />
+		<None Remove="resources\icudt67l.dat" />
+	</ItemGroup>
+	<ItemGroup>
+		<Content Include="resources\cacert.pem">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</Content>
+		<Content Include="resources\icudt67l.dat">
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</Content>
+	</ItemGroup>
 </Project>
