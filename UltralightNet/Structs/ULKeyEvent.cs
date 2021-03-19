@@ -1,7 +1,7 @@
 using System;
 using System.Runtime.InteropServices;
 
-namespace UltralightNet.Structs
+namespace UltralightNet
 {
 	[NativeMarshalling(typeof(ULKeyEventNative))]
 	public struct ULKeyEvent

@@ -1,6 +1,5 @@
 using System;
 using System.Runtime.InteropServices;
-using UltralightNet.Structs;
 
 namespace UltralightNet
 {

@@ -195,68 +195,75 @@ namespace UltralightNet
 
 	public class ULStringMarshaler : ICustomMarshaler
 	{
-		private static ICustomMarshaler? static_instance;
-
-		public static ICustomMarshaler GetInstance(string cookie)
-		{
-			if (static_instance is null)
-			{
-				return static_instance = new ULStringMarshaler();
-			}
-			return static_instance;
-		}
-		public void CleanUpManagedData(object ManagedObj) { }
-
-		private static readonly Type ULString16NativeType = typeof(ULString16Native);
-
-		public void CleanUpNativeData(IntPtr pNativeData)
-		{
-			Marshal.DestroyStructure(pNativeData, ULString16NativeType);
-		}
-
-		public int GetNativeDataSize()
-		{
-			return 12;
-		}
+		#region Structures
 		[StructLayout(LayoutKind.Sequential)]
-		private struct ULString16Native
+		private struct ULStringSTR
 		{
 			[MarshalAs(UnmanagedType.LPWStr)]
 			public string data_;
 			public uint length_;
 		}
 		[StructLayout(LayoutKind.Sequential)]
-		private struct ULString16NativeResult
+		private struct ULStringPTR
 		{
 			public IntPtr data_;
 			public uint length_;
 		}
+		#endregion Structures
 
-		public IntPtr MarshalManagedToNative(object ManagedObj) => MarshalManagedToNative((string)ManagedObj);
-		public IntPtr MarshalManagedToNative(string managedString)
+		private static readonly ULStringMarshaler instance = new();
+
+		public static ICustomMarshaler GetInstance(string cookie) => instance;
+
+		public int GetNativeDataSize() => 12;
+
+		public void CleanUpManagedData(object ManagedObj) { }
+		public void CleanUpNativeData(IntPtr ptr) => CleanUpNative(ptr);
+
+		public IntPtr MarshalManagedToNative(object ManagedObj) => ManagedToNative(ManagedObj as string);
+		public object MarshalNativeToManaged(IntPtr ptr) => NativeToManaged(ptr);
+
+		#region Code
+
+		/// <summary>
+		/// Creates ULString from <see cref="string"/>
+		/// </summary>
+		/// <param name="managedString">Unicode text</param>
+		/// <returns>ULString pointer</returns>
+		/// <remarks>you <b>MUST</b> call <see cref="CleanUpNativeData(IntPtr)"/> after you done</remarks>
+		public static IntPtr ManagedToNative(string managedString)
 		{
-			unsafe
+			IntPtr ptr = Marshal.AllocHGlobal(12);
+			ULStringSTR nativeStruct = new()
 			{
-				IntPtr ptr = Marshal.AllocHGlobal(12);
-				ULString16Native nativeStruct = new()
-				{
-					data_ = managedString,
-					length_ = (uint)managedString.Length
-				};
-				Marshal.StructureToPtr(
-					nativeStruct as object,
-					ptr,
-					false
-				);
-				return ptr;
-			}
-			//return Methods.ulCreateStringUTF16(managedString, (uint)managedString.Length);
+				data_ = managedString,
+				length_ = (uint)managedString.Length
+			};
+			Marshal.StructureToPtr(
+				nativeStruct as object,
+				ptr,
+				false
+			);
+			return ptr;
 		}
 
-		public object MarshalNativeToManaged(IntPtr ptr)
+		/// <summary>
+		/// Creates <see cref="string"/> from ULString pointer
+		/// </summary>
+		/// <param name="ptr">ULString pointer</param>
+		/// <returns></returns>
+		public static string NativeToManaged(IntPtr ptr)
 		{
-			ULString16NativeResult result = Marshal.PtrToStructure<ULString16NativeResult>(ptr);
+			ULStringPTR result = Marshal.PtrToStructure<ULStringPTR>(ptr);
 			return Marshal.PtrToStringUni(result.data_, (int)result.length_);
 		}
+
+		/// <summary>
+		/// Frees ULString
+		/// </summary>
+		/// <param name="ptr">ULString pointer</param>
+		public static void CleanUpNative(IntPtr ptr) => Marshal.DestroyStructure<ULStringSTR>(ptr);
+
+		#endregion Code
 	}
 }
