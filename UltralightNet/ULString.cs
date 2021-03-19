@@ -207,11 +207,11 @@ namespace UltralightNet
 		}
 		public void CleanUpManagedData(object ManagedObj) { }
 
-		private static readonly Type ULString16NativeResultType = typeof(ULString16NativeResult);
+		private static readonly Type ULString16NativeType = typeof(ULString16Native);
 
 		public void CleanUpNativeData(IntPtr pNativeData)
 		{
-			Marshal.DestroyStructure(pNativeData, ULString16NativeResultType);
+			Marshal.DestroyStructure(pNativeData, ULString16NativeType);
 		}
 
 		public int GetNativeDataSize()
