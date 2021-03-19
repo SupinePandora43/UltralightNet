@@ -205,19 +205,18 @@ namespace UltralightNet
 			}
 			return static_instance;
 		}
-
 		public void CleanUpManagedData(object ManagedObj) { }
+
+		private static readonly Type ULString16NativeResultType = typeof(ULString16NativeResult);
+
 		public void CleanUpNativeData(IntPtr pNativeData)
 		{
-			Marshal.DestroyStructure<ULString16Native>(pNativeData);
+			Marshal.DestroyStructure(pNativeData, ULString16NativeResultType);
 		}
 
 		public int GetNativeDataSize()
 		{
-			unsafe
-			{
-				return 1000000;
-			}
+			return 12;
 		}
 		[StructLayout(LayoutKind.Sequential)]
 		private struct ULString16Native
@@ -239,13 +238,13 @@ namespace UltralightNet
 			unsafe
 			{
 				IntPtr ptr = Marshal.AllocHGlobal(12);
-				ULString16Native nativeStruct = new ULString16Native()
+				ULString16Native nativeStruct = new()
 				{
 					data_ = managedString,
 					length_ = (uint)managedString.Length
 				};
 				Marshal.StructureToPtr(
-					nativeStruct,
+					nativeStruct as object,
 					ptr,
 					false
 				);
