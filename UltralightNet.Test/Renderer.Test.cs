@@ -17,8 +17,7 @@ namespace UltralightNet.Test
 			{
 				ResourcePath = "./resources"
 			};
-			Renderer renderer = new(config);
-
+			Renderer renderer = new(config, false);
 
 			#region Session
 			Session session = Session.DefaultSession(renderer);
@@ -33,6 +32,11 @@ namespace UltralightNet.Test
 
 			// LoadURL
 			view.URL = "https://github.com/";
+
+			/*while (true)
+			{
+				view.URL = "https://github.com/";
+			}*/
 
 			while (view.URL == "")
 			{

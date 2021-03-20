@@ -76,7 +76,7 @@ namespace UltralightNet
 				IntPtr data = Marshal.StringToHGlobalUni(str);
 				return new() { data_ = data, length_ = (uint)str.Length };
 			}
-			public string ToManged() => Marshal.PtrToStringUni(data_, (int)length_);
+			public string ToManaged() => Marshal.PtrToStringUni(data_, (int)length_);
 			public static void CleanUpNative(ULStringPTR ulStringPTR) => Marshal.FreeHGlobal(ulStringPTR.data_);
 		}
 		#endregion Structures
@@ -103,6 +103,7 @@ namespace UltralightNet
 		/// <remarks>you <b>MUST</b> call <see cref="CleanUpNativeData(IntPtr)"/> after you done</remarks>
 		public static IntPtr ManagedToNative(string managedString)
 		{
+			Console.WriteLine("Allocating ULString");
 			IntPtr ptr = Marshal.AllocHGlobal(12);
 			ULStringSTR nativeStruct = new()
 			{
@@ -132,7 +133,11 @@ namespace UltralightNet
 		/// Frees ULString
 		/// </summary>
 		/// <param name="ptr">ULString pointer</param>
-		public static void CleanUpNative(IntPtr ptr) => Marshal.DestroyStructure<ULStringSTR>(ptr);
+		public static void CleanUpNative(IntPtr ptr)
+		{
+			Console.WriteLine("Cleaning ULString");
+			Marshal.DestroyStructure<ULStringSTR>(ptr);
+		}
 
 		#endregion Code
 	}
