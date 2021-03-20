@@ -1,5 +1,3 @@
-using System;
-using System.Runtime.InteropServices;
 using System.Threading;
 using Xunit;
 
