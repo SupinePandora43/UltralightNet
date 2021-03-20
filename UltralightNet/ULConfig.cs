@@ -121,13 +121,13 @@ namespace UltralightNet
 	}
 
 	/// <summary>Configuration settings for Ultralight.</summary>
-	[NativeMarshalling(typeof(ULConfigNative))]
-	public struct ULConfig
+	[StructLayout(LayoutKind.Sequential)]
+	public struct ULConfig_C
 	{
 		/// <summary>The file path to the directory that contains Ultralight's bundled resources (eg, cacert.pem and other localized resources).</summary>
-		public string ResourcePath;
+		public ULStringMarshaler.ULStringPTR resource_path;
 		/// <summary>The file path to a writable directory that will be used to store cookies, cached resources, and other persistent data.</summary>
-		public string CachePath;
+		public ULStringMarshaler.ULStringPTR cache_path;
 
 		/// <remarks>
 		/// When enabled, each View will be rendered to an offscreen GPU texture<br/>
@@ -138,65 +138,210 @@ namespace UltralightNet
 		/// pixel buffer. This pixel buffer can optionally be provided by the user--<br/>
 		/// for more info see ulViewGetSurface.
 		/// </remarks>
-		public bool UseGpu;
+		public bool use_gpu_renderer;
+		public double device_scale;
+
+		public ULFaceWinding face_winding;
+
+		/// <summary>Whether or not images should be enabled.</summary>
+		public bool enable_images;
+		/// <summary>Whether or not JavaScript should be enabled.</summary>
+		public bool enable_javascript;
+
+		/// <summary>The hinting algorithm to use when rendering fonts.</summary>
+		/// <see cref="ULFontHinting"/>
+		public ULFontHinting font_hinting;
+
+		/// <summary>The gamma to use when compositing font glyphs, change this value to adjust contrast (Adobe and Apple prefer 1.8, others may prefer 2.2).</summary>
+		public double font_gamma;
+
+		public ULStringMarshaler.ULStringPTR font_family_standard;
+		public ULStringMarshaler.ULStringPTR font_family_fixed;
+		public ULStringMarshaler.ULStringPTR font_family_serif;
+		public ULStringMarshaler.ULStringPTR font_family_sans_serif;
+
+		public ULStringMarshaler.ULStringPTR user_agent;
+		public ULStringMarshaler.ULStringPTR user_stylesheet;
+
+		public bool force_repaint;
+
+		public double animation_timer_delay;
+		public double scroll_timer_delay;
+		public double recycle_delay;
+
+		public uint memory_cache_size;
+		public uint page_cache_size;
+		public uint override_ram_size;
+		public uint min_large_heap_size;
+		public uint min_small_heap_size;
+	}
+	/// <summary>Configuration settings for Ultralight.</summary>
+	public class ULConfig : IDisposable
+	{
+		public IntPtr Ptr
+		{
+			get;
+			private set;
+		}
+		public ULConfig_C ULConfig_C
+		{
+			get => Marshal.PtrToStructure<ULConfig_C>(Ptr);
+		}
+
+		public ULConfig(bool dispose = true)
+		{
+			Ptr = Methods.ulCreateConfig();
+			IsDisposed = !dispose;
+		}
+		/// <summary>The file path to the directory that contains Ultralight's bundled resources (eg, cacert.pem and other localized resources).</summary>
+		public string ResourcePath
+		{
+			get => ULConfig_C.resource_path.ToManaged();
+			set => Methods.ulConfigSetResourcePath(Ptr, value);
+		}
+		/// <summary>The file path to a writable directory that will be used to store cookies, cached resources, and other persistent data.</summary>
+		public string CachePath
+		{
+			get => ULConfig_C.cache_path.ToManaged();
+			set => Methods.ulConfigSetCachePath(Ptr, value);
+		}
+
+		/// <remarks>
+		/// When enabled, each View will be rendered to an offscreen GPU texture<br/>
+		/// using the GPU driver set in ulPlatformSetGPUDriver. You can fetch<br/>
+		/// details for the texture via ulViewGetRenderTarget.<br/>
+		/// <br/>
+		/// When disabled (the default), each View will be rendered to an offscreen<br/>
+		/// pixel buffer. This pixel buffer can optionally be provided by the user--<br/>
+		/// for more info see ulViewGetSurface.
+		/// </remarks>
+		public bool UseGpu
+		{
+			get => ULConfig_C.use_gpu_renderer;
+			set => Methods.ulConfigSetUseGPURenderer(Ptr, value);
+		}
 
 		/// <summary>The amount that the application DPI has been scaled (200% = 2.0).<br/>This should match the device scale set for the current monitor.</summary>
 		/// <remarks>Device scales are rounded to nearest 1/8th (eg, 0.125).</remarks>
-		public double DeviceScale;
+		public double DeviceScale
+		{
+			get => ULConfig_C.device_scale;
+			set => Methods.ulConfigSetDeviceScale(Ptr, value);
+		}
 
 		/// <summary>The winding order for front-facing triangles. <see cref="ULFaceWinding"/></summary>
 		/// <remarks>This is only used when the GPU renderer is enabled.</remarks>
-		public ULFaceWinding FaceWinding;
+		public ULFaceWinding FaceWinding
+		{
+			get => ULConfig_C.face_winding;
+			set => Methods.ulConfigSetFaceWinding(Ptr, value);
+		}
 
 		/// <summary>Whether or not images should be enabled.</summary>
-		public bool EnableImages;
+		public bool EnableImages
+		{
+			get => ULConfig_C.enable_images;
+			set => Methods.ulConfigSetEnableImages(Ptr, value);
+		}
 		/// <summary>Whether or not JavaScript should be enabled.</summary>
-		public bool EnableJavaScript;
+		public bool EnableJavaScript
+		{
+			get => ULConfig_C.enable_javascript;
+			set => Methods.ulConfigSetEnableJavaScript(Ptr, value);
+		}
 
 		/// <summary>The hinting algorithm to use when rendering fonts. <see cref="ULFontHinting"/></summary>
-		public ULFontHinting FontHinting;
+		public ULFontHinting FontHinting
+		{
+			get => ULConfig_C.font_hinting;
+			set => Methods.ulConfigSetFontHinting(Ptr, value);
+		}
 
 		/// <summary>The gamma to use when compositing font glyphs, change this value to adjust contrast (Adobe and Apple prefer 1.8, others may prefer 2.2).</summary>
-		public double FontGamma;
+		public double FontGamma
+		{
+			get => ULConfig_C.font_gamma;
+			set => Methods.ulConfigSetFontGamma(Ptr, value);
+		}
 		/// <summary>Default font-family to use.</summary>
-		public string FontFamilyStandard;
+		public string FontFamilyStandard
+		{
+			get => ULConfig_C.font_family_standard.ToManaged();
+			set => Methods.ulConfigSetFontFamilyStandard(Ptr, value);
+		}
 		/// <summary>Default font-family to use for fixed fonts. (pre/code)</summary>
-		public string FontFamilyFixed;
+		public string FontFamilyFixed
+		{
+			get => ULConfig_C.font_family_fixed.ToManaged();
+			set => Methods.ulConfigSetFontFamilyFixed(Ptr, value);
+		}
 		/// <summary>Default font-family to use for serif fonts.</summary>
-		public string FontFamilySerif;
+		public string FontFamilySerif
+		{
+			get => ULConfig_C.font_family_serif.ToManaged();
+			set => Methods.ulConfigSetFontFamilySerif(Ptr, value);
+		}
 		/// <summary>Default font-family to use for sans-serif fonts.</summary>
-		public string FontFamilySansSerif;
+		public string FontFamilySansSerif
+		{
+			get => ULConfig_C.font_family_sans_serif.ToManaged();
+			set => Methods.ulConfigSetFontFamilySansSerif(Ptr, value);
+		}
 		/// <summary>Default user-agent string.</summary>
-		public string UserAgent;
+		public string UserAgent
+		{
+			get => ULConfig_C.user_agent.ToManaged();
+			set => Methods.ulConfigSetUserAgent(Ptr, value);
+		}
 		/// <summary>
 		/// Default user stylesheet. You should set this to your own custom CSS
 		/// string to define default styles for various DOM elements, scrollbars,
 		/// and platform input widgets.
 		/// </summary>
-		public string UserStylesheet;
+		public string UserStylesheet
+		{
+			get => ULConfig_C.user_stylesheet.ToManaged();
+			set => Methods.ulConfigSetUserStylesheet(Ptr, value);
+		}
 
 		/// <summary>
 		/// Whether or not we should continuously repaint any Views or compositor
 		/// layers, regardless if they are dirty or not. This is mainly used to
 		/// diagnose painting/shader issues.
 		/// </summary>
-		public bool ForceRepaint;
+		public bool ForceRepaint
+		{
+			get => ULConfig_C.force_repaint;
+			set => Methods.ulConfigSetForceRepaint(Ptr, value);
+		}
 
 		/// <summary>
 		/// When a CSS animation is active, the amount of time (in seconds) to wait
 		/// before triggering another repaint. Default is 60 Hz.
 		/// </summary>
-		public double AnimationTimerDelay;
+		public double AnimationTimerDelay
+		{
+			get => ULConfig_C.animation_timer_delay;
+			set => Methods.ulConfigSetAnimationTimerDelay(Ptr, value);
+		}
 		/// <summary>
 		/// When a smooth scroll animation is active, the amount of time (in seconds)
 		/// to wait before triggering another repaint. Default is 60 Hz.
 		/// </summary>
-		public double ScrollTimerDelay;
+		public double ScrollTimerDelay
+		{
+			get => ULConfig_C.scroll_timer_delay;
+			set => Methods.ulConfigSetScrollTimerDelay(Ptr, value);
+		}
 		/// <summary>
 		/// The amount of time (in seconds) to wait before running the recycler (will
 		/// attempt to return excess memory back to the system).
 		/// </summary>
-		public double RecycleDelay;
+		public double RecycleDelay
+		{
+			get => ULConfig_C.recycle_delay;
+			set => Methods.ulConfigSetRecycleDelay(Ptr, value);
+		}
 
 		/// <summary>
 		/// Size of WebCore's memory cache in bytes. 
@@ -205,7 +350,11 @@ namespace UltralightNet
 		/// You should increase this if you anticipate handling pages with
 		/// large resources, Safari typically uses 128+ MiB for its cache.
 		/// </remarks>
-		public uint MemoryCacheSize;
+		public uint MemoryCacheSize
+		{
+			get => ULConfig_C.memory_cache_size;
+			set => Methods.ulConfigSetMemoryCacheSize(Ptr, value);
+		}
 		/// <summary>
 		/// Number of pages to keep in the cache. Defaults to 0 (none).
 		/// </summary>
@@ -214,7 +363,11 @@ namespace UltralightNet
 		/// cache to support typical web-browsing activities. If you increase
 		/// this, you should probably increase the memory cache size as well.
 		/// </remarks>
-		public uint PageCacheSize;
+		public uint PageCacheSize
+		{
+			get => ULConfig_C.page_cache_size;
+			set => Methods.ulConfigSetPageCacheSize(Ptr, value);
+		}
 		/// <summary>
 		/// JavaScriptCore tries to detect the system's physical RAM size to set
 		/// reasonable allocation limits. Set this to anything other than 0 to
@@ -224,121 +377,43 @@ namespace UltralightNet
 		/// This can be used to force JavaScriptCore to be more conservative with
 		/// its allocation strategy (at the cost of some performance).
 		/// </remarks>
-		public uint OverrideRAMSize;
+		public uint OverrideRAMSize
+		{
+			get => ULConfig_C.override_ram_size;
+			set => Methods.ulConfigSetOverrideRAMSize(Ptr, value);
+		}
 		/// <summary>
 		/// The minimum size of large VM heaps in JavaScriptCore. Set this to a
 		/// lower value to make these heaps start with a smaller initial value.
 		/// </summary>
-		public uint MinLargeHeapSize;
+		public uint MinLargeHeapSize
+		{
+			get => ULConfig_C.min_large_heap_size;
+			set => Methods.ulConfigSetMinLargeHeapSize(Ptr, value);
+		}
 		/// <summary>
 		/// The minimum size of small VM heaps in JavaScriptCore. Set this to a
 		/// lower value to make these heaps start with a smaller initial value.
 		/// </summary>
-		public uint MinSmallHeapSize;
-	}
-
-	/// <summary>
-	/// FOR <b>INTERNAL</b> USE<br/>but you can use this too<br/>pls don't
-	/// </summary>
-	[BlittableType]
-	public struct ULConfigNative
-	{
-		public ULStringMarshaler.ULStringPTR ResourcePath;
-		public ULStringMarshaler.ULStringPTR CachePath;
-
-		public byte UseGpu;
-
-		public double DeviceScale;
-
-		public int FaceWinding;
-
-		public byte EnableImages;
-		public byte EnableJavaScript;
-
-		public double FontGamma;
-
-		public ULStringMarshaler.ULStringPTR FontFamilyStandard;
-		public ULStringMarshaler.ULStringPTR FontFamilyFixed;
-		public ULStringMarshaler.ULStringPTR FontFamilySerif;
-		public ULStringMarshaler.ULStringPTR FontFamilySansSerif;
-		public ULStringMarshaler.ULStringPTR UserAgent;
-		public ULStringMarshaler.ULStringPTR UserStylesheet;
-
-		public byte ForceRepaint;
-
-		public double AnimationTimerDelay;
-		public double ScrollTimerDelay;
-		public double RecycleDelay;
-
-		public uint MemoryCacheSize;
-		public uint PageCacheSize;
-		public uint OverrideRAMSize;
-		public uint MinLargeHeapSize;
-		public uint MinSmallHeapSize;
-
-		public ULConfigNative(ULConfig config)
+		public uint MinSmallHeapSize
 		{
-			ResourcePath = ULStringMarshaler.ULStringPTR.ManagedToNative(config.ResourcePath);
-			CachePath = ULStringMarshaler.ULStringPTR.ManagedToNative(config.CachePath);
-			UseGpu = (byte)(config.UseGpu ? 1 : 0);
-			DeviceScale = config.DeviceScale;
-			FaceWinding = (int)config.FaceWinding;
-			EnableImages = (byte)(config.EnableImages ? 1 : 0);
-			EnableJavaScript = (byte)(config.EnableJavaScript ? 1 : 0);
-			FontGamma = config.FontGamma;
-			FontFamilyStandard = ULStringMarshaler.ULStringPTR.ManagedToNative(config.FontFamilyStandard);
-			FontFamilyFixed = ULStringMarshaler.ULStringPTR.ManagedToNative(config.FontFamilyFixed);
-			FontFamilySerif = ULStringMarshaler.ULStringPTR.ManagedToNative(config.FontFamilySerif);
-			FontFamilySansSerif = ULStringMarshaler.ULStringPTR.ManagedToNative(config.FontFamilySansSerif);
-			UserAgent = ULStringMarshaler.ULStringPTR.ManagedToNative(config.UserAgent);
-			UserStylesheet = ULStringMarshaler.ULStringPTR.ManagedToNative(config.UserStylesheet);
-			ForceRepaint = (byte)(config.ForceRepaint ? 1 : 0);
-			AnimationTimerDelay = config.AnimationTimerDelay;
-			ScrollTimerDelay = config.ScrollTimerDelay;
-			RecycleDelay = config.RecycleDelay;
-			MemoryCacheSize = config.MemoryCacheSize;
-			PageCacheSize = config.PageCacheSize;
-			OverrideRAMSize = config.OverrideRAMSize;
-			MinLargeHeapSize = config.MinLargeHeapSize;
-			MinSmallHeapSize = config.MinSmallHeapSize;
-		}
-		public void FreeNative()
-		{
-			ULStringMarshaler.ULStringPTR.CleanUpNative(ResourcePath);
-			ULStringMarshaler.ULStringPTR.CleanUpNative(CachePath);
-			ULStringMarshaler.ULStringPTR.CleanUpNative(FontFamilyStandard);
-			ULStringMarshaler.ULStringPTR.CleanUpNative(FontFamilyFixed);
-			ULStringMarshaler.ULStringPTR.CleanUpNative(FontFamilySerif);
-			ULStringMarshaler.ULStringPTR.CleanUpNative(FontFamilySansSerif);
-			ULStringMarshaler.ULStringPTR.CleanUpNative(UserAgent);
-			ULStringMarshaler.ULStringPTR.CleanUpNative(UserStylesheet);
+			get => ULConfig_C.min_small_heap_size;
+			set => Methods.ulConfigSetMinSmallHeapSize(Ptr, value);
 		}
 
-		public ULConfig ToManaged() => new()
+		public bool IsDisposed
 		{
-			ResourcePath = ResourcePath.ToManaged(),
-			CachePath = CachePath.ToManaged(),
-			UseGpu = UseGpu != 0,
-			DeviceScale = DeviceScale,
-			FaceWinding = (ULFaceWinding)FaceWinding,
-			EnableImages = EnableImages != 0,
-			EnableJavaScript = EnableJavaScript != 0,
-			FontGamma = FontGamma,
-			FontFamilyStandard = FontFamilyStandard.ToManaged(),
-			FontFamilyFixed = FontFamilyFixed.ToManaged(),
-			FontFamilySerif = FontFamilySerif.ToManaged(),
-			FontFamilySansSerif = FontFamilySansSerif.ToManaged(),
-			UserAgent = UserAgent.ToManaged(),
-			UserStylesheet = UserStylesheet.ToManaged(),
-			ForceRepaint = ForceRepaint != 0,
-			AnimationTimerDelay = AnimationTimerDelay,
-			ScrollTimerDelay = ScrollTimerDelay,
-			RecycleDelay = RecycleDelay,
-			MemoryCacheSize = MemoryCacheSize,
-			PageCacheSize = PageCacheSize,
-			OverrideRAMSize = OverrideRAMSize,
-			MinLargeHeapSize = MinLargeHeapSize,
-			MinSmallHeapSize = MinSmallHeapSize,
-		};
+			get;
+			private set;
+		}
+		~ULConfig() => Dispose();
+		public void Dispose()
+		{
+			if (IsDisposed) return;
+			Methods.ulDestroyConfig(Ptr);
+
+			IsDisposed = true;
+			GC.SuppressFinalize(this);
+		}
 	}
 }

@@ -1,5 +1,4 @@
 using System;
-using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
 namespace UltralightNet
@@ -72,20 +71,16 @@ namespace UltralightNet
 
 			public static ULStringPTR ManagedToNative(string str)
 			{
-				Console.Write($"ULStringPTR.ManagedToNative({str}) = ");
 				if (str is null) str = "";
 				IntPtr data = Marshal.StringToHGlobalUni(str);
-				Console.WriteLine(data.ToInt32());
 				return new() { data_ = data, length_ = (uint)str.Length };
 			}
 			public string ToManaged()
 			{
-				Console.WriteLine($"ULStringPTR.ToManaged() ({data_.ToInt32()})");
 				return Marshal.PtrToStringUni(data_, (int)length_);
 			}
 			public static void CleanUpNative(ULStringPTR ulStringPTR)
 			{
-				Console.WriteLine($"ULStringPTR.CleanUpNative({ulStringPTR.data_.ToInt32()} len = {ulStringPTR.length_}) = ");
 				Marshal.FreeHGlobal(ulStringPTR.data_);
 			}
 		}
@@ -113,9 +108,7 @@ namespace UltralightNet
 		/// <remarks>you <b>MUST</b> call <see cref="CleanUpNativeData(IntPtr)"/> after you done</remarks>
 		public static IntPtr ManagedToNative(string managedString)
 		{
-			Console.Write($"ULStringMarshaler.ManagedToNative({managedString}) = ");
 			IntPtr ptr = Marshal.AllocHGlobal(11);
-			Console.WriteLine(ptr.ToInt32());
 			ULStringSTR nativeStruct = new()
 			{
 				data_ = managedString,
@@ -136,7 +129,6 @@ namespace UltralightNet
 		/// <returns></returns>
 		public static string NativeToManaged(IntPtr ptr)
 		{
-			Console.WriteLine($"ULStringMarshaler.NativeToManaged({ptr.ToInt32()})");
 			ULStringPTR result = Marshal.PtrToStructure<ULStringPTR>(ptr);
 			return Marshal.PtrToStringUni(result.data_, (int)result.length_);
 		}
@@ -147,7 +139,6 @@ namespace UltralightNet
 		/// <param name="ptr">ULString pointer</param>
 		public static void CleanUpNative(IntPtr ptr)
 		{
-			Console.WriteLine($"ULStringMarshaler.CleanUpNative({ptr.ToInt32()})");
 			Marshal.DestroyStructure<ULStringSTR>(ptr);
 			//Marshal.FreeHGlobal(ptr);
 		}
