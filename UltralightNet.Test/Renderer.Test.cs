@@ -18,7 +18,13 @@ namespace UltralightNet.Test
 			};
 			Renderer renderer = new(config);
 
-			View view = new(renderer, 512, 512, false, Session.DefaultSession(renderer), true);
+
+			#region Session
+			Session session = Session.DefaultSession(renderer);
+			Assert.Equal("default", session.Name);
+			#endregion
+
+			View view = new(renderer, 512, 512, false, session, true);
 
 			// Width, Height
 			Assert.Equal(512u, view.Width);

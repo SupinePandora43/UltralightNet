@@ -7,7 +7,7 @@ namespace UltralightNet
 	{
 		/// <summary>Create a Session to store local data in (such as cookies, local storage, application cache, indexed db, etc).</summary>
 		[GeneratedDllImport("Ultralight")]
-		public static partial IntPtr ulCreateSession(IntPtr renderer, bool is_persistent, IntPtr name);
+		public static partial IntPtr ulCreateSession(IntPtr renderer, bool is_persistent, [MarshalAs(UnmanagedType.CustomMarshaler, MarshalTypeRef = typeof(ULStringMarshaler))] string name);
 
 		/// <summary>Destroy a Session.</summary>
 		[DllImport("Ultralight")]
@@ -24,7 +24,8 @@ namespace UltralightNet
 
 		/// <summary>Unique name identifying the session (used for unique disk path).</summary>
 		[DllImport("Ultralight")]
-		public static extern IntPtr ulSessionGetName(IntPtr session);
+		[return: MarshalAs(UnmanagedType.CustomMarshaler, MarshalTypeRef = typeof(ULStringMarshaler))]
+		public static extern string ulSessionGetName(IntPtr session);
 
 		/// <summary>Unique numeric Id for the session.</summary>
 		[GeneratedDllImport("Ultralight")]
@@ -32,7 +33,8 @@ namespace UltralightNet
 
 		/// <summary>The disk path to write to (used by persistent sessions only).</summary>
 		[DllImport("Ultralight")]
-		public static extern IntPtr ulSessionGetDiskPath(IntPtr session);
+		[return: MarshalAs(UnmanagedType.CustomMarshaler, MarshalTypeRef = typeof(ULStringMarshaler))]
+		public static extern string ulSessionGetDiskPath(IntPtr session);
 	}
 
 	///<summary>Stores local data such as cookies, local storage, and application cache for one or more Views. </summary>
@@ -50,17 +52,17 @@ namespace UltralightNet
 		/// <remarks>A default, persistent Session is already created for you. You only need to call this if you want to create private, in-memory session or use a separate session for each View.</remarks>
 		/// <param name="is_persistent">Whether or not to store the session on disk.<br/>Persistent sessions will be written to the path set in <see cref="ULConfig.CachePath"/></param>
 		/// <param name="name">A unique name for this session, this will be used to generate a unique disk path for persistent sessions.</param>
-		public Session(Renderer renderer, bool is_persistent, ULString name) => Ptr = Methods.ulCreateSession(renderer.Ptr, is_persistent, name.Ptr);
+		public Session(Renderer renderer, bool is_persistent, string name) => Ptr = Methods.ulCreateSession(renderer.Ptr, is_persistent, name);
 		public static Session DefaultSession(Renderer renderer) => new(Methods.ulDefaultSession(renderer.Ptr));
 
 		/// <summary>Whether or not this session is written to disk.</summary>
 		public bool IsPersistent => Methods.ulSessionIsPersistent(Ptr);
 		/// <summary>A unique name identifying this session.</summary>
-		public ULString Name => new(Methods.ulSessionGetName(Ptr));
+		public string Name => Methods.ulSessionGetName(Ptr);
 		/// <summary>A unique numeric ID identifying this session.</summary>
 		public ulong Id => Methods.ulSessionGetId(Ptr);
 		/// <summary>The disk path of this session (only valid for persistent sessions).</summary>
-		public ULString DiskPath => new(Methods.ulSessionGetDiskPath(Ptr));
+		public string DiskPath => Methods.ulSessionGetDiskPath(Ptr);
 
 		~Session() => Dispose();
 		public void Dispose()

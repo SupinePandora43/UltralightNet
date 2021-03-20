@@ -69,6 +69,10 @@ namespace UltralightNet
 		};
 	}
 
+	/// <summary>
+	/// All the key-code definitions for KeyboardEvent.
+	/// Most of these correspond directly to the key-code values on Windows.
+	/// </summary>
 	public static class ULKeyCodes
 	{
 		// GK_BACK (08) BACKSPACE key
