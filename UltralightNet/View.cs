@@ -112,6 +112,13 @@ namespace UltralightNet
 
 		[GeneratedDllImport("Ultralight")]
 		public static partial void ulViewFireKeyEvent(IntPtr view, ULKeyEvent key_event);
+
+		[GeneratedDllImport("Ultralight")]
+		public static partial void ulViewFireMouseEvent(IntPtr view, ULMouseEvent mouse_event);
+
+		[GeneratedDllImport("Ultralight")]
+		public static partial void ulViewFireScrollEvent(IntPtr view, ULScrollEvent scroll_event);
+
 		// to be continued https://github.com/ultralight-ux/Ultralight-API/blob/7f9de24ca1c7ec8b385e895c4899b9d96626da58/Ultralight/CAPI.h#L744
 	}
 
@@ -138,7 +145,8 @@ namespace UltralightNet
 
 		public ULSurface Surface
 		{
-			get {
+			get
+			{
 				IntPtr surfacePtr = Methods.ulViewGetSurface(Ptr);
 				if (surfacePtr == IntPtr.Zero) return null;
 				return new(surfacePtr);
@@ -168,6 +176,18 @@ namespace UltralightNet
 		public bool HasInputFocus() => Methods.ulViewHasInputFocus(Ptr);
 
 		public void FireKeyEvent(ULKeyEvent keyEvent) => Methods.ulViewFireKeyEvent(Ptr, keyEvent);
+		public void FireMouseEvent(ULMouseEvent mouseEvent) => Methods.ulViewFireMouseEvent(Ptr, mouseEvent);
+		public void FireScrollEvent(ULScrollEvent scrollEvent) => Methods.ulViewFireScrollEvent(Ptr, scrollEvent);
+
+
+
+
+
+
+
+
+
+
 
 		~View() => Dispose();
 		public void Dispose()
