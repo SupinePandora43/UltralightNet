@@ -34,7 +34,8 @@ namespace UltralightNet.Test
 			if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
 			{
 				GetKeyIdentifierFromVirtualKeyCode_win(ULKeyCodes.GK_VOLUME_MUTE, ulStringPtr);
-			}else if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
+			}
+			else if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
 			{
 				GetKeyIdentifierFromVirtualKeyCode_linux(ULKeyCodes.GK_VOLUME_MUTE, ulStringPtr);
 			}
