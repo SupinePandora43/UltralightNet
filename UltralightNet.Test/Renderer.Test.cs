@@ -18,20 +18,28 @@ namespace UltralightNet.Test
 			};
 			Renderer renderer = new(config);
 
-			View view = new View(renderer, 512, 512, false, Session.DefaultSession(renderer), true);
+			View view = new(renderer, 512, 512, false, Session.DefaultSession(renderer), true);
 
-			view.URL = "https://github.com";
+			// Width, Height
+			Assert.Equal(512u, view.Width);
+			Assert.Equal(512u, view.Height);
 
-			uint att = 0;
+			// LoadURL
+			view.URL = "https://github.com/";
 
 			while (view.URL == "")
 			{
 				renderer.Update();
 				Thread.Sleep(100);
-				att++;
 			}
 
+			// GetURL
 			Assert.Equal("https://github.com/", view.URL);
+
+			// EvaluateScript
+			Assert.Equal("3", view.EvaluateScript("1+2", out string exception));
+			Assert.True(string.IsNullOrEmpty(exception));
+
 		}
 	}
 }

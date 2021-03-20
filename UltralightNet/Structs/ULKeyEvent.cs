@@ -26,9 +26,9 @@ namespace UltralightNet
 		public uint modifiers;
 		public int virtual_key_code;
 		public int native_key_code;
-		public ULString16Native key_identifier;
-		public ULString16Native text;
-		public ULString16Native unmodified_text;
+		public IntPtr key_identifier;
+		public IntPtr text;
+		public IntPtr unmodified_text;
 		public byte is_keypad;
 		public byte is_auto_repeat;
 		public byte is_system_key;
@@ -39,12 +39,19 @@ namespace UltralightNet
 			modifiers = (uint)keyEvent.modifiers;
 			virtual_key_code = keyEvent.virtual_key_code;
 			native_key_code = keyEvent.native_key_code;
-			key_identifier = new ULString16Native(keyEvent.key_identifier);
-			text = new ULString16Native(keyEvent.text);
-			unmodified_text = new ULString16Native(keyEvent.unmodified_text);
+			key_identifier = ULStringMarshaler.ManagedToNative(keyEvent.key_identifier);
+			text = ULStringMarshaler.ManagedToNative(keyEvent.text);
+			unmodified_text = ULStringMarshaler.ManagedToNative(keyEvent.unmodified_text);
 			is_keypad = (byte)(keyEvent.is_keypad ? 1 : 0);
 			is_auto_repeat = (byte)(keyEvent.is_auto_repeat ? 1 : 0);
 			is_system_key = (byte)(keyEvent.is_system_key ? 1 : 0);
+		}
+
+		public void FreeNative()
+		{
+			ULStringMarshaler.CleanUpNative(key_identifier);
+			ULStringMarshaler.CleanUpNative(text);
+			ULStringMarshaler.CleanUpNative(unmodified_text);
 		}
 
 		public ULKeyEvent ToManaged() => new()
@@ -53,9 +60,9 @@ namespace UltralightNet
 			modifiers = (ULKeyEventModifiers)modifiers,
 			virtual_key_code = virtual_key_code,
 			native_key_code = native_key_code,
-			key_identifier = key_identifier.ToManaged().data_,
-			text = text.ToManaged().data_,
-			unmodified_text = unmodified_text.ToManaged().data_,
+			key_identifier = ULStringMarshaler.NativeToManaged(key_identifier),
+			text = ULStringMarshaler.NativeToManaged(text),
+			unmodified_text = ULStringMarshaler.NativeToManaged(unmodified_text),
 			is_keypad = is_keypad != 0,
 			is_auto_repeat = is_auto_repeat != 0,
 			is_system_key = is_system_key != 0

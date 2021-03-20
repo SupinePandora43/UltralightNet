@@ -16,7 +16,8 @@ namespace UltralightNet
 		public static extern string ulViewGetURL(IntPtr view);
 
 		[DllImport("Ultralight")]
-		public static extern IntPtr ulViewGetTitle(IntPtr view);
+		[return: MarshalAs(UnmanagedType.CustomMarshaler, MarshalTypeRef = typeof(ULStringMarshaler))]
+		public static extern string ulViewGetTitle(IntPtr view);
 
 		[DllImport("Ultralight")]
 		public static extern uint ulViewGetWidth(IntPtr view);
@@ -34,10 +35,10 @@ namespace UltralightNet
 		public static extern IntPtr ulViewGetSurface(IntPtr view);
 
 		[DllImport("Ultralight")]
-		public static extern void ulViewLoadHTML(IntPtr view, IntPtr html_string);
+		public static extern void ulViewLoadHTML(IntPtr view, [MarshalAs(UnmanagedType.CustomMarshaler, MarshalTypeRef = typeof(ULStringMarshaler))] string html_string);
 
 		[DllImport("Ultralight")]
-		public static extern void ulViewLoadURL(IntPtr view, [MarshalAs(UnmanagedType.CustomMarshaler,MarshalTypeRef =typeof(ULStringMarshaler))]string url_string);
+		public static extern void ulViewLoadURL(IntPtr view, [MarshalAs(UnmanagedType.CustomMarshaler, MarshalTypeRef = typeof(ULStringMarshaler))] string url_string);
 
 		[DllImport("Ultralight")]
 		public static extern void ulViewResize(IntPtr view, uint width, uint height);
@@ -50,7 +51,8 @@ namespace UltralightNet
 		public static extern void ulViewUnlockJSContext(IntPtr view);
 
 		[DllImport("Ultralight")]
-		public static extern IntPtr ulViewEvaluateScript(IntPtr view, IntPtr js_string, out IntPtr exception);
+		[return: MarshalAs(UnmanagedType.CustomMarshaler, MarshalTypeRef = typeof(ULStringMarshaler))]
+		public static extern string ulViewEvaluateScript(IntPtr view, [MarshalAs(UnmanagedType.CustomMarshaler, MarshalTypeRef = typeof(ULStringMarshaler))] string js_string, [MarshalAs(UnmanagedType.CustomMarshaler, MarshalTypeRef = typeof(ULStringMarshaler))] out string exception);
 
 		/// <summary>Check if can navigate backwards in history.</summary>
 		[GeneratedDllImport("Ultralight")]
@@ -124,8 +126,8 @@ namespace UltralightNet
 		}
 
 		public string URL { get => Methods.ulViewGetURL(Ptr); set => Methods.ulViewLoadURL(Ptr, value); }
-		public ULString HTML { set => Methods.ulViewLoadHTML(Ptr, value.Ptr); }
-		public ULString Title { get => new(Methods.ulViewGetTitle(Ptr)); }
+		public string HTML { set => Methods.ulViewLoadHTML(Ptr, value); }
+		public string Title { get => Methods.ulViewGetTitle(Ptr); }
 
 		public uint Width => Methods.ulViewGetWidth(Ptr);
 		public uint Height => Methods.ulViewGetHeight(Ptr);
@@ -141,12 +143,7 @@ namespace UltralightNet
 		public IntPtr LockJSContext() => Methods.ulViewLockJSContext(Ptr);
 		public void UnlockJSContext() => Methods.ulViewUnlockJSContext(Ptr);
 
-		public ULString EvaluateScript(ULString js_string, out ULString exception)
-		{
-			IntPtr result_ptr = Methods.ulViewEvaluateScript(Ptr, js_string.Ptr, out IntPtr exception_ptr);
-			exception = new(exception_ptr);
-			return new(result_ptr);
-		}
+		public string EvaluateScript(string js_string, out string exception) => Methods.ulViewEvaluateScript(Ptr, js_string, out exception);
 
 		public bool CanGoBack() => Methods.ulViewCanGoBack(Ptr);
 		public bool CanGoForward() => Methods.ulViewCanGoForward(Ptr);

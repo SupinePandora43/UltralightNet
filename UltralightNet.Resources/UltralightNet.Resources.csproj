@@ -1,9 +1,6 @@
 <Project Sdk="Microsoft.NET.Sdk">
 	<PropertyGroup>
 		<TargetFrameworks>net5;netstandard1</TargetFrameworks>
-		<NoBuild>true</NoBuild>
-		<IncludeBuildOutput>false</IncludeBuildOutput>
-		<DisableImplicitFrameworkReferences>true</DisableImplicitFrameworkReferences>
 		
 		<PackageId>UltralightNet.Resources</PackageId>
 		<Version>1.2.1</Version>
