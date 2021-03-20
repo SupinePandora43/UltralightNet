@@ -1,5 +1,6 @@
 using System.Runtime.InteropServices;
 using System.Threading;
+using UltralightNet.AppCore;
 using Xunit;
 
 namespace UltralightNet.Test
@@ -10,7 +11,7 @@ namespace UltralightNet.Test
 		public void TestRenderer()
 		{
 			if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX)) return;
-			AppCore.AppCore.EnablePlatformFontLoader();
+			AppCoreMethods.ulEnablePlatformFontLoader();
 
 			ULConfig config = new()
 			{

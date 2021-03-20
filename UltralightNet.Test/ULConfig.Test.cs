@@ -1,4 +1,3 @@
-using System;
 using Xunit;
 
 namespace UltralightNet.Test
@@ -6,18 +5,6 @@ namespace UltralightNet.Test
 	public class ULConfigTest
 	{
 		private ULConfig config = new();
-
-		[Fact]
-		public void DisposeTest()
-		{
-			config.Dispose();
-		}
-		[Fact]
-		public void FinalizeTest()
-		{
-			config = null;
-			GC.WaitForPendingFinalizers();
-		}
 
 		[Fact]
 		public void ResourcePathTest()

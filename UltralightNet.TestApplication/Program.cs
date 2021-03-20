@@ -14,11 +14,11 @@ namespace UltralightNetTestApplication
 			Renderer renderer = new(config);
 
 			//Session session = Session.DefaultSession(renderer);
-			Session session = new(renderer, false, (ULString)"asd");
+			Session session = new(renderer, false, "asd");
 
-			AppCore.EnableDefaultLogger((ULString)"./log.txt");
-			AppCore.EnablePlatformFileSystem((ULString)"./");
-			AppCore.EnablePlatformFontLoader();
+			AppCoreMethods.ulEnableDefaultLogger("./log.txt");
+			AppCoreMethods.ulEnablePlatformFileSystem("./");
+			AppCoreMethods.ulEnablePlatformFontLoader();
 
 			//Ultralight.View view = new(renderer.Ptr, 512, 512, false, session.Ptr);
 			//IntPtr view = ulCreateView(renderer.Ptr, 256, 256, 0, IntPtr.Zero, 0);

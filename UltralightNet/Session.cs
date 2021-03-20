@@ -6,8 +6,8 @@ namespace UltralightNet
 	public static partial class Methods
 	{
 		/// <summary>Create a Session to store local data in (such as cookies, local storage, application cache, indexed db, etc).</summary>
-		[GeneratedDllImport("Ultralight")]
-		public static partial IntPtr ulCreateSession(IntPtr renderer, bool is_persistent, [MarshalAs(UnmanagedType.CustomMarshaler, MarshalTypeRef = typeof(ULStringMarshaler))] string name);
+		[DllImport("Ultralight")]
+		public static extern IntPtr ulCreateSession(IntPtr renderer, bool is_persistent, [MarshalAs(UnmanagedType.CustomMarshaler, MarshalTypeRef = typeof(ULStringMarshaler))] string name);
 
 		/// <summary>Destroy a Session.</summary>
 		[DllImport("Ultralight")]

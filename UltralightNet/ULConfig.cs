@@ -16,11 +16,11 @@ namespace UltralightNet
 
 		/// <summary>Set the file path to the directory that contains Ultralight's bundled resources (eg, cacert.pem and other localized resources).</summary>
 		[DllImport("Ultralight")]
-		public static extern void ulConfigSetResourcePath(IntPtr config, IntPtr resource_path);
+		public static extern void ulConfigSetResourcePath(IntPtr config, [MarshalAs(UnmanagedType.CustomMarshaler, MarshalTypeRef = typeof(ULStringMarshaler))] string resource_path);
 
 		/// <summary>Set the file path to a writable directory that will be used to store cookies, cached resources, and other persistent data.</summary>
 		[DllImport("Ultralight")]
-		public static extern void ulConfigSetCachePath(IntPtr config, IntPtr cache_path);
+		public static extern void ulConfigSetCachePath(IntPtr config, [MarshalAs(UnmanagedType.CustomMarshaler, MarshalTypeRef = typeof(ULStringMarshaler))] string cache_path);
 
 		[GeneratedDllImport("Ultralight")]
 		public static partial void ulConfigSetUseGPURenderer(IntPtr config, bool use_gpu);
@@ -54,27 +54,27 @@ namespace UltralightNet
 
 		/// <summary>Set default font-family to use (Default = Times New Roman).</summary>
 		[DllImport("Ultralight")]
-		public static extern void ulConfigSetFontFamilyStandard(IntPtr config, IntPtr font_name);
+		public static extern void ulConfigSetFontFamilyStandard(IntPtr config, [MarshalAs(UnmanagedType.CustomMarshaler, MarshalTypeRef = typeof(ULStringMarshaler))] string font_name);
 
 		/// <summary>Set default font-family to use for fixed fonts, eg <pre> and <code> (Default = Courier New).</summary>
 		[DllImport("Ultralight")]
-		public static extern void ulConfigSetFontFamilyFixed(IntPtr config, IntPtr font_name);
+		public static extern void ulConfigSetFontFamilyFixed(IntPtr config, [MarshalAs(UnmanagedType.CustomMarshaler, MarshalTypeRef = typeof(ULStringMarshaler))] string font_name);
 
 		/// <summary>Set default font-family to use for serif fonts (Default = Times New Roman).</summary>
 		[DllImport("Ultralight")]
-		public static extern void ulConfigSetFontFamilySerif(IntPtr config, IntPtr font_name);
+		public static extern void ulConfigSetFontFamilySerif(IntPtr config, [MarshalAs(UnmanagedType.CustomMarshaler, MarshalTypeRef = typeof(ULStringMarshaler))] string font_name);
 
 		/// <summary>Set default font-family to use for sans-serif fonts (Default = Arial).</summary>
 		[DllImport("Ultralight")]
-		public static extern void ulConfigSetFontFamilySansSerif(IntPtr config, IntPtr font_name);
+		public static extern void ulConfigSetFontFamilySansSerif(IntPtr config, [MarshalAs(UnmanagedType.CustomMarshaler, MarshalTypeRef = typeof(ULStringMarshaler))] string font_name);
 
 		/// <summary>Set user agent string</summary>
 		[DllImport("Ultralight")]
-		public static extern void ulConfigSetUserAgent(IntPtr config, IntPtr font_name);
+		public static extern void ulConfigSetUserAgent(IntPtr config, [MarshalAs(UnmanagedType.CustomMarshaler, MarshalTypeRef = typeof(ULStringMarshaler))] string font_name);
 
 		/// <summary>Set user stylesheet (CSS) (Default = Empty).</summary>
 		[DllImport("Ultralight")]
-		public static extern void ulConfigSetUserStylesheet(IntPtr config, IntPtr font_name);
+		public static extern void ulConfigSetUserStylesheet(IntPtr config, [MarshalAs(UnmanagedType.CustomMarshaler, MarshalTypeRef = typeof(ULStringMarshaler))] string font_name);
 
 		/// <summary>Set whether or not we should continuously repaint any Views or compositor layers, regardless if they are dirty or not. This is mainly used to diagnose painting/shader issues.</summary>
 		[GeneratedDllImport("Ultralight")]
@@ -121,13 +121,13 @@ namespace UltralightNet
 	}
 
 	/// <summary>Configuration settings for Ultralight.</summary>
-	[StructLayout(LayoutKind.Sequential)]
-	public struct ULConfig_C
+	[NativeMarshalling(typeof(ULConfigNative))]
+	public struct ULConfig
 	{
 		/// <summary>The file path to the directory that contains Ultralight's bundled resources (eg, cacert.pem and other localized resources).</summary>
-		public ULString16 resource_path;
+		public string ResourcePath;
 		/// <summary>The file path to a writable directory that will be used to store cookies, cached resources, and other persistent data.</summary>
-		public ULString16 cache_path;
+		public string CachePath;
 
 		/// <remarks>
 		/// When enabled, each View will be rendered to an offscreen GPU texture<br/>
@@ -138,252 +138,65 @@ namespace UltralightNet
 		/// pixel buffer. This pixel buffer can optionally be provided by the user--<br/>
 		/// for more info see ulViewGetSurface.
 		/// </remarks>
-		public bool use_gpu_renderer;
-		public double device_scale;
-
-		public ULFaceWinding face_winding;
-
-		/// <summary>Whether or not images should be enabled.</summary>
-		public bool enable_images;
-		/// <summary>Whether or not JavaScript should be enabled.</summary>
-		public bool enable_javascript;
-
-		/// <summary>The hinting algorithm to use when rendering fonts.</summary>
-		/// <see cref="ULFontHinting"/>
-		public ULFontHinting font_hinting;
-
-		/// <summary>The gamma to use when compositing font glyphs, change this value to adjust contrast (Adobe and Apple prefer 1.8, others may prefer 2.2).</summary>
-		public double font_gamma;
-
-		public ULString16 font_family_standard;
-		public ULString16 font_family_fixed;
-		public ULString16 font_family_serif;
-		public ULString16 font_family_sans_serif;
-
-		public ULString16 user_agent;
-		public ULString16 user_stylesheet;
-
-		public bool force_repaint;
-
-		public double animation_timer_delay;
-		public double scroll_timer_delay;
-		public double recycle_delay;
-
-		public uint memory_cache_size;
-		public uint page_cache_size;
-		public uint override_ram_size;
-		public uint min_large_heap_size;
-		public uint min_small_heap_size;
-	}
-
-	/// <summary>Configuration settings for Ultralight.</summary>
-	public class ULConfig : IDisposable
-	{
-		public IntPtr Ptr
-		{
-			[MethodImpl(MethodImplOptions.AggressiveInlining)]
-			get;
-			[MethodImpl(MethodImplOptions.AggressiveInlining)]
-			private set;
-		}
-		public ULConfig_C ULConfig_C
-		{
-			[MethodImpl(MethodImplOptions.AggressiveInlining)]
-			get => Marshal.PtrToStructure<ULConfig_C>(Ptr);
-		}
-
-		public ULConfig(bool dispose = true)
-		{
-			Ptr = Methods.ulCreateConfig();
-			IsDisposed = !dispose;
-		}
-		/// <summary>The file path to the directory that contains Ultralight's bundled resources (eg, cacert.pem and other localized resources).</summary>
-		public string ResourcePath
-		{
-			[MethodImpl(MethodImplOptions.AggressiveInlining)]
-			get => ULConfig_C.resource_path.data_;
-			[MethodImpl(MethodImplOptions.AggressiveInlining)]
-			set => Methods.ulConfigSetResourcePath(Ptr, ((ULString)value).Ptr);
-		}
-		/// <summary>The file path to a writable directory that will be used to store cookies, cached resources, and other persistent data.</summary>
-		public string CachePath
-		{
-			[MethodImpl(MethodImplOptions.AggressiveInlining)]
-			get => ULConfig_C.cache_path.data_;
-			[MethodImpl(MethodImplOptions.AggressiveInlining)]
-			set => Methods.ulConfigSetCachePath(Ptr, ((ULString)value).Ptr);
-		}
-
-		/// <remarks>
-		/// When enabled, each View will be rendered to an offscreen GPU texture<br/>
-		/// using the GPU driver set in ulPlatformSetGPUDriver. You can fetch<br/>
-		/// details for the texture via ulViewGetRenderTarget.<br/>
-		/// <br/>
-		/// When disabled (the default), each View will be rendered to an offscreen<br/>
-		/// pixel buffer. This pixel buffer can optionally be provided by the user--<br/>
-		/// for more info see ulViewGetSurface.
-		/// </remarks>
-		public bool UseGpu
-		{
-			[MethodImpl(MethodImplOptions.AggressiveInlining)]
-			get => ULConfig_C.use_gpu_renderer;
-			[MethodImpl(MethodImplOptions.AggressiveInlining)]
-			set => Methods.ulConfigSetUseGPURenderer(Ptr, value);
-		}
+		public bool UseGpu;
 
 		/// <summary>The amount that the application DPI has been scaled (200% = 2.0).<br/>This should match the device scale set for the current monitor.</summary>
 		/// <remarks>Device scales are rounded to nearest 1/8th (eg, 0.125).</remarks>
-		public double DeviceScale
-		{
-			[MethodImpl(MethodImplOptions.AggressiveInlining)]
-			get => ULConfig_C.device_scale;
-			[MethodImpl(MethodImplOptions.AggressiveInlining)]
-			set => Methods.ulConfigSetDeviceScale(Ptr, value);
-		}
+		public double DeviceScale;
 
 		/// <summary>The winding order for front-facing triangles. <see cref="ULFaceWinding"/></summary>
 		/// <remarks>This is only used when the GPU renderer is enabled.</remarks>
-		public ULFaceWinding FaceWinding
-		{
-			[MethodImpl(MethodImplOptions.AggressiveInlining)]
-			get => ULConfig_C.face_winding;
-			[MethodImpl(MethodImplOptions.AggressiveInlining)]
-			set => Methods.ulConfigSetFaceWinding(Ptr, value);
-		}
+		public ULFaceWinding FaceWinding;
 
 		/// <summary>Whether or not images should be enabled.</summary>
-		public bool EnableImages
-		{
-			[MethodImpl(MethodImplOptions.AggressiveInlining)]
-			get => ULConfig_C.enable_images;
-			[MethodImpl(MethodImplOptions.AggressiveInlining)]
-			set => Methods.ulConfigSetEnableImages(Ptr, value);
-		}
+		public bool EnableImages;
 		/// <summary>Whether or not JavaScript should be enabled.</summary>
-		public bool EnableJavaScript
-		{
-			[MethodImpl(MethodImplOptions.AggressiveInlining)]
-			get => ULConfig_C.enable_javascript;
-			[MethodImpl(MethodImplOptions.AggressiveInlining)]
-			set => Methods.ulConfigSetEnableJavaScript(Ptr, value);
-		}
+		public bool EnableJavaScript;
 
 		/// <summary>The hinting algorithm to use when rendering fonts. <see cref="ULFontHinting"/></summary>
-		public ULFontHinting FontHinting
-		{
-			[MethodImpl(MethodImplOptions.AggressiveInlining)]
-			get => ULConfig_C.font_hinting;
-			[MethodImpl(MethodImplOptions.AggressiveInlining)]
-			set => Methods.ulConfigSetFontHinting(Ptr, value);
-		}
+		public ULFontHinting FontHinting;
 
 		/// <summary>The gamma to use when compositing font glyphs, change this value to adjust contrast (Adobe and Apple prefer 1.8, others may prefer 2.2).</summary>
-		public double FontGamma
-		{
-			[MethodImpl(MethodImplOptions.AggressiveInlining)]
-			get => ULConfig_C.font_gamma;
-			[MethodImpl(MethodImplOptions.AggressiveInlining)]
-			set => Methods.ulConfigSetFontGamma(Ptr, value);
-		}
+		public double FontGamma;
 		/// <summary>Default font-family to use.</summary>
-		public string FontFamilyStandard
-		{
-			[MethodImpl(MethodImplOptions.AggressiveInlining)]
-			get => ULConfig_C.font_family_standard.data_;
-			[MethodImpl(MethodImplOptions.AggressiveInlining)]
-			set => Methods.ulConfigSetFontFamilyStandard(Ptr, ((ULString)value).Ptr);
-		}
+		public string FontFamilyStandard;
 		/// <summary>Default font-family to use for fixed fonts. (pre/code)</summary>
-		public string FontFamilyFixed
-		{
-			[MethodImpl(MethodImplOptions.AggressiveInlining)]
-			get => ULConfig_C.font_family_fixed.data_;
-			[MethodImpl(MethodImplOptions.AggressiveInlining)]
-			set => Methods.ulConfigSetFontFamilyFixed(Ptr, ((ULString)value).Ptr);
-		}
+		public string FontFamilyFixed;
 		/// <summary>Default font-family to use for serif fonts.</summary>
-		public string FontFamilySerif
-		{
-			[MethodImpl(MethodImplOptions.AggressiveInlining)]
-			get => ULConfig_C.font_family_serif.data_;
-			[MethodImpl(MethodImplOptions.AggressiveInlining)]
-			set => Methods.ulConfigSetFontFamilySerif(Ptr, ((ULString)value).Ptr);
-		}
+		public string FontFamilySerif;
 		/// <summary>Default font-family to use for sans-serif fonts.</summary>
-		public string FontFamilySansSerif
-		{
-			[MethodImpl(MethodImplOptions.AggressiveInlining)]
-			get => ULConfig_C.font_family_sans_serif.data_;
-			[MethodImpl(MethodImplOptions.AggressiveInlining)]
-			set => Methods.ulConfigSetFontFamilySansSerif(Ptr, ((ULString)value).Ptr);
-		}
+		public string FontFamilySansSerif;
 		/// <summary>Default user-agent string.</summary>
-		public string UserAgent
-		{
-			[MethodImpl(MethodImplOptions.AggressiveInlining)]
-			get => ULConfig_C.user_agent.data_;
-			[MethodImpl(MethodImplOptions.AggressiveInlining)]
-			set => Methods.ulConfigSetUserAgent(Ptr, ((ULString)value).Ptr);
-		}
+		public string UserAgent;
 		/// <summary>
 		/// Default user stylesheet. You should set this to your own custom CSS
 		/// string to define default styles for various DOM elements, scrollbars,
 		/// and platform input widgets.
 		/// </summary>
-		public string UserStylesheet
-		{
-			[MethodImpl(MethodImplOptions.AggressiveInlining)]
-			get => ULConfig_C.user_stylesheet.data_;
-			[MethodImpl(MethodImplOptions.AggressiveInlining)]
-			set => Methods.ulConfigSetUserStylesheet(Ptr, ((ULString)value).Ptr);
-		}
+		public string UserStylesheet;
 
 		/// <summary>
 		/// Whether or not we should continuously repaint any Views or compositor
 		/// layers, regardless if they are dirty or not. This is mainly used to
 		/// diagnose painting/shader issues.
 		/// </summary>
-		public bool ForceRepaint
-		{
-			[MethodImpl(MethodImplOptions.AggressiveInlining)]
-			get => ULConfig_C.force_repaint;
-			[MethodImpl(MethodImplOptions.AggressiveInlining)]
-			set => Methods.ulConfigSetForceRepaint(Ptr, value);
-		}
+		public bool ForceRepaint;
 
 		/// <summary>
 		/// When a CSS animation is active, the amount of time (in seconds) to wait
 		/// before triggering another repaint. Default is 60 Hz.
 		/// </summary>
-		public double AnimationTimerDelay
-		{
-			[MethodImpl(MethodImplOptions.AggressiveInlining)]
-			get => ULConfig_C.animation_timer_delay;
-			[MethodImpl(MethodImplOptions.AggressiveInlining)]
-			set => Methods.ulConfigSetAnimationTimerDelay(Ptr, value);
-		}
+		public double AnimationTimerDelay;
 		/// <summary>
 		/// When a smooth scroll animation is active, the amount of time (in seconds)
 		/// to wait before triggering another repaint. Default is 60 Hz.
 		/// </summary>
-		public double ScrollTimerDelay
-		{
-			[MethodImpl(MethodImplOptions.AggressiveInlining)]
-			get => ULConfig_C.scroll_timer_delay;
-			[MethodImpl(MethodImplOptions.AggressiveInlining)]
-			set => Methods.ulConfigSetScrollTimerDelay(Ptr, value);
-		}
+		public double ScrollTimerDelay;
 		/// <summary>
 		/// The amount of time (in seconds) to wait before running the recycler (will
 		/// attempt to return excess memory back to the system).
 		/// </summary>
-		public double RecycleDelay
-		{
-			[MethodImpl(MethodImplOptions.AggressiveInlining)]
-			get => ULConfig_C.recycle_delay;
-			[MethodImpl(MethodImplOptions.AggressiveInlining)]
-			set => Methods.ulConfigSetRecycleDelay(Ptr, value);
-		}
+		public double RecycleDelay;
 
 		/// <summary>
 		/// Size of WebCore's memory cache in bytes. 
@@ -392,13 +205,7 @@ namespace UltralightNet
 		/// You should increase this if you anticipate handling pages with
 		/// large resources, Safari typically uses 128+ MiB for its cache.
 		/// </remarks>
-		public uint MemoryCacheSize
-		{
-			[MethodImpl(MethodImplOptions.AggressiveInlining)]
-			get => ULConfig_C.memory_cache_size;
-			[MethodImpl(MethodImplOptions.AggressiveInlining)]
-			set => Methods.ulConfigSetMemoryCacheSize(Ptr, value);
-		}
+		public uint MemoryCacheSize;
 		/// <summary>
 		/// Number of pages to keep in the cache. Defaults to 0 (none).
 		/// </summary>
@@ -407,13 +214,7 @@ namespace UltralightNet
 		/// cache to support typical web-browsing activities. If you increase
 		/// this, you should probably increase the memory cache size as well.
 		/// </remarks>
-		public uint PageCacheSize
-		{
-			[MethodImpl(MethodImplOptions.AggressiveInlining)]
-			get => ULConfig_C.page_cache_size;
-			[MethodImpl(MethodImplOptions.AggressiveInlining)]
-			set => Methods.ulConfigSetPageCacheSize(Ptr, value);
-		}
+		public uint PageCacheSize;
 		/// <summary>
 		/// JavaScriptCore tries to detect the system's physical RAM size to set
 		/// reasonable allocation limits. Set this to anything other than 0 to
@@ -423,52 +224,121 @@ namespace UltralightNet
 		/// This can be used to force JavaScriptCore to be more conservative with
 		/// its allocation strategy (at the cost of some performance).
 		/// </remarks>
-		public uint OverrideRAMSize
-		{
-			[MethodImpl(MethodImplOptions.AggressiveInlining)]
-			get => ULConfig_C.override_ram_size;
-			[MethodImpl(MethodImplOptions.AggressiveInlining)]
-			set => Methods.ulConfigSetOverrideRAMSize(Ptr, value);
-		}
+		public uint OverrideRAMSize;
 		/// <summary>
 		/// The minimum size of large VM heaps in JavaScriptCore. Set this to a
 		/// lower value to make these heaps start with a smaller initial value.
 		/// </summary>
-		public uint MinLargeHeapSize
-		{
-			[MethodImpl(MethodImplOptions.AggressiveInlining)]
-			get => ULConfig_C.min_large_heap_size;
-			[MethodImpl(MethodImplOptions.AggressiveInlining)]
-			set => Methods.ulConfigSetMinLargeHeapSize(Ptr, value);
-		}
+		public uint MinLargeHeapSize;
 		/// <summary>
 		/// The minimum size of small VM heaps in JavaScriptCore. Set this to a
 		/// lower value to make these heaps start with a smaller initial value.
 		/// </summary>
-		public uint MinSmallHeapSize
+		public uint MinSmallHeapSize;
+	}
+
+	/// <summary>
+	/// FOR <b>INTERNAL</b> USE<br/>but you can use this too<br/>pls don't
+	/// </summary>
+	[BlittableType]
+	public struct ULConfigNative
+	{
+		public ULStringMarshaler.ULStringPTR ResourcePath;
+		public ULStringMarshaler.ULStringPTR CachePath;
+
+		public byte UseGpu;
+
+		public double DeviceScale;
+
+		public int FaceWinding;
+
+		public byte EnableImages;
+		public byte EnableJavaScript;
+
+		public double FontGamma;
+
+		public ULStringMarshaler.ULStringPTR FontFamilyStandard;
+		public ULStringMarshaler.ULStringPTR FontFamilyFixed;
+		public ULStringMarshaler.ULStringPTR FontFamilySerif;
+		public ULStringMarshaler.ULStringPTR FontFamilySansSerif;
+		public ULStringMarshaler.ULStringPTR UserAgent;
+		public ULStringMarshaler.ULStringPTR UserStylesheet;
+
+		public byte ForceRepaint;
+
+		public double AnimationTimerDelay;
+		public double ScrollTimerDelay;
+		public double RecycleDelay;
+
+		public uint MemoryCacheSize;
+		public uint PageCacheSize;
+		public uint OverrideRAMSize;
+		public uint MinLargeHeapSize;
+		public uint MinSmallHeapSize;
+
+		public ULConfigNative(ULConfig config)
 		{
-			[MethodImpl(MethodImplOptions.AggressiveInlining)]
-			get => ULConfig_C.min_small_heap_size;
-			[MethodImpl(MethodImplOptions.AggressiveInlining)]
-			set => Methods.ulConfigSetMinSmallHeapSize(Ptr, value);
+			ResourcePath = ULStringMarshaler.ULStringPTR.ManagedToNative(config.ResourcePath);
+			CachePath = ULStringMarshaler.ULStringPTR.ManagedToNative(config.CachePath);
+			UseGpu = (byte)(config.UseGpu ? 1 : 0);
+			DeviceScale = config.DeviceScale;
+			FaceWinding = (int)config.FaceWinding;
+			EnableImages = (byte)(config.EnableImages ? 1 : 0);
+			EnableJavaScript = (byte)(config.EnableJavaScript ? 1 : 0);
+			FontGamma = config.FontGamma;
+			FontFamilyStandard = ULStringMarshaler.ULStringPTR.ManagedToNative(config.FontFamilyStandard);
+			FontFamilyFixed = ULStringMarshaler.ULStringPTR.ManagedToNative(config.FontFamilyFixed);
+			FontFamilySerif = ULStringMarshaler.ULStringPTR.ManagedToNative(config.FontFamilySerif);
+			FontFamilySansSerif = ULStringMarshaler.ULStringPTR.ManagedToNative(config.FontFamilySansSerif);
+			UserAgent = ULStringMarshaler.ULStringPTR.ManagedToNative(config.UserAgent);
+			UserStylesheet = ULStringMarshaler.ULStringPTR.ManagedToNative(config.UserStylesheet);
+			ForceRepaint = (byte)(config.ForceRepaint ? 1 : 0);
+			AnimationTimerDelay = config.AnimationTimerDelay;
+			ScrollTimerDelay = config.ScrollTimerDelay;
+			RecycleDelay = config.RecycleDelay;
+			MemoryCacheSize = config.MemoryCacheSize;
+			PageCacheSize = config.PageCacheSize;
+			OverrideRAMSize = config.OverrideRAMSize;
+			MinLargeHeapSize = config.MinLargeHeapSize;
+			MinSmallHeapSize = config.MinSmallHeapSize;
+		}
+		public void FreeNative()
+		{
+			ULStringMarshaler.ULStringPTR.CleanUpNative(ResourcePath);
+			ULStringMarshaler.ULStringPTR.CleanUpNative(CachePath);
+			ULStringMarshaler.ULStringPTR.CleanUpNative(FontFamilyStandard);
+			ULStringMarshaler.ULStringPTR.CleanUpNative(FontFamilyFixed);
+			ULStringMarshaler.ULStringPTR.CleanUpNative(FontFamilySerif);
+			ULStringMarshaler.ULStringPTR.CleanUpNative(FontFamilySansSerif);
+			ULStringMarshaler.ULStringPTR.CleanUpNative(UserAgent);
+			ULStringMarshaler.ULStringPTR.CleanUpNative(UserStylesheet);
 		}
 
-		public bool IsDisposed
+		public ULConfig ToManaged() => new()
 		{
-			[MethodImpl(MethodImplOptions.AggressiveInlining)]
-			get;
-			[MethodImpl(MethodImplOptions.AggressiveInlining)]
-			private set;
-		}
-		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		~ULConfig() => Dispose();
-		public void Dispose()
-		{
-			if (IsDisposed) return;
-			Methods.ulDestroyConfig(Ptr);
-
-			IsDisposed = true;
-			GC.SuppressFinalize(this);
-		}
+			ResourcePath = ResourcePath.ToManged(),
+			CachePath = CachePath.ToManged(),
+			UseGpu = UseGpu != 0,
+			DeviceScale = DeviceScale,
+			FaceWinding = (ULFaceWinding)FaceWinding,
+			EnableImages = EnableImages != 0,
+			EnableJavaScript = EnableJavaScript != 0,
+			FontGamma = FontGamma,
+			FontFamilyStandard = FontFamilyStandard.ToManged(),
+			FontFamilyFixed = FontFamilyFixed.ToManged(),
+			FontFamilySerif = FontFamilySerif.ToManged(),
+			FontFamilySansSerif = FontFamilySansSerif.ToManged(),
+			UserAgent = UserAgent.ToManged(),
+			UserStylesheet = UserStylesheet.ToManged(),
+			ForceRepaint = ForceRepaint != 0,
+			AnimationTimerDelay = AnimationTimerDelay,
+			ScrollTimerDelay = ScrollTimerDelay,
+			RecycleDelay = RecycleDelay,
+			MemoryCacheSize = MemoryCacheSize,
+			PageCacheSize = PageCacheSize,
+			OverrideRAMSize = OverrideRAMSize,
+			MinLargeHeapSize = MinLargeHeapSize,
+			MinSmallHeapSize = MinSmallHeapSize,
+		};
 	}
 }
