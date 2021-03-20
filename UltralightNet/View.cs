@@ -136,7 +136,14 @@ namespace UltralightNet
 
 		public RenderTarget RenderTarget => Methods.ulViewGetRenderTarget(Ptr);
 
-		public ULSurface Surface => new(Methods.ulViewGetSurface(Ptr));
+		public ULSurface Surface
+		{
+			get {
+				IntPtr surfacePtr = Methods.ulViewGetSurface(Ptr);
+				if (surfacePtr == IntPtr.Zero) return null;
+				return new(surfacePtr);
+			}
+		}
 
 		public void Resize(uint width, uint height) => Methods.ulViewResize(Ptr, width, height);
 
