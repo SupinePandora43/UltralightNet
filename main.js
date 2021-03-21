@@ -242,7 +242,7 @@ var assemblies = [
   {
     "name": "UltralightNet.AppCore",
     "classes": [
-      { "name": "UltralightNet.AppCore.AppCoreMethods", "rp": "UltralightNet.AppCore_AppCoreMethods.html", "cl": 2, "ucl": 1, "cal": 3, "tl": 18, "ct": "LineCoverage", "mc": "-", "cb": 0, "tb": 0, "lch": [], "bch": [], "hc": [] },
+      { "name": "UltralightNet.AppCore.AppCoreMethods", "rp": "UltralightNet.AppCore_AppCoreMethods.html", "cl": 1, "ucl": 0, "cal": 1, "tl": 19, "ct": "LineCoverage", "mc": "-", "cb": 0, "tb": 0, "lch": [], "bch": [], "hc": [] },
     ]},
   {
     "name": "UltralightNet.Resources",
