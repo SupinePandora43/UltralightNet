@@ -9,6 +9,13 @@ jobs:
       fail-fast: false
       matrix:
         os: [ 'windows', 'ubuntu', 'macos' ]
+        include:
+          - os: windows
+            rid: win-x64
+          - os: ubuntu
+            rid: linux-x64
+          - os: macos
+            rid: osx-x64
     steps:
       - uses: actions/checkout@v2
       - name: Setup .NET
@@ -22,7 +29,7 @@ jobs:
 
       - name: Test
         continue-on-error: true
-        run: dotnet test UltralightNet.Test/UltralightNet.Test.csproj --collect:"XPlat Code Coverage" -- DataCollectionRunSettings.DataCollectors.DataCollector.Configuration.Format=cobertura -- DataCollectionRunSettings.DataCollectors.DataCollector.Configuration.UseSourceLink=true
+        run: dotnet test UltralightNet.Test/UltralightNet.Test.csproj -r ${{ matrix.rid }} --collect:"XPlat Code Coverage" -- DataCollectionRunSettings.DataCollectors.DataCollector.Configuration.Format=cobertura -- DataCollectionRunSettings.DataCollectors.DataCollector.Configuration.UseSourceLink=true
       - name: Upload coverage
         uses: actions/upload-artifact@v2
         with:
