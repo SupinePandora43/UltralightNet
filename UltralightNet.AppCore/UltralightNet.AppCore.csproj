@@ -5,7 +5,7 @@
 		
 		<PackageId>UltralightNet.AppCore</PackageId>
 		<Authors>SupinePandora43</Authors>
-		<RuntimeIdentifiers>win-x64;linux-x64;osx-x64</RuntimeIdentifiers>
+		<Platform>x64</Platform>
 	</PropertyGroup>
 
 	<ItemGroup>

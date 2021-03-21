@@ -27,6 +27,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		.github\workflows\coverage.yml = .github\workflows\coverage.yml
 		nuget.config = nuget.config
 		README.md = README.md
+		version.json = version.json
 	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Ultralight", "Ultralight\Ultralight.csproj", "{5F2F13D6-9A21-43FC-B932-A4B423967B2B}"
@@ -45,7 +46,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UltralightNet.TestApplicati
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UltralightNet.AppCore", "UltralightNet.AppCore\UltralightNet.AppCore.csproj", "{C7D7C608-DC96-4CA8-8843-F512D9E74528}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UltralightNet.Resources", "UltralightNet.Resources\UltralightNet.Resources.csproj", "{553CF6D4-7E36-438D-9D1A-A97670C482AF}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UltralightNet.Resources", "UltralightNet.Resources\UltralightNet.Resources.csproj", "{553CF6D4-7E36-438D-9D1A-A97670C482AF}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

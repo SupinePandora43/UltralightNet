@@ -5,16 +5,14 @@
 		<EmitCompilerGeneratedFiles>true</EmitCompilerGeneratedFiles>
 		<LangVersion>preview</LangVersion>
 		<UseAppHost>true</UseAppHost>
-		<IsPackable>false</IsPackable>
+		<IsPackable>true</IsPackable>
 		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-		<RuntimeIdentifiers>win-x64;linux-x64;osx-x64</RuntimeIdentifiers>
 
+		<PublishRepositoryUrl>true</PublishRepositoryUrl>
 		<IncludeSymbols>true</IncludeSymbols>
 		<SymbolPackageFormat>snupkg</SymbolPackageFormat>
-		<DebugType>portable</DebugType>
-
+		
 		<PackageId>UltralightNet</PackageId>
-		<Version>1.2.1</Version>
 		<Authors>SupinePandora43</Authors>
 		<Description>Ultralight .NET bindings</Description>
 		<PackageProjectUrl>https://github.com/SupinePandora43/UltralightSharp</PackageProjectUrl>
@@ -25,5 +23,6 @@
 	<ItemGroup>
 		<PackageReference Include="Ancillary.Interop" Version="1.0.0-alpha.20604.3" />
 		<PackageReference Include="DllImportGenerator" Version="1.0.0-alpha.20604.3" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
+		<PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0" PrivateAssets="All"/>
 	</ItemGroup>
 </Project>
