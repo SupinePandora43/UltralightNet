@@ -421,7 +421,6 @@ namespace UltralightNet
 		{
 			if ((a is null) || (b is null)) return object.ReferenceEquals(a, b);
 			return a.Ptr == b.Ptr;
-
 		}
 #nullable restore
 	}
