@@ -1,7 +1,7 @@
 name: Test Coverage
 on:
   push:
-    branches: [ 'master', 'UltralightNet', 'collect_coverage_across_all_platforms' ]
+    branches: [ 'master' ]
 jobs:
   Test:
     runs-on: ${{ matrix.os }}-latest
