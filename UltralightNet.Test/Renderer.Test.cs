@@ -7,6 +7,7 @@ namespace UltralightNet.Test
 {
 	public class RendererTest
 	{
+		private Renderer renderer;
 		[Fact]
 		public void TestRenderer()
 		{
@@ -17,26 +18,31 @@ namespace UltralightNet.Test
 			{
 				ResourcePath = "./resources"
 			};
-			Renderer renderer = new(config, false);
+			renderer = new(config, false);
 
-			#region Session
+			SessionTest();
+
+			GenericTest();
+
+			JSTest();
+
+			HTMLTest();
+		}
+
+		private void SessionTest()
+		{
 			Session session = Session.DefaultSession(renderer);
 			Assert.Equal("default", session.Name);
-			#endregion
+		}
 
-			View view = new(renderer, 512, 512, false, session, true);
+		private void GenericTest()
+		{
+			View view = new(renderer, 512, 512, false, Session.DefaultSession(renderer), true);
 
-			// Width, Height
 			Assert.Equal(512u, view.Width);
 			Assert.Equal(512u, view.Height);
 
-			// LoadURL
 			view.URL = "https://github.com/";
-
-			/*while (true)
-			{
-				view.URL = "https://github.com/";
-			}*/
 
 			view.SetChangeTitleCallback((user_data, caller, title) =>
 			{
@@ -56,13 +62,24 @@ namespace UltralightNet.Test
 				Thread.Sleep(100);
 			}
 
-			// GetURL
-			Assert.Equal("https://github.com/", view.URL);
+			view.SetChangeTitleCallback(null);
+			view.SetChangeURLCallback(null);
 
-			// EvaluateScript
+			Assert.Equal("https://github.com/", view.URL);
+			Assert.Contains("GitHub", view.Title);
+		}
+
+		private void JSTest()
+		{
+			View view = new(renderer, 2, 2, false, Session.DefaultSession(renderer), true);
 			Assert.Equal("3", view.EvaluateScript("1+2", out string exception));
 			Assert.True(string.IsNullOrEmpty(exception));
+		}
 
+		private void HTMLTest()
+		{
+			View view = new(renderer, 512, 512, false, Session.DefaultSession(renderer), true);
+			view.HTML = "<html />";
 		}
 	}
 }

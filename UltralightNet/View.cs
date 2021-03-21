@@ -210,6 +210,9 @@ namespace UltralightNet
 			GC.SuppressFinalize(this);
 		}
 
+		/// <summary>
+		/// literally creates <see cref="View"/> from <see cref="IntPtr"/> and back, pls don't use
+		/// </summary>
 		public class Marshaler : ICustomMarshaler
 		{
 			private static readonly Marshaler instance = new();
