@@ -237,7 +237,7 @@ var assemblies = [
       { "name": "UltralightNet.ULScrollEventNative", "rp": "UltralightNet_ULScrollEventNative.html", "cl": 0, "ucl": 11, "cal": 11, "tl": 55, "ct": "LineCoverage", "mc": "-", "cb": 0, "tb": 0, "lch": [], "bch": [], "hc": [] },
       { "name": "UltralightNet.ULStringMarshaler", "rp": "UltralightNet_ULStringMarshaler.html", "cl": 30, "ucl": 9, "cal": 39, "tl": 148, "ct": "LineCoverage", "mc": "-", "cb": 0, "tb": 2, "lch": [], "bch": [], "hc": [] },
       { "name": "UltralightNet.ULSurface", "rp": "UltralightNet_ULSurface.html", "cl": 0, "ucl": 13, "cal": 13, "tl": 87, "ct": "LineCoverage", "mc": "-", "cb": 0, "tb": 0, "lch": [], "bch": [], "hc": [] },
-      { "name": "UltralightNet.View", "rp": "UltralightNet_View.html", "cl": 23, "ucl": 35, "cal": 58, "tl": 236, "ct": "LineCoverage", "mc": "-", "cb": 0, "tb": 4, "lch": [], "bch": [], "hc": [] },
+      { "name": "UltralightNet.View", "rp": "UltralightNet_View.html", "cl": 23, "ucl": 37, "cal": 60, "tl": 241, "ct": "LineCoverage", "mc": "-", "cb": 0, "tb": 4, "lch": [], "bch": [], "hc": [] },
     ]},
   {
     "name": "UltralightNet.AppCore",
