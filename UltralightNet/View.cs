@@ -128,6 +128,11 @@ namespace UltralightNet
 		[DllImport("Ultralight")]
 		public static extern void ulViewSetChangeTooltipCallback(IntPtr view, ULChangeTooltipCallback callback, IntPtr user_data);
 
+		[DllImport("Ultralight")]
+		public static extern void ulViewSetChangeCursorCallback(IntPtr view, ULChangeCursorCallback callback, IntPtr user_data);
+
+		[DllImport("Ultralight")]
+		public static extern void ulViewSetAddConsoleMessageCallback(IntPtr view, ULAddConsoleMessageCallback callback, IntPtr user_data);
 		// to be continued https://github.com/ultralight-ux/Ultralight-API/blob/7f9de24ca1c7ec8b385e895c4899b9d96626da58/Ultralight/CAPI.h#L777
 	}
 
@@ -197,8 +202,8 @@ namespace UltralightNet
 		public void SetChangeTitleCallback(ULChangeTitleCallback callback, IntPtr userData = default) => Methods.ulViewSetChangeTitleCallback(Ptr, callback, userData);
 		public void SetChangeURLCallback(ULChangeURLCallback callback, IntPtr userData = default) => Methods.ulViewSetChangeURLCallback(Ptr, callback, userData);
 		public void SetChangeTooltipCallback(ULChangeTooltipCallback callback, IntPtr userData = default) => Methods.ulViewSetChangeTooltipCallback(Ptr, callback, userData);
-
-
+		public void SetChangeCursorCallback(ULChangeCursorCallback callback, IntPtr userData = default) => Methods.ulViewSetChangeCursorCallback(Ptr, callback, userData);
+		public void SetAddConsoleMessageCallback(ULAddConsoleMessageCallback callback, IntPtr userData = default) => Methods.ulViewSetAddConsoleMessageCallback(Ptr, callback, userData);
 
 
 
