@@ -120,10 +120,13 @@ namespace UltralightNet
 		public static partial void ulViewFireScrollEvent(IntPtr view, ULScrollEvent scroll_event);
 
 		[DllImport("Ultralight")]
-		public static extern void ulViewSetChangeTitleCallback(IntPtr view, ULChangeTitleCallback callback);
+		public static extern void ulViewSetChangeTitleCallback(IntPtr view, ULChangeTitleCallback callback, IntPtr user_data);
 
 		[DllImport("Ultralight")]
-		public static extern void ulViewSetChangeURLCallback(IntPtr view, ULChangeURLCallback callback);
+		public static extern void ulViewSetChangeURLCallback(IntPtr view, ULChangeURLCallback callback, IntPtr user_data);
+
+		[DllImport("Ultralight")]
+		public static extern void ulViewSetChangeTooltipCallback(IntPtr view, ULChangeTooltipCallback callback, IntPtr user_data);
 
 		// to be continued https://github.com/ultralight-ux/Ultralight-API/blob/7f9de24ca1c7ec8b385e895c4899b9d96626da58/Ultralight/CAPI.h#L777
 	}
@@ -191,9 +194,9 @@ namespace UltralightNet
 		public void FireScrollEvent(ULScrollEvent scrollEvent) => Methods.ulViewFireScrollEvent(Ptr, scrollEvent);
 
 
-		public void SetChangeTitleCallback(ULChangeTitleCallback callback) => Methods.ulViewSetChangeTitleCallback(Ptr, callback);
-		public void SetChangeURLCallback(ULChangeURLCallback callback) => Methods.ulViewSetChangeURLCallback(Ptr, callback);
-
+		public void SetChangeTitleCallback(ULChangeTitleCallback callback, IntPtr userData = default) => Methods.ulViewSetChangeTitleCallback(Ptr, callback, userData);
+		public void SetChangeURLCallback(ULChangeURLCallback callback, IntPtr userData = default) => Methods.ulViewSetChangeURLCallback(Ptr, callback, userData);
+		public void SetChangeTooltipCallback(ULChangeTooltipCallback callback, IntPtr userData = default) => Methods.ulViewSetChangeTooltipCallback(Ptr, callback, userData);
 
 
 
