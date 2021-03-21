@@ -119,6 +119,8 @@ namespace UltralightNet
 		[GeneratedDllImport("Ultralight")]
 		public static partial void ulViewFireScrollEvent(IntPtr view, ULScrollEvent scroll_event);
 
+		[DllImport("Ultralight")]
+		public static extern void ulViewSetChangeTitleCallback(IntPtr view, ULChangeTitleCallback callback);
 		// to be continued https://github.com/ultralight-ux/Ultralight-API/blob/7f9de24ca1c7ec8b385e895c4899b9d96626da58/Ultralight/CAPI.h#L744
 	}
 
@@ -127,6 +129,11 @@ namespace UltralightNet
 		public IntPtr Ptr { get; private set; }
 		public bool IsDisposed { get; private set; }
 
+		public View(IntPtr ptr, bool dispose = false)
+		{
+			Ptr = ptr;
+			IsDisposed = !dispose;
+		}
 		public View(Renderer renderer, uint width, uint height, bool transparent, Session session, bool force_cpu_renderer)
 		{
 			Ptr = Methods.ulCreateView(renderer.Ptr, width, height, transparent, session.Ptr, force_cpu_renderer);
@@ -180,7 +187,7 @@ namespace UltralightNet
 		public void FireScrollEvent(ULScrollEvent scrollEvent) => Methods.ulViewFireScrollEvent(Ptr, scrollEvent);
 
 
-
+		public void SetChangeTitleCallback(ULChangeTitleCallback callback) => Methods.ulViewSetChangeTitleCallback(Ptr, callback);
 
 
 
@@ -197,6 +204,23 @@ namespace UltralightNet
 
 			IsDisposed = true;
 			GC.SuppressFinalize(this);
+		}
+
+		public class Marshaler : ICustomMarshaler
+		{
+			private static readonly Marshaler instance = new();
+
+			public static ICustomMarshaler GetInstance(string cookie) => instance;
+
+			public void CleanUpManagedData(object ManagedObj) { }
+
+			public void CleanUpNativeData(IntPtr pNativeData) { }
+
+			public int GetNativeDataSize() => 1;
+
+			public IntPtr MarshalManagedToNative(object ManagedObj) => ((View)ManagedObj).Ptr;
+
+			public object MarshalNativeToManaged(IntPtr pNativeData) => new View(pNativeData);
 		}
 	}
 }

@@ -1,3 +1,4 @@
+using System;
 using System.Runtime.InteropServices;
 using System.Threading;
 using UltralightNet.AppCore;
@@ -37,6 +38,12 @@ namespace UltralightNet.Test
 			{
 				view.URL = "https://github.com/";
 			}*/
+
+			view.SetChangeTitleCallback((user_data, caller, title) =>
+			{
+				Assert.Equal(view.Ptr, caller.Ptr);
+				Console.WriteLine(title);
+			});
 
 			while (view.URL == "")
 			{
