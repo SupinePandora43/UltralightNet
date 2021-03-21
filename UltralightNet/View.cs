@@ -221,6 +221,14 @@ namespace UltralightNet
 			GC.SuppressFinalize(this);
 		}
 
+#pragma warning disable CS8632 // The annotation for nullable reference types should only be used in code within a '#nullable' annotations context.
+		public static bool ReferenceEquals(View? a, View? b)
+#pragma warning restore CS8632 // The annotation for nullable reference types should only be used in code within a '#nullable' annotations context.
+		{
+			if ((a is null) || (b is null)) return object.ReferenceEquals(a, b);
+			return a.Ptr == b.Ptr;
+		}
+
 		/// <summary>
 		/// literally creates <see cref="View"/> from <see cref="IntPtr"/> and back, pls don't use
 		/// </summary>
