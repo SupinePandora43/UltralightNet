@@ -13,11 +13,7 @@
 		<SymbolPackageFormat>snupkg</SymbolPackageFormat>
 
 		<PackageId>UltralightNet</PackageId>
-		<Authors>Supine</Authors>
 		<Description>Ultralight .NET bindings</Description>
-		<PackageProjectUrl>https://github.com/SupinePandora43/UltralightSharp</PackageProjectUrl>
-		<RepositoryUrl>https://github.com/SupinePandora43/UltralightSharp</RepositoryUrl>
-		<RepositoryType>git</RepositoryType>
 	</PropertyGroup>
 	<ItemGroup>
 		<PackageReference Include="Ancillary.Interop" Version="1.0.0-alpha.20604.3" />

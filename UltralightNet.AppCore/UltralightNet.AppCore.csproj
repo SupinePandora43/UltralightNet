@@ -7,6 +7,10 @@
 		<PackageId>UltralightNet.AppCore</PackageId>
 		<Authors>Ultralight, Inc.</Authors>
 		<Platform>x64</Platform>
+
+		<PublishRepositoryUrl>true</PublishRepositoryUrl>
+		<IncludeSymbols>true</IncludeSymbols>
+		<SymbolPackageFormat>snupkg</SymbolPackageFormat>
 	</PropertyGroup>
 
 	<ItemGroup>
@@ -18,6 +22,7 @@
 		<Content Include="@(_ExistingAssets->'%(Identity)')" CopyToOutputDirectory="PreserveNewest" PackagePath="%(PackagePath)" Pack="true" />
 	</ItemGroup>
 	<ItemGroup>
+		<PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0" PrivateAssets="All" />
 		<ProjectReference Include="..\UltralightNet\UltralightNet.csproj" />
 	</ItemGroup>
 
