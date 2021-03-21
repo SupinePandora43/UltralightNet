@@ -124,7 +124,8 @@ namespace UltralightNet
 
 		[DllImport("Ultralight")]
 		public static extern void ulViewSetChangeURLCallback(IntPtr view, ULChangeURLCallback callback);
-		// to be continued https://github.com/ultralight-ux/Ultralight-API/blob/7f9de24ca1c7ec8b385e895c4899b9d96626da58/Ultralight/CAPI.h#L744
+
+		// to be continued https://github.com/ultralight-ux/Ultralight-API/blob/7f9de24ca1c7ec8b385e895c4899b9d96626da58/Ultralight/CAPI.h#L777
 	}
 
 	public class View : IDisposable
