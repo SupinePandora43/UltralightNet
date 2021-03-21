@@ -35,10 +35,10 @@ jobs:
 
       - name: Test
         continue-on-error: true
-        run: dotnet test UltralightNet.Test/UltralightNet.Test.csproj --runtime ${{ matrix.rid }} --collect:"XPlat Code Coverage" -- DataCollectionRunSettings.DataCollectors.DataCollector.Configuration.Format=cobertura -- DataCollectionRunSettings.DataCollectors.DataCollector.Configuration.UseSourceLink=true
+        run: dotnet test UltralightNet.Test/UltralightNet.Test.csproj --runtime ${{ matrix.rid }} --collect:"XPlat Code Coverage" -- DataCollectionRunSettings.DataCollectors.DataCollector.Configuration.Format=cobertura,opencover -- DataCollectionRunSettings.DataCollectors.DataCollector.Configuration.UseSourceLink=true
       - name: Test
         continue-on-error: true
-        run: dotnet test UltralightNet.Test/UltralightNet.Test.csproj --collect:"XPlat Code Coverage" -- DataCollectionRunSettings.DataCollectors.DataCollector.Configuration.Format=cobertura -- DataCollectionRunSettings.DataCollectors.DataCollector.Configuration.UseSourceLink=true
+        run: dotnet test UltralightNet.Test/UltralightNet.Test.csproj --collect:"XPlat Code Coverage" -- DataCollectionRunSettings.DataCollectors.DataCollector.Configuration.Format=cobertura,opencover -- DataCollectionRunSettings.DataCollectors.DataCollector.Configuration.UseSourceLink=true
       - name: Upload coverage
         uses: actions/upload-artifact@v2
         with:
@@ -80,7 +80,7 @@ jobs:
     - name: Generate Badge
       uses: danielpalme/ReportGenerator-GitHub-Action@4.8.7
       with:
-        reports: 'Coverage/*/coverage.cobertura.xml' # REQUIRED # The coverage reports that should be parsed (separated by semicolon). Globbing is supported.
+        reports: 'Coverage/*/coverage.cobertura.xml;Coverage/*/coverage.opencover.xml' # REQUIRED # The coverage reports that should be parsed (separated by semicolon). Globbing is supported.
         targetdir: 'coveragereport' # REQUIRED # The directory where the generated report should be saved.
         reporttypes: 'Badges;Html;HtmlChart;HtmlInline;HtmlSummary;PngChart' # The output formats and scope (separated by semicolon) Values: Badges, Clover, Cobertura, CsvSummary, Html, HtmlChart, HtmlInline, HtmlInline_AzurePipelines, HtmlInline_AzurePipelines_Dark, HtmlSummary, JsonSummary, Latex, LatexSummary, lcov, MHtml, PngChart, SonarQube, TeamCitySummary, TextSummary, Xml, XmlSummary
     - name: Deploy
