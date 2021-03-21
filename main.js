@@ -239,6 +239,10 @@ var assemblies = [
       { "name": "UltralightNet.ULSurface", "rp": "UltralightNet_ULSurface.html", "cl": 0, "ucl": 13, "cal": 13, "tl": 88, "ct": "LineCoverage", "mc": "-", "cb": 0, "tb": 0, "lch": [], "bch": [], "hc": [] },
       { "name": "UltralightNet.View", "rp": "UltralightNet_View.html", "cl": 23, "ucl": 42, "cal": 65, "tl": 253, "ct": "LineCoverage", "mc": "-", "cb": 0, "tb": 8, "lch": [], "bch": [], "hc": [] },
     ]},
+  {
+    "name": "UltralightNet.Resources",
+    "classes": [
+    ]},
 ];
 
 var historicCoverageExecutionTimes = [];
