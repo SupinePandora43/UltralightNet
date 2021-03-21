@@ -2,6 +2,9 @@ name: Test Coverage
 on:
   push:
     branches: [ 'master' ]
+    paths:
+    - '**.cs'
+    - '**.csproj'
 jobs:
   Test:
     runs-on: ${{ matrix.os }}-latest
