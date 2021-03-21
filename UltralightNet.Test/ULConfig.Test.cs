@@ -201,6 +201,7 @@ namespace UltralightNet.Test
 		public void DisposeTest()
 		{
 			config.Dispose();
+			config.Dispose();
 		}
 		[Fact]
 		public void FinalizeTest()
