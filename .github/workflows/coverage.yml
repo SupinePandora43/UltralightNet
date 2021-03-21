@@ -5,6 +5,7 @@ on:
     paths:
     - '**.cs'
     - '**.csproj'
+    - '**/coverage.yml'
 jobs:
   Test:
     runs-on: ${{ matrix.os }}-latest
