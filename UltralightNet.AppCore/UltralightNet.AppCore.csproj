@@ -1,18 +1,23 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
 		<TargetFrameworks>net5.0</TargetFrameworks>
 
-		<Description>AppCore's binaries and bindings</Description>
-		<PackageId>UltralightNet.AppCore</PackageId>
-		<Authors>Ultralight, Inc.</Authors>
-		<Platform>x64</Platform>
-
 		<PublishRepositoryUrl>true</PublishRepositoryUrl>
 		<IncludeSymbols>true</IncludeSymbols>
 		<SymbolPackageFormat>snupkg</SymbolPackageFormat>
+		
+		<Authors>Ultralight, Inc.</Authors>
+		<PackageId>UltralightNet.AppCore</PackageId>
+		<Description>AppCore's binaries and bindings</Description>
+		
+		<PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
 	</PropertyGroup>
-
+	<ItemGroup>
+		<None Include="../Ultralight_LICENSE.txt" Pack="true" PackagePath="LICENSE.txt"/>
+		<None Include="../Ultralight_EULA.txt" Pack="true" PackagePath="EULA.txt"/>
+		<None Include="../Ultralight_NOTICES.txt" Pack="true" PackagePath="NOTICES.txt"/>
+	</ItemGroup>
 	<ItemGroup>
 		<_NativeAssetName Include="runtimes/win-x64/native/AppCore.dll" PackagePath="runtimes/win-x64/native" />
 		<_NativeAssetName Include="runtimes/osx-x64/native/libAppCore.dylib" PackagePath="runtimes/osx-x64/native" />
