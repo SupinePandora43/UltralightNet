@@ -9,7 +9,6 @@
 
 		<SolutionDir>$(MSBuildThisFileDirectory)</SolutionDir>
 		<PackageOutputPath>$(SolutionDir)</PackageOutputPath>
-		<VersionFilePath>$(MSBuildThisFileDirectory)/version.json</VersionFilePath>
 		<DebugType>Portable</DebugType>
 	</PropertyGroup>
 </Project>
