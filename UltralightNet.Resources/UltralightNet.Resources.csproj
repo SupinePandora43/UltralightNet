@@ -23,5 +23,6 @@
 			<PackageCopyToOutput>True</PackageCopyToOutput>
 			<CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
 		</Content>
+		<None Update="resources/cacert.pem;resources/icudt67l.dat" Pack="true" PackagePath="/contentFiles" />
 	</ItemGroup>
 </Project>
