@@ -1,9 +1,9 @@
 <Project Sdk="Microsoft.NET.Sdk">
 	<PropertyGroup>
 		<TargetFrameworks>net5;netstandard1</TargetFrameworks>
-		<NoBuild>true</NoBuild>
-		<IncludeBuildOutput>false</IncludeBuildOutput>
-		<DisableImplicitFrameworkReferences>true</DisableImplicitFrameworkReferences>
+		<NoBuild>false</NoBuild>
+		<IncludeBuildOutput>true</IncludeBuildOutput>
+		<DisableImplicitFrameworkReferences>false</DisableImplicitFrameworkReferences>
 		<Platform>x64</Platform>
 
 		<Authors>Ultralight, Inc.</Authors>
@@ -11,15 +11,17 @@
 		<Description>Ultralight 'resources' folder</Description>
 	</PropertyGroup>
 	<ItemGroup>
-		<None Remove="resources\cacert.pem" />
-		<None Remove="resources\icudt67l.dat" />
-	</ItemGroup>
-	<ItemGroup>
-		<Content Include="resources\cacert.pem">
+		<Content Include="resources/cacert.pem">
+			<Pack>True</Pack>
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+			<PackageCopyToOutput>True</PackageCopyToOutput>
+			<CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
 		</Content>
-		<Content Include="resources\icudt67l.dat">
+		<Content Include="resources/icudt67l.dat">
+			<Pack>True</Pack>
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+			<PackageCopyToOutput>True</PackageCopyToOutput>
+			<CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
 		</Content>
 	</ItemGroup>
 </Project>
