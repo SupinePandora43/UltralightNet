@@ -1,9 +1,7 @@
-name: Build & Test
+name: Test & Deploy
 on:
   push:
-    branches: [ '*' ]
-  pull_request:
-    branches: [ master ]
+    branches: [ 'master' ]
 jobs:
   build-and-test:
     runs-on: ${{ matrix.os }}
@@ -25,3 +23,20 @@ jobs:
           dotnet pack UltralightNet.Resources
       - name: Test
         run: dotnet test UltralightNet.Test/UltralightNet.Test.csproj --verbosity normal
+  publish:
+    runs-on: ubuntu-latest
+    needs: build-and-test
+    steps:
+    - uses: actions/checkout@v2
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: 5.0.100
+    - name: Pack
+      run: |
+        dotnet pack UltralightNet.Binaries
+        dotnet pack UltralightNet
+        dotnet pack UltralightNet.AppCore
+        dotnet pack UltralightNet.Resources
+    - name: Publish
+      run: dotnet nuget push -k {{ env.NUGET_TOKEN }} -s https://api.nuget.org/v3/index.json UltralightNet.*.nupkg  --skip-duplicate
