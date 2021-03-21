@@ -14,7 +14,8 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<PackageReference Include="UltralightNet.Binaries" Version="1.2.1" />
+		<PackageReference Include="UltralightNet.Binaries" Version="$(Version)" />
+		<PackageReference Include="UltralightNet.AppCore" Version="$(Version)" />
 
 		<PackageReference Include="coverlet.collector" Version="3.0.3">
 			<PrivateAssets>all</PrivateAssets>
@@ -29,7 +30,6 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<ProjectReference Include="..\UltralightNet.AppCore\UltralightNet.AppCore.csproj" />
 		<ProjectReference Include="..\UltralightNet.Resources\UltralightNet.Resources.csproj" />
 		<ProjectReference Include="..\UltralightNet\UltralightNet.csproj" />
 	</ItemGroup>
