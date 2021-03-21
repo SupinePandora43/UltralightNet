@@ -1,100 +1,68 @@
-using System;
-using System.IO;
+using System.Runtime.InteropServices;
+using System.Threading;
+using UltralightNet.AppCore;
 using Xunit;
 
 namespace UltralightNet.Test
 {
 	public class RendererTest
 	{
-		internal static ULConfig config;
-		internal static Renderer renderer;
-		
-		static RendererTest()
-		{
-			AppCore.AppCore.EnablePlatformFontLoader();
-			config = new();
-			renderer = new(config);
-		}
-
 		[Fact]
-		public void RendererEmptyTest()
+		public void TestRenderer()
 		{
-			renderer.Update();
-			renderer.Render();
-		}
+			if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX)) return;
+			AppCoreMethods.ulEnablePlatformFontLoader();
 
-		[Fact]
-		public void RendererPurgeMemoryTest()
-		{
-			renderer.PurgeMemory();
-		}
+			ULConfig config = new()
+			{
+				ResourcePath = "./resources"
+			};
+			Renderer renderer = new(config, false);
 
-		[Fact]
-		public void RendererLogMemoryUsageTest()
-		{
-			renderer.LogMemoryUsage();
-		}
+			#region Session
+			Session session = Session.DefaultSession(renderer);
+			Assert.Equal("default", session.Name);
+			#endregion
 
-		[Fact]
-		public void RendererDisposeTest()
-		{
-			ULConfig config = new();
-			Renderer renderer = new(config);
+			View view = new(renderer, 512, 512, false, session, true);
 
-			Assert.False(renderer.IsDisposed);
-			renderer.Dispose();
-			Assert.True(renderer.IsDisposed);
-		}
-
-		[Fact]
-		public void RendererFromIntPtrTest()
-		{
-			IntPtr ptr = Methods.ulCreateRenderer(new ULConfig().Ptr);
-			Renderer renderer = new(ptr);
-
-			Assert.Equal(ptr, renderer.Ptr);
-		}
-
-#pragma warning disable IDE0059 // Unnecessary assignment of a value
-		[Fact]
-		[Trait("Priority", "last")]
-		public void RendererFinalizeTest()
-		{
-			ULConfig config = new();
-			Renderer renderer = new(config);
-
-			renderer = null;
-			GC.WaitForPendingFinalizers();
-		}
-#pragma warning restore IDE0059 // Unnecessary assignment of a value
-
-		[Fact]
-		public void ViewWidthTest()
-		{
-			View view = new(renderer, 512, 512, false, Session.DefaultSession(renderer), true);
+			// Width, Height
 			Assert.Equal(512u, view.Width);
-		}
-
-		[Fact]
-		public void ViewHeightTest()
-		{
-			View view = new(renderer, 512, 512, false, Session.DefaultSession(renderer), true);
 			Assert.Equal(512u, view.Height);
-		}
 
-		[Fact]
-		public void ViewIsLoadingTest()
-		{
-			View view = new(renderer, 512, 512, false, Session.DefaultSession(renderer), true);
-			Assert.True(view.IsLoading);
-		}
+			// LoadURL
+			view.URL = "https://github.com/";
 
-		[Fact]
-		public void ViewEvaluateScriptTest()
-		{
-			View view = new(renderer, 512, 512, false, Session.DefaultSession(renderer), true);
-			ULString result = view.EvaluateScript((ULString)"1+2", out _);
-			File.WriteAllText("./test.txt", result.ToString());
+			/*while (true)
+			{
+				view.URL = "https://github.com/";
+			}*/
+
+			view.SetChangeTitleCallback((user_data, caller, title) =>
+			{
+				Assert.Equal(view.Ptr, caller.Ptr);
+				Assert.Contains("GitHub", title);
+			});
+
+			view.SetChangeURLCallback((user_data, caller, url) =>
+			{
+				Assert.Equal(view.Ptr, caller.Ptr);
+				Assert.Equal("https://github.com/", url);
+			});
+
+			while (view.URL == "")
+			{
+				renderer.Update();
+				Thread.Sleep(100);
+			}
+
+			// GetURL
+			Assert.Equal("https://github.com/", view.URL);
+
+			// EvaluateScript
+			Assert.Equal("3", view.EvaluateScript("1+2", out string exception));
+			Assert.True(string.IsNullOrEmpty(exception));
+
 		}
 	}
 }

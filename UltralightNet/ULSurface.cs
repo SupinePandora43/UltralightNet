@@ -55,6 +55,10 @@ namespace UltralightNet
 		/// <summary>Get the underlying user data pointer (this is only valid if you have set a custom surface implementation via ulPlatformSetSurfaceDefinition).</summary>
 		[DllImport("Ultralight")]
 		public static extern IntPtr ulSurfaceGetUserData(IntPtr surface);
+
+		/// <summary>Get the underlying Bitmap from the default Surface.</summary>
+		[DllImport("Ultralight")]
+		public static extern IntPtr ulBitmapSurfaceGetBitmap(IntPtr surface);
 	}
 
 	public class ULSurface
@@ -77,5 +81,7 @@ namespace UltralightNet
 		public void ClearDirtyBounds() => Methods.ulSurfaceClearDirtyBounds(Ptr);
 
 		public IntPtr UserData { get => Methods.ulSurfaceGetUserData(Ptr); }
+
+		public ULBitmap Bitmap => new(Methods.ulBitmapSurfaceGetBitmap(Ptr));
 	}
 }

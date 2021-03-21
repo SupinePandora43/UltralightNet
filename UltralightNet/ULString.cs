@@ -1,5 +1,4 @@
 using System;
-using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
 namespace UltralightNet
@@ -33,6 +32,10 @@ namespace UltralightNet
 		[return: MarshalAs(UnmanagedType.LPWStr)]
 		public static partial string ulStringGetData(IntPtr str);
 
+		/// <summary>Get internal UTF-16 buffer data.</summary>
+		[DllImport("Ultralight", EntryPoint = "ulStringGetData")]
+		public static extern IntPtr ulStringGetDataPtr(IntPtr str);
+
 		/// <summary>Get length in UTF-16 characters.</summary>
 		[GeneratedDllImport("Ultralight")]
 		public static partial uint ulStringGetLength(IntPtr str);
@@ -49,143 +52,97 @@ namespace UltralightNet
 		public static partial void ulStringAssignCString(IntPtr str, [MarshalAs(UnmanagedType.LPUTF8Str)] string c_str);
 	}
 
-	[StructLayout(LayoutKind.Sequential)]
-	[NativeMarshalling(typeof(ULString16Native))]
-	public struct ULString16
+	public class ULStringMarshaler : ICustomMarshaler
 	{
-		[MarshalAs(UnmanagedType.LPWStr)]
-		public string data_;
-		public uint length_;
-	}
-	[BlittableType]
-	internal struct ULString16Native
-	{
-		public IntPtr data_;
-		public uint length_;
-
-		public ULString16Native(ULString16 ulString16)
+		#region Structures
+		[StructLayout(LayoutKind.Sequential)]
+		private struct ULStringSTR
 		{
-			unsafe
+			[MarshalAs(UnmanagedType.LPWStr)]
+			public string data_;
+			public uint length_;
+		}
+		[StructLayout(LayoutKind.Sequential)]
+		[BlittableType]
+		public struct ULStringPTR
+		{
+			public IntPtr data_;
+			public uint length_;
+
+			public static ULStringPTR ManagedToNative(string str)
 			{
-				fixed (void* data = ulString16.data_)
-				{
-					data_ = (IntPtr)data;
-				}
+				if (str is null) str = "";
+				IntPtr data = Marshal.StringToHGlobalUni(str);
+				return new() { data_ = data, length_ = (uint)str.Length };
 			}
-			length_ = ulString16.length_;
-		}
-		public ULString16Native(string str)
-		{
-			unsafe
+			public string ToManaged()
 			{
-				fixed (void* data = str)
-				{
-					data_ = (IntPtr)data;
-				}
+				return Marshal.PtrToStringUni(data_, (int)length_);
 			}
-			length_ = (uint)str.Length;
+			public static void CleanUpNative(ULStringPTR ulStringPTR)
+			{
+				Marshal.FreeHGlobal(ulStringPTR.data_);
+			}
 		}
-		public ULString16 ToManaged() => new()
+		#endregion Structures
+
+		private static readonly ULStringMarshaler instance = new();
+
+		public static ICustomMarshaler GetInstance(string cookie) => instance;
+
+		public int GetNativeDataSize() => 12;
+
+		public void CleanUpManagedData(object ManagedObj) { }
+		public void CleanUpNativeData(IntPtr ptr) => CleanUpNative(ptr);
+
+		public IntPtr MarshalManagedToNative(object ManagedObj) => ManagedToNative(ManagedObj as string);
+		public object MarshalNativeToManaged(IntPtr ptr) => NativeToManaged(ptr);
+
+		#region Code
+
+		/// <summary>
+		/// Creates ULString from <see cref="string"/>
+		/// </summary>
+		/// <param name="managedString">Unicode text</param>
+		/// <returns>ULString pointer</returns>
+		/// <remarks>you <b>MUST</b> call <see cref="CleanUpNativeData(IntPtr)"/> after you done</remarks>
+		public static IntPtr ManagedToNative(string managedString)
 		{
-			data_ = Marshal.PtrToStringUni(data_, (int)length_),
-			length_ = length_
-		};
-	}
-#pragma warning disable CS0659 // Type overrides Object.Equals(object o) but does not override Object.GetHashCode()
-#pragma warning disable CS0661 // Type defines operator == or operator != but does not override Object.GetHashCode()
-	public class ULString : IDisposable, ICloneable, IEquatable<ULString>
-#pragma warning restore CS0661 // Type defines operator == or operator != but does not override Object.GetHashCode()
-#pragma warning restore CS0659 // Type overrides Object.Equals(object o) but does not override Object.GetHashCode()
-	{
-		public IntPtr Ptr
-		{
-			[MethodImpl(MethodImplOptions.AggressiveInlining)]
-			get;
-			[MethodImpl(MethodImplOptions.AggressiveInlining)]
-			private set;
-		}
-
-		public ULString16 ULString16
-		{
-			[MethodImpl(MethodImplOptions.AggressiveInlining)]
-			get => Marshal.PtrToStructure<ULString16>(Ptr);
-		}
-
-		public ULString(IntPtr ptr, bool dispose = false)
-		{
-			Ptr = ptr;
-			IsDisposed = !dispose;
-		}
-		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		public ULString(string str = null) => Ptr = Methods.ulCreateStringUTF16(str ?? "", str is null ? 0 : (uint)str.Length);
-
-		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		public string GetData() => Methods.ulStringGetData(Ptr);
-		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		public uint GetLength() => Methods.ulStringGetLength(Ptr);
-		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		public bool IsEmpty() => Methods.ulStringIsEmpty(Ptr);
-		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		public void Assign(ULString newStr) => Methods.ulStringAssignString(Ptr, newStr.Ptr);
-		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		public void Assign(string newStr) => Assign(new ULString(newStr));
-
-		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		public override string ToString() => GetData();
-
-		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		~ULString() => Dispose();
-
-		public bool IsDisposed
-		{
-			[MethodImpl(MethodImplOptions.AggressiveInlining)]
-			get;
-			[MethodImpl(MethodImplOptions.AggressiveInlining)]
-			private set;
+			IntPtr ptr = Marshal.AllocHGlobal(11);
+			ULStringSTR nativeStruct = new()
+			{
+				data_ = managedString,
+				length_ = (uint)managedString.Length
+			};
+			Marshal.StructureToPtr(
+				nativeStruct as object,
+				ptr,
+				false
+			);
+			return ptr;
 		}
 
-		public void Dispose()
+		/// <summary>
+		/// Creates <see cref="string"/> from ULString pointer
+		/// </summary>
+		/// <param name="ptr">ULString pointer</param>
+		/// <returns></returns>
+		public static string NativeToManaged(IntPtr ptr)
 		{
-			if (IsDisposed) return;
-			Methods.ulDestroyString(Ptr);
-
-			IsDisposed = true;
-			GC.SuppressFinalize(this);
+			ULStringPTR result = Marshal.PtrToStructure<ULStringPTR>(ptr);
+			return Marshal.PtrToStringUni(result.data_, (int)result.length_);
 		}
 
-		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		public object Clone() => new ULString(GetData());
-
-#nullable enable
-
-		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		public static bool ReferenceEquals(ULString? objA, ULString? objB) => ((objA is null) && (objB is null)) ? true : (((objA is null) || (objB is null)) ? false : objA.Ptr == objB.Ptr);
-
-#nullable restore
-
-		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		public bool Equals(ULString other) => other is not null && (Ptr == other.Ptr || GetData() == other.GetData());
-
-		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		public override bool Equals(object obj) => Equals(obj as ULString);
-
-#nullable enable
-
-		public static bool operator ==(ULString? a, ULString? b)
+		/// <summary>
+		/// Frees ULString
+		/// </summary>
+		/// <param name="ptr">ULString pointer</param>
+		public static void CleanUpNative(IntPtr ptr)
 		{
-			if ((a is null) && (b is null)) return true;
-			else if ((a is null) || (b is null)) return false;
-			return a.Equals(b);
+			Marshal.DestroyStructure<ULStringSTR>(ptr);
+			//Marshal.FreeHGlobal(ptr);
 		}
 
-		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		public static bool operator !=(ULString? a, ULString? b) => !(a == b);
-
-		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		public static explicit operator ULString(string str) => new(str);
-		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		public static implicit operator IntPtr(ULString ulString) => ulString.Ptr;
-		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		public static implicit operator string(ULString ulString) => ulString.GetData();
+		#endregion Code
 	}
 }
