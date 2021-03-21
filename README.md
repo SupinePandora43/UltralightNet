@@ -1,7 +1,7 @@
 ![UltralightSharp](https://gitlab.com/SupinePandora43/UltralightSharp/raw/master/icon.png)
 
 [![NuGet](https://img.shields.io/nuget/v/Supine.UltralightSharp.svg)](https://www.nuget.org/packages/Supine.UltralightSharp/) ![Build & Test](https://github.com/SupinePandora43/UltralightSharp/workflows/Build%20&%20Test/badge.svg)
- 
+[![Coverage](https://raw.githubusercontent.com/SupinePandora43/UltralightSharp/gh-pages/badge_linecoverage.svg)](https://supinepandora43.github.io/UltralightSharp/)
 # UltralightSharp
 
 A multi-platform .NET binding of the **[Ultralight](https://utralig.ht)** project.

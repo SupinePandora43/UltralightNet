@@ -1,0 +1,85 @@
+name: Test Coverage
+on:
+  push:
+    branches: [ 'master', 'UltralightNet', 'collect_coverage_across_all_platforms' ]
+jobs:
+  Test:
+    runs-on: ${{ matrix.os }}-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ 'windows', 'ubuntu', 'macos' ]
+    steps:
+      - uses: actions/checkout@v2
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: 5.0.100
+      - uses: actions/cache@v2
+        with:
+          path: |
+            ~/.nuget/packages
+            '*/bin/'
+            '*/obj/'
+          key: ${{ runner.os }}
+          restore-keys: |
+            ${{ runner.os }}
+      - name: Pack UltralightNet.Binaries
+        run: dotnet pack -c Release UltralightNet.Binaries/UltralightNet.Binaries.csproj
+      - name: Build UltralightNet
+        run: dotnet build -c Release UltralightNet/UltralightNet.csproj
+
+      - name: Test
+        continue-on-error: true
+        run: dotnet test UltralightNet.Test/UltralightNet.Test.csproj --collect:"XPlat Code Coverage" -- DataCollectionRunSettings.DataCollectors.DataCollector.Configuration.Format=cobertura -- DataCollectionRunSettings.DataCollectors.DataCollector.Configuration.UseSourceLink=true
+      - name: Upload coverage
+        uses: actions/upload-artifact@v2
+        with:
+          name: coverage-${{ matrix.os }}
+          path: UltralightNet.Test/TestResults/**/coverage.cobertura.xml
+  Coverage:
+    runs-on: ubuntu-latest
+    needs: Test
+    steps:
+    - uses: actions/checkout@v2
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: 5.0.100
+
+    - name: Download windows Coverage
+      uses: actions/download-artifact@v2
+      continue-on-error: true
+      with:
+        name: coverage-windows
+        path: Coverage
+    - name: Download ubuntu Coverage
+      uses: actions/download-artifact@v2
+      continue-on-error: true
+      with:
+        name: coverage-ubuntu
+        path: Coverage
+    - name: Download macos Coverage
+      uses: actions/download-artifact@v2
+      continue-on-error: true
+      with:
+        name: coverage-macos
+        path: Coverage
+
+    - run: tree
+      continue-on-error: true
+    - name: Install ReportGenerator
+      run: dotnet tool install -g dotnet-reportgenerator-globaltool
+    - name: Generate Badge
+      uses: danielpalme/ReportGenerator-GitHub-Action@4.8.7
+      with:
+        reports: 'Coverage/*/coverage.cobertura.xml' # REQUIRED # The coverage reports that should be parsed (separated by semicolon). Globbing is supported.
+        targetdir: 'coveragereport' # REQUIRED # The directory where the generated report should be saved.
+        reporttypes: 'Badges;Html;HtmlChart;HtmlInline;HtmlSummary;PngChart' # The output formats and scope (separated by semicolon) Values: Badges, Clover, Cobertura, CsvSummary, Html, HtmlChart, HtmlInline, HtmlInline_AzurePipelines, HtmlInline_AzurePipelines_Dark, HtmlSummary, JsonSummary, Latex, LatexSummary, lcov, MHtml, PngChart, SonarQube, TeamCitySummary, TextSummary, Xml, XmlSummary
+    - name: Deploy
+      uses: s0/git-publish-subdir-action@develop
+      env:
+        REPO: self
+        BRANCH: gh-pages
+        FOLDER: coveragereport
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

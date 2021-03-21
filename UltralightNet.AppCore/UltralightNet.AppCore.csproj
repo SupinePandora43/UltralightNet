@@ -1,0 +1,24 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<TargetFrameworks>net5.0</TargetFrameworks>
+
+		<Description>AppCore's binaries and bindings</Description>
+		<PackageId>UltralightNet.AppCore</PackageId>
+		<Authors>Ultralight, Inc.</Authors>
+		<Platform>x64</Platform>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<_NativeAssetName Include="runtimes/win-x64/native/AppCore.dll" PackagePath="runtimes/win-x64/native" />
+		<_NativeAssetName Include="runtimes/osx-x64/native/libAppCore.dylib" PackagePath="runtimes/osx-x64/native" />
+		<_NativeAssetName Include="runtimes/linux-x64/native/libAppCore.so" PackagePath="runtimes/linux-x64/native" />
+
+		<_ExistingAssets Include="@(_NativeAssetName)" />
+		<Content Include="@(_ExistingAssets->'%(Identity)')" CopyToOutputDirectory="PreserveNewest" PackagePath="%(PackagePath)" Pack="true" />
+	</ItemGroup>
+	<ItemGroup>
+		<ProjectReference Include="..\UltralightNet\UltralightNet.csproj" />
+	</ItemGroup>
+
+</Project>
