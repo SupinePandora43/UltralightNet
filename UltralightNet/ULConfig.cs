@@ -415,5 +415,14 @@ namespace UltralightNet
 			IsDisposed = true;
 			GC.SuppressFinalize(this);
 		}
+
+#nullable enable
+		public static bool ReferenceEquals(ULConfig? a, ULConfig? b)
+		{
+			if ((a is null) || (b is null)) return object.ReferenceEquals(a, b);
+			return a.Ptr == b.Ptr;
+
+		}
+#nullable restore
 	}
 }
