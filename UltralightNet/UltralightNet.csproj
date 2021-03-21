@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 	<PropertyGroup>
 		<TargetFrameworks>net5.0</TargetFrameworks>
 		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
@@ -11,18 +11,17 @@
 		<PublishRepositoryUrl>true</PublishRepositoryUrl>
 		<IncludeSymbols>true</IncludeSymbols>
 		<SymbolPackageFormat>snupkg</SymbolPackageFormat>
-		
+
 		<PackageId>UltralightNet</PackageId>
-		<Authors>SupinePandora43</Authors>
+		<Authors>Supine</Authors>
 		<Description>Ultralight .NET bindings</Description>
 		<PackageProjectUrl>https://github.com/SupinePandora43/UltralightSharp</PackageProjectUrl>
 		<RepositoryUrl>https://github.com/SupinePandora43/UltralightSharp</RepositoryUrl>
 		<RepositoryType>git</RepositoryType>
-		<iconUrl>https://ultralig.ht/logo_modern2.png</iconUrl>
 	</PropertyGroup>
 	<ItemGroup>
 		<PackageReference Include="Ancillary.Interop" Version="1.0.0-alpha.20604.3" />
-		<PackageReference Include="DllImportGenerator" Version="1.0.0-alpha.20604.3" OutputItemType="Analyzer" ReferenceOutputAssembly="false" />
-		<PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0" PrivateAssets="All"/>
+		<PackageReference Include="DllImportGenerator" Version="1.0.0-alpha.20604.3" OutputItemType="Analyzer" ReferenceOutputAssembly="false" PrivateAssets="All" />
+		<PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0" PrivateAssets="All" />
 	</ItemGroup>
 </Project>

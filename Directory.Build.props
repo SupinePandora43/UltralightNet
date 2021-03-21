@@ -1,5 +1,12 @@
 <Project>
 	<PropertyGroup>
+		<Version>1.2.1-alpha.1</Version>
+
+		<Authors>Supine</Authors>
+		<PackageProjectUrl>https://github.com/SupinePandora43/UltralightNet</PackageProjectUrl>
+		<RepositoryUrl>https://github.com/SupinePandora43/UltralightNet</RepositoryUrl>
+		<RepositoryType>git</RepositoryType>
+
 		<SolutionDir>$(MSBuildThisFileDirectory)</SolutionDir>
 		<PackageOutputPath>$(SolutionDir)</PackageOutputPath>
 		<VersionFilePath>$(MSBuildThisFileDirectory)/version.json</VersionFilePath>

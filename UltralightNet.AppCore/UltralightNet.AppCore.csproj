@@ -1,10 +1,11 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<TargetFramework>net5.0</TargetFramework>
-		
+		<TargetFrameworks>net5.0</TargetFrameworks>
+
+		<Description>AppCore's binaries and bindings</Description>
 		<PackageId>UltralightNet.AppCore</PackageId>
-		<Authors>SupinePandora43</Authors>
+		<Authors>Ultralight, Inc.</Authors>
 		<Platform>x64</Platform>
 	</PropertyGroup>
 

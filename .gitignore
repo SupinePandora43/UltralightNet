@@ -5,6 +5,7 @@
 *.iws
 *.nuget.props
 *.nupkg
+*.snupkg
 *.pdb
 *.pidb
 *.psess

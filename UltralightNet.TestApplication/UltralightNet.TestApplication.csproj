@@ -6,7 +6,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="UltralightNet.Binaries" Version="1.2.1" />
+    <PackageReference Include="UltralightNet.Binaries" Version="$(Version)" />
   </ItemGroup>
 
   <ItemGroup>

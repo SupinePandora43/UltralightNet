@@ -1,21 +1,23 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<TargetFrameworks>net5;netstandard1;netcoreapp1;net4</TargetFrameworks>
+		<TargetFrameworks>net5.0;netstandard1</TargetFrameworks>
 		<NoBuild>true</NoBuild>
 		<IncludeBuildOutput>false</IncludeBuildOutput>
 		<DisableImplicitFrameworkReferences>true</DisableImplicitFrameworkReferences>
 		<Platform>x64</Platform>
 
+		<Authors>Ultralight, Inc.</Authors>
 		<PackageId>UltralightNet.Binaries</PackageId>
-		<Version>1.2.1</Version>
-		<Authors>SupinePandora43</Authors>
 		<Description>Ultralight's binaries</Description>
-		<PackageProjectUrl>https://github.com/SupinePandora43/UltralightSharp</PackageProjectUrl>
-		<RepositoryUrl>https://github.com/SupinePandora43/UltralightSharp</RepositoryUrl>
-		<RepositoryType>git</RepositoryType>
-		<iconUrl>https://ultralig.ht/logo_modern2.png</iconUrl>
+
+		<PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
 	</PropertyGroup>
+	<ItemGroup>
+		<None Include="../Ultralight_LICENSE.txt" Pack="true" PackagePath="LICENSE.txt"/>
+		<None Include="../Ultralight_EULA.txt" Pack="true" PackagePath="EULA.txt"/>
+		<None Include="../Ultralight_NOTICES.txt" Pack="true" PackagePath="NOTICES.txt"/>
+	</ItemGroup>
 	<ItemGroup>
 		<_NativeAssetName Include="runtimes/win-x64/native/Ultralight.dll" PackagePath="runtimes/win-x64/native" />
 		<_NativeAssetName Include="runtimes/win-x64/native/UltralightCore.dll" PackagePath="runtimes/win-x64/native" />
