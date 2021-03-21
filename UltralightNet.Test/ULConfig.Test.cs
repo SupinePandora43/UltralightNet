@@ -1,3 +1,4 @@
+using System;
 using Xunit;
 
 namespace UltralightNet.Test
@@ -195,6 +196,19 @@ namespace UltralightNet.Test
 			Assert.Equal(1u * 1024u * 1024u, config.MinSmallHeapSize);
 			config.MinSmallHeapSize = 512u * 1024u;
 			Assert.Equal(512u * 1024u, config.MinSmallHeapSize);
+		}
+		[Fact]
+		public void DisposeTest()
+		{
+			config.Dispose();
+		}
+		[Fact]
+		public void FinalizeTest()
+		{
+			config = null;
+			GC.Collect();
+			GC.WaitForPendingFinalizers();
+			GC.Collect();
 		}
 	}
 }
