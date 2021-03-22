@@ -136,6 +136,13 @@ namespace UltralightNet
 
 		[DllImport("Ultralight")]
 		public static extern void ulViewSetCreateChildViewCallback(IntPtr view, ULCreateChildViewCallback callback, IntPtr user_data);
+
+		[DllImport("Ultralight")]
+		public static extern void ulViewSetBeginLoadingCallback(IntPtr view, ULBeginLoadingCallback callback, IntPtr user_data);
+
+		[DllImport("Ultralight")]
+		public static extern void ulViewSetFinishLoadingCallback(IntPtr view, ULFinishLoadingCallback callback, IntPtr user_data);
+
 		// to be continued https://github.com/ultralight-ux/Ultralight-API/blob/7f9de24ca1c7ec8b385e895c4899b9d96626da58/Ultralight/CAPI.h#L777
 	}
 
@@ -208,7 +215,8 @@ namespace UltralightNet
 		public void SetChangeCursorCallback(ULChangeCursorCallback callback, IntPtr userData = default) => Methods.ulViewSetChangeCursorCallback(Ptr, callback, userData);
 		public void SetAddConsoleMessageCallback(ULAddConsoleMessageCallback callback, IntPtr userData = default) => Methods.ulViewSetAddConsoleMessageCallback(Ptr, callback, userData);
 		public void SetCreateChildViewCallback(ULCreateChildViewCallback callback, IntPtr userData = default) => Methods.ulViewSetCreateChildViewCallback(Ptr, callback, userData);
-
+		public void SetBeginLoadingCallback(ULBeginLoadingCallback callback, IntPtr userData = default) => Methods.ulViewSetBeginLoadingCallback(Ptr, callback, userData);
+		public void SetFinishLoadingCallback(ULFinishLoadingCallback callback, IntPtr userData = default) => Methods.ulViewSetFinishLoadingCallback(Ptr, callback, userData);
 
 
 		~View() => Dispose();
