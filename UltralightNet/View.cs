@@ -143,6 +143,27 @@ namespace UltralightNet
 		[DllImport("Ultralight")]
 		public static extern void ulViewSetFinishLoadingCallback(IntPtr view, ULFinishLoadingCallback callback, IntPtr user_data);
 
+		[DllImport("Ultralight")]
+		public static extern void ulViewSetFailLoadingCallback(IntPtr view, ULFailLoadingCallback callback, IntPtr user_data);
+
+		[DllImport("Ultralight")]
+		public static extern void ulViewSetWindowObjectReadyCallback(IntPtr view, ULWindowObjectReadyCallback callback, IntPtr user_data);
+
+		[DllImport("Ultralight")]
+		public static extern void ulViewSetDOMReadyCallback(IntPtr view, ULDOMReadyCallback callback, IntPtr user_data);
+
+		[DllImport("Ultralight")]
+		public static extern void ulViewSetUpdateHistoryCallback(IntPtr view, ULUpdateHistoryCallback callback, IntPtr user_data);
+
+		[GeneratedDllImport("Ultralight")]
+		public static partial void ulViewSetNeedsPaint(IntPtr view, bool needs_paint);
+
+		[GeneratedDllImport("Ultralight")]
+		public static partial bool ulViewGetNeedsPaint(IntPtr view);
+
+		[DllImport("Ultralight")]
+		public static extern IntPtr ulViewCreateInspectorView(IntPtr view);
+
 		// to be continued https://github.com/ultralight-ux/Ultralight-API/blob/7f9de24ca1c7ec8b385e895c4899b9d96626da58/Ultralight/CAPI.h#L854
 	}
 
@@ -217,6 +238,14 @@ namespace UltralightNet
 		public void SetCreateChildViewCallback(ULCreateChildViewCallback callback, IntPtr userData = default) => Methods.ulViewSetCreateChildViewCallback(Ptr, callback, userData);
 		public void SetBeginLoadingCallback(ULBeginLoadingCallback callback, IntPtr userData = default) => Methods.ulViewSetBeginLoadingCallback(Ptr, callback, userData);
 		public void SetFinishLoadingCallback(ULFinishLoadingCallback callback, IntPtr userData = default) => Methods.ulViewSetFinishLoadingCallback(Ptr, callback, userData);
+		public void SetFailLoadingCallback(ULFailLoadingCallback callback, IntPtr userData = default) => Methods.ulViewSetFailLoadingCallback(Ptr, callback, userData);
+		public void SetWindowObjectReadyCallback(ULWindowObjectReadyCallback callback, IntPtr userData = default) => Methods.ulViewSetWindowObjectReadyCallback(Ptr, callback, userData);
+		public void SetDOMReadyCallback(ULDOMReadyCallback callback, IntPtr userData = default) => Methods.ulViewSetDOMReadyCallback(Ptr, callback, userData);
+		public void SetUpdateHistoryCallback(ULUpdateHistoryCallback callback, IntPtr userData = default) => Methods.ulViewSetUpdateHistoryCallback(Ptr, callback, userData);
+
+		public bool NeedsPaint { get => Methods.ulViewGetNeedsPaint(Ptr); set => Methods.ulViewSetNeedsPaint(Ptr, value); }
+
+		public View CreateInspectorView() => new(Methods.ulViewCreateInspectorView(Ptr), true);
 
 
 		~View() => Dispose();
