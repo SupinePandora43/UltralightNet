@@ -143,7 +143,7 @@ namespace UltralightNet
 		[DllImport("Ultralight")]
 		public static extern void ulViewSetFinishLoadingCallback(IntPtr view, ULFinishLoadingCallback callback, IntPtr user_data);
 
-		// to be continued https://github.com/ultralight-ux/Ultralight-API/blob/7f9de24ca1c7ec8b385e895c4899b9d96626da58/Ultralight/CAPI.h#L777
+		// to be continued https://github.com/ultralight-ux/Ultralight-API/blob/7f9de24ca1c7ec8b385e895c4899b9d96626da58/Ultralight/CAPI.h#L854
 	}
 
 	public class View : IDisposable
