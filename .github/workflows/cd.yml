@@ -39,4 +39,4 @@ jobs:
         dotnet pack UltralightNet.AppCore
         dotnet pack UltralightNet.Resources
     - name: Publish
-      run: dotnet nuget push -k $NUGET_TOKEN -s https://api.nuget.org/v3/index.json UltralightNet.*.nupkg  --skip-duplicate
+      run: dotnet nuget push UltralightNet.*.nupkg -k $NUGET_TOKEN --source https://api.nuget.org/v3/index.json --skip-duplicate
