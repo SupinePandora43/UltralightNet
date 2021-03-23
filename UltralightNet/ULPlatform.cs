@@ -10,8 +10,8 @@ namespace UltralightNet
 		[DllImport("Ultralight")]
 		public static extern void ulPlatformSetFileSystem(ULFileSystem file_system);
 
-		// [DllImport("Ultralight")]
-		// public static extern void ulPlatformSetSurfaceDefinition(ULSurfaceDefinition surface_definition);
+		[DllImport("Ultralight")]
+		public static extern void ulPlatformSetSurfaceDefinition(ULSurfaceDefinition surface_definition);
 
 		[DllImport("Ultralight")]
 		public static extern void ulPlatformSetGPUDriver(ULGPUDriver gpu_driver);
