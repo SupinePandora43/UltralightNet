@@ -23,7 +23,9 @@ namespace UltralightNet
 	public static class ULPlatform
 	{
 		public static void SetLogger(ULLogger logger) => Methods.ulPlatformSetLogger(logger);
-		public static void SetFileSystem(ULFileSystem fileSystem) => Methods.ulPlatformSetFileSystem(fileSystem);
+		public static void SetFileSystem(ULFileSystem file_system) => Methods.ulPlatformSetFileSystem(file_system);
 		public static void SetGPUDriver(ULGPUDriver gpu_driver) => Methods.ulPlatformSetGPUDriver(gpu_driver);
+		public static void SetSurfaceDefinition(ULSurfaceDefinition surface_definition) => Methods.ulPlatformSetSurfaceDefinition(surface_definition);
+		public static void SetClipboard(ULClipboard clipboard) => Methods.ulPlatformSetClipboard(clipboard);
 	}
 }
