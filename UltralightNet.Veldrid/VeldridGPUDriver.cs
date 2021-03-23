@@ -13,6 +13,7 @@ namespace UltralightNet.Veldrid
 		public TextureSampleCount SampleCount = TextureSampleCount.Count32;
 		public bool WaitForIdle = true;
 
+		// doesn't work
 		private readonly List<TextureEntry> textureEntries;
 		private uint textureid = 0;
 		private readonly List<TextureEntry> geometryEntries;
@@ -32,9 +33,11 @@ namespace UltralightNet.Veldrid
 			NextGeometryId = NextGeometryId,
 			NextRenderBufferId = NextRenderBufferId,
 			CreateTexture = CreateTexture,
-			UpdateTexture = UpdateTexture
+			UpdateTexture = UpdateTexture,
+			BeginSynchronize = nothing,
+			EndSynchronize = nothing
 		};
-
+		private void nothing() { }
 		#region NextId
 		private uint NextTextureId()
 		{

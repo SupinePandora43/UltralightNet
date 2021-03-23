@@ -1,3 +1,5 @@
+using System;
+using UltralightNet.AppCore;
 using Veldrid;
 using Veldrid.Sdl2;
 using Veldrid.StartupUtilities;
@@ -41,6 +43,8 @@ namespace UltralightNet.Veldrid.TestApp
 
 			VeldridGPUDriver gpuDriver = new(graphicsDevice);
 
+			ULPlatform.SetLogger(new() { log_message = (lvl, msg) => Console.WriteLine(msg) }); ;
+			AppCoreMethods.ulEnablePlatformFontLoader();
 			ULPlatform.SetGPUDriver(gpuDriver.GetGPUDriver());
 
 			Renderer renderer = new(new ULConfig()
@@ -60,7 +64,12 @@ namespace UltralightNet.Veldrid.TestApp
 				});
 			};
 
-
+			while (window.Exists)
+			{
+				renderer.Update();
+				renderer.Render();
+				window.PumpEvents();
+			}
 		}
 	}
 }
