@@ -13,8 +13,8 @@ namespace UltralightNet
 		// [DllImport("Ultralight")]
 		// public static extern void ulPlatformSetSurfaceDefinition(ULSurfaceDefinition surface_definition);
 
-		// [DllImport("Ultralight")]
-		// public static extern void ulPlatformSetGPUDriver(ULGPUDriver gpu_driver);
+		[DllImport("Ultralight")]
+		public static extern void ulPlatformSetGPUDriver(ULGPUDriver gpu_driver);
 
 		[DllImport("Ultralight")]
 		public static extern void ulPlatformSetClipboard(ULClipboard clipboard);
@@ -24,5 +24,6 @@ namespace UltralightNet
 	{
 		public static void SetLogger(ULLogger logger) => Methods.ulPlatformSetLogger(logger);
 		public static void SetFileSystem(ULFileSystem fileSystem) => Methods.ulPlatformSetFileSystem(fileSystem);
+		public static void SetGPUDriver(ULGPUDriver gpu_driver) => Methods.ulPlatformSetGPUDriver(gpu_driver);
 	}
 }
