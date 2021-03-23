@@ -4,7 +4,7 @@ namespace UltralightNet
 	{
 		public ULGPUDriverBeginSynchronizeCallback BeginSynchronize;
 		public ULGPUDriverEndSynchronizeCallback EndSynchronize;
-		public ULGPUDriverNextTextureIdCallback NextTexture_id;
+		public ULGPUDriverNextTextureIdCallback NextTextureId;
 		public ULGPUDriverCreateTextureCallback CreateTexture;
 		public ULGPUDriverUpdateTextureCallback UpdateTexture;
 		public ULGPUDriverDestroyTextureCallback DestroyTexture;
