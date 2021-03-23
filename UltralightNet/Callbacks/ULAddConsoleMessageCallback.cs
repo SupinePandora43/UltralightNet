@@ -8,8 +8,7 @@ namespace UltralightNet
 		IntPtr user_data,
 		[MarshalAs(UnmanagedType.CustomMarshaler, MarshalTypeRef = typeof(View.Marshaler))]
 		View caller,
-		[MarshalAs(UnmanagedType.CustomMarshaler, MarshalTypeRef = typeof(ULStringMarshaler))]
-		string source,
+		ULMessageSource source,
 		uint line_number,
 		uint column_number,
 		[MarshalAs(UnmanagedType.CustomMarshaler, MarshalTypeRef = typeof(ULStringMarshaler))]
