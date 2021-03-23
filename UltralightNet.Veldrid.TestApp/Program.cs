@@ -1,12 +1,66 @@
-﻿using System;
+using Veldrid;
+using Veldrid.Sdl2;
+using Veldrid.StartupUtilities;
 
 namespace UltralightNet.Veldrid.TestApp
 {
-    class Program
-    {
-        static void Main(string[] args)
-        {
-            Console.WriteLine("Hello World!");
-        }
-    }
+	class Program
+	{
+		private const GraphicsBackend BACKEND = GraphicsBackend.Direct3D11;
+
+		static void Main(string[] args)
+		{
+			new Program().Run();
+		}
+
+		private void Run()
+		{
+			WindowCreateInfo windowCI = new()
+			{
+				WindowWidth = 512,
+				WindowHeight = 512,
+				WindowTitle = "UltralightNet.Veldrid.TestApp"
+			};
+
+			Sdl2Window window = VeldridStartup.CreateWindow(ref windowCI);
+			//todo
+			window.Resizable = false;
+
+			GraphicsDeviceOptions options = new()
+			{
+				PreferStandardClipSpaceYDirection = true,
+				PreferDepthRangeZeroToOne = true
+			};
+
+			GraphicsDevice graphicsDevice = VeldridStartup.CreateGraphicsDevice(
+				window,
+				options,
+				BACKEND);
+
+			ResourceFactory factory = graphicsDevice.ResourceFactory;
+
+			VeldridGPUDriver gpuDriver = new(graphicsDevice);
+
+			ULPlatform.SetGPUDriver(gpuDriver.GetGPUDriver());
+
+			Renderer renderer = new(new ULConfig()
+			{
+				ResourcePath = "./resources/",
+				UseGpu = true
+			});
+
+			View view = new(renderer, 512, 512, false, Session.DefaultSession(renderer), false);
+
+			window.MouseWheel += (mw) =>
+			{
+				view.FireScrollEvent(new ULScrollEvent()
+				{
+					type = ULScrollEvent.Type.ByPage,
+					deltaY = (int)mw.WheelDelta
+				});
+			};
+
+
+		}
+	}
 }

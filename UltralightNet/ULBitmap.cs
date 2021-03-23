@@ -109,7 +109,7 @@ namespace UltralightNet
 
 		public bool OwnsPixels => Methods.ulBitmapOwnsPixels(Ptr);
 
-		public IntPtr LockPixels => Methods.ulBitmapLockPixels(Ptr);
+		public IntPtr LockPixels() => Methods.ulBitmapLockPixels(Ptr);
 		public void UnlockPixels() => Methods.ulBitmapUnlockPixels(Ptr);
 		public IntPtr RawPixels => Methods.ulBitmapRawPixels(Ptr);
 
