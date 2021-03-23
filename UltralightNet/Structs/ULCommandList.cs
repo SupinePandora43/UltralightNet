@@ -1,5 +1,4 @@
 using System;
-using System.Runtime.InteropServices;
 
 namespace UltralightNet
 {
@@ -9,17 +8,12 @@ namespace UltralightNet
 		public uint size;
 		public IntPtr commandsPtr;
 
-		public ULCommand[] ToArray()
+		public Span<ULCommand> ToSpan()
 		{
-			ULCommand[] commands = new ULCommand[size];
-
-			for (int i = 0; i < size; i++)
+			unsafe
 			{
-				IntPtr structurePtr = Marshal.ReadIntPtr(commandsPtr, i);
-				commands[i] = Marshal.PtrToStructure<ULCommand>(structurePtr);
+				return new((void*)commandsPtr, (int)size);
 			}
-
-			return commands;
 		}
 	}
 }
