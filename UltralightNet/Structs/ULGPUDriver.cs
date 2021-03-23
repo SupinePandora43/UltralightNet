@@ -2,19 +2,19 @@ namespace UltralightNet
 {
 	public struct ULGPUDriver
 	{
-		public ULGPUDriverBeginSynchronizeCallback begin_synchronize;
-		public ULGPUDriverEndSynchronizeCallback end_synchronize;
-		public ULGPUDriverNextTextureIdCallback next_texture_id;
-		public ULGPUDriverCreateTextureCallback create_texture;
-		public ULGPUDriverUpdateTextureCallback update_texture;
-		public ULGPUDriverDestroyTextureCallback destroy_texture;
-		public ULGPUDriverNextRenderBufferIdCallback next_render_buffer_id;
-		public ULGPUDriverCreateRenderBufferCallback create_render_buffer;
-		public ULGPUDriverDestroyRenderBufferCallback destroy_render_buffer;
-		public ULGPUDriverNextGeometryIdCallback next_geometry_id;
-		public ULGPUDriverCreateGeometryCallback create_geometry;
-		public ULGPUDriverUpdateGeometryCallback update_geometry;
-		public ULGPUDriverDestroyGeometryCallback destroy_geometry;
-		public ULGPUDriverUpdateCommandListCallback update_command_list;
+		public ULGPUDriverBeginSynchronizeCallback BeginSynchronize;
+		public ULGPUDriverEndSynchronizeCallback EndSynchronize;
+		public ULGPUDriverNextTextureIdCallback NextTexture_id;
+		public ULGPUDriverCreateTextureCallback CreateTexture;
+		public ULGPUDriverUpdateTextureCallback UpdateTexture;
+		public ULGPUDriverDestroyTextureCallback DestroyTexture;
+		public ULGPUDriverNextRenderBufferIdCallback NextRenderBufferId;
+		public ULGPUDriverCreateRenderBufferCallback CreateRenderBuffer;
+		public ULGPUDriverDestroyRenderBufferCallback DestroyRenderBuffer;
+		public ULGPUDriverNextGeometryIdCallback NextGeometryId;
+		public ULGPUDriverCreateGeometryCallback CreateGeometry;
+		public ULGPUDriverUpdateGeometryCallback UpdateGeometry;
+		public ULGPUDriverDestroyGeometryCallback DestroyGeometry;
+		public ULGPUDriverUpdateCommandListCallback UpdateCommandList;
 	}
 }
