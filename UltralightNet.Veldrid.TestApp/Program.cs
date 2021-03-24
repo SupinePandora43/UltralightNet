@@ -81,6 +81,7 @@ namespace UltralightNet.Veldrid.TestApp
 			{
 				renderer.Update();
 				renderer.Render();
+				gpuDriver.Render();
 				window.PumpEvents();
 			}
 		}

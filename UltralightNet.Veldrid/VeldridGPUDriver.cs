@@ -20,6 +20,8 @@ namespace UltralightNet.Veldrid
 
 		private Queue<ULCommand> commands = new();
 
+		private readonly CommandList commandList;
+
 		public VeldridGPUDriver(GraphicsDevice graphicsDevice)
 		{
 			this.graphicsDevice = graphicsDevice;
@@ -29,6 +31,8 @@ namespace UltralightNet.Veldrid
 					new ResourceLayoutElementDescription("texture", ResourceKind.TextureReadOnly, ShaderStages.Fragment)
 				)
 			);
+
+			commandList = graphicsDevice.ResourceFactory.CreateCommandList();
 		}
 		public ULGPUDriver GetGPUDriver() => new()
 		{
@@ -220,6 +224,34 @@ namespace UltralightNet.Veldrid
 		{
 			foreach (ULCommand command in list.ToSpan())
 				commands.Enqueue(command);
+		}
+
+		public void Render()
+		{
+			if (commands.Count == 0) return;
+
+			commandList.Begin();
+
+			foreach (ULCommand command in commands)
+			{
+				RenderBufferEntry renderBufferEntry = RenderBufferEntries[(int)command.gpu_state.render_buffer_id];
+
+				commandList.SetFramebuffer(renderBufferEntry.framebuffer);
+
+				if (command.command_type is ULCommandType.ClearRenderBuffer)
+				{
+					commandList.ClearColorTarget(0, RgbaFloat.Clear);
+				}
+				else
+				{
+					
+				}
+			}
+
+			commandList.End();
+			graphicsDevice.SubmitCommands(commandList);
+
+			if (WaitForIdle) graphicsDevice.WaitForIdle();
 		}
 
 		private class TextureEntry
