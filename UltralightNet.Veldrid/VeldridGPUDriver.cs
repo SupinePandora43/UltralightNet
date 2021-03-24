@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using Veldrid;
 
 namespace UltralightNet.Veldrid
@@ -17,19 +16,36 @@ namespace UltralightNet.Veldrid
 		private readonly SlottingList<GeometryEntry> GeometryEntries = new(32, 8);
 		private readonly SlottingList<RenderBufferEntry> RenderBufferEntries = new(8, 2);
 
+		private readonly ResourceLayout textureResourceLayout;
+
 		public VeldridGPUDriver(GraphicsDevice graphicsDevice)
 		{
 			this.graphicsDevice = graphicsDevice;
+
+			textureResourceLayout = graphicsDevice.ResourceFactory.CreateResourceLayout(
+				new ResourceLayoutDescription(
+					new ResourceLayoutElementDescription("texture", ResourceKind.TextureReadOnly, ShaderStages.Fragment)
+				)
+			);
 		}
 		public ULGPUDriver GetGPUDriver() => new()
 		{
+			BeginSynchronize = nothing,
+			EndSynchronize = nothing,
+
 			NextTextureId = NextTextureId,
 			NextGeometryId = NextGeometryId,
 			NextRenderBufferId = NextRenderBufferId,
+
 			CreateTexture = CreateTexture,
 			UpdateTexture = UpdateTexture,
-			BeginSynchronize = nothing,
-			EndSynchronize = nothing
+			DestroyTexture = DestroyTexture,
+
+			CreateGeometry = CreateGeometry,
+			UpdateGeometry = UpdateGeometry,
+			DestroyGeometry = DestroyGeometry,
+
+			CreateRenderBuffer = CreateRenderBuffer
 		};
 		private void nothing() { }
 
@@ -47,7 +63,7 @@ namespace UltralightNet.Veldrid
 			return (uint)RenderBufferEntries.Add(new());
 		}
 		#endregion NextId
-
+		#region Texture
 		private void CreateTexture(uint texture_id, ULBitmap bitmap)
 		{
 			bool isRT = bitmap.IsEmpty;
@@ -98,10 +114,18 @@ namespace UltralightNet.Veldrid
 					cl.GenerateMipmaps(entry.texture);
 					cl.End();
 					graphicsDevice.SubmitCommands(cl);
-					if (WaitForIdle) graphicsDevice.WaitForIdle();
 					cl.Dispose();
 				}
 			}
+
+			entry.resourceSet =  graphicsDevice.ResourceFactory.CreateResourceSet(
+				new ResourceSetDescription(
+					textureResourceLayout,
+					entry.texture
+				)
+			);
+
+			if (WaitForIdle) graphicsDevice.WaitForIdle();
 		}
 		private void UpdateTexture(uint texture_id, ULBitmap bitmap)
 		{
@@ -109,7 +133,6 @@ namespace UltralightNet.Veldrid
 
 			graphicsDevice.UpdateTexture(entry.texture, bitmap.LockPixels(), bitmap.Size, 0, 0, 0, bitmap.Width, bitmap.Height, 1, 0, 0);
 			bitmap.UnlockPixels();
-
 
 			if (GenerateMipMaps)
 			{
@@ -122,7 +145,65 @@ namespace UltralightNet.Veldrid
 				cl.Dispose();
 			}
 		}
+		private void DestroyTexture(uint texture_id)
+		{
+			TextureEntry entry = TextureEntries.RemoveAt((int)texture_id);
+			entry.texture.Dispose();
+			entry.resourceSet.Dispose();
+		}
+		#endregion Texture
+		#region Geometry
+		private void CreateGeometry(uint geometry_id, ULVertexBuffer vertices, ULIndexBuffer indices)
+		{
+			GeometryEntry entry = GeometryEntries[(int)geometry_id];
 
+			BufferDescription vertexDescription = new(vertices.size, BufferUsage.VertexBuffer);
+			entry.vertices = graphicsDevice.ResourceFactory.CreateBuffer(ref vertexDescription);
+			BufferDescription indexDescription = new(indices.size, BufferUsage.IndexBuffer);
+			entry.indicies = graphicsDevice.ResourceFactory.CreateBuffer(ref indexDescription);
+
+			graphicsDevice.UpdateBuffer(entry.vertices, 0, vertices.data, vertices.size);
+			graphicsDevice.UpdateBuffer(entry.indicies, 0, indices.data, indices.size);
+
+			if (WaitForIdle) graphicsDevice.WaitForIdle();
+		}
+		private void UpdateGeometry(uint geometry_id, ULVertexBuffer vertices, ULIndexBuffer indices)
+		{
+			GeometryEntry entry = GeometryEntries[(int)geometry_id];
+
+			graphicsDevice.UpdateBuffer(entry.vertices, 0, vertices.data, vertices.size);
+			graphicsDevice.UpdateBuffer(entry.indicies, 0, indices.data, indices.size);
+
+			if (WaitForIdle) graphicsDevice.WaitForIdle();
+		}
+		private void DestroyGeometry(uint geometry_id)
+		{
+			GeometryEntry entry = GeometryEntries.RemoveAt((int)geometry_id);
+
+			entry.vertices.Dispose();
+			entry.indicies.Dispose();
+		}
+		#endregion
+		#region RenderBuffer
+		private void CreateRenderBuffer(uint render_buffer_id, ULRenderBuffer buffer)
+		{
+			RenderBufferEntry entry = RenderBufferEntries[(int)render_buffer_id];
+			TextureEntry textureEntry = TextureEntries[(int)buffer.texture_id];
+
+			entry.textureEntry = textureEntry;
+
+			FramebufferDescription fd = new()
+			{
+				ColorTargets = new[] {
+					new FramebufferAttachmentDescription(textureEntry.texture, 0)
+				}
+			};
+
+			entry.framebuffer = graphicsDevice.ResourceFactory.CreateFramebuffer(ref fd);
+
+			if (WaitForIdle) graphicsDevice.WaitForIdle();
+		}
+		#endregion RenderBuffer
 		private class TextureEntry
 		{
 			public Texture texture;
@@ -135,7 +216,8 @@ namespace UltralightNet.Veldrid
 		}
 		private class RenderBufferEntry
 		{
-
+			public Framebuffer framebuffer;
+			public TextureEntry textureEntry;
 		}
 	}
 }
