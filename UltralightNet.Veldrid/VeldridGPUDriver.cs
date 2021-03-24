@@ -109,7 +109,7 @@ namespace UltralightNet.Veldrid
 
 			if (!isRT)
 			{
-				graphicsDevice.UpdateTexture(entry.texture, bitmap.LockPixels(), bitmap.Size, 0, 0, 0, textureDescription.Width, textureDescription.Height, 1, 0, 0);
+				graphicsDevice.UpdateTexture(entry.texture, bitmap.LockPixels(), (uint)bitmap.Size, 0, 0, 0, textureDescription.Width, textureDescription.Height, 1, 0, 0);
 				bitmap.UnlockPixels();
 
 				if (GenerateMipMaps)
@@ -136,7 +136,7 @@ namespace UltralightNet.Veldrid
 		{
 			TextureEntry entry = TextureEntries[(int)texture_id];
 
-			graphicsDevice.UpdateTexture(entry.texture, bitmap.LockPixels(), bitmap.Size, 0, 0, 0, bitmap.Width, bitmap.Height, 1, 0, 0);
+			graphicsDevice.UpdateTexture(entry.texture, bitmap.LockPixels(), (uint)bitmap.Size, 0, 0, 0, bitmap.Width, bitmap.Height, 1, 0, 0);
 			bitmap.UnlockPixels();
 
 			if (GenerateMipMaps)

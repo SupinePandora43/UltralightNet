@@ -104,7 +104,7 @@ namespace UltralightNet
 		public ULBitmapFormat Format => Methods.ulBitmapGetFormat(Ptr);
 		public uint Bpp => Methods.ulBitmapGetBpp(Ptr);
 		public uint RowBytes => Methods.ulBitmapGetRowBytes(Ptr);
-		public uint Size => Methods.ulBitmapGetSize(Ptr);
+		public nuint Size => Methods.ulBitmapGetSize(Ptr);
 
 		public bool OwnsPixels => Methods.ulBitmapOwnsPixels(Ptr);
 

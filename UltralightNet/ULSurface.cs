@@ -69,7 +69,7 @@ namespace UltralightNet
 		public uint Height => Methods.ulSurfaceGetHeight(Ptr);
 
 		public uint RowBytes => Methods.ulSurfaceGetRowBytes(Ptr);
-		public uint Size => Methods.ulSurfaceGetSize(Ptr);
+		public nuint Size => Methods.ulSurfaceGetSize(Ptr);
 
 		public IntPtr LockPixels => Methods.ulSurfaceLockPixels(Ptr);
 		public void UnlockPixels() => Methods.ulSurfaceUnlockPixels(Ptr);
