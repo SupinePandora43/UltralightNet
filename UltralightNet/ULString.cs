@@ -60,20 +60,20 @@ namespace UltralightNet
 		{
 			[MarshalAs(UnmanagedType.LPWStr)]
 			public string data_;
-			public uint length_;
+			public nuint length_;
 		}
 		[StructLayout(LayoutKind.Sequential)]
 		[BlittableType]
 		public struct ULStringPTR
 		{
 			public IntPtr data_;
-			public uint length_;
+			public nuint length_;
 
 			public static ULStringPTR ManagedToNative(string str)
 			{
 				if (str is null) str = "";
 				IntPtr data = Marshal.StringToHGlobalUni(str);
-				return new() { data_ = data, length_ = (uint)str.Length };
+				return new() { data_ = data, length_ = (nuint)str.Length };
 			}
 			public string ToManaged()
 			{
@@ -90,7 +90,7 @@ namespace UltralightNet
 
 		public static ICustomMarshaler GetInstance(string cookie) => instance;
 
-		public int GetNativeDataSize() => 12;
+		public int GetNativeDataSize() => 16;
 
 		public void CleanUpManagedData(object ManagedObj) { }
 		public void CleanUpNativeData(IntPtr ptr) => CleanUpNative(ptr);

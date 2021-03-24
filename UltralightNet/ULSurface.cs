@@ -19,8 +19,7 @@ namespace UltralightNet
 
 		/// <summary>Size in bytes.</summary>
 		[DllImport("Ultralight")]
-		//todo: size_t
-		public static extern uint ulSurfaceGetSize(IntPtr surface);
+		public static extern nuint ulSurfaceGetSize(IntPtr surface);
 
 		/// <summary>
 		/// Lock the pixel buffer and get a pointer to the beginning of the data

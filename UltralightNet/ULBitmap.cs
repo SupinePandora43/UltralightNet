@@ -48,9 +48,8 @@ namespace UltralightNet
 		/// <summary>
 		/// Get the size in bytes of the underlying pixel buffer.
 		/// </summary>
-		// todo: size_t
 		[DllImport("Ultralight")]
-		public static extern uint ulBitmapGetSize(IntPtr bitmap);
+		public static extern nuint ulBitmapGetSize(IntPtr bitmap);
 
 		/// <summary>Whether or not this bitmap owns its own pixel buffer.</summary>
 		[GeneratedDllImport("Ultralight")]

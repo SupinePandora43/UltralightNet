@@ -3,7 +3,6 @@ using System.Runtime.InteropServices;
 
 namespace UltralightNet
 {
-	// todo: size_t
 	[UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-	public delegate ulong ULSurfaceDefinitionGetSizeCallback(IntPtr user_data);
+	public delegate nuint ULSurfaceDefinitionGetSizeCallback(IntPtr user_data);
 }
