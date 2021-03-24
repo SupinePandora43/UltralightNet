@@ -24,391 +24,13 @@ h1 a.button i { position: relative; top: 1px; }
 .containerright { width: 340px; min-width: 340px; background-color: #e5e5e5; height: 100%; }
 .containerrightfixed { position: fixed; padding: 0 20px 20px 20px; border-left: solid 1px #6f6f6f; width: 300px; overflow-y: auto; height: 100%; top: 0; bottom: 0; }
 .containerrightfixed h1 { background-color: #c00; }
-.containerrightfixed label, .containerright a { white-space: nowrap; overflow: hidden; display: inline-block; width: 100%; max-width: 300px; text-overflow: ellipsis; }
-.containerright a { margin-bottom: 3px; }
-
-@media screen and (max-width:1200px){ 
-    .container { box-shadow: none; width: 100%; }
-    .containerright { display: none; }
-}
-
-.footer { font-size: 0.7em; text-align: center; margin-top: 35px; }
-
-th { text-align: left; }
-.table-fixed { table-layout: fixed; }
-.overview { border: solid 1px #c1c1c1; border-collapse: collapse; width: 100%; word-wrap: break-word; }
-.overview th { border: solid 1px #c1c1c1; border-collapse: collapse; padding: 2px 4px 2px 4px; background-color: #ddd; }
-.overview tr.namespace th { background-color: #dcdcdc; }
-.overview thead th { background-color: #d1d1d1; }
-.overview th a { color: #000; }
-.overview tr.namespace a { margin-left: 15px; display: block; }
-.overview td { border: solid 1px #c1c1c1; border-collapse: collapse; padding: 2px 5px 2px 5px; }
-div.currenthistory { margin: -2px -5px 0 -5px; padding: 2px 5px 2px 5px; height: 16px; }
-.coverage { border: solid 1px #c1c1c1; border-collapse: collapse; font-size: 5px; height: 10px; }
-.coverage td { padding: 0; border: none; }
-.stripped tr:nth-child(2n+1) { background-color: #F3F3F3; }
-
-.customizebox { font-size: 0.75em; margin-bottom: 7px; }
-.customizebox>div { width: 25%; display: inline-block; }
-.customizebox div.right input { font-size: 0.8em; width: 150px; }
-#namespaceslider { width: 200px; display: inline-block; margin-left: 8px; }
-
-.percentagebar {
-    padding-left: 3px;
-}
-a.percentagebar {
-    padding-left: 6px;
-}
-.percentagebarundefined {
-    border-left: 2px solid #fff;
-}
-.percentagebar0 {
-    border-left: 2px solid #c10909;
-}
-.percentagebar10 {
-    border-left: 2px solid;
-    border-image: linear-gradient(to bottom, #c10909 90%, #0aad0a 90%, #0aad0a 100%) 1;
-}
-.percentagebar20 {
-    border-left: 2px solid;
-    border-image: linear-gradient(to bottom, #c10909 80%, #0aad0a 80%, #0aad0a 100%) 1;
-}
-.percentagebar30 {
-    border-left: 2px solid;
-    border-image: linear-gradient(to bottom, #c10909 70%, #0aad0a 70%, #0aad0a 100%) 1;
-}
-.percentagebar40 {
-    border-left: 2px solid;
-    border-image: linear-gradient(to bottom, #c10909 60%, #0aad0a 60%, #0aad0a 100%) 1;
-}
-.percentagebar50 {
-    border-left: 2px solid;
-    border-image: linear-gradient(to bottom, #c10909 50%, #0aad0a 50%, #0aad0a 100%) 1;
-}
-.percentagebar60 {
-    border-left: 2px solid;
-    border-image: linear-gradient(to bottom, #c10909 40%, #0aad0a 40%, #0aad0a 100%) 1;
-}
-.percentagebar70 {
-    border-left: 2px solid;
-    border-image: linear-gradient(to bottom, #c10909 30%, #0aad0a 30%, #0aad0a 100%) 1;
-}
-.percentagebar80 {
-    border-left: 2px solid;
-    border-image: linear-gradient(to bottom, #c10909 20%, #0aad0a 20%, #0aad0a 100%) 1;
-}
-.percentagebar90 {
-    border-left: 2px solid;
-    border-image: linear-gradient(to bottom, #c10909 10%, #0aad0a 10%, #0aad0a 100%) 1;
-}
-.percentagebar100 {
-    border-left: 2px solid #0aad0a;
-}
-
-.hidden, .ng-hide { display: none; }
-.right { text-align: right; }
-.center { text-align: center; }
-.rightmargin  { padding-right: 8px; }
-.leftmargin { padding-left: 5px; }
-.green { background-color: #0aad0a; }
-.lightgreen { background-color: #dcf4dc; }
-.red { background-color: #c10909; }
-.lightred { background-color: #f7dede; }
-.orange { background-color: #FFA500; }
-.lightorange { background-color: #FFEFD5; }
-.gray { background-color: #dcdcdc; }
-.lightgray { color: #888888; }
-.lightgraybg { background-color: #dadada; }
-
-.toggleZoom { text-align:right; }
-
-.ct-chart { position: relative; }
-.ct-chart .ct-line { stroke-width: 2px !important; }
-.ct-chart .ct-point { stroke-width: 6px !important; transition: stroke-width .2s; }
-.ct-chart .ct-point:hover { stroke-width: 10px !important; }
-.ct-chart .ct-series.ct-series-a .ct-line, .ct-chart .ct-series.ct-series-a .ct-point { stroke: #c00 !important;}
-.ct-chart .ct-series.ct-series-b .ct-line, .ct-chart .ct-series.ct-series-b .ct-point { stroke: #1c2298 !important;}
-
-.tinylinecoveragechart, .tinybranchcoveragechart { background-color: #fff; margin-left: -3px; float: left; border: solid 1px #c1c1c1; width: 30px; height: 18px; }
-.historiccoverageoffset { margin-top: 7px; }
-
-.tinylinecoveragechart .ct-line, .tinybranchcoveragechart .ct-line { stroke-width: 1px !important; }
-.tinybranchcoveragechart .ct-series.ct-series-a .ct-line { stroke: #1c2298 !important; }
-
-.linecoverage { background-color: #c00; width: 10px; height: 8px; border: 1px solid #000; display: inline-block; }
-.branchcoverage { background-color: #1c2298; width: 10px; height: 8px; border: 1px solid #000; display: inline-block; }
-
-.tooltip { position: absolute; display: none; padding: 5px; background: #F4C63D; color: #453D3F; pointer-events: none; z-index: 1; min-width: 250px; }
-
-.column1324 { max-width: 1324px; }
-.column674 { max-width: 674px; }
-.column60 { width: 60px; }
-.column70 { width: 70px; }
-.column90 { width: 90px; }
-.column98 { width: 98px; }
-.column100 { width: 100px; }
-.column105 { width: 105px; }
-.column112 { width: 112px; }
-.column135 { width: 135px; }
-.column150 { width: 150px; }
-
-.covered0 { width: 0px; }
-.covered1 { width: 1px; }
-.covered2 { width: 2px; }
-.covered3 { width: 3px; }
-.covered4 { width: 4px; }
-.covered5 { width: 5px; }
-.covered6 { width: 6px; }
-.covered7 { width: 7px; }
-.covered8 { width: 8px; }
-.covered9 { width: 9px; }
-.covered10 { width: 10px; }
-.covered11 { width: 11px; }
-.covered12 { width: 12px; }
-.covered13 { width: 13px; }
-.covered14 { width: 14px; }
-.covered15 { width: 15px; }
-.covered16 { width: 16px; }
-.covered17 { width: 17px; }
-.covered18 { width: 18px; }
-.covered19 { width: 19px; }
-.covered20 { width: 20px; }
-.covered21 { width: 21px; }
-.covered22 { width: 22px; }
-.covered23 { width: 23px; }
-.covered24 { width: 24px; }
-.covered25 { width: 25px; }
-.covered26 { width: 26px; }
-.covered27 { width: 27px; }
-.covered28 { width: 28px; }
-.covered29 { width: 29px; }
-.covered30 { width: 30px; }
-.covered31 { width: 31px; }
-.covered32 { width: 32px; }
-.covered33 { width: 33px; }
-.covered34 { width: 34px; }
-.covered35 { width: 35px; }
-.covered36 { width: 36px; }
-.covered37 { width: 37px; }
-.covered38 { width: 38px; }
-.covered39 { width: 39px; }
-.covered40 { width: 40px; }
-.covered41 { width: 41px; }
-.covered42 { width: 42px; }
-.covered43 { width: 43px; }
-.covered44 { width: 44px; }
-.covered45 { width: 45px; }
-.covered46 { width: 46px; }
-.covered47 { width: 47px; }
-.covered48 { width: 48px; }
-.covered49 { width: 49px; }
-.covered50 { width: 50px; }
-.covered51 { width: 51px; }
-.covered52 { width: 52px; }
-.covered53 { width: 53px; }
-.covered54 { width: 54px; }
-.covered55 { width: 55px; }
-.covered56 { width: 56px; }
-.covered57 { width: 57px; }
-.covered58 { width: 58px; }
-.covered59 { width: 59px; }
-.covered60 { width: 60px; }
-.covered61 { width: 61px; }
-.covered62 { width: 62px; }
-.covered63 { width: 63px; }
-.covered64 { width: 64px; }
-.covered65 { width: 65px; }
-.covered66 { width: 66px; }
-.covered67 { width: 67px; }
-.covered68 { width: 68px; }
-.covered69 { width: 69px; }
-.covered70 { width: 70px; }
-.covered71 { width: 71px; }
-.covered72 { width: 72px; }
-.covered73 { width: 73px; }
-.covered74 { width: 74px; }
-.covered75 { width: 75px; }
-.covered76 { width: 76px; }
-.covered77 { width: 77px; }
-.covered78 { width: 78px; }
-.covered79 { width: 79px; }
-.covered80 { width: 80px; }
-.covered81 { width: 81px; }
-.covered82 { width: 82px; }
-.covered83 { width: 83px; }
-.covered84 { width: 84px; }
-.covered85 { width: 85px; }
-.covered86 { width: 86px; }
-.covered87 { width: 87px; }
-.covered88 { width: 88px; }
-.covered89 { width: 89px; }
-.covered90 { width: 90px; }
-.covered91 { width: 91px; }
-.covered92 { width: 92px; }
-.covered93 { width: 93px; }
-.covered94 { width: 94px; }
-.covered95 { width: 95px; }
-.covered96 { width: 96px; }
-.covered97 { width: 97px; }
-.covered98 { width: 98px; }
-.covered99 { width: 99px; }
-.covered100 { width: 100px; }
-
- @media print {
-    html, body { background-color: #fff; }
-    .container { max-width: 100%; width: 100%; padding: 0; }
-    .overview colgroup col:first-child { width: 300px; }
-}
-
-.icon-up-dir_active {
-    background-image: url(data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiPz4KPHN2ZyB3aWR0aD0iMTc5MiIgaGVpZ2h0PSIxNzkyIiB2aWV3Qm94PSIwIDAgMTc5MiAxNzkyIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjxwYXRoIGZpbGw9IiNjMDAiIGQ9Ik0xNDA4IDEyMTZxMCAyNi0xOSA0NXQtNDUgMTloLTg5NnEtMjYgMC00NS0xOXQtMTktNDUgMTktNDVsNDQ4LTQ0OHExOS0xOSA0NS0xOXQ0NSAxOWw0NDggNDQ4cTE5IDE5IDE5IDQ1eiIvPjwvc3ZnPg==);
-    background-repeat: no-repeat;
-    background-size: contain;
-    padding-left: 15px;
-    height: 0.9em;
-    display: inline-block;
-    position: relative;
-    top: 3px;
-}
-.icon-down-dir_active {
-    background-image: url(data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiPz4KPHN2ZyB3aWR0aD0iMTc5MiIgaGVpZ2h0PSIxNzkyIiB2aWV3Qm94PSIwIDAgMTc5MiAxNzkyIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjxwYXRoIGZpbGw9IiNjMDAiIGQ9Ik0xNDA4IDcwNHEwIDI2LTE5IDQ1bC00NDggNDQ4cS0xOSAxOS00NSAxOXQtNDUtMTlsLTQ0OC00NDhxLTE5LTE5LTE5LTQ1dDE5LTQ1IDQ1LTE5aDg5NnEyNiAwIDQ1IDE5dDE5IDQ1eiIvPjwvc3ZnPg==);
-    background-repeat: no-repeat;
-    background-size: contain;
-    padding-left: 15px;
-    height: 0.9em;
-    display: inline-block;
-    position: relative;
-    top: 3px;
-}
-.icon-down-dir {
-    background-image: url(data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiPz4KPHN2ZyB3aWR0aD0iMTc5MiIgaGVpZ2h0PSIxNzkyIiB2aWV3Qm94PSIwIDAgMTc5MiAxNzkyIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjxwYXRoIGQ9Ik0xNDA4IDcwNHEwIDI2LTE5IDQ1bC00NDggNDQ4cS0xOSAxOS00NSAxOXQtNDUtMTlsLTQ0OC00NDhxLTE5LTE5LTE5LTQ1dDE5LTQ1IDQ1LTE5aDg5NnEyNiAwIDQ1IDE5dDE5IDQ1eiIvPjwvc3ZnPg==);
-    background-repeat: no-repeat;
-    background-size: contain;
-    padding-left: 15px;
-    height: 0.9em;
-    display: inline-block;
-    position: relative;
-    top: 3px;
-}
-.icon-info-circled {
-    background-image: url(data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiPz4KPHN2ZyB3aWR0aD0iMTc5MiIgaGVpZ2h0PSIxNzkyIiB2aWV3Qm94PSIwIDAgMTc5MiAxNzkyIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjxjaXJjbGUgY3g9Ijg5NiIgY3k9Ijg5NiIgcj0iNzUwIiBmaWxsPSIjZmZmIiAvPjxwYXRoIGZpbGw9IiMyOEE1RkYiIGQ9Ik0xMTUyIDEzNzZ2LTE2MHEwLTE0LTktMjN0LTIzLTloLTk2di01MTJxMC0xNC05LTIzdC0yMy05aC0zMjBxLTE0IDAtMjMgOXQtOSAyM3YxNjBxMCAxNCA5IDIzdDIzIDloOTZ2MzIwaC05NnEtMTQgMC0yMyA5dC05IDIzdjE2MHEwIDE0IDkgMjN0MjMgOWg0NDhxMTQgMCAyMy05dDktMjN6bS0xMjgtODk2di0xNjBxMC0xNC05LTIzdC0yMy05aC0xOTJxLTE0IDAtMjMgOXQtOSAyM3YxNjBxMCAxNCA5IDIzdDIzIDloMTkycTE0IDAgMjMtOXQ5LTIzem02NDAgNDE2cTAgMjA5LTEwMyAzODUuNXQtMjc5LjUgMjc5LjUtMzg1LjUgMTAzLTM4NS41LTEwMy0yNzkuNS0yNzkuNS0xMDMtMzg1LjUgMTAzLTM4NS41IDI3OS41LTI3OS41IDM4NS41LTEwMyAzODUuNSAxMDMgMjc5LjUgMjc5LjUgMTAzIDM4NS41eiIvPjwvc3ZnPg==);
-    background-repeat: no-repeat;
-    background-size: contain;
-    padding-left: 15px;
-    height: 0.9em;
-    display: inline-block;
-}
-.icon-plus {
-    background-image: url(data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiPz4KPHN2ZyB3aWR0aD0iMTc5MiIgaGVpZ2h0PSIxNzkyIiB2aWV3Qm94PSIwIDAgMTc5MiAxNzkyIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjxwYXRoIGQ9Ik0xNjAwIDczNnYxOTJxMCA0MC0yOCA2OHQtNjggMjhoLTQxNnY0MTZxMCA0MC0yOCA2OHQtNjggMjhoLTE5MnEtNDAgMC02OC0yOHQtMjgtNjh2LTQxNmgtNDE2cS00MCAwLTY4LTI4dC0yOC02OHYtMTkycTAtNDAgMjgtNjh0NjgtMjhoNDE2di00MTZxMC00MCAyOC02OHQ2OC0yOGgxOTJxNDAgMCA2OCAyOHQyOCA2OHY0MTZoNDE2cTQwIDAgNjggMjh0MjggNjh6Ii8+PC9zdmc+);
-    background-repeat: no-repeat;
-    background-size: contain;
-    padding-left: 15px;
-    height: 0.9em;
-    display: inline-block;
-    position: relative;
-    top: 3px;
-}
-.icon-minus {
-    background-image: url(data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiPz4KPHN2ZyB3aWR0aD0iMTc5MiIgaGVpZ2h0PSIxNzkyIiB2aWV3Qm94PSIwIDAgMTc5MiAxNzkyIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjxwYXRoIGZpbGw9IiNjMDAiIGQ9Ik0xNjAwIDczNnYxOTJxMCA0MC0yOCA2OHQtNjggMjhoLTEyMTZxLTQwIDAtNjgtMjh0LTI4LTY4di0xOTJxMC00MCAyOC02OHQ2OC0yOGgxMjE2cTQwIDAgNjggMjh0MjggNjh6Ii8+PC9zdmc+);
-    background-repeat: no-repeat;
-    background-size: contain;
-    padding-left: 15px;
-    height: 0.9em;
-    display: inline-block;
-    position: relative;
-    top: 3px;
-}
-.icon-wrench {
-    background-image: url(data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiPz4KPHN2ZyB3aWR0aD0iMTc5MiIgaGVpZ2h0PSIxNzkyIiB2aWV3Qm94PSIwIDAgMTc5MiAxNzkyIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjxwYXRoIGQ9Ik00NDggMTQ3MnEwLTI2LTE5LTQ1dC00NS0xOS00NSAxOS0xOSA0NSAxOSA0NSA0NSAxOSA0NS0xOSAxOS00NXptNjQ0LTQyMGwtNjgyIDY4MnEtMzcgMzctOTAgMzctNTIgMC05MS0zN2wtMTA2LTEwOHEtMzgtMzYtMzgtOTAgMC01MyAzOC05MWw2ODEtNjgxcTM5IDk4IDExNC41IDE3My41dDE3My41IDExNC41em02MzQtNDM1cTAgMzktMjMgMTA2LTQ3IDEzNC0xNjQuNSAyMTcuNXQtMjU4LjUgODMuNXEtMTg1IDAtMzE2LjUtMTMxLjV0LTEzMS41LTMxNi41IDEzMS41LTMxNi41IDMxNi41LTEzMS41cTU4IDAgMTIxLjUgMTYuNXQxMDcuNSA0Ni41cTE2IDExIDE2IDI4dC0xNiAyOGwtMjkzIDE2OXYyMjRsMTkzIDEwN3E1LTMgNzktNDguNXQxMzUuNS04MSA3MC41LTM1LjVxMTUgMCAyMy41IDEwdDguNSAyNXoiLz48L3N2Zz4=);
-    background-repeat: no-repeat;
-    background-size: contain;
-    padding-left: 20px;
-    height: 0.9em;
-    display: inline-block;
-}
-.icon-fork {
-    background-image: url(data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiPz4KPHN2ZyB3aWR0aD0iMTc5MiIgaGVpZ2h0PSIxNzkyIiB2aWV3Qm94PSIwIDAgMTc5MiAxNzkyIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjxyZWN0IHdpZHRoPSIxNzkyIiBoZWlnaHQ9IjE3OTIiIHN0eWxlPSJmaWxsOiNmZmYiIC8+PHBhdGggZD0iTTY3MiAxNDcycTAtNDAtMjgtNjh0LTY4LTI4LTY4IDI4LTI4IDY4IDI4IDY4IDY4IDI4IDY4LTI4IDI4LTY4em0wLTExNTJxMC00MC0yOC02OHQtNjgtMjgtNjggMjgtMjggNjggMjggNjggNjggMjggNjgtMjggMjgtNjh6bTY0MCAxMjhxMC00MC0yOC02OHQtNjgtMjgtNjggMjgtMjggNjggMjggNjggNjggMjggNjgtMjggMjgtNjh6bTk2IDBxMCA1Mi0yNiA5Ni41dC03MCA2OS41cS0yIDI4Ny0yMjYgNDE0LTY3IDM4LTIwMyA4MS0xMjggNDAtMTY5LjUgNzF0LTQxLjUgMTAwdjI2cTQ0IDI1IDcwIDY5LjV0MjYgOTYuNXEwIDgwLTU2IDEzNnQtMTM2IDU2LTEzNi01Ni01Ni0xMzZxMC01MiAyNi05Ni41dDcwLTY5LjV2LTgyMHEtNDQtMjUtNzAtNjkuNXQtMjYtOTYuNXEwLTgwIDU2LTEzNnQxMzYtNTYgMTM2IDU2IDU2IDEzNnEwIDUyLTI2IDk2LjV0LTcwIDY5LjV2NDk3cTU0LTI2IDE1NC01NyA1NS0xNyA4Ny41LTI5LjV0NzAuNS0zMSA1OS0zOS41IDQwLjUtNTEgMjgtNjkuNSA4LjUtOTEuNXEtNDQtMjUtNzAtNjkuNXQtMjYtOTYuNXEwLTgwIDU2LTEzNnQxMzYtNTYgMTM2IDU2IDU2IDEzNnoiLz48L3N2Zz4=);
-    background-repeat: no-repeat;
-    background-size: contain;
-    padding-left: 20px;
-    height: 0.9em;
-    display: inline-block;
-}
-.icon-cube {
-    background-image: url(data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiPz4KPHN2ZyB3aWR0aD0iMTc5MiIgaGVpZ2h0PSIxNzkyIiB2aWV3Qm94PSIwIDAgMTc5MiAxNzkyIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjxwYXRoIGQ9Ik04OTYgMTYyOWw2NDAtMzQ5di02MzZsLTY0MCAyMzN2NzUyem0tNjQtODY1bDY5OC0yNTQtNjk4LTI1NC02OTggMjU0em04MzItMjUydjc2OHEwIDM1LTE4IDY1dC00OSA0N2wtNzA0IDM4NHEtMjggMTYtNjEgMTZ0LTYxLTE2bC03MDQtMzg0cS0zMS0xNy00OS00N3QtMTgtNjV2LTc2OHEwLTQwIDIzLTczdDYxLTQ3bDcwNC0yNTZxMjItOCA0NC04dDQ0IDhsNzA0IDI1NnEzOCAxNCA2MSA0N3QyMyA3M3oiLz48L3N2Zz4=);
-    background-repeat: no-repeat;
-    background-size: contain;
-    padding-left: 20px;
-    height: 0.9em;
-    display: inline-block;
-}
-.icon-search-plus {
-    background-image: url(data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiPz4KPHN2ZyB3aWR0aD0iMTc5MiIgaGVpZ2h0PSIxNzkyIiB2aWV3Qm94PSIwIDAgMTc5MiAxNzkyIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciPjxwYXRoIGZpbGw9IiM2ZjZmNmYiIGQ9Ik0xMDg4IDgwMHY2NHEwIDEzLTkuNSAyMi41dC0yMi41IDkuNWgtMjI0djIyNHEwIDEzLTkuNSAyMi41dC0yMi41IDkuNWgtNjRxLTEzIDAtMjIuNS05LjV0LTkuNS0yMi41di0yMjRoLTIyNHEtMTMgMC0yMi41LTkuNXQtOS41LTIyLjV2LTY0cTAtMTMgOS41LTIyLjV0MjIuNS05LjVoMjI0di0yMjRxMC0xMyA5LjUtMjIuNXQyMi41LTkuNWg2NHExMyAwIDIyLjUgOS41dDkuNSAyMi41djIyNGgyMjRxMTMgMCAyMi41IDkuNXQ5LjUgMjIuNXptMTI4IDMycTAtMTg1LTEzMS41LTMxNi41dC0zMTYuNS0xMzEuNS0zMTYuNSAxMzEuNS0xMzEuNSAzMTYuNSAxMzEuNSAzMTYuNSAzMTYuNSAxMzEuNSAzMTYuNS0xMzEuNSAxMzEuNS0zMTYuNXptNTEyIDgzMnEwIDUzLTM3LjUgOTAuNXQtOTAuNSAzNy41cS01NCAwLTkwLTM4bC0zNDMtMzQycS0xNzkgMTI0LTM5OSAxMjQtMTQzIDAtMjczLjUtNTUuNXQtMjI1LTE1MC0xNTAtMjI1LTU1LjUtMjczLjUgNTUuNS0yNzMuNSAxNTAtMjI1IDIyNS0xNTAgMjczLjUtNTUuNSAyNzMuNSA1NS41IDIyNSAxNTAgMT;unmodified_text&nbsp;=&nbsp;ULStringMarshaler.ManagedToNative(keyEvent.unmodified_text);</code></td></tr>
-<tr class="coverableline" title="Not covered (0 visits, 0 of 2 branches are covered)" data-coverage="{'AllTestMethods': {'VC': '0', 'LVS': 'red'}}"><td class="red">&nbsp;</td><td class="leftmargin rightmargin right">0</td><td class="rightmargin right"><a id="file0_line45"></a><code>45</code></td><td class="percentagebar percentagebar0"><i class="icon-fork"></i></td><td class="lightred"><code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;is_keypad&nbsp;=&nbsp;(byte)(keyEvent.is_keypad&nbsp;?&nbsp;1&nbsp;:&nbsp;0);</code></td></tr>
-<tr class="coverableline" title="Not covered (0 visits, 0 of 2 branches are covered)" data-coverage="{'AllTestMethods': {'VC': '0', 'LVS': 'red'}}"><td class="red">&nbsp;</td><td class="leftmargin rightmargin right">0</td><td class="rightmargin right"><a id="file0_line46"></a><code>46</code></td><td class="percentagebar percentagebar0"><i class="icon-fork"></i></td><td class="lightred"><code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;is_auto_repeat&nbsp;=&nbsp;(byte)(keyEvent.is_auto_repeat&nbsp;?&nbsp;1&nbsp;:&nbsp;0);</code></td></tr>
-<tr class="coverableline" title="Not covered (0 visits, 0 of 2 branches are covered)" data-coverage="{'AllTestMethods': {'VC': '0', 'LVS': 'red'}}"><td class="red">&nbsp;</td><td class="leftmargin rightmargin right">0</td><td class="rightmargin right"><a id="file0_line47"></a><code>47</code></td><td class="percentagebar percentagebar0"><i class="icon-fork"></i></td><td class="lightred"><code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;is_system_key&nbsp;=&nbsp;(byte)(keyEvent.is_system_key&nbsp;?&nbsp;1&nbsp;:&nbsp;0);</code></td></tr>
-<tr class="coverableline" title="Not covered (0 visits)" data-coverage="{'AllTestMethods': {'VC': '0', 'LVS': 'red'}}"><td class="red">&nbsp;</td><td class="leftmargin rightmargin right">0</td><td class="rightmargin right"><a id="file0_line48"></a><code>48</code></td><td></td><td class="lightred"><code>&nbsp;&nbsp;&nbsp;&nbsp;}</code></td></tr>
-<tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line49"></a><code>49</code></td><td></td><td class="lightgray"><code></code></td></tr>
-<tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line50"></a><code>50</code></td><td></td><td class="lightgray"><code>&nbsp;&nbsp;&nbsp;&nbsp;public&nbsp;void&nbsp;FreeNative()</code></td></tr>
-<tr class="coverableline" title="Not covered (0 visits)" data-coverage="{'AllTestMethods': {'VC': '0', 'LVS': 'red'}}"><td class="red">&nbsp;</td><td class="leftmargin rightmargin right">0</td><td class="rightmargin right"><a id="file0_line51"></a><code>51</code></td><td></td><td class="lightred"><code>&nbsp;&nbsp;&nbsp;&nbsp;{</code></td></tr>
-<tr class="coverableline" title="Not covered (0 visits)" data-coverage="{'AllTestMethods': {'VC': '0', 'LVS': 'red'}}"><td class="red">&nbsp;</td><td class="leftmargin rightmargin right">0</td><td class="rightmargin right"><a id="file0_line52"></a><code>52</code></td><td></td><td class="lightred"><code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ULStringMarshaler.CleanUpNative(key_identifier);</code></td></tr>
-<tr class="coverableline" title="Not covered (0 visits)" data-coverage="{'AllTestMethods': {'VC': '0', 'LVS': 'red'}}"><td class="red">&nbsp;</td><td class="leftmargin rightmargin right">0</td><td class="rightmargin right"><a id="file0_line53"></a><code>53</code></td><td></td><td class="lightred"><code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ULStringMarshaler.CleanUpNative(text);</code></td></tr>
-<tr class="coverableline" title="Not covered (0 visits)" data-coverage="{'AllTestMethods': {'VC': '0', 'LVS': 'red'}}"><td class="red">&nbsp;</td><td class="leftmargin rightmargin right">0</td><td class="rightmargin right"><a id="file0_line54"></a><code>54</code></td><td></td><td class="lightred"><code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;ULStringMarshaler.CleanUpNative(unmodified_text);</code></td></tr>
-<tr class="coverableline" title="Not covered (0 visits)" data-coverage="{'AllTestMethods': {'VC': '0', 'LVS': 'red'}}"><td class="red">&nbsp;</td><td class="leftmargin rightmargin right">0</td><td class="rightmargin right"><a id="file0_line55"></a><code>55</code></td><td></td><td class="lightred"><code>&nbsp;&nbsp;&nbsp;&nbsp;}</code></td></tr>
-<tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line56"></a><code>56</code></td><td></td><td class="lightgray"><code></code></td></tr>
-<tr class="coverableline" title="Not covered (0 visits)" data-coverage="{'AllTestMethods': {'VC': '0', 'LVS': 'red'}}"><td class="red">&nbsp;</td><td class="leftmargin rightmargin right">0</td><td class="rightmargin right"><a id="file0_line57"></a><code>57</code></td><td></td><td class="lightred"><code>&nbsp;&nbsp;&nbsp;&nbsp;public&nbsp;ULKeyEvent&nbsp;ToManaged()&nbsp;=&gt;&nbsp;new()</code></td></tr>
-<tr class="coverableline" title="Not covered (0 visits)" data-coverage="{'AllTestMethods': {'VC': '0', 'LVS': 'red'}}"><td class="red">&nbsp;</td><td class="leftmargin rightmargin right">0</td><td class="rightmargin right"><a id="file0_line58"></a><code>58</code></td><td></td><td class="lightred"><code>&nbsp;&nbsp;&nbsp;&nbsp;{</code></td></tr>
-<tr class="coverableline" title="Not covered (0 visits)" data-coverage="{'AllTestMethods': {'VC': '0', 'LVS': 'red'}}"><td class="red">&nbsp;</td><td class="leftmargin rightmargin right">0</td><td class="rightmargin right"><a id="file0_line59"></a><code>59</code></td><td></td><td class="lightred"><code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;type&nbsp;=&nbsp;(ULKeyEventType)type,</code></td></tr>
-<tr class="coverableline" title="Not covered (0 visits)" data-coverage="{'AllTestMethods': {'VC': '0', 'LVS': 'red'}}"><td class="red">&nbsp;</td><td class="leftmargin rightmargin right">0</td><td class="rightmargin right"><a id="file0_line60"></a><code>60</code></td><td></td><td class="lightred"><code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;modifiers&nbsp;=&nbsp;(ULKeyEventModifiers)modifiers,</code></td></tr>
-<tr class="coverableline" title="Not covered (0 visits)" data-coverage="{'AllTestMethods': {'VC': '0', 'LVS': 'red'}}"><td class="red">&nbsp;</td><td class="leftmargin rightmargin right">0</td><td class="rightmargin right"><a id="file0_line61"></a><code>61</code></td><td></td><td class="lightred"><code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;virtual_key_code&nbsp;=&nbsp;virtual_key_code,</code></td></tr>
-<tr class="coverableline" title="Not covered (0 visits)" data-coverage="{'AllTestMethods': {'VC': '0', 'LVS': 'red'}}"><td class="red">&nbsp;</td><td class="leftmargin rightmargin right">0</td><td class="rightmargin right"><a id="file0_line62"></a><code>62</code></td><td></td><td class="lightred"><code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;native_key_code&nbsp;=&nbsp;native_key_code,</code></td></tr>
-<tr class="coverableline" title="Not covered (0 visits)" data-coverage="{'AllTestMethods': {'VC': '0', 'LVS': 'red'}}"><td class="red">&nbsp;</td><td class="leftmargin rightmargin right">0</td><td class="rightmargin right"><a id="file0_line63"></a><code>63</code></td><td></td><td class="lightred"><code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;key_identifier&nbsp;=&nbsp;ULStringMarshaler.NativeToManaged(key_identifier),</code></td></tr>
-<tr class="coverableline" title="Not covered (0 visits)" data-coverage="{'AllTestMethods': {'VC': '0', 'LVS': 'red'}}"><td class="red">&nbsp;</td><td class="leftmargin rightmargin right">0</td><td class="rightmargin right"><a id="file0_line64"></a><code>64</code></td><td></td><td class="lightred"><code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;text&nbsp;=&nbsp;ULStringMarshaler.NativeToManaged(text),</code></td></tr>
-<tr class="coverableline" title="Not covered (0 visits)" data-coverage="{'AllTestMethods': {'VC': '0', 'LVS': 'red'}}"><td class="red">&nbsp;</td><td class="leftmargin rightmargin right">0</td><td class="rightmargin right"><a id="file0_line65"></a><code>65</code></td><td></td><td class="lightred"><code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;unmodified_text&nbsp;=&nbsp;ULStringMarshaler.NativeToManaged(unmodified_text),</code></td></tr>
-<tr class="coverableline" title="Not covered (0 visits)" data-coverage="{'AllTestMethods': {'VC': '0', 'LVS': 'red'}}"><td class="red">&nbsp;</td><td class="leftmargin rightmargin right">0</td><td class="rightmargin right"><a id="file0_line66"></a><code>66</code></td><td></td><td class="lightred"><code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;is_keypad&nbsp;=&nbsp;is_keypad&nbsp;!=&nbsp;0,</code></td></tr>
-<tr class="coverableline" title="Not covered (0 visits)" data-coverage="{'AllTestMethods': {'VC': '0', 'LVS': 'red'}}"><td class="red">&nbsp;</td><td class="leftmargin rightmargin right">0</td><td class="rightmargin right"><a id="file0_line67"></a><code>67</code></td><td></td><td class="lightred"><code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;is_auto_repeat&nbsp;=&nbsp;is_auto_repeat&nbsp;!=&nbsp;0,</code></td></tr>
-<tr class="coverableline" title="Not covered (0 visits)" data-coverage="{'AllTestMethods': {'VC': '0', 'LVS': 'red'}}"><td class="red">&nbsp;</td><td class="leftmargin rightmargin right">0</td><td class="rightmargin right"><a id="file0_line68"></a><code>68</code></td><td></td><td class="lightred"><code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;is_system_key&nbsp;=&nbsp;is_system_key&nbsp;!=&nbsp;0</code></td></tr>
-<tr class="coverableline" title="Not covered (0 visits)" data-coverage="{'AllTestMethods': {'VC': '0', 'LVS': 'red'}}"><td class="red">&nbsp;</td><td class="leftmargin rightmargin right">0</td><td class="rightmargin right"><a id="file0_line69"></a><code>69</code></td><td></td><td class="lightred"><code>&nbsp;&nbsp;&nbsp;&nbsp;};</code></td></tr>
-<tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line70"></a><code>70</code></td><td></td><td class="lightgray"><code>&nbsp;&nbsp;}</code></td></tr>
-<tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line71"></a><code>71</code></td><td></td><td class="lightgray"><code></code></td></tr>
-<tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line72"></a><code>72</code></td><td></td><td class="lightgray"><code>&nbsp;&nbsp;///&nbsp;&lt;summary&gt;</code></td></tr>
-<tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line73"></a><code>73</code></td><td></td><td class="lightgray"><code>&nbsp;&nbsp;///&nbsp;All&nbsp;the&nbsp;key-code&nbsp;definitions&nbsp;for&nbsp;KeyboardEvent.</code></td></tr>
-<tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line74"></a><code>74</code></td><td></td><td class="lightgray"><code>&nbsp;&nbsp;///&nbsp;Most&nbsp;of&nbsp;these&nbsp;correspond&nbsp;directly&nbsp;to&nbsp;the&nbsp;key-code&nbsp;values&nbsp;on&nbsp;Windows.</code></td></tr>
-<tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line75"></a><code>75</code></td><td></td><td class="lightgray"><code>&nbsp;&nbsp;///&nbsp;&lt;/summary&gt;</code></td></tr>
-<tr class="" titre{display:block;float:left;content:"";width:0;height:0;padding-bottom:60%}.ct-major-sixth:after{display:table}.ct-major-sixth>svg{display:block;position:absolute;top:0;left:0}.ct-minor-seventh{display:block;position:relative;width:100%}.ct-minor-seventh:before{display:block;float:left;content:"";width:0;height:0;padding-bottom:56.25%}.ct-minor-seventh:after{display:table}.ct-minor-seventh>svg{display:block;position:absolute;top:0;left:0}.ct-major-seventh{display:block;position:relative;width:100%}.ct-major-seventh:before{display:block;float:left;content:"";width:0;height:0;padding-bottom:53.3333333333%}.ct-major-seventh:after{display:table}.ct-major-seventh>svg{display:block;position:absolute;top:0;left:0}.ct-octave{display:block;position:relative;width:100%}.ct-octave:before{display:block;float:left;content:"";width:0;height:0;padding-bottom:50%}.ct-octave:after{display:table}.ct-octave>svg{display:block;position:absolute;top:0;left:0}.ct-major-tenth{display:block;position:relative;width:100%}.ct-major-tenth:before{display:block;float:left;content:"";width:0;height:0;padding-bottom:40%}.ct-major-tenth:after{display:table}.ct-major-tenth>svg{display:block;position:absolute;top:0;left:0}.ct-major-eleventh{display:block;position:relative;width:100%}.ct-major-eleventh:before{display:block;float:left;content:"";width:0;height:0;padding-bottom:37.5%}.ct-major-eleventh:after{display:table}.ct-major-eleventh>svg{display:block;position:absolute;top:0;left:0}.ct-major-twelfth{display:block;position:relative;width:100%}.ct-major-twelfth:before{display:block;float:left;content:"";width:0;height:0;padding-bottom:33.3333333333%}.ct-major-twelfth:after{display:table}.ct-major-twelfth>svg{display:block;position:absolute;top:0;left:0}.ct-double-octave{display:block;position:relative;width:100%}.ct-double-octave:before{display:block;float:left;content:"";width:0;height:0;padding-bottom:25%}.ct-double-octave:after{display:table}.ct-double-octave>svg{display:block;position:absolute;top:0;left:0}</style>
-</head><body><div class="container"><div class="containerleft">
-<h1><a href="index.html" class="back">&lt;</a> Summary</h1>
-<table class="overview table-fixed">
-<colgroup>
-<col class="column150" />
-<col />
-</colgroup>
-<tbody>
-<tr><th>Class:</th><td>UltralightNet.ULKeyEventNative</td></tr>
-<tr><th>Assembly:</th><td>UltralightNet</td></tr>
-<tr><th>File(s):</th><td><a href="#httpsrawgithubusercontentcomSupinePandora43UltralightNetf19b5b49438723f2cade25555dc6773976fd55d8UltralightNetStructsULKeyEventcs" class="navigatetohash">https://raw.githubusercontent.com/SupinePandora43/UltralightNet/f19b5b49438723f2cade25555dc6773976fd55d8/UltralightNet/Structs/ULKeyEvent.cs</a></td></tr>
-<tr><th>Covered lines:</th><td>0</td></tr>
-<tr><th>Uncovered lines:</th><td>30</td></tr>
-<tr><th>Coverable lines:</th><td>30</td></tr>
-<tr><th>Total lines:</th><td>581</td></tr>
-<tr><th>Line coverage:</th><td>0% (0 of 30)</td></tr>
-<tr><th>Covered branches:</th><td>0</td></tr>
-<tr><th>Total branches:</th><td>6</td></tr>
-<tr><th>Branch coverage:</th><td>0% (0 of 6)</td></tr>
-<tr><th>Tag:</th><td>104_682402037</td></tr>
-</tbody>
-</table>
-<h1>Metrics</h1>
-<table class="overview table-fixed">
-<thead><tr><th>Method</th><th>Branch coverage <a href="https://en.wikipedia.org/wiki/Code_coverage"><i class="icon-info-circled"></i></a></th><th>Cyclomatic complexity <a href="https://en.wikipedia.org/wiki/Cyclomatic_complexity"><i class="icon-info-circled"></i></a></th><th>Line coverage <a href="https://en.wikipedia.org/wiki/Code_coverage"><i class="icon-info-circled"></i></a></th></tr></thead>
-<tbody>
-<tr><td title=".ctor(UltralightNet.ULKeyEvent)"><a href="#file0_line37" class="navigatetohash">.ctor(...)</a></td><td>0%</td><td>6</td><td>0%</td></tr>
+.containerrightfixed label, .containerright a { white-space: nowrap; overflow: hidden; display: inline-block;></tr>
 <tr><td title="FreeNative()"><a href="#file0_line51" class="navigatetohash">FreeNative()</a></td><td>100%</td><td>1</td><td>0%</td></tr>
 <tr><td title="ToManaged()"><a href="#file0_line57" class="navigatetohash">ToManaged()</a></td><td>100%</td><td>1</td><td>0%</td></tr>
 </tbody>
 </table>
 <h1>File(s)</h1>
-<h2 id="httpsrawgithubusercontentcomSupinePandora43UltralightNetf19b5b49438723f2cade25555dc6773976fd55d8UltralightNetStructsULKeyEventcs">https://raw.githubusercontent.com/SupinePandora43/UltralightNet/f19b5b49438723f2cade25555dc6773976fd55d8/UltralightNet/Structs/ULKeyEvent.cs</h2>
+<h2 id="httpsrawgithubusercontentcomSupinePandora43UltralightNet2c14dfe1c4bc037219ec9d0c710eeb9777084516UltralightNetStructsULKeyEventcs">https://raw.githubusercontent.com/SupinePandora43/UltralightNet/2c14dfe1c4bc037219ec9d0c710eeb9777084516/UltralightNet/Structs/ULKeyEvent.cs</h2>
 <table class="lineAnalysis">
 <thead><tr><th></th><th>#</th><th>Line</th><th></th><th>Line coverage</th></tr></thead>
 <tbody>
@@ -533,31 +155,30 @@ a.percentagebar {
 <tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line119"></a><code>119</code></td><td></td><td class="lightgray"><code>&nbsp;&nbsp;&nbsp;&nbsp;public&nbsp;const&nbsp;int&nbsp;GK_HANJA&nbsp;=&nbsp;0x19;</code></td></tr>
 <tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line120"></a><code>120</code></td><td></td><td class="lightgray"><code></code></td></tr>
 <tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line121"></a><code>121</code></td><td></td><td class="lightgray"><code>&nbsp;&nbsp;&nbsp;&nbsp;//&nbsp;GK_KANJI&nbsp;(19)&nbsp;IME&nbsp;Kanji&nbsp;mode</code></td></tr>
-<tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line122"></a><code>122</code></td><td></td><td class="lightgray"><code>&nbsp;&nbsp;&nbsp;&nbsp;public&nbsp;const&nbsp;int&nbsp;GK_</code></td></tr>
-<tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line215"></a><code>215</code></td><td></td><td class="lightgray"><code>&nbsp;&nbsp;&nbsp;&nbsp;public&nbsp;const&nbsp;int&nbsp;GK_9&nbsp;=&nbsp;0x39;</code></td></tr>
-<tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line216"></a><code>216</code></td><td></td><td class="lightgray"><code></code></td></tr>
-<tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line217"></a><code>217</code></td><td></td><td class="lightgray"><code>&nbsp;&nbsp;&nbsp;&nbsp;//&nbsp;(41)&nbsp;A&nbsp;key</code></td></tr>
-<tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line218"></a><code>218</code></td><td></td><td class="lightgray"><code>&nbsp;&nbsp;&nbsp;&nbsp;public&nbsp;const&nbsp;int&nbsp;GK_A&nbsp;=&nbsp;0x41;</code></td></tr>
-<tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line219"></a><code>219</code></td><td></td><td class="lightgray"><code></code></td></tr>
-<tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line220"></a><code>220</code></td><td></td><td class="lightgray"><code>&nbsp;&nbsp;&nbsp;&nbsp;//&nbsp;(42)&nbsp;B&nbsp;key</code></td></tr>
-<tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line221"></a><code>221</code></td><td></td><td class="lightgray"><code>&nbsp;&nbsp;&nbsp;&nbsp;public&nbsp;const&nbsp;int&nbsp;GK_B&nbsp;=&nbsp;0x42;</code></td></tr>
-<tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line222"></a><code>222</code></td><td></td><td class="lightgray"><code></code></td></tr>
-<tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line223"></a><code>223</code></td><td></td><td class="lightgray"><code>&nbsp;&nbsp;&nbsp;&nbsp;//&nbsp;(43)&nbsp;C&nbsp;key</code></td></tr>
-<tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line224"></a><code>224</code></td><td></td><td class="lightgray"><code>&nbsp;&nbsp;&nbsp;&nbsp;public&nbsp;const&nbsp;int&nbsp;GK_C&nbsp;=&nbsp;0x43;</code></td></tr>
-<tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line225"></a><code>225</code></td><td></td><td class="lightgray"><code></code></td></tr>
-<tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line226"></a><code>226</code></td><td></td><td class="lightgray"><code>&nbsp;&nbsp;&nbsp;&nbsp;//&nbsp;(44)&nbsp;D&nbsp;key</code></td></tr>
-<tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line227"></a><code>227</code></td><td></td><td class="lightgray"><code>&nbsp;&nbsp;&nbsp;&nbsp;public&nbsp;const&nbsp;int&nbsp;GK_D&nbsp;=&nbsp;0x44;</code></td></tr>
-<tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line228"></a><code>228</code></td><td></td><td class="lightgray"><code></code></td></tr>
-<tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line229"></a><code>229</code></td><td></td><td class="lightgray"><code>&nbsp;&nbsp;&nbsp;&nbsp;//&nbsp;(45)&nbsp;E&nbsp;key</code></td></tr>
-<tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line230"></a><code>230</code></td><td></td><td class="lightgray"><code>&nbsp;&nbsp;&nbsp;&nbsp;public&nbsp;const&nbsp;int&nbsp;GK_E&nbsp;=&nbsp;0x45;</code></td></tr>
-<tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line231"></a><code>231</code></td><td></td><td class="lightgray"><code></code></td></tr>
-<tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line232"></a><code>232</code></td><td></td><td class="lightgray"><code>&nbsp;&nbsp;&nbsp;&nbsp;//&nbsp;(46)&nbsp;F&nbsp;key</code></td></tr>
-<tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line233"></a><code>233</code></td><td></td><td class="lightgray"><code>&nbsp;&nbsp;&nbsp;&nbsp;public&nbsp;const&nbsp;int&nbsp;GK_F&nbsp;=&nbsp;0x46;</code></td></tr>
-<tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line234"></a><code>234</code></td><td></td><td class="lightgray"><code></code></td></tr>
-<tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line235"></a><code>235</code></td><td></td><td class="lightgray"><code>&nbsp;&nbsp;&nbsp;&nbsp;//&nbsp;(47)&nbsp;G&nbsp;key</code></td></tr>
-<tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line236"></a><code>236</code></td><td></td><td class="lightgray"><code>&nbsp;&nbsp;&nbsp;&nbsp;public&nbsp;const&nbsp;int&nbsp;GK_G&nbsp;=&nbsp;0x47;</code></td></tr>
-<tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line237"></a><code>237</code></td><td></td><td class="lightgray"><code></code></td></tr>
-<tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_liny</code></td></tr>
+<tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line122"></a><code>122</code></td><td></td><td class="lightgray"><code>&nbsp;&nbsp;&nbsp;&nbsp;public&nbsp;const&nbsp;int&nbsp;GK_KANJI&nbsp;=&nbsp;0x19;</code></td></tr>
+<tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line123"></a><code>123</code></td><td></td><td class="lightgray"><code></code></td></tr>
+<tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line124"></a><code>124</code></td><td></td><td class="lightgray"><code>&nbsp;&nbsp;&nbsp;&nbsp;//&nbsp;GK_ESCAPE&nbsp;(1B)&nbsp;ESC&nbsp;key</code></td></tr>
+<tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line125"></a><code>125</code></td><td></td><td class="lightgray"><code>&nbsp;&nbsp;&nbsp;&nbsp;public&nbsp;const&nbsp;int&nbsp;GK_ESCAPE&nbsp;=&nbsp;0x1B;</code></td></tr>
+<tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line126"></a><code>126</code></td><td></td><td class="lightgray"><code></code></td></tr>
+<tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line127"></a><code>127</code></td><td></td><td class="lightgray"><code>&nbsp;&nbsp;&nbsp;&nbsp;//&nbsp;GK_CONVERT&nbsp;(1C)&nbsp;IME&nbsp;convert</code></td></tr>
+<tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line128"></a><code>128</code></td><td></td><td class="lightgray"><code>&nbsp;&nbsp;&nbsp;&nbsp;public&nbsp;const&nbsp;int&nbsp;GK_CONVERT&nbsp;=&nbsp;0x1C;</code></td></tr>
+<tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line129"></a><code>129</code></td><td></td><td class="lightgray"><code></code></td></tr>
+<tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line130"></a><code>130</code></td><td></td><td class="lightgray"><code>&nbsp;&nbsp;&nbsp;&nbsp;//&nbsp;GK_NONCONVERT&nbsp;(1D)&nbsp;IME&nbsp;nonconvert</code></td></tr>
+<tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line131"></a><code>131</code></td><td></td><td class="lightgray"><code>&nbsp;&nbsp;&nbsp;&nbsp;public&nbsp;const&nbsp;int&nbsp;GK_NONCONVERT&nbsp;=&nbsp;0x1D;</code></td></tr>
+<tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line132"></a><code>132</code></td><td></td><td class="lightgray"><code></code></td></tr>
+<tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line133"></a><code>133</code></td><td></td><td class="lightgray"><code>&nbsp;&nbsp;&nbsp;&nbsp;//&nbsp;GK_ACCEPT&nbsp;(1E)&nbsp;IME&nbsp;accept</code></td></tr>
+<tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line134"></a><code>134</code></td><td></td><td class="lightgray"><code>&nbsp;&nbsp;&nbsp;&nbsp;public&nbsp;const&nbsp;int&nbsp;GK_ACCEPT&nbsp;=&nbsp;0x1E;</code></td></tr>
+<tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line135"></a><code>135</code></td><td></td><td class="lightgray"><code></code></td></tr>
+<tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line136"></a><code>136</code></td><td></td><td class="lightgray"><code>&nbsp;&nbsp;&nbsp;&nbsp;//&nbsp;GK_MODECHANGE&nbsp;(1F)&nbsp;IME&nbsp;mode&nbsp;change&nbsp;request</code></td></tr>
+<tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line137"></a><code>137</code></td><td></td><td class="lightgray"><code>&nbsp;&nbsp;&nbsp;&nbsp;public&nbsp;const&nbsp;int&nbsp;GK_MODECHANGE&nbsp;=&nbsp;0x1F;</code></td></tr>
+<tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line138"></a><code>138</code></td><td></td><td class="lightgray"><code></code></td></tr>
+<tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line139"></a><code>139</code></td><td></td><td class="lightgray"><code>&nbsp;&nbsp;&nbsp;&nbsp;//&nbsp;GK_SPACE&nbsp;(20)&nbsp;SPACEBAR</code></td></tr>
+<tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line140"></a><code>140</code></td><td></td><td class="lightgray"><code>&nbsp;&nbsp;&nbsp;&nbsp;public&nbsp;const&nbsp;int&nbsp;GK_SPACE&nbsp;=&nbsp;0x20;</code></td></tr>
+<tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line141"></a><code>141</code></td><td></td><td class="lightgray"><code></code></td></tr>
+<tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line142"></a><code>142</code></td><td></td><td class="lightgray"><code>&nbsp;&nbsp;&nbsp;&nbsp;//&nbsp;GK_PRIOR&nbsp;(21)&nbsp;PAGE&nbsp;UP&nbsp;key</code></td></tr>
+<tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line143"></a><code>143</code></td><td></td><td class="lightgray"><code>&nbsp;&nbsp;&nbsp;&nbsp;public&nbsp;const&nbsp;int&nbsp;GK_PRIOR&nbsp;=&nbsp;0x21;</code></td></tr>
+<tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line144"></a><code>144</code></td><td></td><td class="lightgray"><code></code></td></tr>
+<tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line145"></a><code>145</code></td><td></td><td class="lightgray"><code>&nbsp;&nbsp;&nbsp;&nbsp;//&nbsp;GK_NEXT&nbsp;(22)&nbsp;PAGE&nbsp;DOWN&nbsp;key</code></td></tr>
 <tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line146"></a><code>146</code></td><td></td><td class="lightgray"><code>&nbsp;&nbsp;&nbsp;&nbsp;public&nbsp;const&nbsp;int&nbsp;GK_NEXT&nbsp;=&nbsp;0x22;</code></td></tr>
 <tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line147"></a><code>147</code></td><td></td><td class="lightgray"><code></code></td></tr>
 <tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line148"></a><code>148</code></td><td></td><td class="lightgray"><code>&nbsp;&nbsp;&nbsp;&nbsp;//&nbsp;GK_END&nbsp;(23)&nbsp;END&nbsp;key</code></td></tr>
@@ -904,14 +525,99 @@ a.percentagebar {
 <tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line489"></a><code>489</code></td><td></td><td class="lightgray"><code></code></td></tr>
 <tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line490"></a><code>490</code></td><td></td><td class="lightgray"><code>&nbsp;&nbsp;&nbsp;&nbsp;//&nbsp;GK_MEDIA_PLAY_PAUSE&nbsp;(B3)&nbsp;Windows&nbsp;2000/XP:&nbsp;Play/Pause&nbsp;Media&nbsp;key</code></td></tr>
 <tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line491"></a><code>491</code></td><td></td><td class="lightgray"><code>&nbsp;&nbsp;&nbsp;&nbsp;public&nbsp;const&nbsp;int&nbsp;GK_MEDIA_PLAY_PAUSE&nbsp;=&nbsp;0xB3;</code></td></tr>
-<tr class="" title="Not coverableight"></td><td class="rightmargin right"><a id="file0_line577"></a><code>577</code></td><td></td><td class="lightgray"><code>&nbsp;&nbsp;&nbsp;&nbsp;public&nbsp;const&nbsp;int&nbsp;GK_UNKNOWN&nbsp;=&nbsp;0;</code></td></tr>
+<tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line492"></a><code>492</code></td><td></td><td class="lightgray"><code></code></td></tr>
+<tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line493"></a><code>493</code></td><td></td><td class="lightgray"><code>&nbsp;&nbsp;&nbsp;&nbsp;//&nbsp;GK_LAUNCH_MAIL&nbsp;(B4)&nbsp;Windows&nbsp;2000/XP:&nbsp;Start&nbsp;Mail&nbsp;key</code></td></tr>
+<tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line494"></a><code>494</code></td><td></td><td class="lightgray"><code>&nbsp;&nbsp;&nbsp;&nbsp;public&nbsp;const&nbsp;int&nbsp;GK_MEDIA_LAUNCH_MAIL&nbsp;=&nbsp;0xB4;</code></td></tr>
+<tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line495"></a><code>495</code></td><td></td><td class="lightgray"><code></code></td></tr>
+<tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line496"></a><code>496</code></td><td></td><td class="lightgray"><code>&nbsp;&nbsp;&nbsp;&nbsp;//&nbsp;GK_LAUNCH_MEDIA_SELECT&nbsp;(B5)&nbsp;Windows&nbsp;2000/XP:&nbsp;Select&nbsp;Media&nbsp;key</code></td></tr>
+<tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line497"></a><code>497</code></td><td></td><td class="lightgray"><code>&nbsp;&nbsp;&nbsp;&nbsp;public&nbsp;const&nbsp;int&nbsp;GK_MEDIA_LAUNCH_MEDIA_SELECT&nbsp;=&nbsp;0xB5;</code></td></tr>
+<tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line498"></a><code>498</code></td><td></td><td class="lightgray"><code></code></td></tr>
+<tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line499"></a><code>499</code></td><td></td><td class="lightgray"><code>&nbsp;&nbsp;&nbsp;&nbsp;//&nbsp;GK_LAUNCH_APP1&nbsp;(B6)&nbsp;Windows&nbsp;2000/XP:&nbsp;Start&nbsp;Application&nbsp;1&nbsp;key</code></td></tr>
+<tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line500"></a><code>500</code></td><td></td><td class="lightgray"><code>&nbsp;&nbsp;&nbsp;&nbsp;public&nbsp;const&nbsp;int&nbsp;GK_MEDIA_LAUNCH_APP1&nbsp;=&nbsp;0xB6;</code></td></tr>
+<tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line501"></a><code>501</code></td><td></td><td class="lightgray"><code></code></td></tr>
+<tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line502"></a><code>502</code></td><td></td><td class="lightgray"><code>&nbsp;&nbsp;&nbsp;&nbsp;//&nbsp;GK_LAUNCH_APP2&nbsp;(B7)&nbsp;Windows&nbsp;2000/XP:&nbsp;Start&nbsp;Application&nbsp;2&nbsp;key</code></td></tr>
+<tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line503"></a><code>503</code></td><td></td><td class="lightgray"><code>&nbsp;&nbsp;&nbsp;&nbsp;public&nbsp;const&nbsp;int&nbsp;GK_MEDIA_LAUNCH_APP2&nbsp;=&nbsp;0xB7;</code></td></tr>
+<tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line504"></a><code>504</code></td><td></td><td class="lightgray"><code></code></td></tr>
+<tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line505"></a><code>505</code></td><td></td><td class="lightgray"><code>&nbsp;&nbsp;&nbsp;&nbsp;//&nbsp;GK_OEM_1&nbsp;(BA)&nbsp;Used&nbsp;for&nbsp;miscellaneous&nbsp;characters;&nbsp;it&nbsp;can&nbsp;vary&nbsp;by&nbsp;keyboard.&nbsp;Windows&nbsp;2000/XP:&nbsp;For&nbsp;the&nbsp;US&nbsp;standard&nbsp;ke</code></td></tr>
+<tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line506"></a><code>506</code></td><td></td><td class="lightgray"><code>&nbsp;&nbsp;&nbsp;&nbsp;public&nbsp;const&nbsp;int&nbsp;GK_OEM_1&nbsp;=&nbsp;0xBA;</code></td></tr>
+<tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line507"></a><code>507</code></td><td></td><td class="lightgray"><code></code></td></tr>
+<tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line508"></a><code>508</code></td><td></td><td class="lightgray"><code>&nbsp;&nbsp;&nbsp;&nbsp;//&nbsp;GK_OEM_PLUS&nbsp;(BB)&nbsp;Windows&nbsp;2000/XP:&nbsp;For&nbsp;any&nbsp;country/region,&nbsp;the&nbsp;&#39;+&#39;&nbsp;key</code></td></tr>
+<tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line509"></a><code>509</code></td><td></td><td class="lightgray"><code>&nbsp;&nbsp;&nbsp;&nbsp;public&nbsp;const&nbsp;int&nbsp;GK_OEM_PLUS&nbsp;=&nbsp;0xBB;</code></td></tr>
+<tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line510"></a><code>510</code></td><td></td><td class="lightgray"><code></code></td></tr>
+<tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line511"></a><code>511</code></td><td></td><td class="lightgray"><code>&nbsp;&nbsp;&nbsp;&nbsp;//&nbsp;GK_OEM_COMMA&nbsp;(BC)&nbsp;Windows&nbsp;2000/XP:&nbsp;For&nbsp;any&nbsp;country/region,&nbsp;the&nbsp;&#39;,&#39;&nbsp;key</code></td></tr>
+<tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line512"></a><code>512</code></td><td></td><td class="lightgray"><code>&nbsp;&nbsp;&nbsp;&nbsp;public&nbsp;const&nbsp;int&nbsp;GK_OEM_COMMA&nbsp;=&nbsp;0xBC;</code></td></tr>
+<tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line513"></a><code>513</code></td><td></td><td class="lightgray"><code></code></td></tr>
+<tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line514"></a><code>514</code></td><td></td><td class="lightgray"><code>&nbsp;&nbsp;&nbsp;&nbsp;//&nbsp;GK_OEM_MINUS&nbsp;(BD)&nbsp;Windows&nbsp;2000/XP:&nbsp;For&nbsp;any&nbsp;country/region,&nbsp;the&nbsp;&#39;-&#39;&nbsp;key</code></td></tr>
+<tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line515"></a><code>515</code></td><td></td><td class="lightgray"><code>&nbsp;&nbsp;&nbsp;&nbsp;public&nbsp;const&nbsp;int&nbsp;GK_OEM_MINUS&nbsp;=&nbsp;0xBD;</code></td></tr>
+<tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line516"></a><code>516</code></td><td></td><td class="lightgray"><code></code></td></tr>
+<tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line517"></a><code>517</code></td><td></td><td class="lightgray"><code>&nbsp;&nbsp;&nbsp;&nbsp;//&nbsp;GK_OEM_PERIOD&nbsp;(BE)&nbsp;Windows&nbsp;2000/XP:&nbsp;For&nbsp;any&nbsp;country/region,&nbsp;the&nbsp;&#39;.&#39;&nbsp;key</code></td></tr>
+<tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line518"></a><code>518</code></td><td></td><td class="lightgray"><code>&nbsp;&nbsp;&nbsp;&nbsp;public&nbsp;const&nbsp;int&nbsp;GK_OEM_PERIOD&nbsp;=&nbsp;0xBE;</code></td></tr>
+<tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line519"></a><code>519</code></td><td></td><td class="lightgray"><code></code></td></tr>
+<tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line520"></a><code>520</code></td><td></td><td class="lightgray"><code>&nbsp;&nbsp;&nbsp;&nbsp;//&nbsp;GK_OEM_2&nbsp;(BF)&nbsp;Used&nbsp;for&nbsp;miscellaneous&nbsp;characters;&nbsp;it&nbsp;can&nbsp;vary&nbsp;by&nbsp;keyboard.&nbsp;Windows&nbsp;2000/XP:&nbsp;For&nbsp;the&nbsp;US&nbsp;standard&nbsp;ke</code></td></tr>
+<tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line521"></a><code>521</code></td><td></td><td class="lightgray"><code>&nbsp;&nbsp;&nbsp;&nbsp;public&nbsp;const&nbsp;int&nbsp;GK_OEM_2&nbsp;=&nbsp;0xBF;</code></td></tr>
+<tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line522"></a><code>522</code></td><td></td><td class="lightgray"><code></code></td></tr>
+<tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line523"></a><code>523</code></td><td></td><td class="lightgray"><code>&nbsp;&nbsp;&nbsp;&nbsp;//&nbsp;GK_OEM_3&nbsp;(C0)&nbsp;Used&nbsp;for&nbsp;miscellaneous&nbsp;characters;&nbsp;it&nbsp;can&nbsp;vary&nbsp;by&nbsp;keyboard.&nbsp;Windows&nbsp;2000/XP:&nbsp;For&nbsp;the&nbsp;US&nbsp;standard&nbsp;ke</code></td></tr>
+<tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line524"></a><code>524</code></td><td></td><td class="lightgray"><code>&nbsp;&nbsp;&nbsp;&nbsp;public&nbsp;const&nbsp;int&nbsp;GK_OEM_3&nbsp;=&nbsp;0xC0;</code></td></tr>
+<tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line525"></a><code>525</code></td><td></td><td class="lightgray"><code></code></td></tr>
+<tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line526"></a><code>526</code></td><td></td><td class="lightgray"><code>&nbsp;&nbsp;&nbsp;&nbsp;//&nbsp;GK_OEM_4&nbsp;(DB)&nbsp;Used&nbsp;for&nbsp;miscellaneous&nbsp;characters;&nbsp;it&nbsp;can&nbsp;vary&nbsp;by&nbsp;keyboard.&nbsp;Windows&nbsp;2000/XP:&nbsp;For&nbsp;the&nbsp;US&nbsp;standard&nbsp;ke</code></td></tr>
+<tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line527"></a><code>527</code></td><td></td><td class="lightgray"><code>&nbsp;&nbsp;&nbsp;&nbsp;public&nbsp;const&nbsp;int&nbsp;GK_OEM_4&nbsp;=&nbsp;0xDB;</code></td></tr>
+<tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line528"></a><code>528</code></td><td></td><td class="lightgray"><code></code></td></tr>
+<tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line529"></a><code>529</code></td><td></td><td class="lightgray"><code>&nbsp;&nbsp;&nbsp;&nbsp;//&nbsp;GK_OEM_5&nbsp;(DC)&nbsp;Used&nbsp;for&nbsp;miscellaneous&nbsp;characters;&nbsp;it&nbsp;can&nbsp;vary&nbsp;by&nbsp;keyboard.&nbsp;Windows&nbsp;2000/XP:&nbsp;For&nbsp;the&nbsp;US&nbsp;standard&nbsp;ke</code></td></tr>
+<tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line530"></a><code>530</code></td><td></td><td class="lightgray"><code>&nbsp;&nbsp;&nbsp;&nbsp;public&nbsp;const&nbsp;int&nbsp;GK_OEM_5&nbsp;=&nbsp;0xDC;</code></td></tr>
+<tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line531"></a><code>531</code></td><td></td><td class="lightgray"><code></code></td></tr>
+<tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line532"></a><code>532</code></td><td></td><td class="lightgray"><code>&nbsp;&nbsp;&nbsp;&nbsp;//&nbsp;GK_OEM_6&nbsp;(DD)&nbsp;Used&nbsp;for&nbsp;miscellaneous&nbsp;characters;&nbsp;it&nbsp;can&nbsp;vary&nbsp;by&nbsp;keyboard.&nbsp;Windows&nbsp;2000/XP:&nbsp;For&nbsp;the&nbsp;US&nbsp;standard&nbsp;ke</code></td></tr>
+<tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line533"></a><code>533</code></td><td></td><td class="lightgray"><code>&nbsp;&nbsp;&nbsp;&nbsp;public&nbsp;const&nbsp;int&nbsp;GK_OEM_6&nbsp;=&nbsp;0xDD;</code></td></tr>
+<tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line534"></a><code>534</code></td><td></td><td class="lightgray"><code></code></td></tr>
+<tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line535"></a><code>535</code></td><td></td><td class="lightgray"><code>&nbsp;&nbsp;&nbsp;&nbsp;//&nbsp;GK_OEM_7&nbsp;(DE)&nbsp;Used&nbsp;for&nbsp;miscellaneous&nbsp;characters;&nbsp;it&nbsp;can&nbsp;vary&nbsp;by&nbsp;keyboard.&nbsp;Windows&nbsp;2000/XP:&nbsp;For&nbsp;the&nbsp;US&nbsp;standard&nbsp;ke</code></td></tr>
+<tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line536"></a><code>536</code></td><td></td><td class="lightgray"><code>&nbsp;&nbsp;&nbsp;&nbsp;public&nbsp;const&nbsp;int&nbsp;GK_OEM_7&nbsp;=&nbsp;0xDE;</code></td></tr>
+<tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line537"></a><code>537</code></td><td></td><td class="lightgray"><code></code></td></tr>
+<tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line538"></a><code>538</code></td><td></td><td class="lightgray"><code>&nbsp;&nbsp;&nbsp;&nbsp;//&nbsp;GK_OEM_8&nbsp;(DF)&nbsp;Used&nbsp;for&nbsp;miscellaneous&nbsp;characters;&nbsp;it&nbsp;can&nbsp;vary&nbsp;by&nbsp;keyboard.</code></td></tr>
+<tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line539"></a><code>539</code></td><td></td><td class="lightgray"><code>&nbsp;&nbsp;&nbsp;&nbsp;public&nbsp;const&nbsp;int&nbsp;GK_OEM_8&nbsp;=&nbsp;0xDF;</code></td></tr>
+<tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line540"></a><code>540</code></td><td></td><td class="lightgray"><code></code></td></tr>
+<tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line541"></a><code>541</code></td><td></td><td class="lightgray"><code>&nbsp;&nbsp;&nbsp;&nbsp;//&nbsp;GK_OEM_102&nbsp;(E2)&nbsp;Windows&nbsp;2000/XP:&nbsp;Either&nbsp;the&nbsp;angle&nbsp;bracket&nbsp;key&nbsp;or&nbsp;the&nbsp;backslash&nbsp;key&nbsp;on&nbsp;the&nbsp;RT&nbsp;102-key&nbsp;keyboard</code></td></tr>
+<tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line542"></a><code>542</code></td><td></td><td class="lightgray"><code>&nbsp;&nbsp;&nbsp;&nbsp;public&nbsp;const&nbsp;int&nbsp;GK_OEM_102&nbsp;=&nbsp;0xE2;</code></td></tr>
+<tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line543"></a><code>543</code></td><td></td><td class="lightgray"><code></code></td></tr>
+<tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line544"></a><code>544</code></td><td></td><td class="lightgray"><code>&nbsp;&nbsp;&nbsp;&nbsp;//&nbsp;GK_PROCESSKEY&nbsp;(E5)&nbsp;Windows&nbsp;95/98/Me,&nbsp;Windows&nbsp;NT&nbsp;4.0,&nbsp;Windows&nbsp;2000/XP:&nbsp;IME&nbsp;PROCESS&nbsp;key</code></td></tr>
+<tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line545"></a><code>545</code></td><td></td><td class="lightgray"><code>&nbsp;&nbsp;&nbsp;&nbsp;public&nbsp;const&nbsp;int&nbsp;GK_PROCESSKEY&nbsp;=&nbsp;0xE5;</code></td></tr>
+<tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line546"></a><code>546</code></td><td></td><td class="lightgray"><code></code></td></tr>
+<tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line547"></a><code>547</code></td><td></td><td class="lightgray"><code>&nbsp;&nbsp;&nbsp;&nbsp;//&nbsp;GK_PACKET&nbsp;(E7)&nbsp;Windows&nbsp;2000/XP:&nbsp;Used&nbsp;to&nbsp;pass&nbsp;Unicode&nbsp;characters&nbsp;as&nbsp;if&nbsp;they&nbsp;were&nbsp;keystrokes.&nbsp;The&nbsp;GK_PACKET&nbsp;key&nbsp;is&nbsp;</code></td></tr>
+<tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line548"></a><code>548</code></td><td></td><td class="lightgray"><code>&nbsp;&nbsp;&nbsp;&nbsp;public&nbsp;const&nbsp;int&nbsp;GK_PACKET&nbsp;=&nbsp;0xE7;</code></td></tr>
+<tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line549"></a><code>549</code></td><td></td><td class="lightgray"><code></code></td></tr>
+<tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line550"></a><code>550</code></td><td></td><td class="lightgray"><code>&nbsp;&nbsp;&nbsp;&nbsp;//&nbsp;GK_ATTN&nbsp;(F6)&nbsp;Attn&nbsp;key</code></td></tr>
+<tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line551"></a><code>551</code></td><td></td><td class="lightgray"><code>&nbsp;&nbsp;&nbsp;&nbsp;public&nbsp;const&nbsp;int&nbsp;GK_ATTN&nbsp;=&nbsp;0xF6;</code></td></tr>
+<tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line552"></a><code>552</code></td><td></td><td class="lightgray"><code></code></td></tr>
+<tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line553"></a><code>553</code></td><td></td><td class="lightgray"><code>&nbsp;&nbsp;&nbsp;&nbsp;//&nbsp;GK_CRSEL&nbsp;(F7)&nbsp;CrSel&nbsp;key</code></td></tr>
+<tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line554"></a><code>554</code></td><td></td><td class="lightgray"><code>&nbsp;&nbsp;&nbsp;&nbsp;public&nbsp;const&nbsp;int&nbsp;GK_CRSEL&nbsp;=&nbsp;0xF7;</code></td></tr>
+<tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line555"></a><code>555</code></td><td></td><td class="lightgray"><code></code></td></tr>
+<tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line556"></a><code>556</code></td><td></td><td class="lightgray"><code>&nbsp;&nbsp;&nbsp;&nbsp;//&nbsp;GK_EXSEL&nbsp;(F8)&nbsp;ExSel&nbsp;key</code></td></tr>
+<tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line557"></a><code>557</code></td><td></td><td class="lightgray"><code>&nbsp;&nbsp;&nbsp;&nbsp;public&nbsp;const&nbsp;int&nbsp;GK_EXSEL&nbsp;=&nbsp;0xF8;</code></td></tr>
+<tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line558"></a><code>558</code></td><td></td><td class="lightgray"><code></code></td></tr>
+<tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line559"></a><code>559</code></td><td></td><td class="lightgray"><code>&nbsp;&nbsp;&nbsp;&nbsp;//&nbsp;GK_EREOF&nbsp;(F9)&nbsp;Erase&nbsp;EOF&nbsp;key</code></td></tr>
+<tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line560"></a><code>560</code></td><td></td><td class="lightgray"><code>&nbsp;&nbsp;&nbsp;&nbsp;public&nbsp;const&nbsp;int&nbsp;GK_EREOF&nbsp;=&nbsp;0xF9;</code></td></tr>
+<tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line561"></a><code>561</code></td><td></td><td class="lightgray"><code></code></td></tr>
+<tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line562"></a><code>562</code></td><td></td><td class="lightgray"><code>&nbsp;&nbsp;&nbsp;&nbsp;//&nbsp;GK_PLAY&nbsp;(FA)&nbsp;Play&nbsp;key</code></td></tr>
+<tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line563"></a><code>563</code></td><td></td><td class="lightgray"><code>&nbsp;&nbsp;&nbsp;&nbsp;public&nbsp;const&nbsp;int&nbsp;GK_PLAY&nbsp;=&nbsp;0xFA;</code></td></tr>
+<tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line564"></a><code>564</code></td><td></td><td class="lightgray"><code></code></td></tr>
+<tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line565"></a><code>565</code></td><td></td><td class="lightgray"><code>&nbsp;&nbsp;&nbsp;&nbsp;//&nbsp;GK_ZOOM&nbsp;(FB)&nbsp;Zoom&nbsp;key</code></td></tr>
+<tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line566"></a><code>566</code></td><td></td><td class="lightgray"><code>&nbsp;&nbsp;&nbsp;&nbsp;public&nbsp;const&nbsp;int&nbsp;GK_ZOOM&nbsp;=&nbsp;0xFB;</code></td></tr>
+<tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line567"></a><code>567</code></td><td></td><td class="lightgray"><code></code></td></tr>
+<tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line568"></a><code>568</code></td><td></td><td class="lightgray"><code>&nbsp;&nbsp;&nbsp;&nbsp;//&nbsp;GK_NONAME&nbsp;(FC)&nbsp;Reserved&nbsp;for&nbsp;future&nbsp;use</code></td></tr>
+<tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line569"></a><code>569</code></td><td></td><td class="lightgray"><code>&nbsp;&nbsp;&nbsp;&nbsp;public&nbsp;const&nbsp;int&nbsp;GK_NONAME&nbsp;=&nbsp;0xFC;</code></td></tr>
+<tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line570"></a><code>570</code></td><td></td><td class="lightgray"><code></code></td></tr>
+<tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line571"></a><code>571</code></td><td></td><td class="lightgray"><code>&nbsp;&nbsp;&nbsp;&nbsp;//&nbsp;GK_PA1&nbsp;(FD)&nbsp;PA1&nbsp;key</code></td></tr>
+<tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line572"></a><code>572</code></td><td></td><td class="lightgray"><code>&nbsp;&nbsp;&nbsp;&nbsp;public&nbsp;const&nbsp;int&nbsp;GK_PA1&nbsp;=&nbsp;0xFD;</code></td></tr>
+<tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line573"></a><code>573</code></td><td></td><td class="lightgray"><code></code></td></tr>
+<tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line574"></a><code>574</code></td><td></td><td class="lightgray"><code>&nbsp;&nbsp;&nbsp;&nbsp;//&nbsp;GK_OEM_CLEAR&nbsp;(FE)&nbsp;Clear&nbsp;key</code></td></tr>
+<tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line575"></a><code>575</code></td><td></td><td class="lightgray"><code>&nbsp;&nbsp;&nbsp;&nbsp;public&nbsp;const&nbsp;int&nbsp;GK_OEM_CLEAR&nbsp;=&nbsp;0xFE;</code></td></tr>
+<tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line576"></a><code>576</code></td><td></td><td class="lightgray"><code></code></td></tr>
+<tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line577"></a><code>577</code></td><td></td><td class="lightgray"><code>&nbsp;&nbsp;&nbsp;&nbsp;public&nbsp;const&nbsp;int&nbsp;GK_UNKNOWN&nbsp;=&nbsp;0;</code></td></tr>
 <tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line578"></a><code>578</code></td><td></td><td class="lightgray"><code></code></td></tr>
 <tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line579"></a><code>579</code></td><td></td><td class="lightgray"><code>&nbsp;&nbsp;}</code></td></tr>
 <tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line580"></a><code>580</code></td><td></td><td class="lightgray"><code>}</code></td></tr>
 <tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line581"></a><code>581</code></td><td></td><td class="lightgray"><code></code></td></tr>
 </tbody>
 </table>
-<div class="footer">Generated by: ReportGenerator 4.8.7.0<br />03/24/2021 - 08:38:35<br /><a href="https://github.com/danielpalme/ReportGenerator">GitHub</a> | <a href="http://www.palmmedia.de">www.palmmedia.de</a></div></div>
+<div class="footer">Generated by: ReportGenerator 4.8.7.0<br />03/24/2021 - 08:50:56<br /><a href="https://github.com/danielpalme/ReportGenerator">GitHub</a> | <a href="http://www.palmmedia.de">www.palmmedia.de</a></div></div>
 <div class="containerright">
 <div class="containerrightfixed">
 <h1>Methods/Properties</h1>
@@ -1046,7 +752,7 @@ a.percentagebar {
 <tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line581"></a><code>581</code></td><td></td><td class="lightgray"><code></code></td></tr>
 </tbody>
 </table>
-<div class="footer">Generated by: ReportGenerator 4.8.7.0<br />03/24/2021 - 08:38:35<br /><a href="https://github.com/danielpalme/ReportGenerator">GitHub</a> | <a href="http://www.palmmedia.de">www.palmmedia.de</a></div></div>
+<div class="footer">Generated by: ReportGenerator 4.8.7.0<br />03/24/2021 - 08:50:56<br /><a href="https://github.com/danielpalme/ReportGenerator">GitHub</a> | <a href="http://www.palmmedia.de">www.palmmedia.de</a></div></div>
 <div class="containerright">
 <div class="containerrightfixed">
 <h1>Methods/Properties</h1>
