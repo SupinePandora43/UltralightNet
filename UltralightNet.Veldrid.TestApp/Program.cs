@@ -58,7 +58,8 @@ namespace UltralightNet.Veldrid.TestApp
 
 			view.URL = "https://github.com";
 			bool loaded = false;
-			view.SetFinishLoadingCallback((user_data, caller, frame_id, is_main_frame, url) => {
+			view.SetFinishLoadingCallback((user_data, caller, frame_id, is_main_frame, url) =>
+			{
 				loaded = true;
 			});
 			while (!loaded)
