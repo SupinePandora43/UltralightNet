@@ -45,7 +45,8 @@ namespace UltralightNet.Veldrid
 			UpdateGeometry = UpdateGeometry,
 			DestroyGeometry = DestroyGeometry,
 
-			CreateRenderBuffer = CreateRenderBuffer
+			CreateRenderBuffer = CreateRenderBuffer,
+			DestroyRenderBuffer = DestroyRenderBuffer
 		};
 		private void nothing() { }
 
@@ -202,6 +203,12 @@ namespace UltralightNet.Veldrid
 			entry.framebuffer = graphicsDevice.ResourceFactory.CreateFramebuffer(ref fd);
 
 			if (WaitForIdle) graphicsDevice.WaitForIdle();
+		}
+		private void DestroyRenderBuffer(uint render_buffer_id)
+		{
+			RenderBufferEntry entry = RenderBufferEntries[(int)render_buffer_id];
+			entry.textureEntry = null;
+			entry.framebuffer.Dispose();
 		}
 		#endregion RenderBuffer
 		private class TextureEntry
