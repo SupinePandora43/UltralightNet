@@ -13,19 +13,13 @@ namespace UltralightNet.Veldrid
 		public TextureSampleCount SampleCount = TextureSampleCount.Count32;
 		public bool WaitForIdle = true;
 
-		// doesn't work
-		private readonly List<TextureEntry> textureEntries;
-		private uint textureid = 0;
-		private readonly List<TextureEntry> geometryEntries;
-		private uint geometryid = 0;
-		private readonly List<TextureEntry> renderBufferEntries;
-		private uint renderbufferid = 0;
+		private readonly SlottingList<TextureEntry> TextureEntries = new(32, 8);
+		private readonly SlottingList<GeometryEntry> GeometryEntries = new(32, 8);
+		private readonly SlottingList<RenderBufferEntry> RenderBufferEntries = new(8, 2);
 
 		public VeldridGPUDriver(GraphicsDevice graphicsDevice)
 		{
 			this.graphicsDevice = graphicsDevice;
-
-			textureEntries = new();
 		}
 		public ULGPUDriver GetGPUDriver() => new()
 		{
@@ -38,37 +32,38 @@ namespace UltralightNet.Veldrid
 			EndSynchronize = nothing
 		};
 		private void nothing() { }
+
 		#region NextId
 		private uint NextTextureId()
 		{
-			textureEntries.Insert((int)++textureid, new());
-			return textureid;
+			return (uint)TextureEntries.Add(new());
 		}
 		public uint NextGeometryId()
 		{
-			geometryEntries.Insert((int)++geometryid, new());
-			return geometryid;
+			return (uint)GeometryEntries.Add(new());
 		}
 		public uint NextRenderBufferId()
 		{
-			renderBufferEntries.Insert((int)++renderbufferid, new());
-			return renderbufferid;
+			return (uint)RenderBufferEntries.Add(new());
 		}
 		#endregion NextId
 
 		private void CreateTexture(uint texture_id, ULBitmap bitmap)
 		{
-			TextureEntry entry = textureEntries[(int)textureid];
+			bool isRT = bitmap.IsEmpty;
+			TextureEntry entry = TextureEntries[(int)texture_id];
 			TextureDescription textureDescription = new()
 			{
+				Type = TextureType.Texture2D,
 				Width = bitmap.Width,
 				Height = bitmap.Height,
-				MipLevels = MipLevels,
-				SampleCount = SampleCount,
-				ArrayLayers = 1
+				MipLevels = isRT ? 1 : MipLevels,
+				SampleCount = isRT ? TextureSampleCount.Count1 : SampleCount,
+				ArrayLayers = 1,
+				Depth = 1
 			};
 
-			if (bitmap.IsEmpty)
+			if (isRT)
 			{
 				textureDescription.Format = PixelFormat.R8_G8_B8_A8_UNorm_SRgb;
 				textureDescription.Usage = TextureUsage.RenderTarget;
@@ -86,27 +81,31 @@ namespace UltralightNet.Veldrid
 					textureDescription.Format = PixelFormat.B8_G8_R8_A8_UNorm_SRgb;
 				}
 				else throw new NotSupportedException("format");
+				if (GenerateMipMaps) textureDescription.Usage |= TextureUsage.GenerateMipmaps;
 			}
-			if (GenerateMipMaps) textureDescription.Usage |= TextureUsage.GenerateMipmaps;
 
 			entry.texture = graphicsDevice.ResourceFactory.CreateTexture(textureDescription);
-			graphicsDevice.UpdateTexture(entry.texture, bitmap.LockPixels(), bitmap.Size, 0, 0, 0, textureDescription.Width, textureDescription.Height, 1, 0, 0);
-			bitmap.UnlockPixels();
 
-			if (GenerateMipMaps)
+			if (!isRT)
 			{
-				var cl = graphicsDevice.ResourceFactory.CreateCommandList();
-				cl.Begin();
-				cl.GenerateMipmaps(entry.texture);
-				cl.End();
-				graphicsDevice.SubmitCommands(cl);
-				if (WaitForIdle) graphicsDevice.WaitForIdle();
-				cl.Dispose();
+				graphicsDevice.UpdateTexture(entry.texture, bitmap.LockPixels(), bitmap.Size, 0, 0, 0, textureDescription.Width, textureDescription.Height, 1, 0, 0);
+				bitmap.UnlockPixels();
+
+				if (GenerateMipMaps)
+				{
+					var cl = graphicsDevice.ResourceFactory.CreateCommandList();
+					cl.Begin();
+					cl.GenerateMipmaps(entry.texture);
+					cl.End();
+					graphicsDevice.SubmitCommands(cl);
+					if (WaitForIdle) graphicsDevice.WaitForIdle();
+					cl.Dispose();
+				}
 			}
 		}
 		private void UpdateTexture(uint texture_id, ULBitmap bitmap)
 		{
-			TextureEntry entry = textureEntries[(int)textureid];
+			TextureEntry entry = TextureEntries[(int)texture_id];
 
 			graphicsDevice.UpdateTexture(entry.texture, bitmap.LockPixels(), bitmap.Size, 0, 0, 0, bitmap.Width, bitmap.Height, 1, 0, 0);
 			bitmap.UnlockPixels();
@@ -128,6 +127,15 @@ namespace UltralightNet.Veldrid
 		{
 			public Texture texture;
 			public ResourceSet resourceSet;
+		}
+		private class GeometryEntry
+		{
+			public DeviceBuffer vertices;
+			public DeviceBuffer indicies;
+		}
+		private class RenderBufferEntry
+		{
+
 		}
 	}
 }

@@ -1,4 +1,5 @@
 using System;
+using System.Threading;
 using UltralightNet.AppCore;
 using Veldrid;
 using Veldrid.Sdl2;
@@ -54,6 +55,17 @@ namespace UltralightNet.Veldrid.TestApp
 			});
 
 			View view = new(renderer, 512, 512, false, Session.DefaultSession(renderer), false);
+
+			view.URL = "https://github.com";
+			bool loaded = false;
+			view.SetFinishLoadingCallback((user_data, caller, frame_id, is_main_frame, url) => {
+				loaded = true;
+			});
+			while (!loaded)
+			{
+				renderer.Update();
+				Thread.Sleep(10);
+			}
 
 			window.MouseWheel += (mw) =>
 			{
