@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using Veldrid;
 
 namespace UltralightNet.Veldrid
@@ -6,6 +7,7 @@ namespace UltralightNet.Veldrid
 	public class VeldridGPUDriver
 	{
 		private readonly GraphicsDevice graphicsDevice;
+		private readonly ResourceLayout textureResourceLayout;
 
 		public bool GenerateMipMaps = true;
 		public uint MipLevels = 10;
@@ -16,7 +18,7 @@ namespace UltralightNet.Veldrid
 		private readonly SlottingList<GeometryEntry> GeometryEntries = new(32, 8);
 		private readonly SlottingList<RenderBufferEntry> RenderBufferEntries = new(8, 2);
 
-		private readonly ResourceLayout textureResourceLayout;
+		private Queue<ULCommand> commands = new();
 
 		public VeldridGPUDriver(GraphicsDevice graphicsDevice)
 		{
@@ -46,7 +48,9 @@ namespace UltralightNet.Veldrid
 			DestroyGeometry = DestroyGeometry,
 
 			CreateRenderBuffer = CreateRenderBuffer,
-			DestroyRenderBuffer = DestroyRenderBuffer
+			DestroyRenderBuffer = DestroyRenderBuffer,
+
+			UpdateCommandList = UpdateCommandList
 		};
 		private void nothing() { }
 
@@ -72,6 +76,7 @@ namespace UltralightNet.Veldrid
 			TextureDescription textureDescription = new()
 			{
 				Type = TextureType.Texture2D,
+				Usage = TextureUsage.Sampled,
 				Width = bitmap.Width,
 				Height = bitmap.Height,
 				MipLevels = isRT ? 1 : MipLevels,
@@ -83,11 +88,10 @@ namespace UltralightNet.Veldrid
 			if (isRT)
 			{
 				textureDescription.Format = PixelFormat.R8_G8_B8_A8_UNorm_SRgb;
-				textureDescription.Usage = TextureUsage.RenderTarget;
+				textureDescription.Usage |= TextureUsage.RenderTarget;
 			}
 			else
 			{
-				textureDescription.Usage = TextureUsage.Sampled;
 				ULBitmapFormat format = bitmap.Format;
 				if (format is ULBitmapFormat.A8_UNORM)
 				{
@@ -119,7 +123,7 @@ namespace UltralightNet.Veldrid
 				}
 			}
 
-			entry.resourceSet =  graphicsDevice.ResourceFactory.CreateResourceSet(
+			entry.resourceSet = graphicsDevice.ResourceFactory.CreateResourceSet(
 				new ResourceSetDescription(
 					textureResourceLayout,
 					entry.texture
@@ -211,6 +215,13 @@ namespace UltralightNet.Veldrid
 			entry.framebuffer.Dispose();
 		}
 		#endregion RenderBuffer
+
+		private void UpdateCommandList(ULCommandList list)
+		{
+			foreach (ULCommand command in list.ToSpan())
+				commands.Enqueue(command);
+		}
+
 		private class TextureEntry
 		{
 			public Texture texture;
