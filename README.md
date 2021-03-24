@@ -73,7 +73,7 @@ namespace UltralightNet.GettingStarted
 			// Create config, used for specifying resources folder (used for URL loading)
 			ULConfig config = new()
 			{
-				ResourcePath = "./resources"
+				ResourcePath = "./resources" // Requires "UltralightNet.Resources"
 			};
 
 			// Create Renderer
@@ -92,7 +92,7 @@ namespace UltralightNet.GettingStarted
 				loaded = true;
 			});
 
-			view.URL = "https://github.com";
+			view.URL = "https://github.com"; // Requires "UltralightNet.Resources"
 
 			// Update Renderer until page is loaded
 			while (!loaded)
