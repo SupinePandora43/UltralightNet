@@ -269,5 +269,26 @@ namespace UltralightNet.Veldrid
 			public Framebuffer framebuffer;
 			public TextureEntry textureEntry;
 		}
+
+		// todo: https://github.com/ultralight-ux/AppCore/blob/6324e85f31f815b1519b495f559f1f72717b2651/src/linux/gl/GPUDriverGL.cpp#L407
+		/*private Pipeline getUltralightPipeline()
+		{
+			// todo: glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
+			GraphicsPipelineDescription pipelineDescription = new()
+			{
+				BlendState = BlendStateDescription.SingleAlphaBlend,
+				DepthStencilState = new DepthStencilStateDescription()
+				{
+					DepthTestEnabled = false, // glDisable(GL_DEPTH_TEST)
+					StencilTestEnabled = false,
+					DepthComparison = ComparisonKind.Never // glDepthFunc(GL_NEVER)
+				},
+				RasterizerState = new()
+				{
+					CullMode = FaceCullMode.None,
+					FrontFace = FrontFace.Clockwise
+				},
+			};
+		}*/
 	}
 }
