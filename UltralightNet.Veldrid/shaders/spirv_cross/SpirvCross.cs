@@ -22,5 +22,11 @@ namespace UltralightNet.Veldrid.Shaders
 			ShaderDescription fragmentShaderShaderDescription = new(ShaderStages.Fragment, GetShaderBytes("shader_fill.frag.glsl"), "main");
 			return graphicsDevice.ResourceFactory.CreateFromSpirv(vertexShaderShaderDescription, fragmentShaderShaderDescription);
 		}
+		public static Shader[] ulPath(GraphicsDevice graphicsDevice)
+		{
+			ShaderDescription vertexShaderShaderDescription = new(ShaderStages.Vertex, GetShaderBytes("shader_fill_path.vert.glsl"), "main");
+			ShaderDescription fragmentShaderShaderDescription = new(ShaderStages.Fragment, GetShaderBytes("shader_fill_path.frag.glsl"), "main");
+			return graphicsDevice.ResourceFactory.CreateFromSpirv(vertexShaderShaderDescription, fragmentShaderShaderDescription);
+		}
 	}
 }
