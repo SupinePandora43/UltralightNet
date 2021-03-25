@@ -10,7 +10,22 @@
 	</PropertyGroup>
 
 	<ItemGroup>
+	  <None Remove="shaders\spirv_cross\shader_fill.frag.glsl" />
+	  <None Remove="shaders\spirv_cross\shader_fill.vert.glsl" />
+	  <None Remove="shaders\spirv_cross\shader_fill_path.frag.glsl" />
+	  <None Remove="shaders\spirv_cross\shader_fill_path.vert.glsl" />
+	</ItemGroup>
+
+	<ItemGroup>
+	  <EmbeddedResource Include="shaders\spirv_cross\shader_fill.frag.glsl" />
+	  <EmbeddedResource Include="shaders\spirv_cross\shader_fill_path.frag.glsl" />
+	  <EmbeddedResource Include="shaders\spirv_cross\shader_fill_path.vert.glsl" />
+	  <EmbeddedResource Include="shaders\spirv_cross\shader_fill.vert.glsl" />
+	</ItemGroup>
+
+	<ItemGroup>
 		<PackageReference Include="Veldrid" Version="4.9.0-geef8375169" />
+		<PackageReference Include="Veldrid.SPIRV" Version="1.0.14" />
 	</ItemGroup>
 
 	<ItemGroup>

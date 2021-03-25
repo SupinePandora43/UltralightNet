@@ -9,7 +9,7 @@ namespace UltralightNet.Veldrid.TestApp
 {
 	class Program
 	{
-		private const GraphicsBackend BACKEND = GraphicsBackend.Direct3D11;
+		private const GraphicsBackend BACKEND = GraphicsBackend.OpenGL;
 
 		static void Main(string[] args)
 		{
