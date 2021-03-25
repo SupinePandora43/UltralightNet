@@ -1,4 +1,5 @@
 using System;
+using System.Numerics;
 using System.Text;
 using System.Threading;
 using UltralightNet.AppCore;
@@ -11,7 +12,7 @@ namespace UltralightNet.Veldrid.TestApp
 {
 	class Program
 	{
-		private const GraphicsBackend BACKEND = GraphicsBackend.Direct3D11;
+		private const GraphicsBackend BACKEND = GraphicsBackend.OpenGL;
 
 		static void Main(string[] args)
 		{
@@ -49,13 +50,13 @@ namespace UltralightNet.Veldrid.TestApp
 			ResourceLayout basicQuadResourceLayout = factory.CreateResourceLayout(
 				new ResourceLayoutDescription(
 					new ResourceLayoutElementDescription("_sampler",
-						ResourceKind.Sampler,
-						ShaderStages.Fragment
-					),
-					new ResourceLayoutElementDescription("_texture",
 						ResourceKind.TextureReadOnly,
 						ShaderStages.Fragment
-					)
+					)//,
+					/*new ResourceLayoutElementDescription("_texture",
+						ResourceKind.TextureReadOnly,
+						ShaderStages.Fragment
+					)*/
 				)
 			);
 
@@ -107,8 +108,9 @@ new ShaderDescription(ShaderStages.Fragment, Encoding.UTF8.GetBytes(@"
 #version 450
 precision highp float;
 
-layout(binding = 0) uniform sampler _sampler;
-layout(binding = 1) uniform texture2D _texture;
+layout(set=0, binding = 0) uniform sampler2D _texture;
+//layout(binding = 0) uniform sampler _sampler;
+//layout(binding = 1) uniform texture2D _texture;
 
 layout(location = 0) in vec2 out_uv;
 
@@ -116,7 +118,8 @@ layout(location = 0) out vec4 out_Color;
 
 void main()
 {
-	out_Color = texture(sampler2D(_texture, _sampler), out_uv);
+	//out_Color = texture(sampler2D(_texture, _sampler), out_uv);
+	out_Color = texture(_texture, out_uv);
 }
 "), "main"))
 				),
@@ -164,6 +167,18 @@ void main()
 				});
 			};
 
+			DeviceBuffer quadV = factory.CreateBuffer(new(4 * 4 * 4, BufferUsage.VertexBuffer));
+			graphicsDevice.UpdateBuffer(quadV, 0, new Vector4[]
+			{
+				new(-1, 1f, 0, 0 ),
+				new(1, 1, 1, 0 ),
+				new(-1, -1, 0, 1 ),
+				new(1, -1, 1, 1 ),
+			});
+
+			DeviceBuffer quadI = factory.CreateBuffer(new(sizeof(short)*4, BufferUsage.IndexBuffer));
+			graphicsDevice.UpdateBuffer(quadI, 0, new short[] { 0, 1, 2, 3 });
+
 			CommandList commandList = factory.CreateCommandList();
 
 			while (window.Exists)
@@ -179,6 +194,19 @@ void main()
 				commandList.SetFramebuffer(graphicsDevice.SwapchainFramebuffer);
 				commandList.SetFullViewports();
 				commandList.ClearColorTarget(0, RgbaFloat.Blue);
+
+				commandList.SetVertexBuffer(0, quadV);
+				commandList.SetIndexBuffer(quadI, IndexFormat.UInt16);
+
+				commandList.SetGraphicsResourceSet(0, gpuDriver.GetRenderTarget(view));
+
+				commandList.DrawIndexed(
+					4,
+					1,
+					0,
+					0,
+					0
+				);
 
 				commandList.End();
 

@@ -362,6 +362,8 @@ namespace UltralightNet.Veldrid
 			if (WaitForIdle) graphicsDevice.WaitForIdle();
 		}
 
+		public ResourceSet GetRenderTarget(View view) => TextureEntries[view.RenderTarget.texture_id].resourceSet;
+
 		private class TextureEntry
 		{
 			public Texture texture;
