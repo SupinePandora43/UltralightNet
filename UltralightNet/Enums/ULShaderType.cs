@@ -1,6 +1,6 @@
 namespace UltralightNet
 {
-	public enum ULShaderType
+	public enum ULShaderType: byte
 	{
 		Fill,
 		FillPath
