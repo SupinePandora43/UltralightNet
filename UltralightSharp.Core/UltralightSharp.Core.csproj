@@ -18,7 +18,6 @@
         <PackageOutputDir>$(SolutionDir)</PackageOutputDir>
         <RepositoryUrl>https://github.com/Supine/UltralightSharp.git</RepositoryUrl>
         <PackageTags>ultralight webkit webcore appcore ultralight-ux</PackageTags>
-        <PackageIcon>icon.png</PackageIcon>
         <IsPackable>True</IsPackable>
 		<IncludeBuildOutput>false</IncludeBuildOutput>
 		<NoBuild>True</NoBuild>
@@ -34,12 +33,6 @@
     </Choose>
 
     <ItemGroup>
-        <None Include="..\icon.png">
-            <Pack>True</Pack>
-            <PackageCopyToOutput>False</PackageCopyToOutput>
-            <PackagePath />
-            <Link>icon.png</Link>
-        </None>
         <None Include="..\LICENSE">
             <Pack>True</Pack>
             <PackageCopyToOutput>False</PackageCopyToOutput>

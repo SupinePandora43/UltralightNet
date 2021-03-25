@@ -138,23 +138,24 @@ namespace UltralightNet.Veldrid
 				Depth = 1
 			};
 
+			ULBitmapFormat format = bitmap.Format;
+			if (format is ULBitmapFormat.A8_UNORM)
+			{
+				textureDescription.Format = PixelFormat.R8_UNorm;
+			}
+			else if (format is ULBitmapFormat.BGRA8_UNORM_SRGB)
+			{
+				textureDescription.Format = PixelFormat.B8_G8_R8_A8_UNorm_SRgb;
+			}
+			else throw new NotSupportedException("format");
+
 			if (isRT)
 			{
-				textureDescription.Format = PixelFormat.R8_G8_B8_A8_UNorm_SRgb;
+				textureDescription.Format = PixelFormat.B8_G8_R8_A8_UNorm_SRgb;
 				textureDescription.Usage |= TextureUsage.RenderTarget;
 			}
 			else
 			{
-				ULBitmapFormat format = bitmap.Format;
-				if (format is ULBitmapFormat.A8_UNORM)
-				{
-					textureDescription.Format = PixelFormat.R8_UNorm;
-				}
-				else if (format is ULBitmapFormat.BGRA8_UNORM_SRGB)
-				{
-					textureDescription.Format = PixelFormat.B8_G8_R8_A8_UNorm_SRgb;
-				}
-				else throw new NotSupportedException("format");
 				if (GenerateMipMaps) textureDescription.Usage |= TextureUsage.GenerateMipmaps;
 			}
 
@@ -529,7 +530,7 @@ namespace UltralightNet.Veldrid
 				1,
 				1,
 				1,
-				PixelFormat.R8_G8_B8_A8_UNorm_SRgb,
+				PixelFormat.B8_G8_R8_A8_UNorm_SRgb,
 				TextureUsage.RenderTarget,
 				TextureType.Texture2D));
 
