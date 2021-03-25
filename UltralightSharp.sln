@@ -31,8 +31,6 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		README.md = README.md
 	EndProjectSection
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UltralightSharp.Veldrid", "UltralightSharp.Veldrid\UltralightSharp.Veldrid.csproj", "{83971783-6E3E-4211-BB1C-AFFDA599591B}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UltralightNet", "UltralightNet\UltralightNet.csproj", "{1F8BE9AC-A40B-4F00-BA41-F1A28C197F1F}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UltralightNet.Test", "UltralightNet.Test\UltralightNet.Test.csproj", "{73B85E50-C001-424A-A26F-F94ACAAD2978}"
@@ -49,7 +47,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UltralightNet.Veldrid", "Ul
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UltralightNet.Veldrid.TestApp", "UltralightNet.Veldrid.TestApp\UltralightNet.Veldrid.TestApp.csproj", "{F6F0F247-9E1D-469C-81D1-4FAAD701933C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UltralightNet.GettingStarted", "UltralightNet.GettingStarted\UltralightNet.GettingStarted.csproj", "{483B033B-63EF-4AB1-A27E-2AAD4C2D2FF3}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UltralightNet.GettingStarted", "UltralightNet.GettingStarted\UltralightNet.GettingStarted.csproj", "{483B033B-63EF-4AB1-A27E-2AAD4C2D2FF3}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -81,10 +79,6 @@ Global
 		{E4960165-1F8A-4582-962E-D440B4C76413}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E4960165-1F8A-4582-962E-D440B4C76413}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E4960165-1F8A-4582-962E-D440B4C76413}.Release|Any CPU.Build.0 = Release|Any CPU
-		{83971783-6E3E-4211-BB1C-AFFDA599591B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{83971783-6E3E-4211-BB1C-AFFDA599591B}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{83971783-6E3E-4211-BB1C-AFFDA599591B}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{83971783-6E3E-4211-BB1C-AFFDA599591B}.Release|Any CPU.Build.0 = Release|Any CPU
 		{1F8BE9AC-A40B-4F00-BA41-F1A28C197F1F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{1F8BE9AC-A40B-4F00-BA41-F1A28C197F1F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1F8BE9AC-A40B-4F00-BA41-F1A28C197F1F}.Release|Any CPU.ActiveCfg = Release|Any CPU
