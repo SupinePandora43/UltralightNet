@@ -2,7 +2,6 @@ using System;
 using System.Collections.Generic;
 using UltralightNet.Veldrid.Shaders;
 using Veldrid;
-using Veldrid.OpenGLBinding;
 
 namespace UltralightNet.Veldrid
 {
@@ -11,11 +10,11 @@ namespace UltralightNet.Veldrid
 		private readonly GraphicsDevice graphicsDevice;
 		private readonly ResourceLayout textureResourceLayout;
 
-		public bool GenerateMipMaps = true;
-		public uint MipLevels = 10;
-		public TextureSampleCount SampleCount = TextureSampleCount.Count32;
-		public bool WaitForIdle = true;
-		public bool Debug = true;
+		public bool GenerateMipMaps = false;
+		public uint MipLevels = 1;
+		public TextureSampleCount SampleCount = TextureSampleCount.Count1;
+		public bool WaitForIdle = false;
+		public bool Debug = false;
 
 		private readonly Dictionary<uint, TextureEntry> TextureEntries = new();
 		private readonly Dictionary<uint, GeometryEntry> GeometryEntries = new();
@@ -43,7 +42,28 @@ namespace UltralightNet.Veldrid
 
 			InitializeBuffers();
 			InitShaders();
+			InitFramebuffers();
 			InitPipelines();
+
+			emptyTexture = graphicsDevice.ResourceFactory.CreateTexture(
+				new(
+					1,
+					1,
+					1,
+					1,
+					1,
+					PixelFormat.R8_G8_B8_A8_UNorm_SRgb,
+					TextureUsage.Sampled,
+					TextureType.Texture2D
+				)
+			);
+
+			emptyResourceSet = graphicsDevice.ResourceFactory.CreateResourceSet(
+				new ResourceSetDescription(
+					textureResourceLayout,
+					emptyTexture
+				)
+			);
 		}
 		public ULGPUDriver GetGPUDriver() => new()
 		{
@@ -70,22 +90,34 @@ namespace UltralightNet.Veldrid
 		private void nothing() { }
 
 		#region NextId
+
+		private uint GetKey<TValue>(Dictionary<uint, TValue> dictionary)
+		{
+			for (uint i = 1; ; i++)
+			{
+				if (!dictionary.ContainsKey(i))
+					return i;
+			}
+		}
 		private uint NextTextureId()
 		{
-			uint id = (uint)(TextureEntries.Count + 1);
+			uint id = GetKey(TextureEntries);
 			TextureEntries.Add(id, new());
+			Console.WriteLine($"NextTextureId() = {id}");
 			return id;
 		}
 		public uint NextGeometryId()
 		{
-			uint id = (uint)(GeometryEntries.Count + 1);
+			uint id = GetKey(GeometryEntries);
 			GeometryEntries.Add(id, new());
+			Console.WriteLine($"NextGeometryId() = {id}");
 			return id;
 		}
 		public uint NextRenderBufferId()
 		{
-			uint id = (uint)(RenderBufferEntries.Count + 1);
+			uint id = GetKey(RenderBufferEntries);
 			RenderBufferEntries.Add(id, new());
+			Console.WriteLine($"NextRenderBufferId() = {id}");
 			return id;
 		}
 		#endregion NextId
@@ -181,6 +213,7 @@ namespace UltralightNet.Veldrid
 		#region Geometry
 		private void CreateGeometry(uint geometry_id, ULVertexBuffer vertices, ULIndexBuffer indices)
 		{
+			Console.WriteLine($"CreateGeometry({geometry_id})");
 			GeometryEntry entry = GeometryEntries[geometry_id];
 
 			BufferDescription vertexDescription = new(vertices.size, BufferUsage.VertexBuffer);
@@ -195,6 +228,7 @@ namespace UltralightNet.Veldrid
 		}
 		private void UpdateGeometry(uint geometry_id, ULVertexBuffer vertices, ULIndexBuffer indices)
 		{
+			//Console.WriteLine($"UpdateGeometry({geometry_id})");
 			GeometryEntry entry = GeometryEntries[geometry_id];
 
 			graphicsDevice.UpdateBuffer(entry.vertices, 0, vertices.data, vertices.size);
@@ -204,6 +238,7 @@ namespace UltralightNet.Veldrid
 		}
 		private void DestroyGeometry(uint geometry_id)
 		{
+			Console.WriteLine($"DestroyGeometry({geometry_id})");
 			GeometryEntries.Remove(geometry_id, out GeometryEntry entry);
 
 			entry.vertices.Dispose();
@@ -213,6 +248,7 @@ namespace UltralightNet.Veldrid
 		#region RenderBuffer
 		private void CreateRenderBuffer(uint render_buffer_id, ULRenderBuffer buffer)
 		{
+			Console.WriteLine($"CreateRenderBuffer({render_buffer_id})");
 			RenderBufferEntry entry = RenderBufferEntries[render_buffer_id];
 			TextureEntry textureEntry = TextureEntries[buffer.texture_id];
 
@@ -231,6 +267,7 @@ namespace UltralightNet.Veldrid
 		}
 		private void DestroyRenderBuffer(uint render_buffer_id)
 		{
+			Console.WriteLine($"DestroyRenderBuffer({render_buffer_id})");
 			RenderBufferEntries.Remove(render_buffer_id, out RenderBufferEntry entry);
 			entry.textureEntry = null;
 			entry.framebuffer.Dispose();
@@ -246,7 +283,6 @@ namespace UltralightNet.Veldrid
 		public void Render()
 		{
 			if (commands.Count is 0) return;
-
 			commandList.Begin();
 
 			foreach (ULCommand command in commands)
@@ -263,7 +299,7 @@ namespace UltralightNet.Veldrid
 				{
 					ULGPUState state = command.gpu_state;
 
-					if (state.shader_type is ULShaderType.FillPath) return; // for now
+					if (state.shader_type is ULShaderType.FillPath) continue; // for now
 
 					if (state.enable_scissor)
 					{
@@ -290,10 +326,18 @@ namespace UltralightNet.Veldrid
 					#endregion
 
 
+					commandList.SetFramebuffer(renderBufferEntry.framebuffer);
+
 					commandList.SetGraphicsResourceSet(0, uniformResourceSet);
 
-					commandList.SetGraphicsResourceSet(1, TextureEntries[state.texture_1_id].resourceSet);
-					commandList.SetGraphicsResourceSet(2, TextureEntries[state.texture_2_id].resourceSet);
+					if (state.texture_1_id != 0)
+						commandList.SetGraphicsResourceSet(1, TextureEntries[state.texture_1_id].resourceSet);
+					else
+						commandList.SetGraphicsResourceSet(1, emptyResourceSet);
+					if (state.texture_2_id != 0)
+						commandList.SetGraphicsResourceSet(2, TextureEntries[state.texture_2_id].resourceSet);
+					else
+						commandList.SetGraphicsResourceSet(2, emptyResourceSet);
 
 					GeometryEntry geometryEntry = GeometryEntries[command.geometry_id];
 
@@ -309,6 +353,8 @@ namespace UltralightNet.Veldrid
 					);
 				}
 			}
+
+			commands.Clear();
 
 			commandList.End();
 			graphicsDevice.SubmitCommands(commandList);
@@ -333,6 +379,12 @@ namespace UltralightNet.Veldrid
 		}
 
 		// todo: https://github.com/ultralight-ux/AppCore/blob/6324e85f31f815b1519b495f559f1f72717b2651/src/linux/gl/GPUDriverGL.cpp#L407
+
+		private Texture pipelineOutputTexture;
+		private Framebuffer pipelineOutputFramebuffer;
+
+		private Texture emptyTexture;
+		private ResourceSet emptyResourceSet;
 
 		private Pipeline ul_scissor_blend;
 		private Pipeline ul_blend;
@@ -467,7 +519,27 @@ namespace UltralightNet.Veldrid
 					)
 				}, ultralightShaders
 			);
+		private void InitFramebuffers()
+		{
+			pipelineOutputTexture = graphicsDevice.ResourceFactory.CreateTexture(new(
+				512,
+				512,
+				1,
+				1,
+				1,
+				PixelFormat.R8_G8_B8_A8_UNorm_SRgb,
+				TextureUsage.RenderTarget,
+				TextureType.Texture2D));
 
+			pipelineOutputFramebuffer = graphicsDevice.ResourceFactory.CreateFramebuffer(
+				new FramebufferDescription()
+				{
+					ColorTargets = new[] {
+						new FramebufferAttachmentDescription(pipelineOutputTexture, 0)
+					}
+				}
+			);
+		}
 		private void InitPipelines()
 		{
 			ShaderSetDescription fillShaderSetDescription = FillShaderSetDescription();
@@ -511,7 +583,8 @@ namespace UltralightNet.Veldrid
 					CullMode = FaceCullMode.None,
 					//FrontFace = FrontFace.Clockwise,
 					//FillMode = PolygonFillMode.Solid,
-					ScissorTestEnabled = false
+					ScissorTestEnabled = false,
+					DepthClipEnabled = true
 				},
 				//PrimitiveTopology = PrimitiveTopology.TriangleList,
 				ResourceBindingModel = ResourceBindingModel.Default,
@@ -522,7 +595,8 @@ namespace UltralightNet.Veldrid
 					textureResourceLayout,
 					textureResourceLayout,
 					// textureResourceLayout // unused
-				}
+				},
+				Outputs = pipelineOutputFramebuffer.OutputDescription
 			};
 
 			GraphicsPipelineDescription ultralight_pd__SCISSOR_TRUE__ENALBE_BLEND = _ultralightPipelineDescription;

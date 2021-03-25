@@ -1,15 +1,17 @@
 using System;
+using System.Text;
 using System.Threading;
 using UltralightNet.AppCore;
 using Veldrid;
 using Veldrid.Sdl2;
+using Veldrid.SPIRV;
 using Veldrid.StartupUtilities;
 
 namespace UltralightNet.Veldrid.TestApp
 {
 	class Program
 	{
-		private const GraphicsBackend BACKEND = GraphicsBackend.OpenGL;
+		private const GraphicsBackend BACKEND = GraphicsBackend.Direct3D11;
 
 		static void Main(string[] args)
 		{
@@ -22,7 +24,9 @@ namespace UltralightNet.Veldrid.TestApp
 			{
 				WindowWidth = 512,
 				WindowHeight = 512,
-				WindowTitle = "UltralightNet.Veldrid.TestApp"
+				WindowTitle = "UltralightNet.Veldrid.TestApp",
+				X = 100,
+				Y = 100
 			};
 
 			Sdl2Window window = VeldridStartup.CreateWindow(ref windowCI);
@@ -42,6 +46,88 @@ namespace UltralightNet.Veldrid.TestApp
 
 			ResourceFactory factory = graphicsDevice.ResourceFactory;
 
+			ResourceLayout basicQuadResourceLayout = factory.CreateResourceLayout(
+				new ResourceLayoutDescription(
+					new ResourceLayoutElementDescription("_sampler",
+						ResourceKind.Sampler,
+						ShaderStages.Fragment
+					),
+					new ResourceLayoutElementDescription("_texture",
+						ResourceKind.TextureReadOnly,
+						ShaderStages.Fragment
+					)
+				)
+			);
+
+			GraphicsPipelineDescription mainPipelineDescription = new(
+				BlendStateDescription.SingleAlphaBlend,
+				new DepthStencilStateDescription(
+					depthTestEnabled: false,
+					depthWriteEnabled: true,
+					comparisonKind: ComparisonKind.LessEqual),
+				new RasterizerStateDescription(
+					cullMode: FaceCullMode.Back,
+					fillMode: PolygonFillMode.Solid,
+					frontFace: FrontFace.Clockwise,
+					depthClipEnabled: true,
+					scissorTestEnabled: false),
+				PrimitiveTopology.TriangleStrip,
+				new ShaderSetDescription(
+					new VertexLayoutDescription[] {
+						new VertexLayoutDescription(
+							new VertexElementDescription(
+								"vPos",
+								VertexElementSemantic.TextureCoordinate,
+								VertexElementFormat.Float2
+							),
+							new VertexElementDescription(
+								"fUv",
+								VertexElementSemantic.TextureCoordinate,
+								VertexElementFormat.Float2
+							)
+						)
+					}, factory.CreateFromSpirv(new(ShaderStages.Vertex, Encoding.UTF8.GetBytes(@"
+#version 450
+precision highp float;
+
+layout(location = 0) in vec2 in_pos;
+layout(location = 1) in vec2 in_uv;
+
+layout(location = 0) out vec2 out_uv;
+
+void main()
+{
+    //gl_Position = vec4(vPos.x, vPos.y, vPos.z, 1.0);
+    gl_Position = vec4(in_pos, 0, 1);
+	//fUv = 0.5 * vPos.xy + vec2(0.5,0.5);
+	out_uv = in_uv;
+}
+"), "main"),
+new ShaderDescription(ShaderStages.Fragment, Encoding.UTF8.GetBytes(@"
+#version 450
+precision highp float;
+
+layout(binding = 0) uniform sampler _sampler;
+layout(binding = 1) uniform texture2D _texture;
+
+layout(location = 0) in vec2 out_uv;
+
+layout(location = 0) out vec4 out_Color;
+
+void main()
+{
+	out_Color = texture(sampler2D(_texture, _sampler), out_uv);
+}
+"), "main"))
+				),
+				new ResourceLayout[] {
+					basicQuadResourceLayout
+				},
+				graphicsDevice.SwapchainFramebuffer.OutputDescription
+			);
+
+			Pipeline pipeline = factory.CreateGraphicsPipeline(mainPipelineDescription);
+
 			VeldridGPUDriver gpuDriver = new(graphicsDevice);
 
 			ULPlatform.SetLogger(new() { log_message = (lvl, msg) => Console.WriteLine(msg) }); ;
@@ -51,7 +137,8 @@ namespace UltralightNet.Veldrid.TestApp
 			Renderer renderer = new(new ULConfig()
 			{
 				ResourcePath = "./resources/",
-				UseGpu = true
+				UseGpu = true,
+				ForceRepaint = true
 			});
 
 			View view = new(renderer, 512, 512, false, Session.DefaultSession(renderer), false);
@@ -77,11 +164,27 @@ namespace UltralightNet.Veldrid.TestApp
 				});
 			};
 
+			CommandList commandList = factory.CreateCommandList();
+
 			while (window.Exists)
 			{
 				renderer.Update();
 				renderer.Render();
 				gpuDriver.Render();
+
+				commandList.Begin();
+
+				commandList.SetPipeline(pipeline);
+
+				commandList.SetFramebuffer(graphicsDevice.SwapchainFramebuffer);
+				commandList.SetFullViewports();
+				commandList.ClearColorTarget(0, RgbaFloat.Blue);
+
+				commandList.End();
+
+				graphicsDevice.SubmitCommands(commandList);
+				graphicsDevice.SwapBuffers();
+				graphicsDevice.WaitForIdle();
 				window.PumpEvents();
 			}
 		}
