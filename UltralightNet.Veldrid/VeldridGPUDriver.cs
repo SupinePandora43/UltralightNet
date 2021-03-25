@@ -151,13 +151,12 @@ namespace UltralightNet.Veldrid
 
 			if (isRT)
 			{
-				textureDescription.Format = PixelFormat.B8_G8_R8_A8_UNorm_SRgb;
 				textureDescription.Usage |= TextureUsage.RenderTarget;
 			}
 			else
 			{
-				if (GenerateMipMaps) textureDescription.Usage |= TextureUsage.GenerateMipmaps;
 			}
+			if (GenerateMipMaps) textureDescription.Usage |= TextureUsage.GenerateMipmaps;
 
 			entry.texture = graphicsDevice.ResourceFactory.CreateTexture(textureDescription);
 
@@ -300,22 +299,28 @@ namespace UltralightNet.Veldrid
 				{
 					ULGPUState state = command.gpu_state;
 
-					if (state.shader_type is ULShaderType.FillPath) continue; // for now
-
-					if (state.enable_scissor)
+					if (state.shader_type is ULShaderType.Fill)
 					{
-						if (state.enable_blend)
-							commandList.SetPipeline(ul_scissor_blend);
+						if (state.enable_scissor)
+						{
+							if (state.enable_blend)
+								commandList.SetPipeline(ul_scissor_blend);
+							else
+								commandList.SetPipeline(ul_scissor);
+							commandList.SetScissorRect(0, (uint)state.scissor_rect.left, (uint)state.scissor_rect.top, (uint)(state.scissor_rect.right - state.scissor_rect.left), (uint)(state.scissor_rect.bottom - state.scissor_rect.top));
+						}
 						else
-							commandList.SetPipeline(ul_scissor);
-						commandList.SetScissorRect(0, (uint)state.scissor_rect.left, (uint)state.scissor_rect.top, (uint)(state.scissor_rect.right - state.scissor_rect.left), (uint)(state.scissor_rect.bottom - state.scissor_rect.top));
+						{
+							if (state.enable_blend)
+								commandList.SetPipeline(ul_blend);
+							else
+								commandList.SetPipeline(ul);
+						}
 					}
 					else
 					{
-						if (state.enable_blend)
-							commandList.SetPipeline(ul_blend);
-						else
-							commandList.SetPipeline(ul);
+						continue;
+						commandList.SetPipeline(ulPath_scissor_blend);
 					}
 
 					#region Uniforms
@@ -394,6 +399,8 @@ namespace UltralightNet.Veldrid
 		private Pipeline ul_scissor;
 		private Pipeline ul;
 
+		private Pipeline ulPath_scissor_blend;
+
 		private DeviceBuffer uniformBuffer;
 
 		private void InitializeBuffers()
@@ -457,6 +464,7 @@ namespace UltralightNet.Veldrid
 			};*/
 
 			ultralightShaders = SpirvCross.ul(graphicsDevice);
+			ultralightPathShaders = SpirvCross.ulPath(graphicsDevice);
 		}
 
 		private ShaderSetDescription FillShaderSetDescription() =>
@@ -522,6 +530,29 @@ namespace UltralightNet.Veldrid
 					)
 				}, ultralightShaders
 			);
+		private ShaderSetDescription FillPathShaderSetDescription() => new(
+				new VertexLayoutDescription[] {
+					new VertexLayoutDescription(
+							20,
+							new VertexElementDescription(
+								"in_Position",
+								VertexElementSemantic.TextureCoordinate,
+								VertexElementFormat.Float2
+							),
+							new VertexElementDescription(
+								"in_Color",
+								VertexElementSemantic.TextureCoordinate,
+								VertexElementFormat.Byte4_Norm
+							),
+							new VertexElementDescription(
+								"in_TexCoord",
+								VertexElementSemantic.TextureCoordinate,
+								VertexElementFormat.Float2
+							)
+						)
+				}, ultralightPathShaders
+			);
+
 		private void InitFramebuffers()
 		{
 			pipelineOutputTexture = graphicsDevice.ResourceFactory.CreateTexture(new(
@@ -569,15 +600,20 @@ namespace UltralightNet.Veldrid
 						new BlendAttachmentDescription()
 						{
 							SourceColorFactor = BlendFactor.One,
-							SourceAlphaFactor = BlendFactor.One,
+							SourceAlphaFactor = BlendFactor.InverseDestinationAlpha,
 							DestinationColorFactor = BlendFactor.InverseSourceAlpha,
-							DestinationAlphaFactor = BlendFactor.InverseSourceAlpha
+							DestinationAlphaFactor = BlendFactor.One,
+							BlendEnabled = true,
+							ColorFunction = BlendFunction.Add,
+							AlphaFunction = BlendFunction.Add
 						}
 					}
 				},
+				//BlendState = BlendStateDescription.SingleOverrideBlend,
 				DepthStencilState = new DepthStencilStateDescription()
 				{
 					DepthTestEnabled = false, // glDisable(GL_DEPTH_TEST)
+					DepthWriteEnabled = false,
 					StencilTestEnabled = false,
 					DepthComparison = ComparisonKind.Never // glDepthFunc(GL_NEVER)
 				},
@@ -625,6 +661,14 @@ namespace UltralightNet.Veldrid
 			ul_blend = graphicsDevice.ResourceFactory.CreateGraphicsPipeline(ref ultralight_pd__SCISSOR_FALSE__ENALBE_BLEND);
 			ul_scissor = graphicsDevice.ResourceFactory.CreateGraphicsPipeline(ref ultralight_pd__SCISSOR_TRUE__DISALBE_BLEND);
 			ul = graphicsDevice.ResourceFactory.CreateGraphicsPipeline(ref ultralight_pd__SCISSOR_FALSE__DISALBE_BLEND);
+
+
+			GraphicsPipelineDescription _ultralightPathPipelineDescription = _ultralightPipelineDescription;
+			_ultralightPathPipelineDescription.ShaderSet = FillPathShaderSetDescription();
+
+			GraphicsPipelineDescription ultralightPath_pd__SCISSOR_TRUE__ENALBE_BLEND = _ultralightPathPipelineDescription;
+			ultralightPath_pd__SCISSOR_TRUE__ENALBE_BLEND.RasterizerState.ScissorTestEnabled = true;
+			ulPath_scissor_blend = graphicsDevice.ResourceFactory.CreateGraphicsPipeline(ref ultralightPath_pd__SCISSOR_TRUE__ENALBE_BLEND);
 		}
 	}
 }

@@ -1,4 +1,5 @@
 using System;
+using System.Diagnostics;
 using System.Numerics;
 using System.Text;
 using System.Threading;
@@ -49,7 +50,7 @@ namespace UltralightNet.Veldrid.TestApp
 
 			ResourceLayout basicQuadResourceLayout = factory.CreateResourceLayout(
 				new ResourceLayoutDescription(
-					new ResourceLayoutElementDescription("_sampler",
+					new ResourceLayoutElementDescription("_texture",
 						ResourceKind.TextureReadOnly,
 						ShaderStages.Fragment
 					)//,
@@ -180,7 +181,8 @@ void main()
 			graphicsDevice.UpdateBuffer(quadI, 0, new short[] { 0, 1, 2, 3 });
 
 			CommandList commandList = factory.CreateCommandList();
-
+			Stopwatch stopwatch = new();
+			stopwatch.Start();
 			while (window.Exists)
 			{
 				renderer.Update();
@@ -193,6 +195,7 @@ void main()
 
 				commandList.SetFramebuffer(graphicsDevice.SwapchainFramebuffer);
 				commandList.SetFullViewports();
+				commandList.ClearColorTarget(0, new RgbaFloat(255,255 ,0,255));
 				commandList.ClearColorTarget(0, RgbaFloat.Blue);
 
 				commandList.SetVertexBuffer(0, quadV);
