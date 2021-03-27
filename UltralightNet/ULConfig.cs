@@ -121,7 +121,6 @@ namespace UltralightNet
 	}
 
 	/// <summary>Configuration settings for Ultralight.</summary>
-	[StructLayout(LayoutKind.Sequential)]
 	public struct ULConfig_C
 	{
 		/// <summary>The file path to the directory that contains Ultralight's bundled resources (eg, cacert.pem and other localized resources).</summary>
