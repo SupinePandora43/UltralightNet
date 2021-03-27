@@ -1,0 +1,86 @@
+using System;
+using System.Runtime.InteropServices;
+
+namespace UltralightNet.AppCore
+{
+	public static partial class AppCoreMethods
+	{
+		[DllImport("AppCore")]
+		public static extern IntPtr ulCreateOverlay(IntPtr window, uint width, uint height, int x, int y);
+
+		[DllImport("AppCore")]
+		public static extern IntPtr ulCreateOverlayWithView(IntPtr window, IntPtr view, int x, int y);
+
+		[DllImport("AppCore")]
+		public static extern void ulDestroyOverlay(IntPtr overlay);
+
+		[DllImport("AppCore")]
+		public static extern IntPtr ulOverlayGetView(IntPtr overlay);
+
+		[DllImport("AppCore")]
+		public static extern uint ulOverlayGetWidth(IntPtr overlay);
+
+		[DllImport("AppCore")]
+		public static extern uint ulOverlayGetHeight(IntPtr overlay);
+
+		[DllImport("AppCore")]
+		public static extern int ulOverlayGetX(IntPtr overlay);
+
+		[DllImport("AppCore")]
+		public static extern int ulOverlayGetY(IntPtr overlay);
+
+		[DllImport("AppCore")]
+		public static extern void ulOverlayMoveTo(IntPtr overlay, int x, int y);
+
+		[DllImport("AppCore")]
+		public static extern void ulOverlayResize(IntPtr overlay, uint width, uint height);
+
+		[GeneratedDllImport("AppCore")]
+		public static partial bool ulOverlayIsHidden(IntPtr overlay);
+
+		[DllImport("AppCore")]
+		public static extern void ulOverlayHide(IntPtr overlay);
+
+		[DllImport("AppCore")]
+		public static extern void ulOverlayShow(IntPtr overlay);
+
+		[GeneratedDllImport("AppCore")]
+		public static partial bool ulOverlayHasFocus(IntPtr overlay);
+
+		[DllImport("AppCore")]
+		public static extern void ulOverlayFocus(IntPtr overlay);
+
+		[DllImport("AppCore")]
+		public static extern void ulOverlayUnfocus(IntPtr overlay);
+	}
+
+	public class ULOverlay : IDisposable
+	{
+		public IntPtr Ptr { get; private set; }
+		public bool IsDisposed { get; private set; }
+
+		public ULOverlay(IntPtr ptr, bool dispose = false)
+		{
+			Ptr = ptr;
+			IsDisposed = !dispose;
+		}
+
+		public ULOverlay(ULWindow window, uint width, uint height, int x = 0, int y = 0)
+		{
+			Ptr = AppCoreMethods.ulCreateOverlay(window.Ptr, width, height, x, y);
+		}
+		public ULOverlay(ULWindow window, View view, int x = 0, int y = 0)
+		{
+			Ptr = AppCoreMethods.ulCreateOverlayWithView(window.Ptr, view.Ptr, x, y);
+		}
+
+		public void Dispose()
+		{
+			if (IsDisposed) return;
+			AppCoreMethods.ulDestroyOverlay(Ptr);
+
+			IsDisposed = true;
+			GC.SuppressFinalize(this);
+		}
+	}
+}
