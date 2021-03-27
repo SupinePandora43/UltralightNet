@@ -58,7 +58,7 @@ namespace UltralightNet.AppCore
 
 		public void SetUpdateCallback(ULUpdateCallback callback, IntPtr userData = default) => AppCoreMethods.ulAppSetUpdateCallback(Ptr, callback, userData);
 
-		public bool IsRunning { get => AppCoreMethods.ulAppIsRunning(Ptr); }
+		public bool IsRunning => AppCoreMethods.ulAppIsRunning(Ptr);
 
 		~ULApp() => Dispose();
 
