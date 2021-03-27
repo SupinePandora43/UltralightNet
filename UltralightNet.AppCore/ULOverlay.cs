@@ -74,6 +74,23 @@ namespace UltralightNet.AppCore
 			Ptr = AppCoreMethods.ulCreateOverlayWithView(window.Ptr, view.Ptr, x, y);
 		}
 
+		public View View => new(AppCoreMethods.ulOverlayGetView(Ptr));
+
+		public uint Width => AppCoreMethods.ulOverlayGetWidth(Ptr);
+		public uint Height => AppCoreMethods.ulOverlayGetHeight(Ptr);
+		public int X => AppCoreMethods.ulOverlayGetX(Ptr);
+		public int Y => AppCoreMethods.ulOverlayGetY(Ptr);
+		public void MoveTo(int x, int y) => AppCoreMethods.ulOverlayMoveTo(Ptr, x, y);
+		public void Resize(uint width, uint height) => AppCoreMethods.ulOverlayResize(Ptr, width, height);
+
+		public bool IsHidden => AppCoreMethods.ulOverlayIsHidden(Ptr);
+		public void Hide() => AppCoreMethods.ulOverlayHide(Ptr);
+		public void Show() => AppCoreMethods.ulOverlayShow(Ptr);
+
+		public bool HasFocus => AppCoreMethods.ulOverlayHasFocus(Ptr);
+		public void Focus() => AppCoreMethods.ulOverlayFocus(Ptr);
+		public void Unfocus() => AppCoreMethods.ulOverlayUnfocus(Ptr);
+
 		public void Dispose()
 		{
 			if (IsDisposed) return;
