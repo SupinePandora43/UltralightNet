@@ -12,10 +12,10 @@ namespace UltralightNet.AppCore
 		public static extern void ulDestroyApp(IntPtr app);
 
 		[DllImport("AppCore")]
-		public static extern IntPtr ulAppGetWindow(IntPtr app);
+		public static extern void ulAppSetWindow(IntPtr app, IntPtr window);
 
 		[DllImport("AppCore")]
-		public static extern void ulAppSetWindow(IntPtr app, IntPtr window);
+		public static extern IntPtr ulAppGetWindow(IntPtr app);
 
 		[DllImport("AppCore")]
 		public static extern void ulAppSetUpdateCallback(IntPtr app, ULUpdateCallback callback, IntPtr user_data);
