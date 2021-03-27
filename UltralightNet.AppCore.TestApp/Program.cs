@@ -30,8 +30,6 @@ namespace UltralightNet.AppCore.TestApp
 			View view = overlay.View;
 			//view.URL = "https://github.com/SupinePandora43/UltralightNet";
 
-			bool loaded = false;
-
 			view.SetFailLoadingCallback(
 				(user_data, caller, frame_id, is_main_frame, url, description, error_domain, error_code) =>
 					Console.WriteLine("ALARM")
