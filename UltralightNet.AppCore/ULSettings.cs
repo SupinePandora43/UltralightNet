@@ -21,10 +21,10 @@ namespace UltralightNet.AppCore
 		public static extern void ulSettingsSetFileSystemPath(IntPtr settings, [MarshalAs(UnmanagedType.CustomMarshaler, MarshalTypeRef = typeof(ULStringMarshaler))] string path);
 
 		[GeneratedDllImport("AppCore")]
-		public static extern void ulSettingsSetLoadShadersFromFileSystem(IntPtr settings, bool enabled);
+		public static partial void ulSettingsSetLoadShadersFromFileSystem(IntPtr settings, bool enabled);
 
 		[GeneratedDllImport("AppCore")]
-		public static extern void ulSettingsSetForceCPURenderer(IntPtr settings, bool force_cpu);
+		public static partial void ulSettingsSetForceCPURenderer(IntPtr settings, bool force_cpu);
 	}
 
 	public struct ULSettings_C
