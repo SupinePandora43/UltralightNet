@@ -51,7 +51,8 @@ namespace UltralightNet.AppCore
 			Ptr = AppCoreMethods.ulCreateApp(settings.Ptr, config.Ptr);
 		}
 
-		public ULWindow Window {
+		public ULWindow Window
+		{
 			get => new(AppCoreMethods.ulAppGetWindow(Ptr));
 			set => AppCoreMethods.ulAppSetWindow(Ptr, value.Ptr);
 		}
@@ -59,6 +60,13 @@ namespace UltralightNet.AppCore
 		public void SetUpdateCallback(ULUpdateCallback callback, IntPtr userData = default) => AppCoreMethods.ulAppSetUpdateCallback(Ptr, callback, userData);
 
 		public bool IsRunning => AppCoreMethods.ulAppIsRunning(Ptr);
+
+		public ULMonitor MainMonitor => new(AppCoreMethods.ulAppGetMainMonitor(Ptr));
+
+		public Renderer Renderer => new(AppCoreMethods.ulAppGetRenderer(Ptr));
+
+		public void Run() => AppCoreMethods.ulAppRun(Ptr);
+		public void Quit() => AppCoreMethods.ulAppQuit(Ptr);
 
 		~ULApp() => Dispose();
 
