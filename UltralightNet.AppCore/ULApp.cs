@@ -35,7 +35,33 @@ namespace UltralightNet.AppCore
 		[DllImport("AppCore")]
 		public static extern void ulAppQuit(IntPtr app);
 	}
-	public class ULApp
+	public class ULApp : IDisposable
 	{
+		public IntPtr Ptr { get; private set; }
+		public bool IsDisposed { get; private set; }
+
+		public ULApp(IntPtr ptr, bool dispose = false)
+		{
+			Ptr = ptr;
+			IsDisposed = !dispose;
+		}
+
+		public ULApp(ULSettings settings, ULConfig config)
+		{
+			Ptr = AppCoreMethods.ulCreateApp(settings.Ptr, config.Ptr);
+		}
+
+
+
+		~ULApp() => Dispose();
+
+		public void Dispose()
+		{
+			if (IsDisposed) return;
+			AppCoreMethods.ulDestroyApp(Ptr);
+
+			IsDisposed = true;
+			GC.SuppressFinalize(this);
+		}
 	}
 }
