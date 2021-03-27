@@ -35,7 +35,7 @@ namespace UltralightNet.AppCore.TestApp
 					Console.WriteLine("ALARM")
 			);
 
-			view.SetFinishLoadingCallback((user_data, caller, frame_id, is_main_frame, url) => loaded = true);
+			view.SetFinishLoadingCallback((user_data, caller, frame_id, is_main_frame, url) => Console.WriteLine("loaded"));
 
 			view.HTML = "<html><body><p>123</p></body></html>";
 
