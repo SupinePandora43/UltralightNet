@@ -231,7 +231,7 @@ var assemblies = [
       { "name": "UltralightNet.Session", "rp": "UltralightNet_Session.html", "cl": 13, "ucl": 7, "cal": 20, "tl": 78, "ct": "LineCoverage", "mc": "-", "cb": 1, "tb": 2, "lch": [], "bch": [], "hc": [] },
       { "name": "UltralightNet.ULBitmap", "rp": "UltralightNet_ULBitmap.html", "cl": 0, "ucl": 38, "cal": 38, "tl": 155, "ct": "LineCoverage", "mc": "-", "cb": 0, "tb": 2, "lch": [], "bch": [], "hc": [] },
       { "name": "UltralightNet.ULCommandList", "rp": "UltralightNet_ULCommandList.html", "cl": 0, "ucl": 4, "cal": 4, "tl": 20, "ct": "LineCoverage", "mc": "-", "cb": 0, "tb": 0, "lch": [], "bch": [], "hc": [] },
-      { "name": "UltralightNet.ULConfig", "rp": "UltralightNet_ULConfig.html", "cl": 65, "ucl": 4, "cal": 69, "tl": 428, "ct": "LineCoverage", "mc": "-", "cb": 2, "tb": 6, "lch": [], "bch": [], "hc": [] },
+      { "name": "UltralightNet.ULConfig", "rp": "UltralightNet_ULConfig.html", "cl": 65, "ucl": 4, "cal": 69, "tl": 427, "ct": "LineCoverage", "mc": "-", "cb": 2, "tb": 6, "lch": [], "bch": [], "hc": [] },
       { "name": "UltralightNet.ULIntRect", "rp": "UltralightNet_ULIntRect.html", "cl": 0, "ucl": 3, "cal": 3, "tl": 34, "ct": "LineCoverage", "mc": "-", "cb": 0, "tb": 0, "lch": [], "bch": [], "hc": [] },
       { "name": "UltralightNet.ULKeyEventNative", "rp": "UltralightNet_ULKeyEventNative.html", "cl": 0, "ucl": 30, "cal": 30, "tl": 581, "ct": "LineCoverage", "mc": "-", "cb": 0, "tb": 6, "lch": [], "bch": [], "hc": [] },
       { "name": "UltralightNet.ULMouseEventNative", "rp": "UltralightNet_ULMouseEventNative.html", "cl": 0, "ucl": 13, "cal": 13, "tl": 74, "ct": "LineCoverage", "mc": "-", "cb": 0, "tb": 0, "lch": [], "bch": [], "hc": [] },
