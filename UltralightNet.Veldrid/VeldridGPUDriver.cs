@@ -649,12 +649,14 @@ namespace UltralightNet.Veldrid
 			GraphicsPipelineDescription ultralight_pd__SCISSOR_TRUE__DISALBE_BLEND = _ultralightPipelineDescription;
 
 			ultralight_pd__SCISSOR_TRUE__DISALBE_BLEND.RasterizerState.ScissorTestEnabled = true;
-			ultralight_pd__SCISSOR_TRUE__DISALBE_BLEND.BlendState = BlendStateDescription.SingleDisabled;
+			ultralight_pd__SCISSOR_TRUE__DISALBE_BLEND.BlendState.AttachmentStates[0].BlendEnabled = false;
+			//ultralight_pd__SCISSOR_TRUE__DISALBE_BLEND.BlendState = BlendStateDescription.SingleDisabled;
 
 			GraphicsPipelineDescription ultralight_pd__SCISSOR_FALSE__DISALBE_BLEND = _ultralightPipelineDescription;
 
 			ultralight_pd__SCISSOR_FALSE__DISALBE_BLEND.RasterizerState.ScissorTestEnabled = false;
-			ultralight_pd__SCISSOR_FALSE__DISALBE_BLEND.BlendState = BlendStateDescription.SingleDisabled;
+			//ultralight_pd__SCISSOR_FALSE__DISALBE_BLEND.BlendState = BlendStateDescription.SingleDisabled;
+			ultralight_pd__SCISSOR_FALSE__DISALBE_BLEND.BlendState.AttachmentStates[0].BlendEnabled = false;
 
 
 			ul_scissor_blend = graphicsDevice.ResourceFactory.CreateGraphicsPipeline(ref ultralight_pd__SCISSOR_TRUE__ENALBE_BLEND);
