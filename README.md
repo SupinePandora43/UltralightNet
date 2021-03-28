@@ -5,7 +5,7 @@
 
 [Ultralight](https://ultralig.ht) .NET bindings
 
-## Supported platforms:
+## Supported platforms
 
 |         | x86_64    | arm64    |
 |---------|-----------|----------|
@@ -13,7 +13,7 @@
 | linux   | linux-x64 | upstream |
 | osx     | osx-x64   | upstream |
 
-## Known Issues:
+## Known Issues
 
 * not all api covered
 * * ping me in discord `SupinePandora43#3399`

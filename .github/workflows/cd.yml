@@ -40,4 +40,9 @@ jobs:
         dotnet pack UltralightNet.Resources
     - run: tree
     - name: Publish
-      run: dotnet nuget push UltralightNet.*.nupkg -k ${{ secrets.NUGET_TOKEN }} --source https://api.nuget.org/v3/index.json
+      run: |
+        dotnet nuget push UltralightNet.Binaries.*.nupkg -k ${{ secrets.NUGET_TOKEN }} --source https://api.nuget.org/v3/index.json
+        dotnet nuget push UltralightNet.*.nupkg -k ${{ secrets.NUGET_TOKEN }} --source https://api.nuget.org/v3/index.json
+        dotnet nuget push UltralightNet.AppCore.*.nupkg -k ${{ secrets.NUGET_TOKEN }} --source https://api.nuget.org/v3/index.json
+        dotnet nuget push UltralightNet.Resources.*.nupkg -k ${{ secrets.NUGET_TOKEN }} --source https://api.nuget.org/v3/index.json
+      continue-on-error: true
