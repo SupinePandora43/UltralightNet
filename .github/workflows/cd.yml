@@ -34,10 +34,10 @@ jobs:
         dotnet-version: 5.0.100
     - name: Pack
       run: |
-        dotnet pack UltralightNet.Binaries
-        dotnet pack UltralightNet
-        dotnet pack UltralightNet.AppCore
-        dotnet pack UltralightNet.Resources
+        dotnet pack -c Release UltralightNet.Binaries
+        dotnet pack -c Release UltralightNet
+        dotnet pack -c Release UltralightNet.AppCore
+        dotnet pack -c Release UltralightNet.Resources
     - run: tree
     - name: Publish
       run: |
