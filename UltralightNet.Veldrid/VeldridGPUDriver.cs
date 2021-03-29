@@ -626,6 +626,21 @@ namespace UltralightNet.Veldrid
 				}
 			);
 		}
+		private void DisableBlend(ref GraphicsPipelineDescription pipa)
+		{
+			pipa.BlendState.AttachmentStates = new[]
+			{
+				new BlendAttachmentDescription()
+				{
+					SourceColorFactor = BlendFactor.One,
+					SourceAlphaFactor = BlendFactor.One,
+					DestinationColorFactor = BlendFactor.Zero,
+					DestinationAlphaFactor = BlendFactor.Zero,
+
+					BlendEnabled = false
+				}
+			};
+		}
 		private void InitPipelines()
 		{
 			ShaderSetDescription fillShaderSetDescription = FillShaderSetDescription();
@@ -641,33 +656,37 @@ namespace UltralightNet.Veldrid
 			);
 			uniformResourceSet = graphicsDevice.ResourceFactory.CreateResourceSet(new(uniformsResourceLayout, uniformBuffer));
 
-			// todo: glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
 			GraphicsPipelineDescription _ultralightPipelineDescription = new()
 			{
-				/*BlendState = new()
+				BlendState = new()
 				{
 					AttachmentStates = new[]
 					{
 						// glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
 						new BlendAttachmentDescription()
 						{
-							SourceColorFactor = BlendFactor.One,
+							/*SourceColorFactor = BlendFactor.One,
 							SourceAlphaFactor = BlendFactor.InverseDestinationAlpha,
 							DestinationColorFactor = BlendFactor.InverseSourceAlpha,
-							DestinationAlphaFactor = BlendFactor.One,
+							DestinationAlphaFactor = BlendFactor.One,*/
+							SourceColorFactor = BlendFactor.One,
+							SourceAlphaFactor = BlendFactor.One,
+							DestinationColorFactor = BlendFactor.InverseSourceAlpha,
+							DestinationAlphaFactor = BlendFactor.InverseSourceAlpha,
 							BlendEnabled = true,
 							ColorFunction = BlendFunction.Add,
 							AlphaFunction = BlendFunction.Add
 						}
-					}
-				},*/
-				BlendState = BlendStateDescription.SingleAlphaBlend,
+					},
+					AlphaToCoverageEnabled = false
+				},
+				//BlendState = BlendStateDescription.SingleAlphaBlend,
 				DepthStencilState = new DepthStencilStateDescription()
 				{
 					DepthTestEnabled = false, // glDisable(GL_DEPTH_TEST)
 					DepthWriteEnabled = false,
 					StencilTestEnabled = false,
-					DepthComparison = ComparisonKind.LessEqual // glDepthFunc(GL_NEVER)
+					DepthComparison = ComparisonKind.Never // glDepthFunc(GL_NEVER)
 				},
 				RasterizerState = new()
 				{
@@ -701,14 +720,12 @@ namespace UltralightNet.Veldrid
 			GraphicsPipelineDescription ultralight_pd__SCISSOR_TRUE__DISALBE_BLEND = _ultralightPipelineDescription;
 
 			ultralight_pd__SCISSOR_TRUE__DISALBE_BLEND.RasterizerState.ScissorTestEnabled = true;
-			ultralight_pd__SCISSOR_TRUE__DISALBE_BLEND.BlendState.AttachmentStates[0].BlendEnabled = false;
-			//ultralight_pd__SCISSOR_TRUE__DISALBE_BLEND.BlendState = BlendStateDescription.SingleDisabled;
+			DisableBlend(ref ultralight_pd__SCISSOR_TRUE__DISALBE_BLEND);
 
 			GraphicsPipelineDescription ultralight_pd__SCISSOR_FALSE__DISALBE_BLEND = _ultralightPipelineDescription;
 
 			ultralight_pd__SCISSOR_FALSE__DISALBE_BLEND.RasterizerState.ScissorTestEnabled = false;
-			//ultralight_pd__SCISSOR_FALSE__DISALBE_BLEND.BlendState = BlendStateDescription.SingleDisabled;
-			ultralight_pd__SCISSOR_FALSE__DISALBE_BLEND.BlendState.AttachmentStates[0].BlendEnabled = false;
+			DisableBlend(ref ultralight_pd__SCISSOR_FALSE__DISALBE_BLEND);
 
 
 			ul_scissor_blend = graphicsDevice.ResourceFactory.CreateGraphicsPipeline(ref ultralight_pd__SCISSOR_TRUE__ENALBE_BLEND);
@@ -730,12 +747,12 @@ namespace UltralightNet.Veldrid
 
 			GraphicsPipelineDescription ultralightPath_pd__SCISSOR_TRUE__DISABLE_BLEND = _ultralightPathPipelineDescription;
 
-			ultralightPath_pd__SCISSOR_TRUE__DISABLE_BLEND.BlendState.AttachmentStates[0].BlendEnabled = false;
+			DisableBlend(ref ultralightPath_pd__SCISSOR_TRUE__DISABLE_BLEND);
 
 			GraphicsPipelineDescription ultralightPath_pd__SCISSOR_FALSE__DISABLE_BLEND = _ultralightPathPipelineDescription;
 
 			ultralightPath_pd__SCISSOR_FALSE__DISABLE_BLEND.RasterizerState.ScissorTestEnabled = true;
-			ultralightPath_pd__SCISSOR_FALSE__DISABLE_BLEND.BlendState.AttachmentStates[0].BlendEnabled = false;
+			DisableBlend(ref ultralightPath_pd__SCISSOR_FALSE__DISABLE_BLEND);
 
 			ulPath_scissor_blend = graphicsDevice.ResourceFactory.CreateGraphicsPipeline(ref ultralightPath_pd__SCISSOR_TRUE__ENALBE_BLEND);
 			ulPath_blend = graphicsDevice.ResourceFactory.CreateGraphicsPipeline(ref ultralightPath_pd__SCISSOR_FALSE__ENALBE_BLEND);
