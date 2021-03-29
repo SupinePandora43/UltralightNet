@@ -32,13 +32,12 @@ namespace UltralightNet.Veldrid.TestApp
 			};
 
 			Sdl2Window window = VeldridStartup.CreateWindow(ref windowCI);
-			//todo
-			window.Resizable = false;
 
 			GraphicsDeviceOptions options = new()
 			{
 				PreferStandardClipSpaceYDirection = true,
-				PreferDepthRangeZeroToOne = true
+				PreferDepthRangeZeroToOne = true,
+				SwapchainSrgbFormat = true,
 			};
 
 			GraphicsDevice graphicsDevice = VeldridStartup.CreateGraphicsDevice(
@@ -62,11 +61,11 @@ namespace UltralightNet.Veldrid.TestApp
 			);
 
 			GraphicsPipelineDescription mainPipelineDescription = new(
-				BlendStateDescription.SingleAlphaBlend,
+				BlendStateDescription.SingleOverrideBlend,
 				new DepthStencilStateDescription(
 					depthTestEnabled: false,
-					depthWriteEnabled: true,
-					comparisonKind: ComparisonKind.LessEqual),
+					depthWriteEnabled: false,
+					comparisonKind: ComparisonKind.Never),
 				new RasterizerStateDescription(
 					cullMode: FaceCullMode.Back,
 					fillMode: PolygonFillMode.Solid,
@@ -142,12 +141,12 @@ void main()
 			{
 				ResourcePath = "./resources/",
 				UseGpu = true,
-				ForceRepaint = true
+				ForceRepaint = false
 			});
-
+			
 			View view = new(renderer, 512, 512, false, Session.DefaultSession(renderer), false);
 
-			view.URL = "https://github.com";
+			view.URL = "https://youtube.com";
 			bool loaded = false;
 			view.SetFinishLoadingCallback((user_data, caller, frame_id, is_main_frame, url) =>
 			{
@@ -158,16 +157,20 @@ void main()
 				renderer.Update();
 				Thread.Sleep(10);
 			}
-
+			
 			window.MouseWheel += (mw) =>
 			{
 				view.FireScrollEvent(new ULScrollEvent()
 				{
-					type = ULScrollEvent.Type.ByPage,
-					deltaY = (int)mw.WheelDelta
+					type = ULScrollEvent.Type.ByPixel,
+					deltaY = (int)mw.WheelDelta*100
 				});
 			};
-
+			window.Resized += () =>
+			{
+				graphicsDevice.ResizeMainWindow((uint)window.Width, (uint)window.Height);
+				view.Resize((uint)window.Width, (uint)window.Height);
+			};
 			DeviceBuffer quadV = factory.CreateBuffer(new(4 * 4 * 4, BufferUsage.VertexBuffer));
 			graphicsDevice.UpdateBuffer(quadV, 0, new Vector4[]
 			{
@@ -176,7 +179,7 @@ void main()
 				new(-1, -1, 0, 1 ),
 				new(1, -1, 1, 1 ),
 			});
-
+			
 			DeviceBuffer quadI = factory.CreateBuffer(new(sizeof(short)*4, BufferUsage.IndexBuffer));
 			graphicsDevice.UpdateBuffer(quadI, 0, new short[] { 0, 1, 2, 3 });
 
@@ -187,7 +190,7 @@ void main()
 			{
 				renderer.Update();
 				renderer.Render();
-				gpuDriver.Render();
+				gpuDriver.Render(stopwatch.ElapsedTicks / 1000f);
 
 				commandList.Begin();
 
@@ -195,8 +198,8 @@ void main()
 
 				commandList.SetFramebuffer(graphicsDevice.SwapchainFramebuffer);
 				commandList.SetFullViewports();
-				commandList.ClearColorTarget(0, new RgbaFloat(255,255 ,0,255));
-				commandList.ClearColorTarget(0, RgbaFloat.Blue);
+				commandList.ClearColorTarget(0, new RgbaFloat(MathF.Sin(stopwatch.Elapsed.Milliseconds/100f),255,0,255));
+				//commandList.ClearColorTarget(0, RgbaFloat.Blue);
 
 				commandList.SetVertexBuffer(0, quadV);
 				commandList.SetIndexBuffer(quadI, IndexFormat.UInt16);
@@ -215,7 +218,6 @@ void main()
 
 				graphicsDevice.SubmitCommands(commandList);
 				graphicsDevice.SwapBuffers();
-				graphicsDevice.WaitForIdle();
 				window.PumpEvents();
 			}
 		}
