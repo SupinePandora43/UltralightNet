@@ -56,7 +56,7 @@ namespace UltralightNet.Veldrid
 					1,
 					1,
 					1,
-					PixelFormat.B8_G8_R8_A8_UNorm_SRgb,
+					PixelFormat.R8_UNorm,
 					TextureUsage.Sampled,
 					TextureType.Texture2D
 				)
