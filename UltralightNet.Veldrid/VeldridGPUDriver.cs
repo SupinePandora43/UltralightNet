@@ -167,9 +167,15 @@ namespace UltralightNet.Veldrid
 
 			if (!isRT)
 			{
-				graphicsDevice.UpdateTexture(entry.texture, bitmap.LockPixels(), (uint)bitmap.Size, 0, 0, 0, textureDescription.Width, textureDescription.Height, 1, 0, 0);
-				bitmap.UnlockPixels();
-
+				if (bitmap.RowBytes / bitmap.Bpp == bitmap.Width)
+				{
+					graphicsDevice.UpdateTexture(entry.texture, bitmap.LockPixels(), (uint)bitmap.Size, 0, 0, 0, textureDescription.Width, textureDescription.Height, 1, 0, 0);
+					bitmap.UnlockPixels();
+				}
+				else
+				{
+					throw new BadImageFormatException("stride");
+				}
 				if (GenerateMipMaps)
 				{
 					var cl = graphicsDevice.ResourceFactory.CreateCommandList();
@@ -195,9 +201,48 @@ namespace UltralightNet.Veldrid
 			Console.WriteLine($"UpdateTexture({texture_id})");
 			TextureEntry entry = TextureEntries[texture_id];
 
-			if (bitmap.RowBytes / bitmap.Bpp != bitmap.Width) throw new BadImageFormatException("stride");
+			IntPtr pixels = bitmap.LockPixels();
+
+			if (bitmap.RowBytes / bitmap.Bpp != bitmap.Width)
+			{
+				Console.WriteLine("STRIDE!!!");
+
+				uint height = bitmap.Height;
+				uint width = bitmap.Width;
+				uint rowBytes = bitmap.RowBytes;
+				uint offset = rowBytes - width;
+				uint bpp = bitmap.Bpp;
+
+				byte[] noStridePixels = new byte[width * height * bpp];
+
+				unsafe
+				{
+					byte* pixelBytePointer = (byte*)pixels;
+
+					uint pixelOffset = 0;
+					uint stridePixelOffset = 0;
+
+					for (uint verticalLine = 0; verticalLine < height; verticalLine++)
+					{
+						for (uint horizontalLine = 0; horizontalLine < width; horizontalLine++)
+						{
+							noStridePixels[pixelOffset] = pixelBytePointer[stridePixelOffset];
+
+							pixelOffset ++;
+							stridePixelOffset++;
+						}
+						stridePixelOffset += offset;
+					}
+
+				}
+				graphicsDevice.UpdateTexture(entry.texture, noStridePixels, 0, 0, 0, width, height, 1, 0, 0);
 			
-			graphicsDevice.UpdateTexture(entry.texture, bitmap.LockPixels(), (uint)bitmap.Size, 0, 0, 0, bitmap.Width, bitmap.Height, 1, 0, 0);
+			}
+			else
+			{
+				graphicsDevice.UpdateTexture(entry.texture, pixels, (uint)bitmap.Size, 0, 0, 0, bitmap.Width, bitmap.Height, 1, 0, 0);
+			}
+
 			bitmap.UnlockPixels();
 
 			if (GenerateMipMaps)
