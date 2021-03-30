@@ -13,7 +13,7 @@ namespace UltralightNet.Veldrid
 
 		public bool GenerateMipMaps = false;
 		public uint MipLevels = 1;
-		public TextureSampleCount SampleCount = TextureSampleCount.Count1;
+		public TextureSampleCount SampleCount = TextureSampleCount.Count32;
 		public bool WaitForIdle = false;
 		public bool Debug = false;
 
@@ -195,6 +195,8 @@ namespace UltralightNet.Veldrid
 			Console.WriteLine($"UpdateTexture({texture_id})");
 			TextureEntry entry = TextureEntries[texture_id];
 
+			if (bitmap.RowBytes / bitmap.Bpp != bitmap.Width) throw new BadImageFormatException("stride");
+			
 			graphicsDevice.UpdateTexture(entry.texture, bitmap.LockPixels(), (uint)bitmap.Size, 0, 0, 0, bitmap.Width, bitmap.Height, 1, 0, 0);
 			bitmap.UnlockPixels();
 
@@ -303,6 +305,7 @@ namespace UltralightNet.Veldrid
 
 				if (command.command_type is ULCommandType.ClearRenderBuffer)
 				{
+					commandList.SetFullScissorRect(0);
 					commandList.ClearColorTarget(0, RgbaFloat.Clear);
 				}
 				else
@@ -397,6 +400,8 @@ namespace UltralightNet.Veldrid
 						commandList.SetGraphicsResourceSet(2, TextureEntries[state.texture_2_id].resourceSet);
 					else
 						commandList.SetGraphicsResourceSet(2, emptyResourceSet);
+
+					commandList.SetViewport(0, new Viewport(0f, 0f, state.viewport_width, state.viewport_height, 0f, 1f));
 
 					GeometryEntry geometryEntry = GeometryEntries[command.geometry_id];
 
