@@ -1,5 +1,7 @@
 using System;
 using System.Diagnostics;
+using System.IO;
+using System.Net;
 using System.Numerics;
 using System.Text;
 using System.Threading;
@@ -15,12 +17,7 @@ namespace UltralightNet.Veldrid.TestApp
 	{
 		private const GraphicsBackend BACKEND = GraphicsBackend.OpenGL;
 
-		static void Main(string[] args)
-		{
-			new Program().Run();
-		}
-
-		private void Run()
+		public static void Main()
 		{
 			WindowCreateInfo windowCI = new()
 			{
@@ -146,7 +143,7 @@ void main()
 			
 			View view = new(renderer, 512, 512, false, Session.DefaultSession(renderer), false);
 
-			view.URL = "https://youtube.com";
+			view.URL = "https://github.com/SupinePandora43";
 			bool loaded = false;
 			view.SetFinishLoadingCallback((user_data, caller, frame_id, is_main_frame, url) =>
 			{
@@ -157,7 +154,14 @@ void main()
 				renderer.Update();
 				Thread.Sleep(10);
 			}
-			
+
+			WebRequest request = WebRequest.CreateHttp("https://raw.githubusercontent.com/SupinePandora43/UltralightNet/ulPath_pipelines/SilkNetSandbox/assets/index.html");
+
+			var response = request.GetResponse();
+			var responseStream = response.GetResponseStream();
+			StreamReader reader = new(responseStream);
+			//view.HTML = reader.ReadToEnd();
+
 			window.MouseWheel += (mw) =>
 			{
 				view.FireScrollEvent(new ULScrollEvent()
@@ -191,7 +195,7 @@ void main()
 				renderer.Update();
 				renderer.Render();
 				gpuDriver.Render(stopwatch.ElapsedTicks / 1000f);
-
+				
 				commandList.Begin();
 
 				commandList.SetPipeline(pipeline);

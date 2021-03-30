@@ -24,7 +24,7 @@ namespace UltralightNet.Veldrid
 		private readonly bool IsDirectX = false;
 		private readonly bool IsOpenGL = false;
 
-		private Queue<ULCommand> commands = new();
+		private readonly Queue<ULCommand> commands = new();
 
 		private readonly CommandList commandList;
 
@@ -40,7 +40,7 @@ namespace UltralightNet.Veldrid
 
 			commandList = graphicsDevice.ResourceFactory.CreateCommandList();
 
-			IsDirectX = graphicsDevice.BackendType is GraphicsBackend.Direct3D11;
+			//IsDirectX = graphicsDevice.BackendType is GraphicsBackend.Direct3D11;
 
 			IsOpenGL = (graphicsDevice.BackendType is GraphicsBackend.OpenGL) || (graphicsDevice.BackendType is GraphicsBackend.OpenGLES);
 
@@ -95,7 +95,7 @@ namespace UltralightNet.Veldrid
 
 		#region NextId
 
-		private uint GetKey<TValue>(Dictionary<uint, TValue> dictionary)
+		private static uint GetKey<TValue>(Dictionary<uint, TValue> dictionary)
 		{
 			for (uint i = 1; ; i++)
 			{
@@ -128,6 +128,7 @@ namespace UltralightNet.Veldrid
 		#region Texture
 		private void CreateTexture(uint texture_id, ULBitmap bitmap)
 		{
+			Console.WriteLine($"CreateTexture({texture_id})");
 			bool isRT = bitmap.IsEmpty;
 			TextureEntry entry = TextureEntries[texture_id];
 			TextureDescription textureDescription = new()
@@ -191,6 +192,7 @@ namespace UltralightNet.Veldrid
 		}
 		private void UpdateTexture(uint texture_id, ULBitmap bitmap)
 		{
+			Console.WriteLine($"UpdateTexture({texture_id})");
 			TextureEntry entry = TextureEntries[texture_id];
 
 			graphicsDevice.UpdateTexture(entry.texture, bitmap.LockPixels(), (uint)bitmap.Size, 0, 0, 0, bitmap.Width, bitmap.Height, 1, 0, 0);
@@ -209,6 +211,7 @@ namespace UltralightNet.Veldrid
 		}
 		private void DestroyTexture(uint texture_id)
 		{
+			Console.WriteLine($"DestroyTexture({texture_id})");
 			TextureEntries.Remove(texture_id, out TextureEntry entry);
 			entry.resourceSet.Dispose();
 			entry.resourceSet = null;
@@ -308,39 +311,39 @@ namespace UltralightNet.Veldrid
 
 					if (state.shader_type is ULShaderType.Fill)
 					{
-						//if (state.enable_scissor)
+						if (state.enable_scissor)
 						{
-						//	if (state.enable_blend)
+							if (state.enable_blend)
 								commandList.SetPipeline(ul_scissor_blend);
-						//	else
-						//		commandList.SetPipeline(ul_scissor);
+							else
+								commandList.SetPipeline(ul_scissor);
 							commandList.SetScissorRect(0, (uint)state.scissor_rect.left, (uint)state.scissor_rect.top, (uint)(state.scissor_rect.right - state.scissor_rect.left), (uint)(state.scissor_rect.bottom - state.scissor_rect.top));
 						}
-						//else
-						//{
-						//	if (state.enable_blend)
-						//		commandList.SetPipeline(ul_blend);
-						//	else
-						//		commandList.SetPipeline(ul);
-						//}
+						else
+						{
+							if (state.enable_blend)
+								commandList.SetPipeline(ul_blend);
+							else
+								commandList.SetPipeline(ul);
+						}
 					}
 					else
 					{
-						//if (state.enable_scissor)
+						if (state.enable_scissor)
 						{
-						//	if (state.enable_blend)
+							if (state.enable_blend)
 								commandList.SetPipeline(ulPath_scissor_blend);
-						//	else
-						//		commandList.SetPipeline(ulPath_scissor);
+							else
+								commandList.SetPipeline(ulPath_scissor);
 							commandList.SetScissorRect(0, (uint)state.scissor_rect.left, (uint)state.scissor_rect.top, (uint)(state.scissor_rect.right - state.scissor_rect.left), (uint)(state.scissor_rect.bottom - state.scissor_rect.top));
 						}
-						// else
-						// {
-						// 	if (state.enable_blend)
-						// 		commandList.SetPipeline(ulPath_blend);
-						// 	else
-						// 		commandList.SetPipeline(ulPath);
-						// }
+						else
+						{
+							if (state.enable_blend)
+								commandList.SetPipeline(ulPath_blend);
+							else
+								commandList.SetPipeline(ulPath);
+						}
 					}
 
 					#region Uniforms
@@ -418,6 +421,8 @@ namespace UltralightNet.Veldrid
 			if (WaitForIdle) graphicsDevice.WaitForIdle();
 		}
 
+		/// <remarks>will throw exception when view doesn't have RenderTarget</remarks>
+		/// <exception cref="KeyNotFoundException">When called on view without RenderTarget</exception>
 		public ResourceSet GetRenderTarget(View view) => TextureEntries[view.RenderTarget.texture_id].resourceSet;
 
 		private class TextureEntry
