@@ -50,10 +50,10 @@ namespace UltralightNet.Veldrid.TestApp
 						ResourceKind.TextureReadOnly,
 						ShaderStages.Fragment
 					)//,
-					/*new ResourceLayoutElementDescription("_texture",
-						ResourceKind.TextureReadOnly,
-						ShaderStages.Fragment
-					)*/
+				/*new ResourceLayoutElementDescription("_texture",
+					ResourceKind.TextureReadOnly,
+					ShaderStages.Fragment
+				)*/
 				)
 			);
 
@@ -140,7 +140,7 @@ void main()
 				UseGpu = true,
 				ForceRepaint = false
 			});
-			
+
 			View view = new(renderer, 512, 512, false, Session.DefaultSession(renderer), false);
 
 			view.URL = "https://github.com/SupinePandora43";
@@ -162,12 +162,49 @@ void main()
 			StreamReader reader = new(responseStream);
 			//view.HTML = reader.ReadToEnd();
 
+			int x = 0;
+			int y = 0;
+
+			window.MouseMove += (mm) =>
+			{
+				x = (int)mm.MousePosition.X;
+				y = (int)mm.MousePosition.Y;
+				view.FireMouseEvent(new ULMouseEvent()
+				{
+					button = ULMouseEvent.Button.None,
+					type = ULMouseEvent.Type.MouseMoved,
+					x = x,
+					y = y
+				});
+			};
+			window.MouseDown += (md) =>
+			{
+				Console.WriteLine($"Mouse Down {md.Down} {md.MouseButton}");
+				view.FireMouseEvent(new ULMouseEvent()
+				{
+					button = md.MouseButton == MouseButton.Left ? ULMouseEvent.Button.Left : ULMouseEvent.Button.Right,
+					type = ULMouseEvent.Type.MouseDown,
+					x = x,
+					y = y
+				});
+			};
+			window.MouseUp += (mu) =>
+			{
+				Console.WriteLine($"Mouse up {mu.Down} {mu.MouseButton}");
+				view.FireMouseEvent(new ULMouseEvent()
+				{
+					button = mu.MouseButton == MouseButton.Left ? ULMouseEvent.Button.Left : ULMouseEvent.Button.Right,
+					type = ULMouseEvent.Type.MouseUp,
+					x = x,
+					y = y
+				});
+			};
 			window.MouseWheel += (mw) =>
 			{
 				view.FireScrollEvent(new ULScrollEvent()
 				{
 					type = ULScrollEvent.Type.ByPixel,
-					deltaY = (int)mw.WheelDelta*100
+					deltaY = (int)mw.WheelDelta * 100
 				});
 			};
 			window.Resized += () =>
@@ -183,8 +220,8 @@ void main()
 				new(-1, -1, 0, 1 ),
 				new(1, -1, 1, 1 ),
 			});
-			
-			DeviceBuffer quadI = factory.CreateBuffer(new(sizeof(short)*4, BufferUsage.IndexBuffer));
+
+			DeviceBuffer quadI = factory.CreateBuffer(new(sizeof(short) * 4, BufferUsage.IndexBuffer));
 			graphicsDevice.UpdateBuffer(quadI, 0, new short[] { 0, 1, 2, 3 });
 
 			CommandList commandList = factory.CreateCommandList();
@@ -195,14 +232,14 @@ void main()
 				renderer.Update();
 				renderer.Render();
 				gpuDriver.Render(stopwatch.ElapsedTicks / 1000f);
-				
+
 				commandList.Begin();
 
 				commandList.SetPipeline(pipeline);
 
 				commandList.SetFramebuffer(graphicsDevice.SwapchainFramebuffer);
 				commandList.SetFullViewports();
-				commandList.ClearColorTarget(0, new RgbaFloat(MathF.Sin(stopwatch.Elapsed.Milliseconds/100f),255,0,255));
+				commandList.ClearColorTarget(0, new RgbaFloat(MathF.Sin(stopwatch.Elapsed.Milliseconds / 100f), 255, 0, 255));
 				//commandList.ClearColorTarget(0, RgbaFloat.Blue);
 
 				commandList.SetVertexBuffer(0, quadV);
