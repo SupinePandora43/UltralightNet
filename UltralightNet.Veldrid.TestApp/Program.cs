@@ -15,7 +15,7 @@ namespace UltralightNet.Veldrid.TestApp
 {
 	class Program
 	{
-		private const GraphicsBackend BACKEND = GraphicsBackend.OpenGL;
+		private const GraphicsBackend BACKEND = GraphicsBackend.Vulkan;
 
 		public static void Main()
 		{
