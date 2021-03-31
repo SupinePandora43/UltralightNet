@@ -4,7 +4,6 @@ using System.IO;
 using System.Net;
 using System.Numerics;
 using System.Text;
-using System.Threading;
 using UltralightNet.AppCore;
 using Veldrid;
 using Veldrid.Sdl2;
@@ -15,7 +14,7 @@ namespace UltralightNet.Veldrid.TestApp
 {
 	class Program
 	{
-		private const GraphicsBackend BACKEND = GraphicsBackend.Direct3D11;
+		private const GraphicsBackend BACKEND = GraphicsBackend.OpenGL;
 
 		public static void Main()
 		{
@@ -58,7 +57,7 @@ namespace UltralightNet.Veldrid.TestApp
 			);
 
 			GraphicsPipelineDescription mainPipelineDescription = new(
-				BlendStateDescription.SingleOverrideBlend,
+				BlendStateDescription.SingleAlphaBlend,
 				new DepthStencilStateDescription(
 					depthTestEnabled: false,
 					depthWriteEnabled: false,
@@ -138,14 +137,16 @@ void main()
 			{
 				ResourcePath = "./resources/",
 				UseGpu = true,
-				ForceRepaint = false
+				ForceRepaint = true
 			});
 
-			View view = new(renderer, 512, 512, false, Session.DefaultSession(renderer), false);
-			View cpuView = new View(renderer, 512, 512, true, Session.DefaultSession(renderer), true);
+			View view = new(renderer, 512, 512, true, Session.DefaultSession(renderer), false);
+			View cpuView = new(renderer, 512, 512, true, Session.DefaultSession(renderer), true);
 
-			view.URL = "https://github.com/SupinePandora43";
-			cpuView.URL = "https://github.com/SupinePandora43";
+			const string url = "https://github.com/SupinePandora43";
+
+			view.URL = url;
+			cpuView.URL = url;
 
 			WebRequest request = WebRequest.CreateHttp("https://raw.githubusercontent.com/SupinePandora43/UltralightNet/ulPath_pipelines/SilkNetSandbox/assets/index.html");
 
@@ -153,8 +154,8 @@ void main()
 			var responseStream = response.GetResponseStream();
 			StreamReader reader = new(responseStream);
 			string htmlText = reader.ReadToEnd();
-			view.HTML = htmlText;
-			cpuView.HTML = htmlText;
+			//view.HTML = htmlText;
+			//cpuView.HTML = htmlText;
 
 			Texture cpuTexture = null;
 			ResourceSet cpuTextureResourceSet = null;
@@ -192,7 +193,15 @@ void main()
 			{
 				Console.WriteLine($"Mouse Down {md.Down} {md.MouseButton}");
 				if (md.MouseButton is MouseButton.Right) cpu = !cpu;
-
+				if(md.MouseButton is MouseButton.Button1)
+				{
+					view.GoBack();
+					cpuView.GoBack();
+				}else if(md.MouseButton is MouseButton.Button2)
+				{
+					view.GoForward();
+					cpuView.GoForward();
+				}
 				ULMouseEvent mouseEvent = new ULMouseEvent()
 				{
 					button = md.MouseButton == MouseButton.Left ? ULMouseEvent.Button.Left : ULMouseEvent.Button.Right,

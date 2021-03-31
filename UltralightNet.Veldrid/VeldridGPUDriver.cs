@@ -14,7 +14,6 @@ namespace UltralightNet.Veldrid
 		public bool GenerateMipMaps = true;
 		public uint MipLevels = 10;
 		public TextureSampleCount SampleCount = TextureSampleCount.Count32;
-		public bool WaitForIdle = false;
 		public bool Debug = false;
 
 		private readonly Dictionary<uint, TextureEntry> TextureEntries = new();
@@ -53,12 +52,12 @@ namespace UltralightNet.Veldrid
 
 			emptyTexture = graphicsDevice.ResourceFactory.CreateTexture(
 				new(
+					512,
+					512,
 					1,
 					1,
 					1,
-					1,
-					1,
-					PixelFormat.R8_UNorm,
+					PixelFormat.B8_G8_R8_A8_UNorm,
 					TextureUsage.Sampled,
 					TextureType.Texture2D
 				)
@@ -146,22 +145,11 @@ namespace UltralightNet.Veldrid
 			};
 
 			ULBitmapFormat format = bitmap.Format;
-			if (format is ULBitmapFormat.A8_UNORM)
-			{
-				textureDescription.Format = PixelFormat.R8_UNorm;
-			}
-			else if (format is ULBitmapFormat.BGRA8_UNORM_SRGB)
-			{
-				textureDescription.Format = PixelFormat.B8_G8_R8_A8_UNorm_SRgb;
-			}
-			else throw new NotSupportedException("format");
+			textureDescription.Format = format is ULBitmapFormat.A8_UNORM ? PixelFormat.R8_UNorm : PixelFormat.B8_G8_R8_A8_UNorm;
 
 			if (isRT)
 			{
 				textureDescription.Usage |= TextureUsage.RenderTarget;
-			}
-			else
-			{
 			}
 			if (GenerateMipMaps) textureDescription.Usage |= TextureUsage.GenerateMipmaps;
 
@@ -169,14 +157,14 @@ namespace UltralightNet.Veldrid
 
 			if (!isRT)
 			{
-				if (bitmap.RowBytes / bitmap.Bpp == bitmap.Width)
+				if (bitmap.RowBytes / bitmap.Bpp == bitmap.Width && bitmap.Format is not ULBitmapFormat.A8_UNORM)
 				{
 					graphicsDevice.UpdateTexture(entry.texture, bitmap.LockPixels(), (uint)bitmap.Size, 0, 0, 0, textureDescription.Width, textureDescription.Height, 1, 0, 0);
 					bitmap.UnlockPixels();
 				}
 				else
 				{
-					throw new BadImageFormatException("stride");
+					throw new Exception("stride");
 				}
 				if (GenerateMipMaps)
 				{
@@ -195,13 +183,13 @@ namespace UltralightNet.Veldrid
 					entry.texture
 				)
 			);
-
-			if (WaitForIdle) graphicsDevice.WaitForIdle();
 		}
 		private void UpdateTexture(uint texture_id, ULBitmap bitmap)
 		{
 			Console.WriteLine($"UpdateTexture({texture_id})");
 			TextureEntry entry = TextureEntries[texture_id];
+
+			if (bitmap.Format is ULBitmapFormat.A8_UNORM) return;
 
 			IntPtr pixels = bitmap.LockPixels();
 
@@ -241,7 +229,7 @@ namespace UltralightNet.Veldrid
 			}
 			else
 			{
-				graphicsDevice.UpdateTexture(entry.texture, pixels, (uint)bitmap.Size, 0, 0, 0, bitmap.Width, bitmap.Height, 1, 0, 0);
+				graphicsDevice.UpdateTexture(entry.texture, pixels, bitmap.Width * bitmap.Height * bitmap.Bpp, 0, 0, 0, bitmap.Width, bitmap.Height, 1, 0, 0);
 			}
 
 			bitmap.UnlockPixels();
@@ -253,7 +241,6 @@ namespace UltralightNet.Veldrid
 				cl.GenerateMipmaps(entry.texture);
 				cl.End();
 				graphicsDevice.SubmitCommands(cl);
-				if (WaitForIdle) graphicsDevice.WaitForIdle();
 				cl.Dispose();
 			}
 		}
@@ -280,8 +267,6 @@ namespace UltralightNet.Veldrid
 
 			graphicsDevice.UpdateBuffer(entry.vertices, 0, vertices.data, vertices.size);
 			graphicsDevice.UpdateBuffer(entry.indicies, 0, indices.data, indices.size);
-
-			if (WaitForIdle) graphicsDevice.WaitForIdle();
 		}
 		private void UpdateGeometry(uint geometry_id, ULVertexBuffer vertices, ULIndexBuffer indices)
 		{
@@ -290,8 +275,6 @@ namespace UltralightNet.Veldrid
 
 			graphicsDevice.UpdateBuffer(entry.vertices, 0, vertices.data, vertices.size);
 			graphicsDevice.UpdateBuffer(entry.indicies, 0, indices.data, indices.size);
-
-			if (WaitForIdle) graphicsDevice.WaitForIdle();
 		}
 		private void DestroyGeometry(uint geometry_id)
 		{
@@ -319,16 +302,14 @@ namespace UltralightNet.Veldrid
 			};
 
 			entry.framebuffer = graphicsDevice.ResourceFactory.CreateFramebuffer(ref fd);
-
-			if (WaitForIdle) graphicsDevice.WaitForIdle();
 		}
 		private void DestroyRenderBuffer(uint render_buffer_id)
 		{
 			Console.WriteLine($"DestroyRenderBuffer({render_buffer_id})");
 			RenderBufferEntries.Remove(render_buffer_id, out RenderBufferEntry entry);
-			// todo: should i?
-			// entry.textureEntry = null;
+			entry.textureEntry = null;
 			entry.framebuffer.Dispose();
+			entry.framebuffer = null;
 		}
 		#endregion RenderBuffer
 
@@ -468,8 +449,6 @@ namespace UltralightNet.Veldrid
 
 			commandList.End();
 			graphicsDevice.SubmitCommands(commandList);
-
-			if (WaitForIdle) graphicsDevice.WaitForIdle();
 		}
 
 		/// <remarks>will throw exception when view doesn't have RenderTarget</remarks>
@@ -497,8 +476,8 @@ namespace UltralightNet.Veldrid
 		private Texture pipelineOutputTexture;
 		private Framebuffer pipelineOutputFramebuffer;
 
-		private Texture emptyTexture;
-		private ResourceSet emptyResourceSet;
+		private readonly Texture emptyTexture;
+		private readonly ResourceSet emptyResourceSet;
 
 		private Pipeline ul_scissor_blend;
 		private Pipeline ul_blend;
@@ -664,12 +643,12 @@ namespace UltralightNet.Veldrid
 		private void InitFramebuffers()
 		{
 			pipelineOutputTexture = graphicsDevice.ResourceFactory.CreateTexture(new(
+				512,
+				512,
 				1,
 				1,
 				1,
-				1,
-				1,
-				PixelFormat.B8_G8_R8_A8_UNorm_SRgb,
+				PixelFormat.B8_G8_R8_A8_UNorm,
 				TextureUsage.RenderTarget,
 				TextureType.Texture2D));
 
@@ -682,7 +661,7 @@ namespace UltralightNet.Veldrid
 				}
 			);
 		}
-		private void DisableBlend(ref GraphicsPipelineDescription pipa)
+		private static void DisableBlend(ref GraphicsPipelineDescription pipa)
 		{
 			pipa.BlendState.AttachmentStates = new[]
 			{
