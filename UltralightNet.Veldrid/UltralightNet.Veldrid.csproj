@@ -29,6 +29,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
+		<ProjectReference Include="..\Supine.Unstride\Supine.Unstride.csproj" />
 		<ProjectReference Include="..\UltralightNet\UltralightNet.csproj" />
 		<PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0" PrivateAssets="All" />
 	</ItemGroup>

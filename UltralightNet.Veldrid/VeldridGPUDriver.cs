@@ -1,3 +1,4 @@
+using Supine.Unstride;
 using System;
 using System.Collections.Generic;
 using System.Numerics;
@@ -11,9 +12,9 @@ namespace UltralightNet.Veldrid
 		private readonly GraphicsDevice graphicsDevice;
 		private readonly ResourceLayout textureResourceLayout;
 
-		public bool GenerateMipMaps = true;
-		public uint MipLevels = 10;
-		public TextureSampleCount SampleCount = TextureSampleCount.Count32;
+		public bool GenerateMipMaps = false;
+		public uint MipLevels = 1;
+		public TextureSampleCount SampleCount = TextureSampleCount.Count1;
 		public bool Debug = false;
 
 		private readonly Dictionary<uint, TextureEntry> TextureEntries = new();
@@ -52,23 +53,24 @@ namespace UltralightNet.Veldrid
 
 			emptyTexture = graphicsDevice.ResourceFactory.CreateTexture(
 				new(
-					512,
-					512,
+					2,
+					2,
 					1,
 					1,
 					1,
-					PixelFormat.B8_G8_R8_A8_UNorm,
+					PixelFormat.R8_UNorm,
 					TextureUsage.Sampled,
 					TextureType.Texture2D
 				)
 			);
-
 			emptyResourceSet = graphicsDevice.ResourceFactory.CreateResourceSet(
 				new ResourceSetDescription(
 					textureResourceLayout,
 					emptyTexture
 				)
 			);
+
+			TextureEntries.Add(0, new() { texture = emptyTexture, resourceSet = emptyResourceSet });
 		}
 		public ULGPUDriver GetGPUDriver() => new()
 		{
@@ -157,24 +159,7 @@ namespace UltralightNet.Veldrid
 
 			if (!isRT)
 			{
-				if (bitmap.RowBytes / bitmap.Bpp == bitmap.Width && bitmap.Format is not ULBitmapFormat.A8_UNORM)
-				{
-					graphicsDevice.UpdateTexture(entry.texture, bitmap.LockPixels(), (uint)bitmap.Size, 0, 0, 0, textureDescription.Width, textureDescription.Height, 1, 0, 0);
-					bitmap.UnlockPixels();
-				}
-				else
-				{
-					throw new Exception("stride");
-				}
-				if (GenerateMipMaps)
-				{
-					var cl = graphicsDevice.ResourceFactory.CreateCommandList();
-					cl.Begin();
-					cl.GenerateMipmaps(entry.texture);
-					cl.End();
-					graphicsDevice.SubmitCommands(cl);
-					cl.Dispose();
-				}
+				UpdateTexture(texture_id, bitmap);
 			}
 
 			entry.resourceSet = graphicsDevice.ResourceFactory.CreateResourceSet(
@@ -186,52 +171,27 @@ namespace UltralightNet.Veldrid
 		}
 		private void UpdateTexture(uint texture_id, ULBitmap bitmap)
 		{
-			Console.WriteLine($"UpdateTexture({texture_id})");
 			TextureEntry entry = TextureEntries[texture_id];
-
-			if (bitmap.Format is ULBitmapFormat.A8_UNORM) return;
 
 			IntPtr pixels = bitmap.LockPixels();
 
-			if (bitmap.RowBytes / bitmap.Bpp != bitmap.Width)
+			// localize values to not do pinvoke every time
+			// IS THAT A LUA REFERENCE ???
+			uint height = bitmap.Height;
+			uint width = bitmap.Width;
+			uint rowBytes = bitmap.RowBytes;
+			uint bpp = bitmap.Bpp;
+
+			uint offset = rowBytes - (width * bpp);
+
+			if (offset is 0)
 			{
-				Console.WriteLine("STRIDE!!!");
-
-				uint height = bitmap.Height;
-				uint width = bitmap.Width;
-				uint rowBytes = bitmap.RowBytes;
-				uint offset = rowBytes - width;
-				uint bpp = bitmap.Bpp;
-
-				byte[] noStridePixels = new byte[width * height * bpp];
-
-				unsafe
-				{
-					byte* pixelBytePointer = (byte*)pixels;
-
-					uint pixelOffset = 0;
-					uint stridePixelOffset = 0;
-
-					for (uint verticalLine = 0; verticalLine < height; verticalLine++)
-					{
-						for (uint horizontalLine = 0; horizontalLine < width; horizontalLine++)
-						{
-							noStridePixels[pixelOffset] = pixelBytePointer[stridePixelOffset];
-
-							pixelOffset++;
-							stridePixelOffset++;
-						}
-						stridePixelOffset += offset;
-					}
-
-				}
-				graphicsDevice.UpdateTexture(entry.texture, noStridePixels, 0, 0, 0, width, height, 1, 0, 0);
+				graphicsDevice.UpdateTexture(entry.texture, pixels, width * height * bpp, 0, 0, 0, width, height, 1, 0, 0);
 			}
 			else
 			{
-				graphicsDevice.UpdateTexture(entry.texture, pixels, bitmap.Width * bitmap.Height * bitmap.Bpp, 0, 0, 0, bitmap.Width, bitmap.Height, 1, 0, 0);
+				graphicsDevice.UpdateTexture(entry.texture, Unstrider.Unstride(pixels, width, height, bpp, offset), 0, 0, 0, width, height, 1, 0, 0);
 			}
-
 			bitmap.UnlockPixels();
 
 			if (GenerateMipMaps)
@@ -356,6 +316,8 @@ namespace UltralightNet.Veldrid
 							else
 								commandList.SetPipeline(ul);
 						}
+						commandList.SetGraphicsResourceSet(1, TextureEntries[state.texture_1_id].resourceSet);
+						commandList.SetGraphicsResourceSet(2, TextureEntries[state.texture_2_id].resourceSet);
 					}
 					else
 					{
@@ -418,15 +380,6 @@ namespace UltralightNet.Veldrid
 					commandList.SetFramebuffer(renderBufferEntry.framebuffer);
 
 					commandList.SetGraphicsResourceSet(0, uniformResourceSet);
-
-					if (state.texture_1_id != 0)
-						commandList.SetGraphicsResourceSet(1, TextureEntries[state.texture_1_id].resourceSet);
-					else
-						commandList.SetGraphicsResourceSet(1, emptyResourceSet);
-					if (state.texture_2_id != 0)
-						commandList.SetGraphicsResourceSet(2, TextureEntries[state.texture_2_id].resourceSet);
-					else
-						commandList.SetGraphicsResourceSet(2, emptyResourceSet);
 
 					commandList.SetViewport(0, new Viewport(0f, 0f, state.viewport_width, state.viewport_height, 0f, 1f));
 
@@ -731,7 +684,7 @@ namespace UltralightNet.Veldrid
 					ScissorTestEnabled = false,
 					DepthClipEnabled = true
 				},
-				//PrimitiveTopology = PrimitiveTopology.TriangleList,
+				PrimitiveTopology = PrimitiveTopology.TriangleList,
 				ResourceBindingModel = ResourceBindingModel.Default,
 				ShaderSet = fillShaderSetDescription,
 				ResourceLayouts = new[]
@@ -771,6 +724,7 @@ namespace UltralightNet.Veldrid
 
 			GraphicsPipelineDescription _ultralightPathPipelineDescription = _ultralightPipelineDescription;
 			_ultralightPathPipelineDescription.ShaderSet = FillPathShaderSetDescription();
+			_ultralightPathPipelineDescription.ResourceLayouts = new[] { uniformsResourceLayout };
 
 			GraphicsPipelineDescription ultralightPath_pd__SCISSOR_TRUE__ENALBE_BLEND = _ultralightPathPipelineDescription;
 

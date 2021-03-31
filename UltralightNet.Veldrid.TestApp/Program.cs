@@ -14,7 +14,7 @@ namespace UltralightNet.Veldrid.TestApp
 {
 	class Program
 	{
-		private const GraphicsBackend BACKEND = GraphicsBackend.OpenGL;
+		private const GraphicsBackend BACKEND = GraphicsBackend.Vulkan;
 
 		public static void Main()
 		{
@@ -154,6 +154,7 @@ void main()
 			var responseStream = response.GetResponseStream();
 			StreamReader reader = new(responseStream);
 			string htmlText = reader.ReadToEnd();
+
 			//view.HTML = htmlText;
 			//cpuView.HTML = htmlText;
 
