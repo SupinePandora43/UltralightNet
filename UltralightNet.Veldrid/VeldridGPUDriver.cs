@@ -11,8 +11,8 @@ namespace UltralightNet.Veldrid
 		private readonly GraphicsDevice graphicsDevice;
 		private readonly ResourceLayout textureResourceLayout;
 
-		public bool GenerateMipMaps = false;
-		public uint MipLevels = 1;
+		public bool GenerateMipMaps = true;
+		public uint MipLevels = 10;
 		public TextureSampleCount SampleCount = TextureSampleCount.Count32;
 		public bool WaitForIdle = false;
 		public bool Debug = false;
@@ -27,6 +27,8 @@ namespace UltralightNet.Veldrid
 		private readonly Queue<ULCommand> commands = new();
 
 		private readonly CommandList commandList;
+
+		public bool NeedsDraw => commands.Count is not 0;
 
 		public VeldridGPUDriver(GraphicsDevice graphicsDevice)
 		{
@@ -228,7 +230,7 @@ namespace UltralightNet.Veldrid
 						{
 							noStridePixels[pixelOffset] = pixelBytePointer[stridePixelOffset];
 
-							pixelOffset ++;
+							pixelOffset++;
 							stridePixelOffset++;
 						}
 						stridePixelOffset += offset;
@@ -236,7 +238,6 @@ namespace UltralightNet.Veldrid
 
 				}
 				graphicsDevice.UpdateTexture(entry.texture, noStridePixels, 0, 0, 0, width, height, 1, 0, 0);
-			
 			}
 			else
 			{

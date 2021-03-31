@@ -15,7 +15,7 @@ namespace UltralightNet.Veldrid.TestApp
 {
 	class Program
 	{
-		private const GraphicsBackend BACKEND = GraphicsBackend.Vulkan;
+		private const GraphicsBackend BACKEND = GraphicsBackend.Direct3D11;
 
 		public static void Main()
 		{
@@ -34,7 +34,7 @@ namespace UltralightNet.Veldrid.TestApp
 			{
 				PreferStandardClipSpaceYDirection = true,
 				PreferDepthRangeZeroToOne = true,
-				SwapchainSrgbFormat = true,
+				SwapchainSrgbFormat = false,
 			};
 
 			GraphicsDevice graphicsDevice = VeldridStartup.CreateGraphicsDevice(
@@ -142,75 +142,96 @@ void main()
 			});
 
 			View view = new(renderer, 512, 512, false, Session.DefaultSession(renderer), false);
+			View cpuView = new View(renderer, 512, 512, true, Session.DefaultSession(renderer), true);
 
 			view.URL = "https://github.com/SupinePandora43";
-			bool loaded = false;
-			view.SetFinishLoadingCallback((user_data, caller, frame_id, is_main_frame, url) =>
-			{
-				loaded = true;
-			});
-			while (!loaded)
-			{
-				renderer.Update();
-				Thread.Sleep(10);
-			}
+			cpuView.URL = "https://github.com/SupinePandora43";
 
 			WebRequest request = WebRequest.CreateHttp("https://raw.githubusercontent.com/SupinePandora43/UltralightNet/ulPath_pipelines/SilkNetSandbox/assets/index.html");
 
 			var response = request.GetResponse();
 			var responseStream = response.GetResponseStream();
 			StreamReader reader = new(responseStream);
-			//view.HTML = reader.ReadToEnd();
+			string htmlText = reader.ReadToEnd();
+			view.HTML = htmlText;
+			cpuView.HTML = htmlText;
+
+			Texture cpuTexture = null;
+			ResourceSet cpuTextureResourceSet = null;
+
+			void CreateCPUTexture()
+			{
+				cpuTexture = factory.CreateTexture(new TextureDescription(cpuView.Width, cpuView.Height, 1, 1, 1, PixelFormat.B8_G8_R8_A8_UNorm, TextureUsage.Sampled, TextureType.Texture2D));
+				cpuTextureResourceSet = factory.CreateResourceSet(new ResourceSetDescription(basicQuadResourceLayout, cpuTexture));
+			}
+
+			CreateCPUTexture();
 
 			int x = 0;
 			int y = 0;
+
+			bool cpu = false;
 
 			window.MouseMove += (mm) =>
 			{
 				x = (int)mm.MousePosition.X;
 				y = (int)mm.MousePosition.Y;
-				view.FireMouseEvent(new ULMouseEvent()
+
+				ULMouseEvent mouseEvent = new ULMouseEvent()
 				{
 					button = ULMouseEvent.Button.None,
 					type = ULMouseEvent.Type.MouseMoved,
 					x = x,
 					y = y
-				});
+				};
+
+				view.FireMouseEvent(mouseEvent);
+				cpuView.FireMouseEvent(mouseEvent);
 			};
 			window.MouseDown += (md) =>
 			{
 				Console.WriteLine($"Mouse Down {md.Down} {md.MouseButton}");
-				view.FireMouseEvent(new ULMouseEvent()
+				if (md.MouseButton is MouseButton.Right) cpu = !cpu;
+
+				ULMouseEvent mouseEvent = new ULMouseEvent()
 				{
 					button = md.MouseButton == MouseButton.Left ? ULMouseEvent.Button.Left : ULMouseEvent.Button.Right,
 					type = ULMouseEvent.Type.MouseDown,
 					x = x,
 					y = y
-				});
+				};
+				view.FireMouseEvent(mouseEvent);
+				cpuView.FireMouseEvent(mouseEvent);
 			};
 			window.MouseUp += (mu) =>
 			{
 				Console.WriteLine($"Mouse up {mu.Down} {mu.MouseButton}");
-				view.FireMouseEvent(new ULMouseEvent()
+				ULMouseEvent mouseEvent = new ULMouseEvent()
 				{
 					button = mu.MouseButton == MouseButton.Left ? ULMouseEvent.Button.Left : ULMouseEvent.Button.Right,
 					type = ULMouseEvent.Type.MouseUp,
 					x = x,
 					y = y
-				});
+				};
+				view.FireMouseEvent(mouseEvent);
+				cpuView.FireMouseEvent(mouseEvent);
 			};
 			window.MouseWheel += (mw) =>
 			{
-				view.FireScrollEvent(new ULScrollEvent()
+				ULScrollEvent scrollEvent = new ULScrollEvent()
 				{
 					type = ULScrollEvent.Type.ByPixel,
 					deltaY = (int)mw.WheelDelta * 100
-				});
+				};
+				view.FireScrollEvent(scrollEvent);
+				cpuView.FireScrollEvent(scrollEvent);
 			};
 			window.Resized += () =>
 			{
 				graphicsDevice.ResizeMainWindow((uint)window.Width, (uint)window.Height);
 				view.Resize((uint)window.Width, (uint)window.Height);
+				cpuView.Resize((uint)window.Width, (uint)window.Height);
+				CreateCPUTexture();
 			};
 			DeviceBuffer quadV = factory.CreateBuffer(new(4 * 4 * 4, BufferUsage.VertexBuffer));
 			graphicsDevice.UpdateBuffer(quadV, 0, new Vector4[]
@@ -227,10 +248,18 @@ void main()
 			CommandList commandList = factory.CreateCommandList();
 			Stopwatch stopwatch = new();
 			stopwatch.Start();
+
+
 			while (window.Exists)
 			{
 				renderer.Update();
 				renderer.Render();
+
+				ULBitmap bitmap = cpuView.Surface.Bitmap;
+
+				graphicsDevice.UpdateTexture(cpuTexture, bitmap.LockPixels(), (uint)bitmap.Size, 0, 0, 0, cpuView.Width, cpuView.Height, 1, 0, 0);
+				bitmap.UnlockPixels();
+
 				gpuDriver.Render(stopwatch.ElapsedTicks / 1000f);
 
 				commandList.Begin();
@@ -245,7 +274,12 @@ void main()
 				commandList.SetVertexBuffer(0, quadV);
 				commandList.SetIndexBuffer(quadI, IndexFormat.UInt16);
 
-				commandList.SetGraphicsResourceSet(0, gpuDriver.GetRenderTarget(view));
+				if (cpu)
+				{
+					commandList.SetGraphicsResourceSet(0, cpuTextureResourceSet);
+				}
+				else
+					commandList.SetGraphicsResourceSet(0, gpuDriver.GetRenderTarget(view));
 
 				commandList.DrawIndexed(
 					4,
