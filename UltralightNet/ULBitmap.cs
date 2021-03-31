@@ -53,6 +53,7 @@ namespace UltralightNet
 
 		/// <summary>Whether or not this bitmap owns its own pixel buffer.</summary>
 		[GeneratedDllImport("Ultralight")]
+		[return: MarshalAs(UnmanagedType.I1)]
 		public static partial bool ulBitmapOwnsPixels(IntPtr bitmap);
 
 		/// <summary>Lock pixels for reading/writing, returns pointer to pixel buffer.</summary>
@@ -70,6 +71,7 @@ namespace UltralightNet
 
 		/// <summary>Whether or not this bitmap is empty.</summary>
 		[GeneratedDllImport("Ultralight")]
+		[return: MarshalAs(UnmanagedType.I1)]
 		public static partial bool ulBitmapIsEmpty(IntPtr bitmap);
 
 		/// <summary>Reset bitmap pixels to 0.</summary>
@@ -78,6 +80,7 @@ namespace UltralightNet
 
 		/// <summary>Write bitmap to a PNG on disk.</summary>
 		[GeneratedDllImport("Ultralight", CharSet = CharSet.Ansi)]
+		[return: MarshalAs(UnmanagedType.I1)]
 		public static partial bool ulBitmapWritePNG(IntPtr bitmap, [MarshalAs(UnmanagedType.LPUTF8Str)] string path);
 
 		/// <summary>This converts a BGRA bitmap to RGBA bitmap and vice-versa by swapping the red and blue channels.</summary>
