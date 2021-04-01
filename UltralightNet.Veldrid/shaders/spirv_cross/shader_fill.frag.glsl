@@ -34,7 +34,7 @@ layout(location = 6)in vec4 ex_Data4;
 layout(location = 7)in vec4 ex_Data5;
 layout(location = 8)in vec4 ex_Data6;
 layout(location = 9)in vec2 ex_ObjectCoord;
-layout(location = 10)in vec2 ex_ScreenCoord;
+//layout(location = 10)in vec2 ex_ScreenCoord;
 
 // Out Params
 layout(location = 0) out vec4 out_Color;

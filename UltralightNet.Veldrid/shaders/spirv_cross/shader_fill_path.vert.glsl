@@ -27,7 +27,7 @@ layout(location = 2) in vec2 in_TexCoord;
 // Out Params
 layout(location = 0) out vec4 ex_Color;
 layout(location = 1) out vec2 ex_ObjectCoord;
-layout(location = 2) out vec2 ex_ScreenCoord;
+//layout(location = 2) out vec2 ex_ScreenCoord;
 
 void main(void)
 {

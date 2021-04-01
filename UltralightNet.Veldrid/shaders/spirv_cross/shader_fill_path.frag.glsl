@@ -21,7 +21,7 @@ float Scalar(uint i) { if (i < 4u) return Scalar4[0][i]; else return Scalar4[1][
 // Vertex Attributes
 layout(location = 0) in vec4 ex_Color;
 layout(location = 1) in vec2 ex_ObjectCoord;
-layout(location = 2) in vec2 ex_ScreenCoord;
+//layout(location = 2) in vec2 ex_ScreenCoord;
 
 // Out Params
 layout(location = 0) out vec4 out_Color;

@@ -43,7 +43,7 @@ layout(location = 6)out vec4 ex_Data4;
 layout(location = 7)out vec4 ex_Data5;
 layout(location = 8)out vec4 ex_Data6;
 layout(location = 9)out vec2 ex_ObjectCoord;
-layout(location = 10)out vec2 ex_ScreenCoord;
+//layout(location = 10)out vec2 ex_ScreenCoord;
 
 void main(void)
 {
