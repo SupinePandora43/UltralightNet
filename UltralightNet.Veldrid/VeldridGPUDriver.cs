@@ -281,7 +281,7 @@ namespace UltralightNet.Veldrid
 
 		public void Render(float time = 1f)
 		{
-			if (commands.Count is 0) return;
+			if (!NeedsDraw) return;
 			commandList.Begin();
 
 			foreach (ULCommand command in commands)
