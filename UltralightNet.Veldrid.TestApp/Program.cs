@@ -1,3 +1,4 @@
+using Supine.Unstride;
 using System;
 using System.Diagnostics;
 using System.IO;
@@ -14,7 +15,7 @@ namespace UltralightNet.Veldrid.TestApp
 {
 	class Program
 	{
-		private const GraphicsBackend BACKEND = GraphicsBackend.Vulkan;
+		private const GraphicsBackend BACKEND = GraphicsBackend.Direct3D11;
 
 		public static void Main()
 		{
@@ -33,14 +34,13 @@ namespace UltralightNet.Veldrid.TestApp
 			{
 				PreferStandardClipSpaceYDirection = true,
 				PreferDepthRangeZeroToOne = true,
-				SwapchainSrgbFormat = false,
+				SwapchainSrgbFormat = false
 			};
 
 			GraphicsDevice graphicsDevice = VeldridStartup.CreateGraphicsDevice(
 				window,
 				options,
 				BACKEND);
-
 			ResourceFactory factory = graphicsDevice.ResourceFactory;
 
 			ResourceLayout basicQuadResourceLayout = factory.CreateResourceLayout(
@@ -194,11 +194,12 @@ void main()
 			{
 				Console.WriteLine($"Mouse Down {md.Down} {md.MouseButton}");
 				if (md.MouseButton is MouseButton.Right) cpu = !cpu;
-				if(md.MouseButton is MouseButton.Button1)
+				if (md.MouseButton is MouseButton.Button1)
 				{
 					view.GoBack();
 					cpuView.GoBack();
-				}else if(md.MouseButton is MouseButton.Button2)
+				}
+				else if (md.MouseButton is MouseButton.Button2)
 				{
 					view.GoForward();
 					cpuView.GoForward();
@@ -263,14 +264,26 @@ void main()
 			while (window.Exists)
 			{
 				renderer.Update();
+				gpuDriver.time = stopwatch.ElapsedTicks / 1000f;
 				renderer.Render();
 
 				ULBitmap bitmap = cpuView.Surface.Bitmap;
 
-				graphicsDevice.UpdateTexture(cpuTexture, bitmap.LockPixels(), (uint)bitmap.Size, 0, 0, 0, cpuView.Width, cpuView.Height, 1, 0, 0);
+				IntPtr pixels = bitmap.LockPixels();
+				uint rowBytes = bitmap.RowBytes;
+				uint width = bitmap.Width;
+				uint bpp = bitmap.Bpp;
+				if (rowBytes == width * bpp)
+				{
+					graphicsDevice.UpdateTexture(cpuTexture, pixels, (uint)bitmap.Size, 0, 0, 0, cpuView.Width, cpuView.Height, 1, 0, 0);
+				}
+				else
+				{
+					graphicsDevice.UpdateTexture(cpuTexture, Unstrider.Unstride(pixels, width, cpuView.Height, bpp, rowBytes - (width * bpp)), 0, 0, 0, cpuView.Width, cpuView.Height, 1, 0, 0);
+				}
 				bitmap.UnlockPixels();
 
-				gpuDriver.Render(stopwatch.ElapsedTicks / 1000f);
+				gpuDriver.Render();
 
 				commandList.Begin();
 

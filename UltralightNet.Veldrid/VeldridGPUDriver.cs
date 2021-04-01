@@ -29,6 +29,9 @@ namespace UltralightNet.Veldrid
 		private readonly CommandList commandList;
 
 		public bool NeedsDraw => commands.Count is not 0;
+		public bool InstantDraw = true;
+
+		public float time = 1f;
 
 		public VeldridGPUDriver(GraphicsDevice graphicsDevice)
 		{
@@ -273,135 +276,152 @@ namespace UltralightNet.Veldrid
 		}
 		#endregion RenderBuffer
 
-		private void UpdateCommandList(ULCommandList list)
+		private void RunCommand(ULCommand command)
 		{
-			foreach (ULCommand command in list.ToSpan())
-				commands.Enqueue(command);
+			RenderBufferEntry renderBufferEntry = RenderBufferEntries[command.gpu_state.render_buffer_id];
+
+			commandList.SetFramebuffer(renderBufferEntry.framebuffer);
+
+			if (command.command_type is ULCommandType.ClearRenderBuffer)
+			{
+				commandList.SetFullScissorRect(0);
+				commandList.ClearColorTarget(0, RgbaFloat.Clear);
+			}
+			else
+			{
+				ULGPUState state = command.gpu_state;
+
+				if (state.shader_type is ULShaderType.Fill)
+				{
+					if (state.enable_scissor)
+					{
+						if (state.enable_blend)
+							commandList.SetPipeline(ul_scissor_blend);
+						else
+							commandList.SetPipeline(ul_scissor);
+						commandList.SetScissorRect(0, (uint)state.scissor_rect.left, (uint)state.scissor_rect.top, (uint)(state.scissor_rect.right - state.scissor_rect.left), (uint)(state.scissor_rect.bottom - state.scissor_rect.top));
+					}
+					else
+					{
+						if (state.enable_blend)
+							commandList.SetPipeline(ul_blend);
+						else
+							commandList.SetPipeline(ul);
+					}
+					commandList.SetGraphicsResourceSet(1, TextureEntries[state.texture_1_id].resourceSet);
+					commandList.SetGraphicsResourceSet(2, TextureEntries[state.texture_2_id].resourceSet);
+				}
+				else
+				{
+					if (state.enable_scissor)
+					{
+						if (state.enable_blend)
+							commandList.SetPipeline(ulPath_scissor_blend);
+						else
+							commandList.SetPipeline(ulPath_scissor);
+						commandList.SetScissorRect(0, (uint)state.scissor_rect.left, (uint)state.scissor_rect.top, (uint)(state.scissor_rect.right - state.scissor_rect.left), (uint)(state.scissor_rect.bottom - state.scissor_rect.top));
+					}
+					else
+					{
+						if (state.enable_blend)
+							commandList.SetPipeline(ulPath_blend);
+						else
+							commandList.SetPipeline(ulPath);
+					}
+				}
+
+				#region Uniforms
+				Uniforms uniforms = new()
+				{
+					State = new Vector4(time, state.viewport_width, state.viewport_height, 1f),
+					Transform = state.transform.ulApplyProjection(state.viewport_width, state.viewport_height, IsOpenGL),
+
+					scalar_0 = state.scalar_0,
+					scalar_1 = state.scalar_1,
+					scalar_2 = state.scalar_2,
+					scalar_3 = state.scalar_3,
+					scalar_4 = state.scalar_4,
+					scalar_5 = state.scalar_5,
+					scalar_6 = state.scalar_6,
+					scalar_7 = state.scalar_7,
+
+					vector_0 = state.vector_0,
+					vector_1 = state.vector_1,
+					vector_2 = state.vector_2,
+					vector_3 = state.vector_3,
+					vector_4 = state.vector_4,
+					vector_5 = state.vector_5,
+					vector_6 = state.vector_6,
+					vector_7 = state.vector_7,
+
+					clip_size = state.clip_size,
+
+					clip_0 = state.clip_0,
+					clip_1 = state.clip_1,
+					clip_2 = state.clip_2,
+					clip_3 = state.clip_3,
+					clip_4 = state.clip_4,
+					clip_5 = state.clip_5,
+					clip_6 = state.clip_6,
+					clip_7 = state.clip_7
+				};
+				commandList.UpdateBuffer(uniformBuffer, 0, uniforms);
+				#endregion
+
+
+				commandList.SetFramebuffer(renderBufferEntry.framebuffer);
+
+				commandList.SetGraphicsResourceSet(0, uniformResourceSet);
+
+				commandList.SetViewport(0, new Viewport(0f, 0f, state.viewport_width, state.viewport_height, 0f, 1f));
+
+				GeometryEntry geometryEntry = GeometryEntries[command.geometry_id];
+
+				commandList.SetVertexBuffer(0, geometryEntry.vertices);
+				commandList.SetIndexBuffer(geometryEntry.indicies, IndexFormat.UInt32);
+
+				commandList.DrawIndexed(
+					command.indices_count,
+					1,
+					command.indices_offset,
+					0,
+					0
+				);
+			}
 		}
 
-		public void Render(float time = 1f)
+		private void UpdateCommandList(ULCommandList list)
+		{
+			if (InstantDraw)
+			{
+				commandList.Begin();
+				foreach (ULCommand command in list.ToSpan())
+					RunCommand(command);
+				commandList.End();
+				graphicsDevice.SubmitCommands(commandList);
+			}
+			else
+			{
+				foreach (ULCommand command in list.ToSpan())
+					commands.Enqueue(command);
+			}
+		}
+
+		public void Render()
 		{
 			if (!NeedsDraw) return;
+
 			commandList.Begin();
 
 			foreach (ULCommand command in commands)
 			{
-				RenderBufferEntry renderBufferEntry = RenderBufferEntries[command.gpu_state.render_buffer_id];
-
-				commandList.SetFramebuffer(renderBufferEntry.framebuffer);
-
-				if (command.command_type is ULCommandType.ClearRenderBuffer)
-				{
-					commandList.SetFullScissorRect(0);
-					commandList.ClearColorTarget(0, RgbaFloat.Clear);
-				}
-				else
-				{
-					ULGPUState state = command.gpu_state;
-
-					if (state.shader_type is ULShaderType.Fill)
-					{
-						if (state.enable_scissor)
-						{
-							if (state.enable_blend)
-								commandList.SetPipeline(ul_scissor_blend);
-							else
-								commandList.SetPipeline(ul_scissor);
-							commandList.SetScissorRect(0, (uint)state.scissor_rect.left, (uint)state.scissor_rect.top, (uint)(state.scissor_rect.right - state.scissor_rect.left), (uint)(state.scissor_rect.bottom - state.scissor_rect.top));
-						}
-						else
-						{
-							if (state.enable_blend)
-								commandList.SetPipeline(ul_blend);
-							else
-								commandList.SetPipeline(ul);
-						}
-						commandList.SetGraphicsResourceSet(1, TextureEntries[state.texture_1_id].resourceSet);
-						commandList.SetGraphicsResourceSet(2, TextureEntries[state.texture_2_id].resourceSet);
-					}
-					else
-					{
-						if (state.enable_scissor)
-						{
-							if (state.enable_blend)
-								commandList.SetPipeline(ulPath_scissor_blend);
-							else
-								commandList.SetPipeline(ulPath_scissor);
-							commandList.SetScissorRect(0, (uint)state.scissor_rect.left, (uint)state.scissor_rect.top, (uint)(state.scissor_rect.right - state.scissor_rect.left), (uint)(state.scissor_rect.bottom - state.scissor_rect.top));
-						}
-						else
-						{
-							if (state.enable_blend)
-								commandList.SetPipeline(ulPath_blend);
-							else
-								commandList.SetPipeline(ulPath);
-						}
-					}
-
-					#region Uniforms
-					Uniforms uniforms = new()
-					{
-						State = new Vector4(time, state.viewport_width, state.viewport_height, 1f),
-						Transform = state.transform.ulApplyProjection(state.viewport_width, state.viewport_height, IsOpenGL),
-
-						scalar_0 = state.scalar_0,
-						scalar_1 = state.scalar_1,
-						scalar_2 = state.scalar_2,
-						scalar_3 = state.scalar_3,
-						scalar_4 = state.scalar_4,
-						scalar_5 = state.scalar_5,
-						scalar_6 = state.scalar_6,
-						scalar_7 = state.scalar_7,
-
-						vector_0 = state.vector_0,
-						vector_1 = state.vector_1,
-						vector_2 = state.vector_2,
-						vector_3 = state.vector_3,
-						vector_4 = state.vector_4,
-						vector_5 = state.vector_5,
-						vector_6 = state.vector_6,
-						vector_7 = state.vector_7,
-
-						clip_size = state.clip_size,
-
-						clip_0 = state.clip_0,
-						clip_1 = state.clip_1,
-						clip_2 = state.clip_2,
-						clip_3 = state.clip_3,
-						clip_4 = state.clip_4,
-						clip_5 = state.clip_5,
-						clip_6 = state.clip_6,
-						clip_7 = state.clip_7
-					};
-					commandList.UpdateBuffer(uniformBuffer, 0, uniforms);
-					#endregion
-
-
-					commandList.SetFramebuffer(renderBufferEntry.framebuffer);
-
-					commandList.SetGraphicsResourceSet(0, uniformResourceSet);
-
-					commandList.SetViewport(0, new Viewport(0f, 0f, state.viewport_width, state.viewport_height, 0f, 1f));
-
-					GeometryEntry geometryEntry = GeometryEntries[command.geometry_id];
-
-					commandList.SetVertexBuffer(0, geometryEntry.vertices);
-					commandList.SetIndexBuffer(geometryEntry.indicies, IndexFormat.UInt32);
-
-					commandList.DrawIndexed(
-						command.indices_count,
-						1,
-						command.indices_offset,
-						0,
-						0
-					);
-				}
+				RunCommand(command);
 			}
-
-			commands.Clear();
 
 			commandList.End();
 			graphicsDevice.SubmitCommands(commandList);
+
+			commands.Clear();
 		}
 
 		/// <remarks>will throw exception when view doesn't have RenderTarget</remarks>
