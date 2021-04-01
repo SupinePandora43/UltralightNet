@@ -9,25 +9,22 @@ namespace Supine.Unstride
 		{
 			byte[] unstridedPixelByteArray = new byte[width * height * bpp];
 
-			unsafe
+			uint pixelOffset = 0;
+			uint stridePixelOffset = 0;
+
+			for (uint verticalLine = 0; verticalLine < height; verticalLine++)
 			{
-				uint pixelOffset = 0;
-				uint stridePixelOffset = 0;
-
-				for (uint verticalLine = 0; verticalLine < height; verticalLine++)
+				for (uint horizontalLine = 0; horizontalLine < width; horizontalLine++)
 				{
-					for (uint horizontalLine = 0; horizontalLine < width; horizontalLine++)
+					for (uint b = 0; b < bpp; b++)
 					{
-						for (uint b = 0; b < bpp; b++)
-						{
-							unstridedPixelByteArray[pixelOffset] = pixels[stridePixelOffset];
+						unstridedPixelByteArray[pixelOffset] = pixels[stridePixelOffset];
 
-							pixelOffset++;
-							stridePixelOffset++;
-						}
+						pixelOffset++;
+						stridePixelOffset++;
 					}
-					stridePixelOffset += offset;
 				}
+				stridePixelOffset += offset;
 			}
 
 			return unstridedPixelByteArray;
