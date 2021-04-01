@@ -1,4 +1,5 @@
 #version 450
+#extension GL_KHR_vulkan_glsl : enable
 precision highp float;
 
 // Program Uniforms
@@ -20,7 +21,7 @@ float Scalar(uint i) { if (i < 4u) return Scalar4[0][i]; else return Scalar4[1][
 
 // Texture Units
 layout(set=1, binding = 0) uniform sampler2D Texture1;
-layout(set=2, binding = 0) uniform sampler2D Texture2;
+layout(set=2, binding = 1) uniform sampler2D Texture2;
 //layout(binding = 2) uniform sampler2D Texture3;
 
 // Vertex Attributes
