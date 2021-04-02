@@ -197,6 +197,10 @@ namespace UltralightNet
 
 		public bool IsLoading => Methods.ulViewIsLoading(Ptr);
 
+		/// <summary>
+		/// Provides info used to display texture in your application
+		/// </summary>
+		/// <remarks>Only valid when <see cref="ULGPUDriver"/> is used</remarks>
 		public RenderTarget RenderTarget => Methods.ulViewGetRenderTarget(Ptr);
 
 		public ULSurface Surface
