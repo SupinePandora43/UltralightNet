@@ -44,7 +44,6 @@ namespace UltralightNet
 			Ptr = ptr;
 			IsDisposed = !dispose;
 		}
-		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public Renderer(ULConfig config, bool dispose = true)
 		{
 			Ptr = Methods.ulCreateRenderer(config.Ptr);
@@ -55,19 +54,14 @@ namespace UltralightNet
 		public void Update() => Methods.ulUpdate(Ptr);
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public void Render() => Methods.ulRender(Ptr);
-		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public void PurgeMemory() => Methods.ulPurgeMemory(Ptr);
-		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public void LogMemoryUsage() => Methods.ulLogMemoryUsage(Ptr);
 
 		public bool IsDisposed
 		{
-			[MethodImpl(MethodImplOptions.AggressiveInlining)]
 			get;
-			[MethodImpl(MethodImplOptions.AggressiveInlining)]
 			private set;
 		}
-		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		~Renderer() => Dispose();
 		public void Dispose()
 		{
