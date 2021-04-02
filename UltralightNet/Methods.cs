@@ -15,6 +15,7 @@ namespace UltralightNet
 		/// <remarks>UltralightCore, WebCore, Ultralight</remarks>
 		public static void Preload()
 		{
+#if NET5_0_OR_GREATER
 			// i don't have iphone/mac, and probably never
 			// so it will not work for ios, i'm sure 100%%%
 			if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
@@ -31,6 +32,7 @@ namespace UltralightNet
 					NativeLibrary.Load(lib);
 				}
 			}
+#endif
 		}
 	}
 }
