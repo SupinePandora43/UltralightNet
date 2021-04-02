@@ -42,6 +42,7 @@ namespace UltralightNet
 
 		/// <summary>Whether this string is empty or not.</summary>
 		[GeneratedDllImport("Ultralight")]
+		[return: MarshalAs(UnmanagedType.I1)]
 		public static partial bool ulStringIsEmpty(IntPtr str);
 
 		/// <summary>Replaces the contents of 'str' with the contents of 'new_str'</summary>

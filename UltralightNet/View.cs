@@ -6,7 +6,7 @@ namespace UltralightNet
 	public static partial class Methods
 	{
 		[GeneratedDllImport("Ultralight")]
-		public static partial IntPtr ulCreateView(IntPtr renderer, uint width, uint height, bool transparent, IntPtr session, bool force_cpu_renderer);
+		public static partial IntPtr ulCreateView(IntPtr renderer, uint width, uint height, [MarshalAs(UnmanagedType.I1)] bool transparent, IntPtr session, [MarshalAs(UnmanagedType.I1)] bool force_cpu_renderer);
 
 		[DllImport("Ultralight")]
 		public static extern void ulDestroyView(IntPtr view);
@@ -26,6 +26,7 @@ namespace UltralightNet
 		public static extern uint ulViewGetHeight(IntPtr view);
 
 		[GeneratedDllImport("Ultralight")]
+		[return: MarshalAs(UnmanagedType.I1)]
 		public static partial bool ulViewIsLoading(IntPtr view);
 
 		[GeneratedDllImport("Ultralight")]
@@ -56,10 +57,12 @@ namespace UltralightNet
 
 		/// <summary>Check if can navigate backwards in history.</summary>
 		[GeneratedDllImport("Ultralight")]
+		[return: MarshalAs(UnmanagedType.I1)]
 		public static partial bool ulViewCanGoBack(IntPtr view);
 
 		/// <summary>Check if can navigate forwards in history.</summary>
 		[GeneratedDllImport("Ultralight")]
+		[return: MarshalAs(UnmanagedType.I1)]
 		public static partial bool ulViewCanGoForward(IntPtr view);
 
 		/// <summary>Navigate backwards in history.</summary>
@@ -100,6 +103,7 @@ namespace UltralightNet
 
 		/// <summary>Whether or not the View has focus.</summary>
 		[GeneratedDllImport("Ultralight")]
+		[return: MarshalAs(UnmanagedType.I1)]
 		public static partial bool ulViewHasFocus(IntPtr view);
 
 		/// <summary>Whether or not the View has an input element with visible keyboard focus (indicated by a blinking caret).</summary>
@@ -108,6 +112,7 @@ namespace UltralightNet
 		/// keyboard input events (useful in games with mixed UI and key handling).
 		/// </remarks>
 		[GeneratedDllImport("Ultralight")]
+		[return: MarshalAs(UnmanagedType.I1)]
 		public static partial bool ulViewHasInputFocus(IntPtr view);
 
 		[GeneratedDllImport("Ultralight")]
@@ -156,9 +161,10 @@ namespace UltralightNet
 		public static extern void ulViewSetUpdateHistoryCallback(IntPtr view, ULUpdateHistoryCallback callback, IntPtr user_data);
 
 		[GeneratedDllImport("Ultralight")]
-		public static partial void ulViewSetNeedsPaint(IntPtr view, bool needs_paint);
+		public static partial void ulViewSetNeedsPaint(IntPtr view, [MarshalAs(UnmanagedType.I1)] bool needs_paint);
 
 		[GeneratedDllImport("Ultralight")]
+		[return: MarshalAs(UnmanagedType.I1)]
 		public static partial bool ulViewGetNeedsPaint(IntPtr view);
 
 		[DllImport("Ultralight")]

@@ -267,7 +267,10 @@ void main()
 				gpuDriver.time = stopwatch.ElapsedTicks / 1000f;
 				renderer.Render();
 
-				ULBitmap bitmap = cpuView.Surface.Bitmap;
+				ULSurface surface = cpuView.Surface;
+				ULBitmap bitmap = surface.Bitmap;
+
+				ULIntRect dirty = surface.DirtyBounds;
 
 				IntPtr pixels = bitmap.LockPixels();
 				uint rowBytes = bitmap.RowBytes;
@@ -275,12 +278,13 @@ void main()
 				uint bpp = bitmap.Bpp;
 				if (rowBytes == width * bpp)
 				{
-					graphicsDevice.UpdateTexture(cpuTexture, pixels, (uint)bitmap.Size, 0, 0, 0, cpuView.Width, cpuView.Height, 1, 0, 0);
+					graphicsDevice.UpdateTexture(cpuTexture, pixels, (uint)bitmap.Size, (uint)dirty.left,(uint) dirty.top, 0, (uint)(dirty.right - dirty.left), (uint)(dirty.bottom - dirty.top), 1, 0, 0);
 				}
 				else
 				{
-					graphicsDevice.UpdateTexture(cpuTexture, Unstrider.Unstride(pixels, width, cpuView.Height, bpp, rowBytes - (width * bpp)), 0, 0, 0, cpuView.Width, cpuView.Height, 1, 0, 0);
+					graphicsDevice.UpdateTexture(cpuTexture, Unstrider.Unstride(pixels, width, cpuView.Height, bpp, rowBytes - (width * bpp)), (uint)dirty.left, (uint)dirty.top, 0, (uint)(dirty.right - dirty.left), (uint)(dirty.bottom - dirty.top), 1, 0, 0);
 				}
+				surface.ClearDirtyBounds();
 				bitmap.UnlockPixels();
 
 				gpuDriver.Render();

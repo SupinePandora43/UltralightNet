@@ -15,7 +15,7 @@ namespace UltralightNet
 
 		/// <summary>Create bitmap from existing pixel buffer. @see Bitmap for help using this function.</summary>
 		[GeneratedDllImport("Ultralight")]
-		public static partial IntPtr ulCreateBitmapFromPixels(uint width, uint height, ULBitmapFormat format, uint row_bytes, IntPtr pixels, uint size, bool should_copy);
+		public static partial IntPtr ulCreateBitmapFromPixels(uint width, uint height, ULBitmapFormat format, uint row_bytes, IntPtr pixels, uint size, [MarshalAs(UnmanagedType.I1)] bool should_copy);
 
 		/// <summary>Create bitmap from copy.</summary>
 		[DllImport("Ultralight")]

@@ -23,7 +23,7 @@ namespace UltralightNet
 		public static extern void ulConfigSetCachePath(IntPtr config, [MarshalAs(UnmanagedType.CustomMarshaler, MarshalTypeRef = typeof(ULStringMarshaler))] string cache_path);
 
 		[GeneratedDllImport("Ultralight")]
-		public static partial void ulConfigSetUseGPURenderer(IntPtr config, bool use_gpu);
+		public static partial void ulConfigSetUseGPURenderer(IntPtr config, [MarshalAs(UnmanagedType.I1)] bool use_gpu);
 
 		/// <summary>Set the amount that the application DPI has been scaled, used for scaling device coordinates to pixels and oversampling raster shapes.</summary>
 		[GeneratedDllImport("Ultralight")]
@@ -37,11 +37,11 @@ namespace UltralightNet
 
 		/// <summary>Set whether images should be enabled.</summary>
 		[GeneratedDllImport("Ultralight")]
-		public static partial void ulConfigSetEnableImages(IntPtr config, bool enabled = true);
+		public static partial void ulConfigSetEnableImages(IntPtr config, [MarshalAs(UnmanagedType.I1)] bool enabled);
 
 		/// <summary>Set whether JavaScript should be eanbled.</summary>
 		[GeneratedDllImport("Ultralight")]
-		public static partial void ulConfigSetEnableJavaScript(IntPtr config, bool enabled = true);
+		public static partial void ulConfigSetEnableJavaScript(IntPtr config, [MarshalAs(UnmanagedType.I1)] bool enabled);
 
 		/// <summary>The hinting algorithm to use when rendering fonts.</summary>
 		/// <see cref="ULFontHinting"/>
@@ -78,7 +78,7 @@ namespace UltralightNet
 
 		/// <summary>Set whether or not we should continuously repaint any Views or compositor layers, regardless if they are dirty or not. This is mainly used to diagnose painting/shader issues.</summary>
 		[GeneratedDllImport("Ultralight")]
-		public static partial void ulConfigSetForceRepaint(IntPtr config, bool enabled = false);
+		public static partial void ulConfigSetForceRepaint(IntPtr config, [MarshalAs(UnmanagedType.I1)] bool enabled = false);
 
 		/// <summary>Set the amount of time to wait before triggering another repaint when a CSS animation is active.</summary>
 		[GeneratedDllImport("Ultralight")]
