@@ -116,7 +116,7 @@ namespace UltralightNet
 				length_ = (uint)managedString.Length
 			};
 			Marshal.StructureToPtr(
-				nativeStruct as object,
+				nativeStruct,
 				ptr,
 				false
 			);

@@ -49,7 +49,7 @@ namespace UltralightNet.Test
 			config.EnableImages = true;
 			Assert.True(config.EnableImages);
 			config.EnableImages = false;
-			//Assert.False(config.EnableImages);
+			Assert.False(config.EnableImages);
 		}
 		[Fact]
 		public void EnableJavaScriptTest()
@@ -57,7 +57,7 @@ namespace UltralightNet.Test
 			config.EnableJavaScript = true;
 			Assert.True(config.EnableJavaScript);
 			config.EnableJavaScript = false;
-			//Assert.False(config.EnableJavaScript);
+			Assert.False(config.EnableJavaScript);
 		}
 		[Fact]
 		public void FontHintingTest()
@@ -65,9 +65,9 @@ namespace UltralightNet.Test
 			config.FontHinting = ULFontHinting.Smooth;
 			Assert.Equal(ULFontHinting.Smooth, config.FontHinting);
 			config.FontHinting = ULFontHinting.Normal;
-			//Assert.Equal(ULFontHinting.Normal, config.FontHinting);
+			Assert.Equal(ULFontHinting.Normal, config.FontHinting);
 			config.FontHinting = ULFontHinting.Monochrome;
-			//Assert.Equal(ULFontHinting.Monochrome, config.FontHinting);
+			Assert.Equal(ULFontHinting.Monochrome, config.FontHinting);
 		}
 		[Fact]
 		public void FontGammaTest()

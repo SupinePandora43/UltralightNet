@@ -137,14 +137,17 @@ namespace UltralightNet
 		/// pixel buffer. This pixel buffer can optionally be provided by the user--<br/>
 		/// for more info see ulViewGetSurface.
 		/// </remarks>
+		[MarshalAs(UnmanagedType.I1)]
 		public bool use_gpu_renderer;
 		public double device_scale;
 
 		public ULFaceWinding face_winding;
 
 		/// <summary>Whether or not images should be enabled.</summary>
+		[MarshalAs(UnmanagedType.I1)]
 		public bool enable_images;
 		/// <summary>Whether or not JavaScript should be enabled.</summary>
+		[MarshalAs(UnmanagedType.I1)]
 		public bool enable_javascript;
 
 		/// <summary>The hinting algorithm to use when rendering fonts.</summary>
@@ -162,6 +165,7 @@ namespace UltralightNet
 		public ULStringMarshaler.ULStringPTR user_agent;
 		public ULStringMarshaler.ULStringPTR user_stylesheet;
 
+		[MarshalAs(UnmanagedType.I1)]
 		public bool force_repaint;
 
 		public double animation_timer_delay;
