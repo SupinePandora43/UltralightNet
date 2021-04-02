@@ -71,7 +71,7 @@ namespace UltralightNet
 		public uint RowBytes => Methods.ulSurfaceGetRowBytes(Ptr);
 		public nuint Size => Methods.ulSurfaceGetSize(Ptr);
 
-		public IntPtr LockPixels => Methods.ulSurfaceLockPixels(Ptr);
+		public IntPtr LockPixels() => Methods.ulSurfaceLockPixels(Ptr);
 		public void UnlockPixels() => Methods.ulSurfaceUnlockPixels(Ptr);
 
 		public void Resize(uint width, uint height) => Methods.ulSurfaceResize(Ptr, width, height);
@@ -79,7 +79,7 @@ namespace UltralightNet
 		public ULIntRect DirtyBounds { get => Methods.ulSurfaceGetDirtyBounds(Ptr); set => Methods.ulSurfaceSetDirtyBounds(Ptr, value); }
 		public void ClearDirtyBounds() => Methods.ulSurfaceClearDirtyBounds(Ptr);
 
-		public IntPtr UserData { get => Methods.ulSurfaceGetUserData(Ptr); }
+		public IntPtr UserData => Methods.ulSurfaceGetUserData(Ptr);
 
 		public ULBitmap Bitmap => new(Methods.ulBitmapSurfaceGetBitmap(Ptr));
 	}
