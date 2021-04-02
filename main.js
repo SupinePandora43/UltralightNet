@@ -228,7 +228,7 @@ var assemblies = [
       { "name": "UltralightNet.Methods", "rp": "UltralightNet_Methods.html", "cl": 89, "ucl": 748, "cal": 837, "tl": 39, "ct": "LineCoverage", "mc": "-", "cb": 15, "tb": 98, "lch": [], "bch": [], "hc": [] },
       { "name": "UltralightNet.Renderer", "rp": "UltralightNet_Renderer.html", "cl": 18, "ucl": 36, "cal": 54, "tl": 76, "ct": "LineCoverage", "mc": "-", "cb": 2, "tb": 4, "lch": [], "bch": [], "hc": [] },
       { "name": "UltralightNet.RenderTargetNative", "rp": "UltralightNet_RenderTargetNative.html", "cl": 0, "ucl": 46, "cal": 46, "tl": 69, "ct": "LineCoverage", "mc": "-", "cb": 0, "tb": 4, "lch": [], "bch": [], "hc": [] },
-      { "name": "UltralightNet.Session", "rp": "UltralightNet_Session.html", "cl": 13, "ucl": 27, "cal": 40, "tl": 78, "ct": "LineCoverage", "mc": "-", "cb": 1, "tb": 4, "lch": [], "bch": [], "hc": [] },
+      { "name": "UltralightNet.Session", "rp": "UltralightNet_Session.html", "cl": 9, "ucl": 31, "cal": 40, "tl": 78, "ct": "LineCoverage", "mc": "-", "cb": 0, "tb": 4, "lch": [], "bch": [], "hc": [] },
       { "name": "UltralightNet.ULBitmap", "rp": "UltralightNet_ULBitmap.html", "cl": 0, "ucl": 76, "cal": 76, "tl": 158, "ct": "LineCoverage", "mc": "-", "cb": 0, "tb": 4, "lch": [], "bch": [], "hc": [] },
       { "name": "UltralightNet.ULCommandList", "rp": "UltralightNet_ULCommandList.html", "cl": 0, "ucl": 8, "cal": 8, "tl": 20, "ct": "LineCoverage", "mc": "-", "cb": 0, "tb": 0, "lch": [], "bch": [], "hc": [] },
       { "name": "UltralightNet.ULConfig", "rp": "UltralightNet_ULConfig.html", "cl": 65, "ucl": 73, "cal": 138, "tl": 431, "ct": "LineCoverage", "mc": "-", "cb": 2, "tb": 12, "lch": [], "bch": [], "hc": [] },
@@ -240,7 +240,7 @@ var assemblies = [
       { "name": "UltralightNet.ULScrollEventNative", "rp": "UltralightNet_ULScrollEventNative.html", "cl": 0, "ucl": 22, "cal": 22, "tl": 56, "ct": "LineCoverage", "mc": "-", "cb": 0, "tb": 0, "lch": [], "bch": [], "hc": [] },
       { "name": "UltralightNet.ULStringMarshaler", "rp": "UltralightNet_ULStringMarshaler.html", "cl": 30, "ucl": 48, "cal": 78, "tl": 150, "ct": "LineCoverage", "mc": "-", "cb": 0, "tb": 4, "lch": [], "bch": [], "hc": [] },
       { "name": "UltralightNet.ULSurface", "rp": "UltralightNet_ULSurface.html", "cl": 0, "ucl": 26, "cal": 26, "tl": 87, "ct": "LineCoverage", "mc": "-", "cb": 0, "tb": 0, "lch": [], "bch": [], "hc": [] },
-      { "name": "UltralightNet.View", "rp": "UltralightNet_View.html", "cl": 29, "ucl": 117, "cal": 146, "tl": 296, "ct": "LineCoverage", "mc": "-", "cb": 2, "tb": 16, "lch": [], "bch": [], "hc": [] },
+      { "name": "UltralightNet.View", "rp": "UltralightNet_View.html", "cl": 29, "ucl": 117, "cal": 146, "tl": 300, "ct": "LineCoverage", "mc": "-", "cb": 2, "tb": 16, "lch": [], "bch": [], "hc": [] },
     ]},
   {
     "name": "UltralightNet.Resources",
