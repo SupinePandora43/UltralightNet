@@ -6,6 +6,7 @@ namespace UltralightNet
 	{
 		/// <summary>Whether or not a ULRect is empty (all members equal to 0)</summary>
 		[GeneratedDllImport("Ultralight")]
+		[return: MarshalAs(UnmanagedType.I1)]
 		public static partial bool ulRectIsEmpty(ULRect rect);
 
 		/// <summary>Create an empty ULRect (all members equal to 0)</summary>
@@ -23,6 +24,6 @@ namespace UltralightNet
 
 		public static ULRect MakeEmpty() => Methods.ulRectMakeEmpty();
 
-		public bool IsEmpty() => Methods.ulRectIsEmpty(this);
+		public bool IsEmpty => Methods.ulRectIsEmpty(this);
 	}
 }

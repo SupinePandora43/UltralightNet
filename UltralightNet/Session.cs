@@ -7,7 +7,7 @@ namespace UltralightNet
 	{
 		/// <summary>Create a Session to store local data in (such as cookies, local storage, application cache, indexed db, etc).</summary>
 		[DllImport("Ultralight")]
-		public static extern IntPtr ulCreateSession(IntPtr renderer, bool is_persistent, [MarshalAs(UnmanagedType.CustomMarshaler, MarshalTypeRef = typeof(ULStringMarshaler))] string name);
+		public static extern IntPtr ulCreateSession(IntPtr renderer, [MarshalAs(UnmanagedType.I1)] bool is_persistent, [MarshalAs(UnmanagedType.CustomMarshaler, MarshalTypeRef = typeof(ULStringMarshaler))] string name);
 
 		/// <summary>Destroy a Session.</summary>
 		[DllImport("Ultralight")]
@@ -20,6 +20,7 @@ namespace UltralightNet
 
 		/// <summary>Whether or not is persistent (backed to disk).</summary>
 		[GeneratedDllImport("Ultralight")]
+		[return: MarshalAs(UnmanagedType.I1)]
 		public static partial bool ulSessionIsPersistent(IntPtr session);
 
 		/// <summary>Unique name identifying the session (used for unique disk path).</summary>
