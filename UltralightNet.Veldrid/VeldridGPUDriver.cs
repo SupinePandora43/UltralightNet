@@ -2,6 +2,7 @@ using Supine.Unstride;
 using System;
 using System.Collections.Generic;
 using System.Numerics;
+using System.Runtime.CompilerServices;
 using UltralightNet.Veldrid.Shaders;
 using Veldrid;
 
@@ -276,6 +277,7 @@ namespace UltralightNet.Veldrid
 		}
 		#endregion RenderBuffer
 
+		[MethodImpl(MethodImplOptions.AggressiveOptimization)]
 		private void RunCommand(ULCommand command)
 		{
 			RenderBufferEntry renderBufferEntry = RenderBufferEntries[command.gpu_state.render_buffer_id];
