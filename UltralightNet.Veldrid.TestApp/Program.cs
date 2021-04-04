@@ -251,9 +251,28 @@ void main()
 
 			window.KeyDown += (kd) =>
 			{
-				ULKeyEvent kv = new(ULKeyEventType.Char, 0, 0, 0, "a", "a", false, false, false);
+				/*ULKeyEvent kv = new(ULKeyEventType.Char, 0, 0, 0, "a", "a", false, false, false);
 				view.FireKeyEvent(kv);
 				cpuView.FireKeyEvent(kv);
+				*/
+				IntPtr keyIdentifier = ULStringMarshaler.ManagedToNative("");
+
+				GetKey(ULKeyCodes.GK_TAB, keyIdentifier);
+
+				string managedKeyIdentifier = ULStringMarshaler.NativeToManaged(keyIdentifier);
+
+				ULKeyEvent ked = new(ULKeyEventType.KeyDown, ULKeyEventModifiers.ShiftKey, ULKeyCodes.GK_TAB, 0, "", null, false, false, false);
+
+				view.FireKeyEvent(ked);
+			};
+
+			window.KeyUp += (ku) =>
+			{
+				IntPtr keyIdentifier = ULStringMarshaler.ManagedToNative("");
+				GetKey(ULKeyCodes.GK_TAB, keyIdentifier);
+				string managedKeyIdentifier = ULStringMarshaler.NativeToManaged(keyIdentifier);
+				ULKeyEvent ked = new(ULKeyEventType.KeyUp, ULKeyEventModifiers.ShiftKey, ULKeyCodes.GK_TAB, 0, "", null, false, false, false);
+				view.FireKeyEvent(ked);
 			};
 
 			window.Resized += () =>
@@ -279,6 +298,15 @@ void main()
 			Stopwatch stopwatch = new();
 			stopwatch.Start();
 
+			
+			view.SetDOMReadyCallback((user_data, caller, frame_id, is_main_frame, url) =>
+			{
+				Console.WriteLine("Dom is ready");
+
+				// view.EvaluateScript("window.location = \"https://heeeeeeeey.com/\"", out string exception);
+
+				view.SetDOMReadyCallback(null);
+			});
 
 			while (window.Exists)
 			{
