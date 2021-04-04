@@ -3,70 +3,49 @@ using System.Runtime.InteropServices;
 
 namespace UltralightNet
 {
-	[NativeMarshalling(typeof(ULKeyEventNative))]
-	public struct ULKeyEvent
+	public static partial class Methods
 	{
-		public ULKeyEventType type;
-		public ULKeyEventModifiers modifiers;
-		/// <see cref="ULKeyCodes"/>
-		public int virtual_key_code;
-		public int native_key_code;
-		public string key_identifier;
-		public string text;
-		public string unmodified_text;
-		public bool is_keypad;
-		public bool is_auto_repeat;
-		public bool is_system_key;
+		[DllImport("Ultralight")]
+		public static extern IntPtr ulCreateKeyEvent(
+			ULKeyEventType type,
+			[MarshalAs(UnmanagedType.U4)] ULKeyEventModifiers modifiers,
+			int virtual_key_code, int native_key_code,
+			[MarshalAs(UnmanagedType.CustomMarshaler, MarshalTypeRef = typeof(ULStringMarshaler))] string text, [MarshalAs(UnmanagedType.CustomMarshaler, MarshalTypeRef = typeof(ULStringMarshaler))] string unmodified_text,
+			[MarshalAs(UnmanagedType.I1)] bool is_keypad,
+			[MarshalAs(UnmanagedType.I1)] bool is_auto_repeat,
+			[MarshalAs(UnmanagedType.I1)] bool is_system_key);
+
+		[DllImport("Ultralight")]
+		public static extern void ulDestroyKeyEvent(IntPtr evt);
 	}
 
-	[BlittableType]
-	public struct ULKeyEventNative
+	public class ULKeyEvent : IDisposable
 	{
-		public int type;
-		public uint modifiers;
-		public int virtual_key_code;
-		public int native_key_code;
-		public IntPtr key_identifier;
-		public IntPtr text;
-		public IntPtr unmodified_text;
-		public byte is_keypad;
-		public byte is_auto_repeat;
-		public byte is_system_key;
+		public readonly IntPtr Ptr;
+		//todo: DoDispose bool
+		public bool IsDisposed { get; private set; }
 
-		public ULKeyEventNative(ULKeyEvent keyEvent)
+		public ULKeyEvent(IntPtr ptr, bool dispose = false)
 		{
-			type = (int)keyEvent.type;
-			modifiers = (uint)keyEvent.modifiers;
-			virtual_key_code = keyEvent.virtual_key_code;
-			native_key_code = keyEvent.native_key_code;
-			key_identifier = ULStringMarshaler.ManagedToNative(keyEvent.key_identifier);
-			text = ULStringMarshaler.ManagedToNative(keyEvent.text);
-			unmodified_text = ULStringMarshaler.ManagedToNative(keyEvent.unmodified_text);
-			is_keypad = (byte)(keyEvent.is_keypad ? 1 : 0);
-			is_auto_repeat = (byte)(keyEvent.is_auto_repeat ? 1 : 0);
-			is_system_key = (byte)(keyEvent.is_system_key ? 1 : 0);
+			Ptr = ptr;
+			IsDisposed = !dispose;
 		}
 
-		public void FreeNative()
+		public ULKeyEvent(ULKeyEventType type, ULKeyEventModifiers modifiers, int virtual_key_code, int native_key_code, string text, string unmodified_text, bool is_keypad, bool is_auto_repeat, bool is_system_key)
 		{
-			ULStringMarshaler.CleanUpNative(key_identifier);
-			ULStringMarshaler.CleanUpNative(text);
-			ULStringMarshaler.CleanUpNative(unmodified_text);
+			Ptr = Methods.ulCreateKeyEvent(type, modifiers, virtual_key_code, native_key_code, text, unmodified_text, is_keypad, is_auto_repeat, is_system_key);
 		}
 
-		public ULKeyEvent ToManaged() => new()
+		~ULKeyEvent() => Dispose();
+
+		public void Dispose()
 		{
-			type = (ULKeyEventType)type,
-			modifiers = (ULKeyEventModifiers)modifiers,
-			virtual_key_code = virtual_key_code,
-			native_key_code = native_key_code,
-			key_identifier = ULStringMarshaler.NativeToManaged(key_identifier),
-			text = ULStringMarshaler.NativeToManaged(text),
-			unmodified_text = ULStringMarshaler.NativeToManaged(unmodified_text),
-			is_keypad = is_keypad != 0,
-			is_auto_repeat = is_auto_repeat != 0,
-			is_system_key = is_system_key != 0
-		};
+			if (IsDisposed) return;
+			Methods.ulDestroyKeyEvent(Ptr);
+
+			IsDisposed = true;
+			GC.SuppressFinalize(this);
+		}
 	}
 
 	/// <summary>

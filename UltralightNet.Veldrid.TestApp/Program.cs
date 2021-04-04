@@ -24,18 +24,6 @@ namespace UltralightNet.Veldrid.TestApp
 		[DllImport("Ultralight", EntryPoint = "?GetKeyIdentifierFromVirtualKeyCode@ultralight@@YAXHAEAVString@1@@Z")]
 		private static extern void GetKey(int i, IntPtr id);
 
-		[DllImport("Ultralight")]
-		private static extern IntPtr ulCreateKeyEvent(ULKeyEventType type,
-									 uint modifiers,
-									 int virtual_key_code, int native_key_code,
-									 IntPtr text, IntPtr unmodified_text,
-									 [MarshalAs(UnmanagedType.I1)]bool is_keypad, [MarshalAs(UnmanagedType.I1)] bool is_auto_repeat,
-									[MarshalAs(UnmanagedType.I1)] bool is_system_key);
-
-		[DllImport("Ultralight")]
-		private static extern void ulViewFireKeyEvent(IntPtr view, ULKeyEventNative key_event);
-
-
 		public static void Main()
 		{
 			WindowCreateInfo windowCI = new()
@@ -257,48 +245,15 @@ void main()
 				cpuView.FireScrollEvent(scrollEvent);
 			};
 
-				view.Focus();
+			// idk why
+			view.Focus();
+			cpuView.Focus();
+
 			window.KeyDown += (kd) =>
 			{
-				/*ULKeyEvent keyEvent = new()
-				{
-					type = ULKeyEventType.Char,
-					text = kd.Key.ToString().ToLower(),
-					unmodified_text = kd.Key.ToString().ToLower()
-				};*/
-				/*ULKeyEvent keyEvent = new()
-				{
-					type = ULKeyEventType.RawKeyDown,
-					virtual_key_code = ULKeyCodes.GK_DOWN,
-				};*/
-
-				//IntPtr keyEventNative = ulCreateKeyEvent(ULKeyEventType.RawKeyDown, 0, ULKeyCodes.GK_DOWN, 0, IntPtr.Zero, IntPtr.Zero, false, false, false);
-
-				IntPtr str = ULStringMarshaler.ManagedToNative("a");
-				IntPtr strEmpty = ULStringMarshaler.ManagedToNative("");
-
-				ULKeyEventNative keyEventNative = new()
-				{
-					type = 3,
-					text = str,
-					unmodified_text = str,
-
-					//key_identifier = strEmpty
-				};
-				ulViewFireKeyEvent(view.Ptr, keyEventNative);
-				ulViewFireKeyEvent(cpuView.Ptr, keyEventNative);
-
-				ULStringMarshaler.CleanUpNative(str);
-				ULStringMarshaler.CleanUpNative(strEmpty);
-				//new IntPtr();
-				/*
-				IntPtr str = ULStringMarshaler.ManagedToNative("");
-				GetKey(keyEvent.virtual_key_code, str);
-				keyEvent.key_identifier = ULStringMarshaler.NativeToManaged(str);
-				ULStringMarshaler.CleanUpNative(str);
-
-				view.FireKeyEvent(keyEvent);
-				cpuView.FireKeyEvent(keyEvent);*/
+				ULKeyEvent kv = new(ULKeyEventType.Char, 0, 0, 0, "a", "a", false, false, false);
+				view.FireKeyEvent(kv);
+				cpuView.FireKeyEvent(kv);
 			};
 
 			window.Resized += () =>

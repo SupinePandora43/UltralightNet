@@ -115,8 +115,8 @@ namespace UltralightNet
 		[return: MarshalAs(UnmanagedType.I1)]
 		public static partial bool ulViewHasInputFocus(IntPtr view);
 
-		[GeneratedDllImport("Ultralight")]
-		public static partial void ulViewFireKeyEvent(IntPtr view, ULKeyEvent key_event);
+		[DllImport("Ultralight")]
+		public static extern void ulViewFireKeyEvent(IntPtr view, IntPtr key_event);
 
 		[GeneratedDllImport("Ultralight")]
 		public static partial void ulViewFireMouseEvent(IntPtr view, ULMouseEvent mouse_event);
@@ -235,10 +235,9 @@ namespace UltralightNet
 		public bool HasFocus() => Methods.ulViewHasFocus(Ptr);
 		public bool HasInputFocus() => Methods.ulViewHasInputFocus(Ptr);
 
-		public void FireKeyEvent(ULKeyEvent keyEvent) => Methods.ulViewFireKeyEvent(Ptr, keyEvent);
+		public void FireKeyEvent(ULKeyEvent keyEvent) => Methods.ulViewFireKeyEvent(Ptr, keyEvent.Ptr);
 		public void FireMouseEvent(ULMouseEvent mouseEvent) => Methods.ulViewFireMouseEvent(Ptr, mouseEvent);
 		public void FireScrollEvent(ULScrollEvent scrollEvent) => Methods.ulViewFireScrollEvent(Ptr, scrollEvent);
-
 
 		public void SetChangeTitleCallback(ULChangeTitleCallback callback, IntPtr userData = default) => Methods.ulViewSetChangeTitleCallback(Ptr, callback, userData);
 		public void SetChangeURLCallback(ULChangeURLCallback callback, IntPtr userData = default) => Methods.ulViewSetChangeURLCallback(Ptr, callback, userData);
