@@ -1,7 +1,7 @@
 namespace UltralightNet
 {
 	/// <summary>An enumeration of the different keyboard modifiers.</summary>
-	public enum ULKeyEventModifiers: uint
+	public enum ULKeyEventModifiers: byte
 	{
 		/// <summary>Whether or not an ALT key is down</summary>
 		AltKey = 1 << 0,

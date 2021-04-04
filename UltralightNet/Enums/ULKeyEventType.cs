@@ -1,6 +1,6 @@
 namespace UltralightNet
 {
-	public enum ULKeyEventType
+	public enum ULKeyEventType: int
 	{
 		KeyDown,
 		KeyUp,

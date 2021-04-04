@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Net;
 using System.Numerics;
+using System.Runtime.InteropServices;
 using System.Text;
 using UltralightNet.AppCore;
 using Veldrid;
@@ -17,12 +18,30 @@ namespace UltralightNet.Veldrid.TestApp
 	{
 		private const GraphicsBackend BACKEND = GraphicsBackend.Direct3D11;
 
+		private const uint Width = 1024;
+		private const uint Height = 512;
+
+		[DllImport("Ultralight", EntryPoint = "?GetKeyIdentifierFromVirtualKeyCode@ultralight@@YAXHAEAVString@1@@Z")]
+		private static extern void GetKey(int i, IntPtr id);
+
+		[DllImport("Ultralight")]
+		private static extern IntPtr ulCreateKeyEvent(ULKeyEventType type,
+									 uint modifiers,
+									 int virtual_key_code, int native_key_code,
+									 IntPtr text, IntPtr unmodified_text,
+									 [MarshalAs(UnmanagedType.I1)]bool is_keypad, [MarshalAs(UnmanagedType.I1)] bool is_auto_repeat,
+									[MarshalAs(UnmanagedType.I1)] bool is_system_key);
+
+		[DllImport("Ultralight")]
+		private static extern void ulViewFireKeyEvent(IntPtr view, ULKeyEventNative key_event);
+
+
 		public static void Main()
 		{
 			WindowCreateInfo windowCI = new()
 			{
-				WindowWidth = 512,
-				WindowHeight = 512,
+				WindowWidth = (int)Width,
+				WindowHeight = (int)Height,
 				WindowTitle = "UltralightNet.Veldrid.TestApp",
 				X = 100,
 				Y = 100
@@ -137,11 +156,11 @@ void main()
 			{
 				ResourcePath = "./resources/",
 				UseGpu = true,
-				ForceRepaint = true
+				ForceRepaint = false
 			});
 
-			View view = new(renderer, 512, 512, true, Session.DefaultSession(renderer), false);
-			View cpuView = new(renderer, 512, 512, true, Session.DefaultSession(renderer), true);
+			View view = new(renderer, Width, Height, true, Session.DefaultSession(renderer), false);
+			View cpuView = new(renderer, Width, Height, true, Session.DefaultSession(renderer), true);
 
 			const string url = "https://github.com/SupinePandora43";
 
@@ -237,6 +256,51 @@ void main()
 				view.FireScrollEvent(scrollEvent);
 				cpuView.FireScrollEvent(scrollEvent);
 			};
+
+				view.Focus();
+			window.KeyDown += (kd) =>
+			{
+				/*ULKeyEvent keyEvent = new()
+				{
+					type = ULKeyEventType.Char,
+					text = kd.Key.ToString().ToLower(),
+					unmodified_text = kd.Key.ToString().ToLower()
+				};*/
+				/*ULKeyEvent keyEvent = new()
+				{
+					type = ULKeyEventType.RawKeyDown,
+					virtual_key_code = ULKeyCodes.GK_DOWN,
+				};*/
+
+				//IntPtr keyEventNative = ulCreateKeyEvent(ULKeyEventType.RawKeyDown, 0, ULKeyCodes.GK_DOWN, 0, IntPtr.Zero, IntPtr.Zero, false, false, false);
+
+				IntPtr str = ULStringMarshaler.ManagedToNative("a");
+				IntPtr strEmpty = ULStringMarshaler.ManagedToNative("");
+
+				ULKeyEventNative keyEventNative = new()
+				{
+					type = 3,
+					text = str,
+					unmodified_text = str,
+
+					//key_identifier = strEmpty
+				};
+				ulViewFireKeyEvent(view.Ptr, keyEventNative);
+				ulViewFireKeyEvent(cpuView.Ptr, keyEventNative);
+
+				ULStringMarshaler.CleanUpNative(str);
+				ULStringMarshaler.CleanUpNative(strEmpty);
+				//new IntPtr();
+				/*
+				IntPtr str = ULStringMarshaler.ManagedToNative("");
+				GetKey(keyEvent.virtual_key_code, str);
+				keyEvent.key_identifier = ULStringMarshaler.NativeToManaged(str);
+				ULStringMarshaler.CleanUpNative(str);
+
+				view.FireKeyEvent(keyEvent);
+				cpuView.FireKeyEvent(keyEvent);*/
+			};
+
 			window.Resized += () =>
 			{
 				graphicsDevice.ResizeMainWindow((uint)window.Width, (uint)window.Height);
@@ -282,6 +346,7 @@ void main()
 				}
 				else
 				{
+					Console.WriteLine("stride");
 					graphicsDevice.UpdateTexture(cpuTexture, Unstrider.Unstride(pixels, width, cpuView.Height, bpp, rowBytes - (width * bpp)), (uint)dirty.left, (uint)dirty.top, 0, (uint)(dirty.right - dirty.left), (uint)(dirty.bottom - dirty.top), 1, 0, 0);
 				}
 				surface.ClearDirtyBounds();

@@ -109,6 +109,8 @@ namespace UltralightNet
 		/// <remarks>you <b>MUST</b> call <see cref="CleanUpNativeData(IntPtr)"/> after you done</remarks>
 		public static IntPtr ManagedToNative(string managedString)
 		{
+			if (managedString is null) return IntPtr.Zero;
+
 			IntPtr ptr = Marshal.AllocHGlobal(11);
 			ULStringSTR nativeStruct = new()
 			{
@@ -130,6 +132,7 @@ namespace UltralightNet
 		/// <returns></returns>
 		public static string NativeToManaged(IntPtr ptr)
 		{
+			if (ptr == IntPtr.Zero) return null;
 			ULStringPTR result = Marshal.PtrToStructure<ULStringPTR>(ptr);
 			return Marshal.PtrToStringUni(result.data_, (int)result.length_);
 		}
@@ -140,6 +143,7 @@ namespace UltralightNet
 		/// <param name="ptr">ULString pointer</param>
 		public static void CleanUpNative(IntPtr ptr)
 		{
+			if (ptr == IntPtr.Zero) return;
 			Marshal.DestroyStructure<ULStringSTR>(ptr);
 			//Marshal.FreeHGlobal(ptr);
 		}

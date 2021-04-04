@@ -20,7 +20,7 @@ namespace UltralightNet
 	}
 
 	[BlittableType]
-	internal struct ULKeyEventNative
+	public struct ULKeyEventNative
 	{
 		public int type;
 		public uint modifiers;
