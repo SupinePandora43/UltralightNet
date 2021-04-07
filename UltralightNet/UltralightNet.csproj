@@ -16,8 +16,10 @@
 		<Description>Ultralight .NET bindings</Description>
 	</PropertyGroup>
 	<ItemGroup>
-		<PackageReference Include="Ancillary.Interop" Version="1.0.0-alpha.20604.3" />
 		<PackageReference Include="DllImportGenerator" Version="1.0.0-alpha.20604.3" OutputItemType="Analyzer" ReferenceOutputAssembly="false" PrivateAssets="All" />
 		<PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0" PrivateAssets="All" />
+
+		<PackageReference Condition="'$(TargetFramework)'=='net45'" Include="System.Memory" Version="4.5.4" />
+		<PackageReference Condition="'$(TargetFramework)'=='net45'" Include="System.Numerics.Vectors" Version="4.5.0" />
 	</ItemGroup>
 </Project>
