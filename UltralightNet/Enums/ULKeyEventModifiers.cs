@@ -1,6 +1,9 @@
+using System;
+
 namespace UltralightNet
 {
 	/// <summary>An enumeration of the different keyboard modifiers.</summary>
+	[Flags]
 	public enum ULKeyEventModifiers: uint
 	{
 		/// <summary>Whether or not an ALT key is down</summary>

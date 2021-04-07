@@ -261,9 +261,17 @@ void main()
 
 				string managedKeyIdentifier = ULStringMarshaler.NativeToManaged(keyIdentifier);
 
-				ULKeyEvent ked = new(ULKeyEventType.KeyDown, ULKeyEventModifiers.ShiftKey, ULKeyCodes.GK_TAB, 0, "", null, false, false, false);
+				ULKeyEventModifiers modifiers = 0;
+
+				if ((kd.Modifiers & ModifierKeys.Alt) is ModifierKeys.Alt) modifiers |= ULKeyEventModifiers.AltKey;
+				if ((kd.Modifiers & ModifierKeys.Control) is ModifierKeys.Control) modifiers |= ULKeyEventModifiers.CtrlKey;
+				if ((kd.Modifiers & ModifierKeys.Shift) is ModifierKeys.Shift) modifiers |= ULKeyEventModifiers.ShiftKey;
+				if ((kd.Modifiers & ModifierKeys.Gui) is ModifierKeys.Gui) modifiers |= ULKeyEventModifiers.MetaKey;
+
+				ULKeyEvent ked = new(ULKeyEventType.KeyDown, modifiers, ULKeyCodes.GK_TAB, 0, "", null, false, false, false);
 
 				view.FireKeyEvent(ked);
+				cpuView.FireKeyEvent(ked);
 			};
 
 			window.KeyUp += (ku) =>
@@ -271,8 +279,9 @@ void main()
 				IntPtr keyIdentifier = ULStringMarshaler.ManagedToNative("");
 				GetKey(ULKeyCodes.GK_TAB, keyIdentifier);
 				string managedKeyIdentifier = ULStringMarshaler.NativeToManaged(keyIdentifier);
-				ULKeyEvent ked = new(ULKeyEventType.KeyUp, ULKeyEventModifiers.ShiftKey, ULKeyCodes.GK_TAB, 0, "", null, false, false, false);
+				ULKeyEvent ked = new(ULKeyEventType.KeyUp, 0, ULKeyCodes.GK_TAB, 0, "", null, false, false, false);
 				view.FireKeyEvent(ked);
+				cpuView.FireKeyEvent(ked);
 			};
 
 			window.Resized += () =>
@@ -298,7 +307,7 @@ void main()
 			Stopwatch stopwatch = new();
 			stopwatch.Start();
 
-			
+
 			view.SetDOMReadyCallback((user_data, caller, frame_id, is_main_frame, url) =>
 			{
 				Console.WriteLine("Dom is ready");
@@ -321,16 +330,17 @@ void main()
 
 				IntPtr pixels = bitmap.LockPixels();
 				uint rowBytes = bitmap.RowBytes;
+				uint height = bitmap.Height;
 				uint width = bitmap.Width;
 				uint bpp = bitmap.Bpp;
 				if (rowBytes == width * bpp)
 				{
-					graphicsDevice.UpdateTexture(cpuTexture, pixels, (uint)bitmap.Size, (uint)dirty.left,(uint) dirty.top, 0, (uint)(dirty.right - dirty.left), (uint)(dirty.bottom - dirty.top), 1, 0, 0);
+					graphicsDevice.UpdateTexture(cpuTexture, pixels, (uint)bitmap.Size, 0, 0, 0, width, height, 1, 0, 0);
 				}
 				else
 				{
 					Console.WriteLine("stride");
-					graphicsDevice.UpdateTexture(cpuTexture, Unstrider.Unstride(pixels, width, cpuView.Height, bpp, rowBytes - (width * bpp)), (uint)dirty.left, (uint)dirty.top, 0, (uint)(dirty.right - dirty.left), (uint)(dirty.bottom - dirty.top), 1, 0, 0);
+					graphicsDevice.UpdateTexture(cpuTexture, Unstrider.Unstride(pixels, width, cpuView.Height, bpp, rowBytes - (width * bpp)), 0, 0, 0, width, height, 1, 0, 0);
 				}
 				surface.ClearDirtyBounds();
 				bitmap.UnlockPixels();

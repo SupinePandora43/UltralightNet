@@ -78,8 +78,8 @@ namespace UltralightNet.Veldrid
 		}
 		public ULGPUDriver GetGPUDriver() => new()
 		{
-			BeginSynchronize = nothing,
-			EndSynchronize = nothing,
+			BeginSynchronize = null,
+			EndSynchronize = null,
 
 			NextTextureId = NextTextureId,
 			NextGeometryId = NextGeometryId,
@@ -98,7 +98,6 @@ namespace UltralightNet.Veldrid
 
 			UpdateCommandList = UpdateCommandList
 		};
-		private void nothing() { }
 
 		#region NextId
 
