@@ -1,6 +1,6 @@
 <Project Sdk="Microsoft.NET.Sdk">
 	<PropertyGroup>
-		<TargetFrameworks>net5.0;net45</TargetFrameworks>
+		<TargetFrameworks>net5.0;net45;netstandard2</TargetFrameworks>
 		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
 		<EmitCompilerGeneratedFiles>true</EmitCompilerGeneratedFiles>
 		<LangVersion>preview</LangVersion>
@@ -20,7 +20,7 @@
 		<PackageReference Condition="'$(TargetFramework)'=='net5.0'" Include="DllImportGenerator" Version="1.0.0-alpha.20604.3" OutputItemType="Analyzer" ReferenceOutputAssembly="false" PrivateAssets="All" />
 		<PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0" PrivateAssets="All" />
 
-		<PackageReference Condition="'$(TargetFramework)'=='net45'" Include="System.Memory" Version="4.5.4" />
-		<PackageReference Condition="'$(TargetFramework)'=='net45'" Include="System.Numerics.Vectors" Version="4.5.0" />
+		<PackageReference Condition="'$(TargetFramework)'!='net5.0'" Include="System.Memory" Version="4.5.4" />
+		<PackageReference Condition="'$(TargetFramework)'!='net5.0'" Include="System.Numerics.Vectors" Version="4.5.0" />
 	</ItemGroup>
 </Project>
