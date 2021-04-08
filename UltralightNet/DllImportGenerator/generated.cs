@@ -6,7 +6,7 @@
 
 using System;
 
-#pragma warning disable 0059
+#pragma warning disable IDE0059
 
 namespace System.Runtime.CompilerServices
 {
@@ -1200,5 +1200,7 @@ namespace UltralightNet
         extern private static unsafe byte ulViewGetNeedsPaint__PInvoke__(global::System.IntPtr view);
     }
 }
+
+#pragma warning restore IDE0059
 
 #endif
