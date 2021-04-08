@@ -10,9 +10,13 @@ namespace UltralightNet
 		public static partial IntPtr ulCreateString([MarshalAs(UnmanagedType.LPStr)] string str);
 
 		/// <summary>Create string from UTF-8 buffer.</summary>
+#if NET5_0_OR_GREATER
 		[GeneratedDllImport("Ultralight")]
 		[Obsolete("Unexpected behaviour")]
 		public static partial IntPtr ulCreateStringUTF8([MarshalAs(UnmanagedType.LPUTF8Str)] string str, uint len);
+#else
+		public static partial IntPtr ulCreateStringUTF8([MarshalAs(UnmanagedType.LPStr)] string str, uint len);
+#endif
 
 		/// <summary>Create string from UTF-16 buffer.</summary>
 		[GeneratedDllImport("Ultralight", CharSet = CharSet.Unicode)]
@@ -49,8 +53,12 @@ namespace UltralightNet
 		[DllImport("Ultralight")]
 		public static extern void ulStringAssignString(IntPtr str, IntPtr newStr);
 
+#if NET5_0_OR_GREATER
 		[GeneratedDllImport("Ultralight", CharSet = CharSet.Ansi)]
 		public static partial void ulStringAssignCString(IntPtr str, [MarshalAs(UnmanagedType.LPUTF8Str)] string c_str);
+#else
+		public static partial void ulStringAssignCString(IntPtr str, [MarshalAs(UnmanagedType.LPStr)] string c_str);
+#endif
 	}
 
 	public class ULStringMarshaler : ICustomMarshaler
@@ -133,7 +141,11 @@ namespace UltralightNet
 		public static string NativeToManaged(IntPtr ptr)
 		{
 			if (ptr == IntPtr.Zero) return null;
+#if NET5_0_OR_GREATER
 			ULStringPTR result = Marshal.PtrToStructure<ULStringPTR>(ptr);
+#else
+			ULStringPTR result = (ULStringPTR)Marshal.PtrToStructure(ptr, typeof(ULStringPTR));
+#endif
 			return Marshal.PtrToStringUni(result.data_, (int)result.length_);
 		}
 
@@ -144,7 +156,11 @@ namespace UltralightNet
 		public static void CleanUpNative(IntPtr ptr)
 		{
 			if (ptr == IntPtr.Zero) return;
+#if NET5_0_OR_GREATER
 			Marshal.DestroyStructure<ULStringSTR>(ptr);
+#else
+			Marshal.DestroyStructure(ptr, typeof(ULStringSTR));
+#endif
 			//Marshal.FreeHGlobal(ptr);
 		}
 

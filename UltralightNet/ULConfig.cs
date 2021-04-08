@@ -188,7 +188,11 @@ namespace UltralightNet
 		}
 		public ULConfig_C ULConfig_C
 		{
+#if NET5_0_OR_GREATER
 			get => Marshal.PtrToStructure<ULConfig_C>(Ptr);
+#else
+			get => (ULConfig_C)Marshal.PtrToStructure(Ptr, typeof(ULConfig_C));
+#endif
 		}
 
 		public ULConfig(bool dispose = true)
