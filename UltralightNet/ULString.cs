@@ -133,6 +133,22 @@ namespace UltralightNet
 			return ptr;
 		}
 
+		public static void ManagedToNative(string managedString, IntPtr ptr)
+		{
+			if (managedString is null || ptr == IntPtr.Zero) return;
+
+			ULStringSTR nativeStruct = new()
+			{
+				data_ = managedString,
+				length_ = (uint)managedString.Length
+			};
+			Marshal.StructureToPtr(
+				nativeStruct,
+				ptr,
+				false
+			);
+		}
+
 		/// <summary>
 		/// Creates <see cref="string"/> from ULString pointer
 		/// </summary>
