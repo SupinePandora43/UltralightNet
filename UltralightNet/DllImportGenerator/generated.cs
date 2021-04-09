@@ -4,6 +4,8 @@
 
 #pragma warning disable IDE0059
 
+using System;
+
 namespace UltralightNet
 {
 	public static partial class Methods
