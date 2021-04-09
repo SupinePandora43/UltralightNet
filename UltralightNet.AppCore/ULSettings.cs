@@ -21,10 +21,10 @@ namespace UltralightNet.AppCore
 		public static extern void ulSettingsSetFileSystemPath(IntPtr settings, [MarshalAs(UnmanagedType.CustomMarshaler, MarshalTypeRef = typeof(ULStringMarshaler))] string path);
 
 		[GeneratedDllImport("AppCore")]
-		public static partial void ulSettingsSetLoadShadersFromFileSystem(IntPtr settings, bool enabled);
+		public static partial void ulSettingsSetLoadShadersFromFileSystem(IntPtr settings, [MarshalAs(UnmanagedType.I1)] bool enabled);
 
 		[GeneratedDllImport("AppCore")]
-		public static partial void ulSettingsSetForceCPURenderer(IntPtr settings, bool force_cpu);
+		public static partial void ulSettingsSetForceCPURenderer(IntPtr settings, [MarshalAs(UnmanagedType.I1)] bool force_cpu);
 	}
 
 	public struct ULSettings_C
@@ -32,7 +32,9 @@ namespace UltralightNet.AppCore
 		public ULStringMarshaler.ULStringPTR developer_name;
 		public ULStringMarshaler.ULStringPTR app_name;
 		public ULStringMarshaler.ULStringPTR file_system_path;
+		[MarshalAs(UnmanagedType.I1)]
 		public bool load_shaders_from_file_system;
+		[MarshalAs(UnmanagedType.I1)]
 		public bool force_cpu_renderer;
 	}
 
@@ -51,9 +53,11 @@ namespace UltralightNet.AppCore
 			IsDisposed = !dispose;
 			Ptr = AppCoreMethods.ulCreateSettings();
 		}
-
+#if NET5_0_OR_GREATER || NET_4_5_1 || NETSTANDARD2_0
 		public ULSettings_C ULSettings_C => Marshal.PtrToStructure<ULSettings_C>(Ptr);
-
+#else
+		public ULSettings_C ULSettings_C => (ULSettings_C)Marshal.PtrToStructure(Ptr, typeof(ULSettings_C));
+#endif
 		public string DeveloperName
 		{
 			get => ULSettings_C.developer_name.ToManaged();

@@ -141,7 +141,7 @@ namespace UltralightNet
 		public static string NativeToManaged(IntPtr ptr)
 		{
 			if (ptr == IntPtr.Zero) return null;
-#if NET5_0_OR_GREATER
+#if NET5_0_OR_GREATER || NET_4_5_1 || NETSTANDARD2_0
 			ULStringPTR result = Marshal.PtrToStructure<ULStringPTR>(ptr);
 #else
 			ULStringPTR result = (ULStringPTR)Marshal.PtrToStructure(ptr, typeof(ULStringPTR));
@@ -156,7 +156,7 @@ namespace UltralightNet
 		public static void CleanUpNative(IntPtr ptr)
 		{
 			if (ptr == IntPtr.Zero) return;
-#if NET5_0_OR_GREATER
+#if NET5_0_OR_GREATER || NET_4_5_1 || NETSTANDARD2_0
 			Marshal.DestroyStructure<ULStringSTR>(ptr);
 #else
 			Marshal.DestroyStructure(ptr, typeof(ULStringSTR));
@@ -164,6 +164,6 @@ namespace UltralightNet
 			//Marshal.FreeHGlobal(ptr);
 		}
 
-		#endregion Code
+#endregion Code
 	}
 }

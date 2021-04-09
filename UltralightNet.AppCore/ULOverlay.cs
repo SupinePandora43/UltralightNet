@@ -36,6 +36,7 @@ namespace UltralightNet.AppCore
 		public static extern void ulOverlayResize(IntPtr overlay, uint width, uint height);
 
 		[GeneratedDllImport("AppCore")]
+		[return: MarshalAs(UnmanagedType.I1)]
 		public static partial bool ulOverlayIsHidden(IntPtr overlay);
 
 		[DllImport("AppCore")]
@@ -45,6 +46,7 @@ namespace UltralightNet.AppCore
 		public static extern void ulOverlayShow(IntPtr overlay);
 
 		[GeneratedDllImport("AppCore")]
+		[return: MarshalAs(UnmanagedType.I1)]
 		public static partial bool ulOverlayHasFocus(IntPtr overlay);
 
 		[DllImport("AppCore")]

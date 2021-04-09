@@ -1,6 +1,6 @@
 <Project Sdk="Microsoft.NET.Sdk">
 	<PropertyGroup>
-		<TargetFrameworks>net5;netstandard1</TargetFrameworks>
+		<TargetFrameworks>net5;net45;netstandard1</TargetFrameworks>
 		<NoBuild>false</NoBuild>
 		<IncludeBuildOutput>true</IncludeBuildOutput>
 		<DisableImplicitFrameworkReferences>false</DisableImplicitFrameworkReferences>

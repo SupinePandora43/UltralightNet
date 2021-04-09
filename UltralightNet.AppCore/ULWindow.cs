@@ -6,7 +6,7 @@ namespace UltralightNet.AppCore
 	public static partial class AppCoreMethods
 	{
 		[GeneratedDllImport("AppCore")]
-		public static partial IntPtr ulCreateWindow(IntPtr monitor, uint width, uint height, bool fullscreen, ULWindowFlags flags);
+		public static partial IntPtr ulCreateWindow(IntPtr monitor, uint width, uint height, [MarshalAs(UnmanagedType.I1)] bool fullscreen, ULWindowFlags flags);
 
 		[DllImport("AppCore")]
 		public static extern void ulDestroyWindow(IntPtr window);
@@ -24,6 +24,7 @@ namespace UltralightNet.AppCore
 		public static extern uint ulWindowGetHeight(IntPtr window);
 
 		[GeneratedDllImport("AppCore")]
+		[return: MarshalAs(UnmanagedType.I1)]
 		public static partial bool ulWindowIsFullscreen(IntPtr window);
 
 		[DllImport("AppCore")]
