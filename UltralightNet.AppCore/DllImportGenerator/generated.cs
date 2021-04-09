@@ -1,18 +1,11 @@
-#if (!NET5_0) || (!NET5_0_OR_GREATER)
-
 using System;
 
 #pragma warning disable IDE0059
-
-namespace System.Runtime.CompilerServices {
-	internal class SkipLocalsInitAttribute: Attribute { }
-}
 
 namespace UltralightNet.AppCore
 {
 	public static partial class AppCoreMethods
 	{
-		[System.Runtime.CompilerServices.SkipLocalsInitAttribute]
 		public static partial void ulSettingsSetLoadShadersFromFileSystem(global::System.IntPtr settings, bool enabled)
 		{
 			unsafe
@@ -37,7 +30,6 @@ namespace UltralightNet.AppCore
 {
 	public static partial class AppCoreMethods
 	{
-		[System.Runtime.CompilerServices.SkipLocalsInitAttribute]
 		public static partial void ulSettingsSetForceCPURenderer(global::System.IntPtr settings, bool force_cpu)
 		{
 			unsafe
@@ -62,7 +54,6 @@ namespace UltralightNet.AppCore
 {
 	public static partial class AppCoreMethods
 	{
-		[System.Runtime.CompilerServices.SkipLocalsInitAttribute]
 		public static partial bool ulOverlayIsHidden(global::System.IntPtr overlay)
 		{
 			unsafe
@@ -89,7 +80,6 @@ namespace UltralightNet.AppCore
 {
 	public static partial class AppCoreMethods
 	{
-		[System.Runtime.CompilerServices.SkipLocalsInitAttribute]
 		public static partial bool ulOverlayHasFocus(global::System.IntPtr overlay)
 		{
 			unsafe
@@ -116,7 +106,6 @@ namespace UltralightNet.AppCore
 {
 	public static partial class AppCoreMethods
 	{
-		[System.Runtime.CompilerServices.SkipLocalsInitAttribute]
 		public static partial bool ulAppIsRunning(global::System.IntPtr app)
 		{
 			unsafe
@@ -143,7 +132,6 @@ namespace UltralightNet.AppCore
 {
 	public static partial class AppCoreMethods
 	{
-		[System.Runtime.CompilerServices.SkipLocalsInitAttribute]
 		public static partial global::System.IntPtr ulCreateWindow(global::System.IntPtr monitor, uint width, uint height, bool fullscreen, global::UltralightNet.AppCore.ULWindowFlags flags)
 		{
 			unsafe
@@ -170,7 +158,6 @@ namespace UltralightNet.AppCore
 {
 	public static partial class AppCoreMethods
 	{
-		[System.Runtime.CompilerServices.SkipLocalsInitAttribute]
 		public static partial bool ulWindowIsFullscreen(global::System.IntPtr window)
 		{
 			unsafe
@@ -197,7 +184,6 @@ namespace UltralightNet.AppCore
 {
 	public static partial class AppCoreMethods
 	{
-		[System.Runtime.CompilerServices.SkipLocalsInitAttribute]
 		public static partial void ulWindowSetTitle(global::System.IntPtr window, string title)
 		{
 #if NET5_0_OR_GREATER
@@ -268,5 +254,3 @@ namespace UltralightNet.AppCore
 }
 
 #pragma warning restore IDE0059
-
-#endif
