@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<TargetFrameworks>net5.0;net451;net45;netstandard2</TargetFrameworks>
+		<TargetFrameworks>net5.0;net451;net45;netstandard2.1;netstandard2</TargetFrameworks>
 		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
 		<LangVersion>preview</LangVersion>
 
