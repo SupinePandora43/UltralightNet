@@ -31,13 +31,7 @@ namespace UltralightNet
 
 	public class Renderer : IDisposable
 	{
-		public IntPtr Ptr
-		{
-			[MethodImpl(MethodImplOptions.AggressiveInlining)]
-			get;
-			[MethodImpl(MethodImplOptions.AggressiveInlining)]
-			private set;
-		}
+		public readonly IntPtr Ptr;
 
 		public Renderer(IntPtr ptr, bool dispose = false)
 		{

@@ -1,3 +1,4 @@
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
 namespace UltralightNet
@@ -10,8 +11,8 @@ namespace UltralightNet
 		public static partial bool ulIntRectIsEmpty(ULIntRect rect);
 
 		/// <summary>Create an empty ULIntRect (all members equal to 0)</summary>
-		[GeneratedDllImport("Ultralight")]
-		public static partial ULIntRect ulIntRectMakeEmpty();
+		[DllImport("Ultralight")]
+		public static extern ULIntRect ulIntRectMakeEmpty();
 	}
 
 	[BlittableType]
@@ -22,7 +23,11 @@ namespace UltralightNet
 		public int right;
 		public int bottom;
 
-		public bool IsEmpty => Methods.ulIntRectIsEmpty(this);
+		public bool IsEmpty
+		{
+			[MethodImpl(MethodImplOptions.AggressiveInlining)]
+			get => Methods.ulIntRectIsEmpty(this);
+		}
 
 		public bool IsManagedEmpty() => Equals(default(ULIntRect));
 

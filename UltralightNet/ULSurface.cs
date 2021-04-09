@@ -1,4 +1,5 @@
 using System;
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
 namespace UltralightNet
@@ -39,13 +40,13 @@ namespace UltralightNet
 		public static extern void ulSurfaceResize(IntPtr surface, uint width, uint height);
 
 		/// <summary>Set the dirty bounds to a certain value.</summary>
-		[GeneratedDllImport("Ultralight")]
-		public static partial void ulSurfaceSetDirtyBounds(IntPtr surface, ULIntRect bounds);
+		[DllImport("Ultralight")]
+		public static extern void ulSurfaceSetDirtyBounds(IntPtr surface, ULIntRect bounds);
 
 		/// <summary>Get the dirty bounds.</summary>
 		// todo: example code
-		[GeneratedDllImport("Ultralight")]
-		public static partial ULIntRect ulSurfaceGetDirtyBounds(IntPtr surface);
+		[DllImport("Ultralight")]
+		public static extern ULIntRect ulSurfaceGetDirtyBounds(IntPtr surface);
 
 		/// <summary>Clear the dirty bounds.</summary>
 		[DllImport("Ultralight")]
@@ -62,7 +63,7 @@ namespace UltralightNet
 
 	public class ULSurface
 	{
-		public IntPtr Ptr { get; private set; }
+		public readonly IntPtr Ptr;
 		public ULSurface(IntPtr ptr) => Ptr = ptr;
 
 		public uint Width => Methods.ulSurfaceGetWidth(Ptr);
@@ -76,11 +77,21 @@ namespace UltralightNet
 
 		public void Resize(uint width, uint height) => Methods.ulSurfaceResize(Ptr, width, height);
 
-		public ULIntRect DirtyBounds { get => Methods.ulSurfaceGetDirtyBounds(Ptr); set => Methods.ulSurfaceSetDirtyBounds(Ptr, value); }
+		public ULIntRect DirtyBounds
+		{
+			[MethodImpl(MethodImplOptions.AggressiveInlining)]
+			get => Methods.ulSurfaceGetDirtyBounds(Ptr);
+			set => Methods.ulSurfaceSetDirtyBounds(Ptr, value);
+		}
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public void ClearDirtyBounds() => Methods.ulSurfaceClearDirtyBounds(Ptr);
 
 		public IntPtr UserData => Methods.ulSurfaceGetUserData(Ptr);
 
-		public ULBitmap Bitmap => new(Methods.ulBitmapSurfaceGetBitmap(Ptr));
+		public ULBitmap Bitmap
+		{
+			[MethodImpl(MethodImplOptions.AggressiveInlining)]
+			get => new(Methods.ulBitmapSurfaceGetBitmap(Ptr));
+		}
 	}
 }

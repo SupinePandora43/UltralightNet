@@ -1,4 +1,5 @@
 using System;
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
 namespace UltralightNet
@@ -94,7 +95,7 @@ namespace UltralightNet
 	}
 	public class ULBitmap : IDisposable, ICloneable
 	{
-		public IntPtr Ptr { get; private set; }
+		public readonly IntPtr Ptr;
 		public bool IsDisposed { get; private set; }
 
 		public ULBitmap(IntPtr ptr, bool dispose = false)
@@ -106,24 +107,55 @@ namespace UltralightNet
 		public ULBitmap(uint width, uint height, ULBitmapFormat format) => Ptr = Methods.ulCreateBitmap(width, height, format);
 		public ULBitmap(uint width, uint height, ULBitmapFormat format, uint row_bytes, IntPtr pixels, uint size, bool should_copy) => Ptr = Methods.ulCreateBitmapFromPixels(width, height, format, row_bytes, pixels, size, should_copy);
 
-		public uint Width => Methods.ulBitmapGetWidth(Ptr);
-		public uint Height => Methods.ulBitmapGetHeight(Ptr);
+		public uint Width
+		{
+			[MethodImpl(MethodImplOptions.AggressiveInlining)]
+			get => Methods.ulBitmapGetWidth(Ptr);
+		}
+		public uint Height
+		{
+			[MethodImpl(MethodImplOptions.AggressiveInlining)]
+			get => Methods.ulBitmapGetHeight(Ptr);
+		}
 
 		public ULBitmapFormat Format => Methods.ulBitmapGetFormat(Ptr);
-		public uint Bpp => Methods.ulBitmapGetBpp(Ptr);
-		public uint RowBytes => Methods.ulBitmapGetRowBytes(Ptr);
-		public nuint Size => Methods.ulBitmapGetSize(Ptr);
+		public uint Bpp
+		{
+			[MethodImpl(MethodImplOptions.AggressiveInlining)]
+			get => Methods.ulBitmapGetBpp(Ptr);
+		}
+		public uint RowBytes
+		{
+			[MethodImpl(MethodImplOptions.AggressiveInlining)]
+			get => Methods.ulBitmapGetRowBytes(Ptr);
+		}
+		public nuint Size
+		{
+			[MethodImpl(MethodImplOptions.AggressiveInlining)]
+			get => Methods.ulBitmapGetSize(Ptr);
+		}
 
 		public bool OwnsPixels => Methods.ulBitmapOwnsPixels(Ptr);
 
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public IntPtr LockPixels() => Methods.ulBitmapLockPixels(Ptr);
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public void UnlockPixels() => Methods.ulBitmapUnlockPixels(Ptr);
-		public IntPtr RawPixels => Methods.ulBitmapRawPixels(Ptr);
 
-		public bool IsEmpty => Methods.ulBitmapIsEmpty(Ptr);
+		public IntPtr RawPixels
+		{
+			[MethodImpl(MethodImplOptions.AggressiveInlining)]
+			get => Methods.ulBitmapRawPixels(Ptr);
+		}
+		public bool IsEmpty
+		{
+			[MethodImpl(MethodImplOptions.AggressiveInlining)]
+			get => Methods.ulBitmapIsEmpty(Ptr);
+		}
 		public void Erase() => Methods.ulBitmapErase(Ptr);
 
 		public bool WritePng(string path) => Methods.ulBitmapWritePNG(Ptr, path);
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public void SwapRedBlueChannels() => Methods.ulBitmapSwapRedBlueChannels(Ptr);
 
 		~ULBitmap() => Dispose();

@@ -2,8 +2,6 @@
 // + (side story) https://github.com/dotnet/runtimelab/issues/938
 
 
-using System;
-
 #pragma warning disable IDE0059
 
 namespace UltralightNet
@@ -462,27 +460,6 @@ namespace UltralightNet
 {
 	public static partial class Methods
 	{
-		public static partial global::UltralightNet.ULIntRect ulIntRectMakeEmpty()
-		{
-			unsafe
-			{
-				global::UltralightNet.ULIntRect __retVal = default;
-				//
-				// Invoke
-				//
-				__retVal = ulIntRectMakeEmpty__PInvoke__();
-				return __retVal;
-			}
-		}
-
-		[System.Runtime.InteropServices.DllImportAttribute("Ultralight", EntryPoint = "ulIntRectMakeEmpty")]
-		extern private static unsafe global::UltralightNet.ULIntRect ulIntRectMakeEmpty__PInvoke__();
-	}
-}
-namespace UltralightNet
-{
-	public static partial class Methods
-	{
 		public static partial bool ulRectIsEmpty(global::UltralightNet.ULRect rect)
 		{
 			unsafe
@@ -833,46 +810,6 @@ namespace UltralightNet
 {
 	public static partial class Methods
 	{
-		public static partial void ulSurfaceSetDirtyBounds(global::System.IntPtr surface, global::UltralightNet.ULIntRect bounds)
-		{
-			unsafe
-			{
-				//
-				// Invoke
-				//
-				ulSurfaceSetDirtyBounds__PInvoke__(surface, bounds);
-			}
-		}
-
-		[System.Runtime.InteropServices.DllImportAttribute("Ultralight", EntryPoint = "ulSurfaceSetDirtyBounds")]
-		extern private static unsafe void ulSurfaceSetDirtyBounds__PInvoke__(global::System.IntPtr surface, global::UltralightNet.ULIntRect bounds);
-	}
-}
-namespace UltralightNet
-{
-	public static partial class Methods
-	{
-		public static partial global::UltralightNet.ULIntRect ulSurfaceGetDirtyBounds(global::System.IntPtr surface)
-		{
-			unsafe
-			{
-				global::UltralightNet.ULIntRect __retVal = default;
-				//
-				// Invoke
-				//
-				__retVal = ulSurfaceGetDirtyBounds__PInvoke__(surface);
-				return __retVal;
-			}
-		}
-
-		[System.Runtime.InteropServices.DllImportAttribute("Ultralight", EntryPoint = "ulSurfaceGetDirtyBounds")]
-		extern private static unsafe global::UltralightNet.ULIntRect ulSurfaceGetDirtyBounds__PInvoke__(global::System.IntPtr surface);
-	}
-}
-namespace UltralightNet
-{
-	public static partial class Methods
-	{
 		public static partial global::System.IntPtr ulCreateView(global::System.IntPtr renderer, uint width, uint height, bool transparent, global::System.IntPtr session, bool force_cpu_renderer)
 		{
 			unsafe
@@ -1151,5 +1088,14 @@ namespace UltralightNet
 		extern private static unsafe byte ulViewGetNeedsPaint__PInvoke__(global::System.IntPtr view);
 	}
 }
+namespace UltralightNet
+{
+	public static partial class Methods
+	{
+		public static partial global::System.Numerics.Matrix4x4 ulApplyProjection(global::System.Numerics.Matrix4x4 transform, float viewport_width, float viewport_height, bool flip_y) => ulApplyProjection__PInvoke__(transform, viewport_width, viewport_height, (byte)(flip_y ? 1 : 0));
 
+		[System.Runtime.InteropServices.DllImportAttribute("Ultralight", EntryPoint = "ulApplyProjection")]
+		internal static extern global::System.Numerics.Matrix4x4 ulApplyProjection__PInvoke__(global::System.Numerics.Matrix4x4 transform, float viewport_width, float viewport_height, byte flip_y);
+	}
+}
 #pragma warning restore IDE0059
