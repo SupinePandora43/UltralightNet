@@ -1,6 +1,6 @@
 <Project>
 	<PropertyGroup>
-		<Version>1.2.1-alpha.6</Version>
+		<Version>1.2.1-alpha.7</Version>
 
 		<Authors>Supine</Authors>
 		<PackageProjectUrl>https://github.com/SupinePandora43/UltralightNet</PackageProjectUrl>
