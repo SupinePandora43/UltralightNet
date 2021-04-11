@@ -188,7 +188,7 @@ namespace UltralightNet
 		}
 		public ULConfig_C ULConfig_C
 		{
-#if NET5_0_OR_GREATER || NET_4_5_1 || NETSTANDARD2_0
+#if NET5_0_OR_GREATER || NET451 || NETSTANDARD2_0
 			get => Marshal.PtrToStructure<ULConfig_C>(Ptr);
 #else
 			get => (ULConfig_C)Marshal.PtrToStructure(Ptr, typeof(ULConfig_C));

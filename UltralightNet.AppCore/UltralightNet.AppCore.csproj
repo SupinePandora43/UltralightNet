@@ -14,8 +14,6 @@
 		<Description>AppCore's binaries and bindings</Description>
 
 		<PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
-
-		<DefineConstants Condition="'$(TargetFramework)'=='net451'">$(DefineConstants);NET_4_5_1</DefineConstants>
 	</PropertyGroup>
 	<ItemGroup>
 		<None Include="../Ultralight_LICENSE.txt" Pack="true" PackagePath="LICENSE.txt" />

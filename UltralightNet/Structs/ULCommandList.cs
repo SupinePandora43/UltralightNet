@@ -1,4 +1,5 @@
 using System;
+using System.Runtime.CompilerServices;
 
 namespace UltralightNet
 {
@@ -8,7 +9,8 @@ namespace UltralightNet
 		public uint size;
 		public IntPtr commandsPtr;
 
-		public Span<ULCommand> ToSpan()
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		public ReadOnlySpan<ULCommand> ToSpan()
 		{
 			unsafe
 			{

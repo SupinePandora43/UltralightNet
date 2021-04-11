@@ -14,8 +14,6 @@
 
 		<PackageId>UltralightNet</PackageId>
 		<Description>Ultralight .NET bindings</Description>
-
-		<DefineConstants Condition="'$(TargetFramework)'=='net451'">$(DefineConstants);NET_4_5_1</DefineConstants>
 	</PropertyGroup>
 	<ItemGroup>
 
