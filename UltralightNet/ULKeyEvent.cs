@@ -16,9 +16,18 @@ namespace UltralightNet
 			[MarshalAs(UnmanagedType.I1)] bool is_system_key);
 
 		[DllImport("Ultralight")]
+		public static extern IntPtr ulCreateKeyEventWindows(ULKeyEventType type, UIntPtr wparam, IntPtr lparam);
+
+		[DllImport("Ultralight")]
+		public static extern IntPtr ulCreateKeyEventMacOS(IntPtr evt);
+
+		[DllImport("Ultralight")]
 		public static extern void ulDestroyKeyEvent(IntPtr evt);
 	}
 
+	/// <summary>
+	/// A generic keyboard event
+	/// </summary>
 	public class ULKeyEvent : IDisposable
 	{
 		public readonly IntPtr Ptr;
@@ -35,6 +44,22 @@ namespace UltralightNet
 		{
 			Ptr = Methods.ulCreateKeyEvent(type, modifiers, virtual_key_code, native_key_code, text, unmodified_text, is_keypad, is_auto_repeat, is_system_key);
 		}
+
+		/// <summary>
+		/// Create <see cref="ULKeyEvent"/> from Windows event
+		/// </summary>
+		public ULKeyEvent(ULKeyEventType type, UIntPtr wparam, IntPtr lparam)
+		{
+			Ptr = Methods.ulCreateKeyEventWindows(type, wparam, lparam);
+		}
+
+		/// <summary>
+		/// Create a key event from native macOS event.
+		/// </summary>
+		/// <param name="evt">NSEvent*</param>
+		public static ULKeyEvent CreateFromNSEvent(IntPtr evt)
+			=> new(Methods.ulCreateKeyEventMacOS(evt), true);
+
 
 		~ULKeyEvent() => Dispose();
 
