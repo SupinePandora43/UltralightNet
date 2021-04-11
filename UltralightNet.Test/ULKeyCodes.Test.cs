@@ -41,7 +41,6 @@ namespace UltralightNet.Test
 			}
 			else
 			{
-				return;
 				try
 				{
 					GetKeyIdentifierFromVirtualKeyCode_osx(ULKeyCodes.GK_VOLUME_MUTE, ulStringPtr);
