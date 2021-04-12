@@ -1,9 +1,9 @@
-using Supine.Unstride;
 using System;
 using System.Diagnostics;
 using System.IO;
 using System.Net;
 using System.Numerics;
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Text;
 using UltralightNet.AppCore;
@@ -24,8 +24,10 @@ namespace UltralightNet.Veldrid.TestApp
 		[DllImport("Ultralight", EntryPoint = "?GetKeyIdentifierFromVirtualKeyCode@ultralight@@YAXHAEAVString@1@@Z")]
 		private static extern void GetKey(int i, IntPtr id);
 
+		[MethodImpl(MethodImplOptions.AggressiveOptimization)]
 		public static void Main()
 		{
+			Stopwatch framerateStopwatch = new();
 			WindowCreateInfo windowCI = new()
 			{
 				WindowWidth = (int)Width,
@@ -148,12 +150,12 @@ void main()
 			});
 
 			View view = new(renderer, Width, Height, true, Session.DefaultSession(renderer), false);
-			View cpuView = new(renderer, Width, Height, true, Session.DefaultSession(renderer), true);
+			//View cpuView = new(renderer, Width, Height, true, Session.DefaultSession(renderer), true);
 
 			const string url = "https://github.com/SupinePandora43";
 
 			view.URL = url;
-			cpuView.URL = url;
+			//cpuView.URL = url;
 
 			WebRequest request = WebRequest.CreateHttp("https://raw.githubusercontent.com/SupinePandora43/UltralightNet/ulPath_pipelines/SilkNetSandbox/assets/index.html");
 
@@ -165,7 +167,7 @@ void main()
 			//view.HTML = htmlText;
 			//cpuView.HTML = htmlText;
 
-			Texture cpuTexture = null;
+			/*Texture cpuTexture = null;
 			ResourceSet cpuTextureResourceSet = null;
 
 			void CreateCPUTexture()
@@ -175,7 +177,7 @@ void main()
 			}
 
 			CreateCPUTexture();
-
+			*/
 			int x = 0;
 			int y = 0;
 
@@ -195,7 +197,7 @@ void main()
 				};
 
 				view.FireMouseEvent(mouseEvent);
-				cpuView.FireMouseEvent(mouseEvent);
+				//cpuView.FireMouseEvent(mouseEvent);
 			};
 			window.MouseDown += (md) =>
 			{
@@ -204,12 +206,12 @@ void main()
 				if (md.MouseButton is MouseButton.Button1)
 				{
 					view.GoBack();
-					cpuView.GoBack();
+					//cpuView.GoBack();
 				}
 				else if (md.MouseButton is MouseButton.Button2)
 				{
 					view.GoForward();
-					cpuView.GoForward();
+					//cpuView.GoForward();
 				}
 				ULMouseEvent mouseEvent = new ULMouseEvent()
 				{
@@ -219,7 +221,7 @@ void main()
 					y = y
 				};
 				view.FireMouseEvent(mouseEvent);
-				cpuView.FireMouseEvent(mouseEvent);
+				//cpuView.FireMouseEvent(mouseEvent);
 			};
 			window.MouseUp += (mu) =>
 			{
@@ -232,7 +234,7 @@ void main()
 					y = y
 				};
 				view.FireMouseEvent(mouseEvent);
-				cpuView.FireMouseEvent(mouseEvent);
+				//cpuView.FireMouseEvent(mouseEvent);
 			};
 			window.MouseWheel += (mw) =>
 			{
@@ -242,12 +244,12 @@ void main()
 					deltaY = (int)mw.WheelDelta * 100
 				};
 				view.FireScrollEvent(scrollEvent);
-				cpuView.FireScrollEvent(scrollEvent);
+				//cpuView.FireScrollEvent(scrollEvent);
 			};
 
 			// idk why
 			view.Focus();
-			cpuView.Focus();
+			//cpuView.Focus();
 
 			window.KeyDown += (kd) =>
 			{
@@ -271,7 +273,7 @@ void main()
 				ULKeyEvent ked = new(ULKeyEventType.KeyDown, modifiers, ULKeyCodes.GK_TAB, 0, "", null, false, false, false);
 
 				view.FireKeyEvent(ked);
-				cpuView.FireKeyEvent(ked);
+				//cpuView.FireKeyEvent(ked);
 			};
 
 			window.KeyUp += (ku) =>
@@ -281,15 +283,15 @@ void main()
 				string managedKeyIdentifier = ULStringMarshaler.NativeToManaged(keyIdentifier);
 				ULKeyEvent ked = new(ULKeyEventType.KeyUp, 0, ULKeyCodes.GK_TAB, 0, "", null, false, false, false);
 				view.FireKeyEvent(ked);
-				cpuView.FireKeyEvent(ked);
+				//cpuView.FireKeyEvent(ked);
 			};
 
 			window.Resized += () =>
 			{
 				graphicsDevice.ResizeMainWindow((uint)window.Width, (uint)window.Height);
 				view.Resize((uint)window.Width, (uint)window.Height);
-				cpuView.Resize((uint)window.Width, (uint)window.Height);
-				CreateCPUTexture();
+				//cpuView.Resize((uint)window.Width, (uint)window.Height);
+				//CreateCPUTexture();
 			};
 			DeviceBuffer quadV = factory.CreateBuffer(new(4 * 4 * 4, BufferUsage.VertexBuffer));
 			graphicsDevice.UpdateBuffer(quadV, 0, new Vector4[]
@@ -317,13 +319,30 @@ void main()
 				view.SetDOMReadyCallback(null);
 			});
 
+
+			uint frame_of_second = 0;
+
+			framerateStopwatch.Restart();
+			
+			uint fps = 0;
+
 			while (window.Exists)
 			{
+				if(framerateStopwatch.ElapsedMilliseconds/1000 >= 1)
+				{
+					fps = frame_of_second;
+					Console.WriteLine(fps);
+					frame_of_second = 0;
+					framerateStopwatch.Restart();
+				}
+				//Console.WriteLine("Update");
 				renderer.Update();
 				gpuDriver.time = stopwatch.ElapsedTicks / 1000f;
+				//Console.WriteLine("Render");
 				renderer.Render();
-
-				ULSurface surface = cpuView.Surface;
+				//Console.WriteLine("Done");
+				
+				/*ULSurface surface = cpuView.Surface;
 				ULBitmap bitmap = surface.Bitmap;
 
 				ULIntRect dirty = surface.DirtyBounds;
@@ -344,8 +363,8 @@ void main()
 				}
 				surface.ClearDirtyBounds();
 				bitmap.UnlockPixels();
-
-				gpuDriver.Render();
+				*/
+				//gpuDriver.Render();
 
 				commandList.Begin();
 
@@ -353,17 +372,17 @@ void main()
 
 				commandList.SetFramebuffer(graphicsDevice.SwapchainFramebuffer);
 				commandList.SetFullViewports();
-				commandList.ClearColorTarget(0, new RgbaFloat(MathF.Sin(stopwatch.Elapsed.Milliseconds / 100f), 255, 0, 255));
+				//commandList.ClearColorTarget(0, new RgbaFloat(MathF.Sin(stopwatch.Elapsed.Milliseconds / 100f), 255, 0, 255));
 				//commandList.ClearColorTarget(0, RgbaFloat.Blue);
 
 				commandList.SetVertexBuffer(0, quadV);
 				commandList.SetIndexBuffer(quadI, IndexFormat.UInt16);
 
-				if (cpu)
-				{
-					commandList.SetGraphicsResourceSet(0, cpuTextureResourceSet);
-				}
-				else
+				//if (cpu)
+				//{
+					//commandList.SetGraphicsResourceSet(0, cpuTextureResourceSet);
+				//}
+				//else
 					commandList.SetGraphicsResourceSet(0, gpuDriver.GetRenderTarget(view));
 
 				commandList.DrawIndexed(
@@ -373,12 +392,14 @@ void main()
 					0,
 					0
 				);
-
+				
 				commandList.End();
 
 				graphicsDevice.SubmitCommands(commandList);
 				graphicsDevice.SwapBuffers();
 				window.PumpEvents();
+
+				frame_of_second++;
 			}
 		}
 	}

@@ -1,4 +1,3 @@
-using Supine.Unstride;
 using System;
 using System.Collections.Generic;
 using System.Numerics;
@@ -18,7 +17,10 @@ namespace UltralightNet.Veldrid
 		public TextureSampleCount SampleCount = TextureSampleCount.Count1;
 		public bool Debug = false;
 
-		private readonly Dictionary<uint, TextureEntry> TextureEntries = new();
+		/// <summary>
+		/// public only for <see cref="GetRenderTarget(View)"/> inlining
+		/// </summary>
+		public readonly Dictionary<uint, TextureEntry> TextureEntries = new();
 		private readonly Dictionary<uint, GeometryEntry> GeometryEntries = new();
 		private readonly Dictionary<uint, RenderBufferEntry> RenderBufferEntries = new();
 
@@ -28,6 +30,7 @@ namespace UltralightNet.Veldrid
 		private readonly Queue<ULCommand> commands = new();
 
 		private readonly CommandList commandList;
+		private readonly CommandList _commandList;
 
 		public bool NeedsDraw => commands.Count is not 0;
 		public bool InstantDraw = true;
@@ -45,6 +48,7 @@ namespace UltralightNet.Veldrid
 			);
 
 			commandList = graphicsDevice.ResourceFactory.CreateCommandList();
+			_commandList = graphicsDevice.ResourceFactory.CreateCommandList();
 
 			//IsDirectX = graphicsDevice.BackendType is GraphicsBackend.Direct3D11;
 
@@ -100,7 +104,7 @@ namespace UltralightNet.Veldrid
 		};
 
 		#region NextId
-
+		[MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
 		private static uint GetKey<TValue>(Dictionary<uint, TValue> dictionary)
 		{
 			for (uint i = 1; ; i++)
@@ -109,32 +113,79 @@ namespace UltralightNet.Veldrid
 					return i;
 			}
 		}
+		[MethodImpl(MethodImplOptions.AggressiveOptimization)]
 		private uint NextTextureId()
 		{
 			uint id = GetKey(TextureEntries);
 			TextureEntries.Add(id, new());
+#if DEBUG
 			Console.WriteLine($"NextTextureId() = {id}");
+#endif
 			return id;
 		}
+		[MethodImpl(MethodImplOptions.AggressiveOptimization)]
 		public uint NextGeometryId()
 		{
 			uint id = GetKey(GeometryEntries);
 			GeometryEntries.Add(id, new());
+#if DEBUG
 			Console.WriteLine($"NextGeometryId() = {id}");
+#endif
 			return id;
 		}
+		[MethodImpl(MethodImplOptions.AggressiveOptimization)]
 		public uint NextRenderBufferId()
 		{
 			uint id = GetKey(RenderBufferEntries);
 			RenderBufferEntries.Add(id, new());
+#if DEBUG
 			Console.WriteLine($"NextRenderBufferId() = {id}");
+#endif
 			return id;
 		}
 		#endregion NextId
 		#region Texture
+		[MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
+		private unsafe void Set2DTextureData(
+	ReadOnlySpan<byte> pixels, uint width, uint height, int stride, int bpp,
+	Texture dst, uint dstX, uint dstY, uint dstZ, uint dstMipLevel, uint dstArrayLayer)
+		{
+			_commandList.Begin();
+
+			TextureDescription stagingDesc = new(width, height, 1, 1, 1, dst.Format, TextureUsage.Staging, TextureType.Texture2D);
+			using Texture staging = graphicsDevice.ResourceFactory.CreateTexture(ref stagingDesc);
+
+			MappedResource mappedStaging = graphicsDevice.Map(staging, MapMode.Write);
+			try
+			{
+				Span<byte> stagingSpan = new((void*)mappedStaging.Data, (int)mappedStaging.SizeInBytes);
+
+				int rowPitch = (int)width * bpp;
+				int mappedRowPitch = (int)mappedStaging.RowPitch;
+
+				for (int y = 0; y < height; y++)
+				{
+					ReadOnlySpan<byte> sourceRow = pixels.Slice(y * stride, rowPitch);
+					Span<byte> stagingRow = stagingSpan.Slice(y * mappedRowPitch, mappedRowPitch);
+					sourceRow.CopyTo(stagingRow);
+				}
+			}
+			finally
+			{
+				graphicsDevice.Unmap(staging);
+			}
+
+			_commandList.CopyTexture(
+				staging, 0, 0, 0, 0, 0,
+				dst, dstX, dstY, dstZ, dstMipLevel, dstArrayLayer, width, height, 1, 1);
+			_commandList.End();
+			graphicsDevice.SubmitCommands(_commandList);
+		}
 		private void CreateTexture(uint texture_id, ULBitmap bitmap)
 		{
+#if DEBUG
 			Console.WriteLine($"CreateTexture({texture_id})");
+#endif
 			bool isRT = bitmap.IsEmpty;
 			TextureEntry entry = TextureEntries[texture_id];
 			TextureDescription textureDescription = new()
@@ -172,6 +223,7 @@ namespace UltralightNet.Veldrid
 				)
 			);
 		}
+		[MethodImpl(MethodImplOptions.AggressiveOptimization)]
 		private void UpdateTexture(uint texture_id, ULBitmap bitmap)
 		{
 			TextureEntry entry = TextureEntries[texture_id];
@@ -193,7 +245,41 @@ namespace UltralightNet.Veldrid
 			}
 			else
 			{
-				graphicsDevice.UpdateTexture(entry.texture, Unstrider.Unstride(pixels, width, height, bpp, offset), 0, 0, 0, width, height, 1, 0, 0);
+				unsafe
+				{
+					//Stopwatch stopwatch = new();
+
+					//Console.Write($"({width}x{height})");
+
+					//stopwatch.Restart();
+					Set2DTextureData(new ReadOnlySpan<byte>((void*)pixels, (int)(rowBytes * height)), width, height, (int)rowBytes, (int)bpp, entry.texture, 0, 0, 0, 0, 0);
+					//Console.Write($" {stopwatch.ElapsedMilliseconds}");
+					//stopwatch.Restart();
+					//graphicsDevice.UpdateTexture(entry.texture, Unstrider.Unstride(pixels, width, height, bpp, offset), 0, 0, 0, width, height, 1, 0, 0);
+					//Console.Write($" {stopwatch.ElapsedMilliseconds}");
+
+					//stopwatch.Restart();
+					/*
+					ReadOnlySpan<byte> pixelsSpan = new((void*)pixels, (int)(rowBytes * height));
+					uint length = width * height * bpp;
+					byte[] unstridedPixels = new byte[length];
+
+					Span<byte> unstridedPixelsSpan = new(unstridedPixels);
+
+					int rowBytesInt = (int)rowBytes;
+					int idk = (int)(width * bpp);
+
+					for (int y = 0; y < height; y++)
+					{
+						ReadOnlySpan<byte> stridedRow = pixelsSpan.Slice(y * rowBytesInt, idk);
+						Span<byte> unstridedRow = unstridedPixelsSpan.Slice(y * idk, idk);
+						stridedRow.CopyTo(unstridedRow);
+					}
+
+					graphicsDevice.UpdateTexture(entry.texture, (ReadOnlySpan<byte>)unstridedPixelsSpan, 0, 0, 0, width, height, 1, 0, 0);
+					Console.WriteLine($" {stopwatch.ElapsedMilliseconds}");
+					*/
+				}
 			}
 			bitmap.UnlockPixels();
 
@@ -209,7 +295,9 @@ namespace UltralightNet.Veldrid
 		}
 		private void DestroyTexture(uint texture_id)
 		{
+#if DEBUG
 			Console.WriteLine($"DestroyTexture({texture_id})");
+#endif
 			TextureEntries.Remove(texture_id, out TextureEntry entry);
 			entry.resourceSet.Dispose();
 			entry.resourceSet = null;
@@ -220,7 +308,9 @@ namespace UltralightNet.Veldrid
 		#region Geometry
 		private void CreateGeometry(uint geometry_id, ULVertexBuffer vertices, ULIndexBuffer indices)
 		{
+#if DEBUG
 			Console.WriteLine($"CreateGeometry({geometry_id})");
+#endif
 			GeometryEntry entry = GeometryEntries[geometry_id];
 
 			BufferDescription vertexDescription = new(vertices.size, BufferUsage.VertexBuffer);
@@ -241,7 +331,9 @@ namespace UltralightNet.Veldrid
 		}
 		private void DestroyGeometry(uint geometry_id)
 		{
+#if DEBUG
 			Console.WriteLine($"DestroyGeometry({geometry_id})");
+#endif
 			GeometryEntries.Remove(geometry_id, out GeometryEntry entry);
 
 			entry.vertices.Dispose();
@@ -251,7 +343,9 @@ namespace UltralightNet.Veldrid
 		#region RenderBuffer
 		private void CreateRenderBuffer(uint render_buffer_id, ULRenderBuffer buffer)
 		{
+#if DEBUG
 			Console.WriteLine($"CreateRenderBuffer({render_buffer_id})");
+#endif
 			RenderBufferEntry entry = RenderBufferEntries[render_buffer_id];
 			TextureEntry textureEntry = TextureEntries[buffer.texture_id];
 
@@ -268,7 +362,9 @@ namespace UltralightNet.Veldrid
 		}
 		private void DestroyRenderBuffer(uint render_buffer_id)
 		{
+#if DEBUG
 			Console.WriteLine($"DestroyRenderBuffer({render_buffer_id})");
+#endif
 			RenderBufferEntries.Remove(render_buffer_id, out RenderBufferEntry entry);
 			entry.textureEntry = null;
 			entry.framebuffer.Dispose();
@@ -276,7 +372,7 @@ namespace UltralightNet.Veldrid
 		}
 		#endregion RenderBuffer
 
-		[MethodImpl(MethodImplOptions.AggressiveOptimization)]
+		[MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
 		private void RunCommand(ULCommand command)
 		{
 			RenderBufferEntry renderBufferEntry = RenderBufferEntries[command.gpu_state.render_buffer_id];
@@ -290,7 +386,7 @@ namespace UltralightNet.Veldrid
 			}
 			else
 			{
-				ULGPUState state = command.gpu_state;
+				ref ULGPUState state = ref command.gpu_state;
 
 				if (state.shader_type is ULShaderType.Fill)
 				{
@@ -336,7 +432,7 @@ namespace UltralightNet.Veldrid
 				{
 					State = new Vector4(time, state.viewport_width, state.viewport_height, 1f),
 					Transform = state.transform.ApplyProjection(state.viewport_width, state.viewport_height, IsOpenGL),
-					
+
 					scalar_0 = state.scalar_0,
 					scalar_1 = state.scalar_1,
 					scalar_2 = state.scalar_2,
@@ -366,11 +462,11 @@ namespace UltralightNet.Veldrid
 					clip_6 = state.clip_6,
 					clip_7 = state.clip_7
 				};
-				commandList.UpdateBuffer(uniformBuffer, 0, uniforms);
+				commandList.UpdateBuffer(uniformBuffer, 0, ref uniforms);
 				#endregion
 
 
-				commandList.SetFramebuffer(renderBufferEntry.framebuffer);
+				//commandList.SetFramebuffer(renderBufferEntry.framebuffer);
 
 				commandList.SetGraphicsResourceSet(0, uniformResourceSet);
 
@@ -391,6 +487,7 @@ namespace UltralightNet.Veldrid
 			}
 		}
 
+		[MethodImpl(MethodImplOptions.AggressiveOptimization)]
 		private void UpdateCommandList(ULCommandList list)
 		{
 			if (InstantDraw)
@@ -408,6 +505,7 @@ namespace UltralightNet.Veldrid
 			}
 		}
 
+		[MethodImpl(MethodImplOptions.AggressiveOptimization)]
 		public void Render()
 		{
 			if (!NeedsDraw) return;
@@ -427,9 +525,10 @@ namespace UltralightNet.Veldrid
 
 		/// <remarks>will throw exception when view doesn't have RenderTarget</remarks>
 		/// <exception cref="KeyNotFoundException">When called on view without RenderTarget</exception>
+		[MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
 		public ResourceSet GetRenderTarget(View view) => TextureEntries[view.RenderTarget.texture_id].resourceSet;
 
-		private class TextureEntry
+		public class TextureEntry
 		{
 			public Texture texture;
 			public ResourceSet resourceSet;
@@ -703,7 +802,7 @@ namespace UltralightNet.Veldrid
 					FrontFace = FrontFace.Clockwise,
 					FillMode = PolygonFillMode.Solid,
 					ScissorTestEnabled = false,
-					DepthClipEnabled = true
+					DepthClipEnabled = false // true
 				},
 				PrimitiveTopology = PrimitiveTopology.TriangleList,
 				ResourceBindingModel = ResourceBindingModel.Default,
