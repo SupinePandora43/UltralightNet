@@ -146,7 +146,7 @@ namespace UltralightNet.Veldrid
 		#endregion NextId
 		#region Texture
 		/// <summary>
-		/// Made by https://github.com/TechnologicalPizza
+		/// Thx https://github.com/TechnologicalPizza
 		/// </summary>
 		[MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
 		private unsafe void Set2DTextureData(ReadOnlySpan<byte> pixels, uint width, uint height, int stride, int bpp, Texture dst, uint dstX, uint dstY, uint dstZ, uint dstMipLevel, uint dstArrayLayer)
