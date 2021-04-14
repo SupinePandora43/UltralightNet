@@ -134,7 +134,7 @@ void main()
 				graphicsDevice.SwapchainFramebuffer.OutputDescription
 			);
 
-			Pipeline pipeline = factory.CreateGraphicsPipeline(mainPipelineDescription);
+			Pipeline pipeline = factory.CreateGraphicsPipeline(ref mainPipelineDescription);
 
 			VeldridGPUDriver gpuDriver = new(graphicsDevice);
 
