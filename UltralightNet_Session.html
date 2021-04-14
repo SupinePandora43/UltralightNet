@@ -24,30 +24,112 @@ h1 a.button i { position: relative; top: 1px; }
 .containerright { width: 340px; min-width: 340px; background-color: #e5e5e5; height: 100%; }
 .containerrightfixed { position: fixed; padding: 0 20px 20px 20px; border-left: solid 1px #6f6f6f; width: 300px; overflow-y: auto; height: 100%; top: 0; bottom: 0; }
 .containerrightfixed h1 { background-color: #c00; }
-.containerrightfixed label, .containerright a { white-space: nowrap; overflow: hidden; display: inline-block; width: 1line45" class="navigatetohash">get_IsDisposed()</a></td><td>100%</td><td>1</td><td>100%</td></tr>
-<tr><td title=".ctor(System.IntPtr,System.Boolean)"><a href="#file0_line47" class="navigatetohash">.ctor(...)</a></td><td>100%</td><td>1</td><td>100%</td></tr>
-<tr><td title=".ctor(UltralightNet.Renderer,System.Boolean,System.String)"><a href="#file0_line56" class="navigatetohash">.ctor(...)</a></td><td>100%</td><td>1</td><td>0%</td></tr>
-<tr><td title="DefaultSession(UltralightNet.Renderer)"><a href="#file0_line57" class="navigatetohash">DefaultSession(...)</a></td><td>100%</td><td>1</td><td>100%</td></tr>
-<tr><td title="get_IsPersistent()"><a href="#file0_line60" class="navigatetohash">get_IsPersistent()</a></td><td>100%</td><td>1</td><td>0%</td></tr>
-<tr><td title="get_Name()"><a href="#file0_line62" class="navigatetohash">get_Name()</a></td><td>100%</td><td>1</td><td>100%</td></tr>
-<tr><td title="get_Id()"><a href="#file0_line64" class="navigatetohash">get_Id()</a></td><td>100%</td><td>1</td><td>0%</td></tr>
-<tr><td title="get_DiskPath()"><a href="#file0_line66" class="navigatetohash">get_DiskPath()</a></td><td>100%</td><td>1</td><td>0%</td></tr>
-<tr><td title="Finalize()"><a href="#file0_line68" class="navigatetohash">Finalize()</a></td><td>100%</td><td>1</td><td>100%</td></tr>
-<tr><td title="Dispose()"><a href="#file0_line70" class="navigatetohash">Dispose()</a></td><td>50%</td><td>2</td><td>50%</td></tr>
-</tbody>
-</table>
-<h1>File(s)</h1>
-<h2 id="httpsrawgithubusercontentcomSupinePandora43UltralightNet843284b8ca82572ba7e2d3cfde04a92a78ad776cUltralightNetSessioncs">https://raw.githubusercontent.com/SupinePandora43/UltralightNet/843284b8ca82572ba7e2d3cfde04a92a78ad776c/UltralightNet/Session.cs</h2>
-<table class="lineAnalysis">
-<thead><tr><th></th><th>#</th><th>Line</th><th></th><th>Line coverage</th></tr></thead>
-<tbody>
-<tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line1"></a><code>1</code></td><td></td><td class="lightgray"><code>using&nbsp;System;</code></td></tr>
-<tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line2"></a><code>2</code></td><td></td><td class="lightgray"><code>using&nbsp;System.Runtime.InteropServices;</code></td></tr>
-<tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line3"></a><code>3</code></td><td></td><td class="lightgray"><code></code></td></tr>
-<tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line4"></a><code>4</code></td><td></td><td class="lightgray"><code>namespace&nbsp;UltralightNet</code></td></tr>
-<tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line5"></a><code>5</code></td><td></td><td class="lightgray"><code>{</code></td></tr>
-<tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line6"></a><code>6</code></td><td></td><td class="lightgray"><code>&nbsp;&nbsp;public&nbsp;static&nbsp;partial&nbsp;class&nbsp;Methods</code></td></tr>
-<tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line7"></a><code>7</code></td><td></td><td class="lightgray"><code>&nbsp;&nbsp;{</code></td></tr>
+.containerrightfixed label, .containerright a { white-space: nowrap; overflow: hidden; display: inline-block; width: 100%; max-width: 300px; text-overflow: ellipsis; }
+.containerright a { margin-bottom: 3px; }
+
+@media screen and (max-width:1200px){ 
+    .container { box-shadow: none; width: 100%; }
+    .containerright { display: none; }
+}
+
+.footer { font-size: 0.7em; text-align: center; margin-top: 35px; }
+
+th { text-align: left; }
+.table-fixed { table-layout: fixed; }
+.overview { border: solid 1px #c1c1c1; border-collapse: collapse; width: 100%; word-wrap: break-word; }
+.overview th { border: solid 1px #c1c1c1; border-collapse: collapse; padding: 2px 4px 2px 4px; background-color: #ddd; }
+.overview tr.namespace th { background-color: #dcdcdc; }
+.overview thead th { background-color: #d1d1d1; }
+.overview th a { color: #000; }
+.overview tr.namespace a { margin-left: 15px; display: block; }
+.overview td { border: solid 1px #c1c1c1; border-collapse: collapse; padding: 2px 5px 2px 5px; }
+div.currenthistory { margin: -2px -5px 0 -5px; padding: 2px 5px 2px 5px; height: 16px; }
+.coverage { border: solid 1px #c1c1c1; border-collapse: collapse; font-size: 5px; height: 10px; }
+.coverage td { padding: 0; border: none; }
+.stripped tr:nth-child(2n+1) { background-color: #F3F3F3; }
+
+.customizebox { font-size: 0.75em; margin-bottom: 7px; }
+.customizebox>div { width: 25%; display: inline-block; }
+.customizebox div.right input { font-size: 0.8em; width: 150px; }
+#namespaceslider { width: 200px; display: inline-block; margin-left: 8px; }
+
+.percentagebar {
+    padding-left: 3px;
+}
+a.percentagebar {
+    padding-left: 6px;
+}
+.percentagebarundefined {
+    border-left: 2px solid #fff;
+}
+.percentagebar0 {
+    border-left: 2px solid #c10909;
+}
+.percentagebar10 {
+    border-left: 2px solid;
+    border-image: linear-gradient(to bottom, #c10909 90%, #0aad0a 90%, #0aad0a 100%) 1;
+}
+.percentagebar20 {
+    border-left: 2px solid;
+    border-image: linear-gradient(to bottom, #c10909 80%, #0aad0a 80%, #0aad0a 100%) 1;
+}
+.percentagebar30 {
+    border-left: 2px solid;
+    border-image: linear-gradient(to bottom, #c10909 70%, #0aad0a 70%, #0aad0a 100%) 1;
+}
+.percentagebar40 {
+    border-left: 2px solid;
+    border-image: linear-gradient(to bottom, #c10909 60%, #0aad0a 60%, #0aad0a 100%) 1;
+}
+.percentagebar50 {
+    border-left: 2px solid;
+    border-image: linear-gradient(to bottom, #c10909 50%, #0aad0a 50%, #0aad0a 100%) 1;
+}
+.percentagebar60 {
+    border-left: 2px solid;
+    border-image: linear-gradient(to bottom, #c10909 40%, #0aad0a 40%, #0aad0a 100%) 1;
+}
+.percentagebar70 {
+    border-left: 2px solid;
+    border-image: linear-gradient(to bottom, #c10909 30%, #0aad0a 30%, #0aad0a 100%) 1;
+}
+.percentagebar80 {
+    border-left: 2px solid;
+    border-image: linear-gradient(to bottom, #c10909 20%, #0aad0a 20%, #0aad0a 100%) 1;
+}
+.percentagebar90 {
+    border-left: 2px solid;
+    border-image: linear-gradient(to bottom, #c10909 10%, #0aad0a 10%, #0aad0a 100%) 1;
+}
+.percentagebar100 {
+    border-left: 2px solid #0aad0a;
+}
+
+.hidden, .ng-hide { display: none; }
+.right { text-align: right; }
+.center { text-align: center; }
+.rightmargin  { padding-right: 8px; }
+.leftmargin { padding-left: 5px; }
+.green { background-color: #0aad0a; }
+.lightgreen { background-color: #dcf4dc; }
+.red { background-color: #c10909; }
+.lightred { background-color: #f7dede; }
+.orange { background-color: #FFA500; }
+.lightorange { background-color: #FFEFD5; }
+.gray { background-color: #dcdcdc; }
+.lightgray { color: #888888; }
+.lightgraybg { background-color: #dadada; }
+
+.toggleZoom { text-align:right; }
+
+.ct-chart { position: relative; }
+.ct-chart .ct-line { stroke-width: 2px !important; }
+.ct-chart .ct-point { stroke-width: 6px !important; transition: stroke-width .2s; }
+.ct-chart .ct-point:hover { stroke-width: 10px !important; }
+.ct-chart .ct-series.ct-series-a .ct-line, .ct-chart .ct-series.ct-series-a .ct-point { stroke: #c00 !important;}
+.ct-chart .ct-series.ct-series-b .ct-line, .ct-chart .ct-series.ct-series-b .ct-point { stroke: #1c2298 !important;}
+
+.tinylinecoveragechart, .tinybranchcoverage;{</code></td></tr>
 <tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line8"></a><code>8</code></td><td></td><td class="lightgray"><code>&nbsp;&nbsp;&nbsp;&nbsp;///&nbsp;&lt;summary&gt;Create&nbsp;a&nbsp;Session&nbsp;to&nbsp;store&nbsp;local&nbsp;data&nbsp;in&nbsp;(such&nbsp;as&nbsp;cookies,&nbsp;local&nbsp;storage,&nbsp;application&nbsp;cache,&nbsp;indexed&nbsp;db,</code></td></tr>
 <tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line9"></a><code>9</code></td><td></td><td class="lightgray"><code>&nbsp;&nbsp;&nbsp;&nbsp;[DllImport(&quot;Ultralight&quot;)]</code></td></tr>
 <tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line10"></a><code>10</code></td><td></td><td class="lightgray"><code>&nbsp;&nbsp;&nbsp;&nbsp;public&nbsp;static&nbsp;extern&nbsp;IntPtr&nbsp;ulCreateSession(IntPtr&nbsp;renderer,&nbsp;[MarshalAs(UnmanagedType.I1)]&nbsp;bool&nbsp;is_persistent,&nbsp;[Mars</code></td></tr>
@@ -85,7 +167,7 @@ h1 a.button i { position: relative; top: 1px; }
 <tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line42"></a><code>42</code></td><td></td><td class="lightgray"><code>&nbsp;&nbsp;public&nbsp;class&nbsp;Session&nbsp;:&nbsp;IDisposable</code></td></tr>
 <tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line43"></a><code>43</code></td><td></td><td class="lightgray"><code>&nbsp;&nbsp;{</code></td></tr>
 <tr class="coverableline" title="Covered (40 visits)" data-coverage="{'AllTestMethods': {'VC': '40', 'LVS': 'green'}}"><td class="green">&nbsp;</td><td class="leftmargin rightmargin right">40</td><td class="rightmargin right"><a id="file0_line44"></a><code>44</code></td><td></td><td class="lightgreen"><code>&nbsp;&nbsp;&nbsp;&nbsp;public&nbsp;IntPtr&nbsp;Ptr&nbsp;{&nbsp;get;&nbsp;private&nbsp;set;&nbsp;}</code></td></tr>
-<tr class="coverableline" title="Covered (22 visits)" data-coverage="{'AllTestMethods': {'VC': '22', 'LVS': 'green'}}"><td class="green">&nbsp;</td><td class="leftmargin rightmargin right">22</td><td class="rightmargin right"><a id="file0_line45"></a><code>45</code></td><td></td><td class="lightgreen"><code>&nbsp;&nbsp;&nbsp;&nbsp;public&nbsp;bool&nbsp;IsDisposed&nbsp;{&nbsp;get;&nbsp;private&nbsp;set;&nbsp;}</code></td></tr>
+<tr class="coverableline" title="Covered (23 visits)" data-coverage="{'AllTestMethods': {'VC': '23', 'LVS': 'green'}}"><td class="green">&nbsp;</td><td class="leftmargin rightmargin right">23</td><td class="rightmargin right"><a id="file0_line45"></a><code>45</code></td><td></td><td class="lightgreen"><code>&nbsp;&nbsp;&nbsp;&nbsp;public&nbsp;bool&nbsp;IsDisposed&nbsp;{&nbsp;get;&nbsp;private&nbsp;set;&nbsp;}</code></td></tr>
 <tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line46"></a><code>46</code></td><td></td><td class="lightgray"><code></code></td></tr>
 <tr class="coverableline" title="Covered (20 visits)" data-coverage="{'AllTestMethods': {'VC': '20', 'LVS': 'green'}}"><td class="green">&nbsp;</td><td class="leftmargin rightmargin right">20</td><td class="rightmargin right"><a id="file0_line47"></a><code>47</code></td><td></td><td class="lightgreen"><code>&nbsp;&nbsp;&nbsp;&nbsp;public&nbsp;Session(IntPtr&nbsp;ptr,&nbsp;bool&nbsp;dispose&nbsp;=&nbsp;false)</code></td></tr>
 <tr class="coverableline" title="Covered (20 visits)" data-coverage="{'AllTestMethods': {'VC': '20', 'LVS': 'green'}}"><td class="green">&nbsp;</td><td class="leftmargin rightmargin right">20</td><td class="rightmargin right"><a id="file0_line48"></a><code>48</code></td><td></td><td class="lightgreen"><code>&nbsp;&nbsp;&nbsp;&nbsp;{</code></td></tr>
@@ -108,21 +190,21 @@ h1 a.button i { position: relative; top: 1px; }
 <tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line65"></a><code>65</code></td><td></td><td class="lightgray"><code>&nbsp;&nbsp;&nbsp;&nbsp;///&nbsp;&lt;summary&gt;The&nbsp;disk&nbsp;path&nbsp;of&nbsp;this&nbsp;session&nbsp;(only&nbsp;valid&nbsp;for&nbsp;persistent&nbsp;sessions).&lt;/summary&gt;</code></td></tr>
 <tr class="coverableline" title="Not covered (0 visits)" data-coverage="{'AllTestMethods': {'VC': '0', 'LVS': 'red'}}"><td class="red">&nbsp;</td><td class="leftmargin rightmargin right">0</td><td class="rightmargin right"><a id="file0_line66"></a><code>66</code></td><td></td><td class="lightred"><code>&nbsp;&nbsp;&nbsp;&nbsp;public&nbsp;string&nbsp;DiskPath&nbsp;=&gt;&nbsp;Methods.ulSessionGetDiskPath(Ptr);</code></td></tr>
 <tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line67"></a><code>67</code></td><td></td><td class="lightgray"><code></code></td></tr>
-<tr class="coverableline" title="Covered (2 visits)" data-coverage="{'AllTestMethods': {'VC': '2', 'LVS': 'green'}}"><td class="green">&nbsp;</td><td class="leftmargin rightmargin right">2</td><td class="rightmargin right"><a id="file0_line68"></a><code>68</code></td><td></td><td class="lightgreen"><code>&nbsp;&nbsp;&nbsp;&nbsp;~Session()&nbsp;=&gt;&nbsp;Dispose();</code></td></tr>
+<tr class="coverableline" title="Covered (3 visits)" data-coverage="{'AllTestMethods': {'VC': '3', 'LVS': 'green'}}"><td class="green">&nbsp;</td><td class="leftmargin rightmargin right">3</td><td class="rightmargin right"><a id="file0_line68"></a><code>68</code></td><td></td><td class="lightgreen"><code>&nbsp;&nbsp;&nbsp;&nbsp;~Session()&nbsp;=&gt;&nbsp;Dispose();</code></td></tr>
 <tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line69"></a><code>69</code></td><td></td><td class="lightgray"><code>&nbsp;&nbsp;&nbsp;&nbsp;public&nbsp;void&nbsp;Dispose()</code></td></tr>
-<tr class="coverableline" title="Covered (2 visits)" data-coverage="{'AllTestMethods': {'VC': '2', 'LVS': 'green'}}"><td class="green">&nbsp;</td><td class="leftmargin rightmargin right">2</td><td class="rightmargin right"><a id="file0_line70"></a><code>70</code></td><td></td><td class="lightgreen"><code>&nbsp;&nbsp;&nbsp;&nbsp;{</code></td></tr>
-<tr class="coverableline" title="Partially covered (4 visits, 1 of 2 branches are covered)" data-coverage="{'AllTestMethods': {'VC': '4', 'LVS': 'orange'}}"><td class="orange">&nbsp;</td><td class="leftmargin rightmargin right">4</td><td class="rightmargin right"><a id="file0_line71"></a><code>71</code></td><td class="percentagebar percentagebar50"><i class="icon-fork"></i></td><td class="lightorange"><code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;if&nbsp;(IsDisposed)&nbsp;return;</code></td></tr>
+<tr class="coverableline" title="Covered (3 visits)" data-coverage="{'AllTestMethods': {'VC': '3', 'LVS': 'green'}}"><td class="green">&nbsp;</td><td class="leftmargin rightmargin right">3</td><td class="rightmargin right"><a id="file0_line70"></a><code>70</code></td><td></td><td class="lightgreen"><code>&nbsp;&nbsp;&nbsp;&nbsp;{</code></td></tr>
+<tr class="coverableline" title="Partially covered (6 visits, 1 of 2 branches are covered)" data-coverage="{'AllTestMethods': {'VC': '6', 'LVS': 'orange'}}"><td class="orange">&nbsp;</td><td class="leftmargin rightmargin right">6</td><td class="rightmargin right"><a id="file0_line71"></a><code>71</code></td><td class="percentagebar percentagebar50"><i class="icon-fork"></i></td><td class="lightorange"><code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;if&nbsp;(IsDisposed)&nbsp;return;</code></td></tr>
 <tr class="coverableline" title="Not covered (0 visits)" data-coverage="{'AllTestMethods': {'VC': '0', 'LVS': 'red'}}"><td class="red">&nbsp;</td><td class="leftmargin rightmargin right">0</td><td class="rightmargin right"><a id="file0_line72"></a><code>72</code></td><td></td><td class="lightred"><code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Methods.ulDestroySession(Ptr);</code></td></tr>
 <tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line73"></a><code>73</code></td><td></td><td class="lightgray"><code></code></td></tr>
 <tr class="coverableline" title="Not covered (0 visits)" data-coverage="{'AllTestMethods': {'VC': '0', 'LVS': 'red'}}"><td class="red">&nbsp;</td><td class="leftmargin rightmargin right">0</td><td class="rightmargin right"><a id="file0_line74"></a><code>74</code></td><td></td><td class="lightred"><code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;IsDisposed&nbsp;=&nbsp;true;</code></td></tr>
 <tr class="coverableline" title="Not covered (0 visits)" data-coverage="{'AllTestMethods': {'VC': '0', 'LVS': 'red'}}"><td class="red">&nbsp;</td><td class="leftmargin rightmargin right">0</td><td class="rightmargin right"><a id="file0_line75"></a><code>75</code></td><td></td><td class="lightred"><code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;GC.SuppressFinalize(this);</code></td></tr>
-<tr class="coverableline" title="Covered (2 visits)" data-coverage="{'AllTestMethods': {'VC': '2', 'LVS': 'green'}}"><td class="green">&nbsp;</td><td class="leftmargin rightmargin right">2</td><td class="rightmargin right"><a id="file0_line76"></a><code>76</code></td><td></td><td class="lightgreen"><code>&nbsp;&nbsp;&nbsp;&nbsp;}</code></td></tr>
+<tr class="coverableline" title="Covered (3 visits)" data-coverage="{'AllTestMethods': {'VC': '3', 'LVS': 'green'}}"><td class="green">&nbsp;</td><td class="leftmargin rightmargin right">3</td><td class="rightmargin right"><a id="file0_line76"></a><code>76</code></td><td></td><td class="lightgreen"><code>&nbsp;&nbsp;&nbsp;&nbsp;}</code></td></tr>
 <tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line77"></a><code>77</code></td><td></td><td class="lightgray"><code>&nbsp;&nbsp;}</code></td></tr>
 <tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line78"></a><code>78</code></td><td></td><td class="lightgray"><code>}</code></td></tr>
 <tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line79"></a><code>79</code></td><td></td><td class="lightgray"><code></code></td></tr>
 </tbody>
 </table>
-<div class="footer">Generated by: ReportGenerator 4.8.7.0<br />04/13/2021 - 16:35:59<br /><a href="https://github.com/danielpalme/ReportGenerator">GitHub</a> | <a href="http://www.palmmedia.de">www.palmmedia.de</a></div></div>
+<div class="footer">Generated by: ReportGenerator 4.8.7.0<br />04/14/2021 - 16:23:13<br /><a href="https://github.com/danielpalme/ReportGenerator">GitHub</a> | <a href="http://www.palmmedia.de">www.palmmedia.de</a></div></div>
 <div class="containerright">
 <div class="containerrightfixed">
 <h1>Methods/Properties</h1>
@@ -221,7 +303,7 @@ h1 a.button i { position: relative; top: 1px; }
 <tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line42"></a><code>42</code></td><td></td><td class="lightgray"><code>&nbsp;&nbsp;public&nbsp;class&nbsp;Session&nbsp;:&nbsp;IDisposable</code></td></tr>
 <tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line43"></a><code>43</code></td><td></td><td class="lightgray"><code>&nbsp;&nbsp;{</code></td></tr>
 <tr class="coverableline" title="Covered (40 visits)" data-coverage="{'AllTestMethods': {'VC': '40', 'LVS': 'green'}}"><td class="green">&nbsp;</td><td class="leftmargin rightmargin right">40</td><td class="rightmargin right"><a id="file0_line44"></a><code>44</code></td><td></td><td class="lightgreen"><code>&nbsp;&nbsp;&nbsp;&nbsp;public&nbsp;IntPtr&nbsp;Ptr&nbsp;{&nbsp;get;&nbsp;private&nbsp;set;&nbsp;}</code></td></tr>
-<tr class="coverableline" title="Covered (22 visits)" data-coverage="{'AllTestMethods': {'VC': '22', 'LVS': 'green'}}"><td class="green">&nbsp;</td><td class="leftmargin rightmargin right">22</td><td class="rightmargin right"><a id="file0_line45"></a><code>45</code></td><td></td><td class="lightgreen"><code>&nbsp;&nbsp;&nbsp;&nbsp;public&nbsp;bool&nbsp;IsDisposed&nbsp;{&nbsp;get;&nbsp;private&nbsp;set;&nbsp;}</code></td></tr>
+<tr class="coverableline" title="Covered (23 visits)" data-coverage="{'AllTestMethods': {'VC': '23', 'LVS': 'green'}}"><td class="green">&nbsp;</td><td class="leftmargin rightmargin right">23</td><td class="rightmargin right"><a id="file0_line45"></a><code>45</code></td><td></td><td class="lightgreen"><code>&nbsp;&nbsp;&nbsp;&nbsp;public&nbsp;bool&nbsp;IsDisposed&nbsp;{&nbsp;get;&nbsp;private&nbsp;set;&nbsp;}</code></td></tr>
 <tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line46"></a><code>46</code></td><td></td><td class="lightgray"><code></code></td></tr>
 <tr class="coverableline" title="Covered (20 visits)" data-coverage="{'AllTestMethods': {'VC': '20', 'LVS': 'green'}}"><td class="green">&nbsp;</td><td class="leftmargin rightmargin right">20</td><td class="rightmargin right"><a id="file0_line47"></a><code>47</code></td><td></td><td class="lightgreen"><code>&nbsp;&nbsp;&nbsp;&nbsp;public&nbsp;Session(IntPtr&nbsp;ptr,&nbsp;bool&nbsp;dispose&nbsp;=&nbsp;false)</code></td></tr>
 <tr class="coverableline" title="Covered (20 visits)" data-coverage="{'AllTestMethods': {'VC': '20', 'LVS': 'green'}}"><td class="green">&nbsp;</td><td class="leftmargin rightmargin right">20</td><td class="rightmargin right"><a id="file0_line48"></a><code>48</code></td><td></td><td class="lightgreen"><code>&nbsp;&nbsp;&nbsp;&nbsp;{</code></td></tr>
@@ -244,21 +326,21 @@ h1 a.button i { position: relative; top: 1px; }
 <tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line65"></a><code>65</code></td><td></td><td class="lightgray"><code>&nbsp;&nbsp;&nbsp;&nbsp;///&nbsp;&lt;summary&gt;The&nbsp;disk&nbsp;path&nbsp;of&nbsp;this&nbsp;session&nbsp;(only&nbsp;valid&nbsp;for&nbsp;persistent&nbsp;sessions).&lt;/summary&gt;</code></td></tr>
 <tr class="coverableline" title="Not covered (0 visits)" data-coverage="{'AllTestMethods': {'VC': '0', 'LVS': 'red'}}"><td class="red">&nbsp;</td><td class="leftmargin rightmargin right">0</td><td class="rightmargin right"><a id="file0_line66"></a><code>66</code></td><td></td><td class="lightred"><code>&nbsp;&nbsp;&nbsp;&nbsp;public&nbsp;string&nbsp;DiskPath&nbsp;=&gt;&nbsp;Methods.ulSessionGetDiskPath(Ptr);</code></td></tr>
 <tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line67"></a><code>67</code></td><td></td><td class="lightgray"><code></code></td></tr>
-<tr class="coverableline" title="Covered (2 visits)" data-coverage="{'AllTestMethods': {'VC': '2', 'LVS': 'green'}}"><td class="green">&nbsp;</td><td class="leftmargin rightmargin right">2</td><td class="rightmargin right"><a id="file0_line68"></a><code>68</code></td><td></td><td class="lightgreen"><code>&nbsp;&nbsp;&nbsp;&nbsp;~Session()&nbsp;=&gt;&nbsp;Dispose();</code></td></tr>
+<tr class="coverableline" title="Covered (3 visits)" data-coverage="{'AllTestMethods': {'VC': '3', 'LVS': 'green'}}"><td class="green">&nbsp;</td><td class="leftmargin rightmargin right">3</td><td class="rightmargin right"><a id="file0_line68"></a><code>68</code></td><td></td><td class="lightgreen"><code>&nbsp;&nbsp;&nbsp;&nbsp;~Session()&nbsp;=&gt;&nbsp;Dispose();</code></td></tr>
 <tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line69"></a><code>69</code></td><td></td><td class="lightgray"><code>&nbsp;&nbsp;&nbsp;&nbsp;public&nbsp;void&nbsp;Dispose()</code></td></tr>
-<tr class="coverableline" title="Covered (2 visits)" data-coverage="{'AllTestMethods': {'VC': '2', 'LVS': 'green'}}"><td class="green">&nbsp;</td><td class="leftmargin rightmargin right">2</td><td class="rightmargin right"><a id="file0_line70"></a><code>70</code></td><td></td><td class="lightgreen"><code>&nbsp;&nbsp;&nbsp;&nbsp;{</code></td></tr>
-<tr class="coverableline" title="Partially covered (4 visits, 1 of 2 branches are covered)" data-coverage="{'AllTestMethods': {'VC': '4', 'LVS': 'orange'}}"><td class="orange">&nbsp;</td><td class="leftmargin rightmargin right">4</td><td class="rightmargin right"><a id="file0_line71"></a><code>71</code></td><td class="percentagebar percentagebar50"><i class="icon-fork"></i></td><td class="lightorange"><code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;if&nbsp;(IsDisposed)&nbsp;return;</code></td></tr>
+<tr class="coverableline" title="Covered (3 visits)" data-coverage="{'AllTestMethods': {'VC': '3', 'LVS': 'green'}}"><td class="green">&nbsp;</td><td class="leftmargin rightmargin right">3</td><td class="rightmargin right"><a id="file0_line70"></a><code>70</code></td><td></td><td class="lightgreen"><code>&nbsp;&nbsp;&nbsp;&nbsp;{</code></td></tr>
+<tr class="coverableline" title="Partially covered (6 visits, 1 of 2 branches are covered)" data-coverage="{'AllTestMethods': {'VC': '6', 'LVS': 'orange'}}"><td class="orange">&nbsp;</td><td class="leftmargin rightmargin right">6</td><td class="rightmargin right"><a id="file0_line71"></a><code>71</code></td><td class="percentagebar percentagebar50"><i class="icon-fork"></i></td><td class="lightorange"><code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;if&nbsp;(IsDisposed)&nbsp;return;</code></td></tr>
 <tr class="coverableline" title="Not covered (0 visits)" data-coverage="{'AllTestMethods': {'VC': '0', 'LVS': 'red'}}"><td class="red">&nbsp;</td><td class="leftmargin rightmargin right">0</td><td class="rightmargin right"><a id="file0_line72"></a><code>72</code></td><td></td><td class="lightred"><code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Methods.ulDestroySession(Ptr);</code></td></tr>
 <tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line73"></a><code>73</code></td><td></td><td class="lightgray"><code></code></td></tr>
 <tr class="coverableline" title="Not covered (0 visits)" data-coverage="{'AllTestMethods': {'VC': '0', 'LVS': 'red'}}"><td class="red">&nbsp;</td><td class="leftmargin rightmargin right">0</td><td class="rightmargin right"><a id="file0_line74"></a><code>74</code></td><td></td><td class="lightred"><code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;IsDisposed&nbsp;=&nbsp;true;</code></td></tr>
 <tr class="coverableline" title="Not covered (0 visits)" data-coverage="{'AllTestMethods': {'VC': '0', 'LVS': 'red'}}"><td class="red">&nbsp;</td><td class="leftmargin rightmargin right">0</td><td class="rightmargin right"><a id="file0_line75"></a><code>75</code></td><td></td><td class="lightred"><code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;GC.SuppressFinalize(this);</code></td></tr>
-<tr class="coverableline" title="Covered (2 visits)" data-coverage="{'AllTestMethods': {'VC': '2', 'LVS': 'green'}}"><td class="green">&nbsp;</td><td class="leftmargin rightmargin right">2</td><td class="rightmargin right"><a id="file0_line76"></a><code>76</code></td><td></td><td class="lightgreen"><code>&nbsp;&nbsp;&nbsp;&nbsp;}</code></td></tr>
+<tr class="coverableline" title="Covered (3 visits)" data-coverage="{'AllTestMethods': {'VC': '3', 'LVS': 'green'}}"><td class="green">&nbsp;</td><td class="leftmargin rightmargin right">3</td><td class="rightmargin right"><a id="file0_line76"></a><code>76</code></td><td></td><td class="lightgreen"><code>&nbsp;&nbsp;&nbsp;&nbsp;}</code></td></tr>
 <tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line77"></a><code>77</code></td><td></td><td class="lightgray"><code>&nbsp;&nbsp;}</code></td></tr>
 <tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line78"></a><code>78</code></td><td></td><td class="lightgray"><code>}</code></td></tr>
 <tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line79"></a><code>79</code></td><td></td><td class="lightgray"><code></code></td></tr>
 </tbody>
 </table>
-<div class="footer">Generated by: ReportGenerator 4.8.7.0<br />04/13/2021 - 16:35:59<br /><a href="https://github.com/danielpalme/ReportGenerator">GitHub</a> | <a href="http://www.palmmedia.de">www.palmmedia.de</a></div></div>
+<div class="footer">Generated by: ReportGenerator 4.8.7.0<br />04/14/2021 - 16:23:13<br /><a href="https://github.com/danielpalme/ReportGenerator">GitHub</a> | <a href="http://www.palmmedia.de">www.palmmedia.de</a></div></div>
 <div class="containerright">
 <div class="containerrightfixed">
 <h1>Methods/Properties</h1>
