@@ -11,10 +11,10 @@ namespace UltralightNet.AppCore
 		[DllImport("AppCore")]
 		public static extern void ulEnablePlatformFontLoader();
 
-		[DllImport("AppCore")]
-		public static extern void ulEnablePlatformFileSystem([MarshalAs(UnmanagedType.CustomMarshaler, MarshalTypeRef = typeof(ULStringMarshaler))] string base_dir);
+		[GeneratedDllImport("AppCore")]
+		public static partial void ulEnablePlatformFileSystem([MarshalUsing(typeof(ULStringGeneratedDllImportMarshaler))] string base_dir);
 
-		[DllImport("AppCore")]
-		public static extern void ulEnableDefaultLogger([MarshalAs(UnmanagedType.CustomMarshaler, MarshalTypeRef = typeof(ULStringMarshaler))] string log_path);
+		[GeneratedDllImport("AppCore")]
+		public static partial void ulEnableDefaultLogger([MarshalUsing(typeof(ULStringGeneratedDllImportMarshaler))] string log_path);
 	}
 }

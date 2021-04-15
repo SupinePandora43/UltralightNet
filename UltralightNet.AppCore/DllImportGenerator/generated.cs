@@ -1,5 +1,7 @@
 using System;
 
+#if !GENERATED
+
 #pragma warning disable IDE0059
 
 namespace UltralightNet.AppCore
@@ -100,6 +102,84 @@ namespace UltralightNet.AppCore
 
 		[System.Runtime.InteropServices.DllImportAttribute("AppCore", EntryPoint = "ulOverlayHasFocus")]
 		extern private static unsafe byte ulOverlayHasFocus__PInvoke__(global::System.IntPtr overlay);
+	}
+}
+namespace UltralightNet.AppCore
+{
+	public static partial class AppCoreMethods
+	{
+		public static partial void ulEnablePlatformFileSystem(string base_dir)
+		{
+			unsafe
+			{
+				global::System.IntPtr __base_dir_gen_native = default;
+				//
+				// Setup
+				//
+				global::UltralightNet.ULStringGeneratedDllImportMarshaler __base_dir_gen_native__marshaler = default;
+				try
+				{
+					//
+					// Marshal
+					//
+					__base_dir_gen_native__marshaler = new global::UltralightNet.ULStringGeneratedDllImportMarshaler(base_dir);
+					__base_dir_gen_native = __base_dir_gen_native__marshaler.Value;
+					//
+					// Invoke
+					//
+					ulEnablePlatformFileSystem__PInvoke__(__base_dir_gen_native);
+				}
+				finally
+				{
+					//
+					// Cleanup
+					//
+					__base_dir_gen_native__marshaler.FreeNative();
+				}
+			}
+		}
+
+		[System.Runtime.InteropServices.DllImportAttribute("AppCore", EntryPoint = "ulEnablePlatformFileSystem")]
+		extern private static unsafe void ulEnablePlatformFileSystem__PInvoke__(global::System.IntPtr base_dir);
+	}
+}
+namespace UltralightNet.AppCore
+{
+	public static partial class AppCoreMethods
+	{
+		public static partial void ulEnableDefaultLogger(string log_path)
+		{
+			unsafe
+			{
+				global::System.IntPtr __log_path_gen_native = default;
+				//
+				// Setup
+				//
+				global::UltralightNet.ULStringGeneratedDllImportMarshaler __log_path_gen_native__marshaler = default;
+				try
+				{
+					//
+					// Marshal
+					//
+					__log_path_gen_native__marshaler = new global::UltralightNet.ULStringGeneratedDllImportMarshaler(log_path);
+					__log_path_gen_native = __log_path_gen_native__marshaler.Value;
+					//
+					// Invoke
+					//
+					ulEnableDefaultLogger__PInvoke__(__log_path_gen_native);
+				}
+				finally
+				{
+					//
+					// Cleanup
+					//
+					__log_path_gen_native__marshaler.FreeNative();
+				}
+			}
+		}
+
+		[System.Runtime.InteropServices.DllImportAttribute("AppCore", EntryPoint = "ulEnableDefaultLogger")]
+		extern private static unsafe void ulEnableDefaultLogger__PInvoke__(global::System.IntPtr log_path);
 	}
 }
 namespace UltralightNet.AppCore
@@ -254,3 +334,5 @@ namespace UltralightNet.AppCore
 }
 
 #pragma warning restore IDE0059
+
+#endif

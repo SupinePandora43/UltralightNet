@@ -15,8 +15,8 @@ namespace UltralightNet
 		public static extern void ulDestroyConfig(IntPtr config);
 
 		/// <summary>Set the file path to the directory that contains Ultralight's bundled resources (eg, cacert.pem and other localized resources).</summary>
-		[DllImport("Ultralight")]
-		public static extern void ulConfigSetResourcePath(IntPtr config, [MarshalAs(UnmanagedType.CustomMarshaler, MarshalTypeRef = typeof(ULStringMarshaler))] string resource_path);
+		[GeneratedDllImport("Ultralight")]
+		public static partial void ulConfigSetResourcePath(IntPtr config, [MarshalUsing(typeof(ULStringGeneratedDllImportMarshaler))] string resource_path);
 
 		/// <summary>Set the file path to a writable directory that will be used to store cookies, cached resources, and other persistent data.</summary>
 		[DllImport("Ultralight")]

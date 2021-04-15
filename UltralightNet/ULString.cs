@@ -1,4 +1,5 @@
 using System;
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
 namespace UltralightNet
@@ -59,6 +60,31 @@ namespace UltralightNet
 #else
 		public static partial void ulStringAssignCString(IntPtr str, [MarshalAs(UnmanagedType.LPStr)] string c_str);
 #endif
+	}
+
+	public struct ULStringGeneratedDllImportMarshaler
+	{
+		public IntPtr ptr;
+
+		public ULStringGeneratedDllImportMarshaler(string str)
+		{
+			ptr = ULStringMarshaler.ManagedToNative(str);
+		}
+
+		public string ToManaged() => ULStringMarshaler.NativeToManaged(ptr);
+
+		public IntPtr Value
+		{
+			[MethodImpl(MethodImplOptions.AggressiveInlining)]
+			get => ptr;
+			[MethodImpl(MethodImplOptions.AggressiveInlining)]
+			set => ptr = value;
+		}
+
+		public void FreeNative()
+		{
+			ULStringMarshaler.CleanUpNative(ptr);
+		}
 	}
 
 	public class ULStringMarshaler : ICustomMarshaler

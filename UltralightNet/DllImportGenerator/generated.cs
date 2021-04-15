@@ -2,6 +2,8 @@
 // + (side story) https://github.com/dotnet/runtimelab/issues/938
 
 
+#if !GENERATED
+
 #pragma warning disable IDE0059
 
 using System;
@@ -374,6 +376,45 @@ namespace UltralightNet
 		[System.Runtime.InteropServices.DllImportAttribute("Ultralight", EntryPoint = "ulConfigSetForceRepaint")]
 		extern private static unsafe void ulConfigSetForceRepaint__PInvoke__(global::System.IntPtr config, byte enabled);
 	}
+}
+namespace UltralightNet
+{
+    public static partial class Methods
+    {
+        public static partial void ulConfigSetResourcePath(global::System.IntPtr config, string resource_path)
+        {
+            unsafe
+            {
+                global::System.IntPtr __resource_path_gen_native = default;
+                //
+                // Setup
+                //
+                global::UltralightNet.ULStringGeneratedDllImportMarshaler __resource_path_gen_native__marshaler = default;
+                try
+                {
+                    //
+                    // Marshal
+                    //
+                    __resource_path_gen_native__marshaler = new global::UltralightNet.ULStringGeneratedDllImportMarshaler(resource_path);
+                    __resource_path_gen_native = __resource_path_gen_native__marshaler.Value;
+                    //
+                    // Invoke
+                    //
+                    ulConfigSetResourcePath__PInvoke__(config, __resource_path_gen_native);
+                }
+                finally
+                {
+                    //
+                    // Cleanup
+                    //
+                    __resource_path_gen_native__marshaler.FreeNative();
+                }
+            }
+        }
+
+        [System.Runtime.InteropServices.DllImportAttribute("Ultralight", EntryPoint = "ulConfigSetResourcePath")]
+        extern private static unsafe void ulConfigSetResourcePath__PInvoke__(global::System.IntPtr config, global::System.IntPtr resource_path);
+    }
 }
 namespace UltralightNet
 {
@@ -890,6 +931,138 @@ namespace UltralightNet
 }
 namespace UltralightNet
 {
+    public static partial class Methods
+    {
+        public static partial void ulViewLoadHTML(global::System.IntPtr view, string html_string)
+        {
+            unsafe
+            {
+                global::System.IntPtr __html_string_gen_native = default;
+                //
+                // Setup
+                //
+                global::UltralightNet.ULStringGeneratedDllImportMarshaler __html_string_gen_native__marshaler = default;
+                try
+                {
+                    //
+                    // Marshal
+                    //
+                    __html_string_gen_native__marshaler = new global::UltralightNet.ULStringGeneratedDllImportMarshaler(html_string);
+                    __html_string_gen_native = __html_string_gen_native__marshaler.Value;
+                    //
+                    // Invoke
+                    //
+                    ulViewLoadHTML__PInvoke__(view, __html_string_gen_native);
+                }
+                finally
+                {
+                    //
+                    // Cleanup
+                    //
+                    __html_string_gen_native__marshaler.FreeNative();
+                }
+            }
+        }
+
+        [System.Runtime.InteropServices.DllImportAttribute("Ultralight", EntryPoint = "ulViewLoadHTML")]
+        extern private static unsafe void ulViewLoadHTML__PInvoke__(global::System.IntPtr view, global::System.IntPtr html_string);
+    }
+}
+namespace UltralightNet
+{
+    public static partial class Methods
+    {
+        public static partial void ulViewLoadURL(global::System.IntPtr view, string url_string)
+        {
+            unsafe
+            {
+                global::System.IntPtr __url_string_gen_native = default;
+                //
+                // Setup
+                //
+                global::UltralightNet.ULStringGeneratedDllImportMarshaler __url_string_gen_native__marshaler = default;
+                try
+                {
+                    //
+                    // Marshal
+                    //
+                    __url_string_gen_native__marshaler = new global::UltralightNet.ULStringGeneratedDllImportMarshaler(url_string);
+                    __url_string_gen_native = __url_string_gen_native__marshaler.Value;
+                    //
+                    // Invoke
+                    //
+                    ulViewLoadURL__PInvoke__(view, __url_string_gen_native);
+                }
+                finally
+                {
+                    //
+                    // Cleanup
+                    //
+                    __url_string_gen_native__marshaler.FreeNative();
+                }
+            }
+        }
+
+        [System.Runtime.InteropServices.DllImportAttribute("Ultralight", EntryPoint = "ulViewLoadURL")]
+        extern private static unsafe void ulViewLoadURL__PInvoke__(global::System.IntPtr view, global::System.IntPtr url_string);
+    }
+}
+namespace UltralightNet
+{
+    public static partial class Methods
+    {
+        public static partial string ulViewEvaluateScript(global::System.IntPtr view, string js_string, out string exception)
+        {
+            unsafe
+            {
+                global::System.IntPtr __js_string_gen_native = default;
+                exception = default;
+                global::System.IntPtr __exception_gen_native = default;
+                string __retVal = default;
+                global::System.IntPtr __retVal_gen_native = default;
+                //
+                // Setup
+                //
+                global::UltralightNet.ULStringGeneratedDllImportMarshaler __retVal_gen_native__marshaler = default;
+                global::UltralightNet.ULStringGeneratedDllImportMarshaler __js_string_gen_native__marshaler = default;
+                global::UltralightNet.ULStringGeneratedDllImportMarshaler __exception_gen_native__marshaler = default;
+                try
+                {
+                    //
+                    // Marshal
+                    //
+                    __js_string_gen_native__marshaler = new global::UltralightNet.ULStringGeneratedDllImportMarshaler(js_string);
+                    __js_string_gen_native = __js_string_gen_native__marshaler.Value;
+                    //
+                    // Invoke
+                    //
+                    __retVal_gen_native = ulViewEvaluateScript__PInvoke__(view, __js_string_gen_native, &__exception_gen_native);
+                    //
+                    // Unmarshal
+                    //
+                    __retVal_gen_native__marshaler.Value = __retVal_gen_native;
+                    __retVal = __retVal_gen_native__marshaler.ToManaged();
+                    __exception_gen_native__marshaler.Value = __exception_gen_native;
+                    exception = __exception_gen_native__marshaler.ToManaged();
+                }
+                finally
+                {
+                    //
+                    // Cleanup
+                    //
+                    __js_string_gen_native__marshaler.FreeNative();
+                }
+
+                return __retVal;
+            }
+        }
+
+        [System.Runtime.InteropServices.DllImportAttribute("Ultralight", EntryPoint = "ulViewEvaluateScript")]
+        extern private static unsafe global::System.IntPtr ulViewEvaluateScript__PInvoke__(global::System.IntPtr view, global::System.IntPtr js_string, global::System.IntPtr*exception);
+    }
+}
+namespace UltralightNet
+{
 	public static partial class Methods
 	{
 		public static partial bool ulViewCanGoBack(global::System.IntPtr view)
@@ -1090,14 +1263,6 @@ namespace UltralightNet
 		extern private static unsafe byte ulViewGetNeedsPaint__PInvoke__(global::System.IntPtr view);
 	}
 }
-namespace UltralightNet
-{
-	public static partial class Methods
-	{
-		public static partial global::System.Numerics.Matrix4x4 ulApplyProjection(global::System.Numerics.Matrix4x4 transform, float viewport_width, float viewport_height, bool flip_y) => ulApplyProjection__PInvoke__(transform, viewport_width, viewport_height, (byte)(flip_y ? 1 : 0));
-
-		[System.Runtime.InteropServices.DllImportAttribute("Ultralight", EntryPoint = "ulApplyProjection")]
-		internal static extern global::System.Numerics.Matrix4x4 ulApplyProjection__PInvoke__(global::System.Numerics.Matrix4x4 transform, float viewport_width, float viewport_height, byte flip_y);
-	}
-}
 #pragma warning restore IDE0059
+
+#endif

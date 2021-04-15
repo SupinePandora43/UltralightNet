@@ -14,6 +14,8 @@
 		<Description>AppCore's binaries and bindings</Description>
 
 		<PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
+
+		<DefineConstants Condition="'$(TargetFramework)'=='net5.0'">$(DefineConstants);GENERATED</DefineConstants>
 	</PropertyGroup>
 	<ItemGroup>
 		<None Include="../Ultralight_LICENSE.txt" Pack="true" PackagePath="LICENSE.txt" />
@@ -29,7 +31,7 @@
 		<Content Include="@(_ExistingAssets->'%(Identity)')" CopyToOutputDirectory="PreserveNewest" PackagePath="%(PackagePath)" Pack="true" />
 	</ItemGroup>
 	<ItemGroup>
-		<!--<PackageReference Condition="'$(TargetFramework)'=='net5.0'" Include="DllImportGenerator" Version="1.0.0-alpha.20604.3" OutputItemType="Analyzer" ReferenceOutputAssembly="false" PrivateAssets="All" />-->
+		<PackageReference Condition="'$(TargetFramework)'=='net5.0'" Include="DllImportGenerator" Version="1.0.0-alpha.20604.3" OutputItemType="Analyzer" ReferenceOutputAssembly="false" PrivateAssets="All" />
 		<PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0" PrivateAssets="All" />
 		<ProjectReference Include="..\UltralightNet\UltralightNet.csproj" />
 	</ItemGroup>

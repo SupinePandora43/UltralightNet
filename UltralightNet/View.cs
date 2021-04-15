@@ -36,11 +36,11 @@ namespace UltralightNet
 		[DllImport("Ultralight")]
 		public static extern IntPtr ulViewGetSurface(IntPtr view);
 
-		[DllImport("Ultralight")]
-		public static extern void ulViewLoadHTML(IntPtr view, [MarshalAs(UnmanagedType.CustomMarshaler, MarshalTypeRef = typeof(ULStringMarshaler))] string html_string);
+		[GeneratedDllImport("Ultralight")]
+		public static partial void ulViewLoadHTML(IntPtr view, [MarshalUsing(typeof(ULStringGeneratedDllImportMarshaler))] string html_string);
 
-		[DllImport("Ultralight")]
-		public static extern void ulViewLoadURL(IntPtr view, [MarshalAs(UnmanagedType.CustomMarshaler, MarshalTypeRef = typeof(ULStringMarshaler))] string url_string);
+		[GeneratedDllImport("Ultralight")]
+		public static partial void ulViewLoadURL(IntPtr view, [MarshalUsing(typeof(ULStringGeneratedDllImportMarshaler))] string url_string);
 
 		[DllImport("Ultralight")]
 		public static extern void ulViewResize(IntPtr view, uint width, uint height);
@@ -52,9 +52,9 @@ namespace UltralightNet
 		[DllImport("Ultralight")]
 		public static extern void ulViewUnlockJSContext(IntPtr view);
 
-		[DllImport("Ultralight")]
-		[return: MarshalAs(UnmanagedType.CustomMarshaler, MarshalTypeRef = typeof(ULStringMarshaler))]
-		public static extern string ulViewEvaluateScript(IntPtr view, [MarshalAs(UnmanagedType.CustomMarshaler, MarshalTypeRef = typeof(ULStringMarshaler))] string js_string, [MarshalAs(UnmanagedType.CustomMarshaler, MarshalTypeRef = typeof(ULStringMarshaler))] out string exception);
+		[GeneratedDllImport("Ultralight")]
+		[return: MarshalUsing(typeof(ULStringGeneratedDllImportMarshaler))]
+		public static partial string ulViewEvaluateScript(IntPtr view, [MarshalUsing(typeof(ULStringGeneratedDllImportMarshaler))] string js_string, [MarshalUsing(typeof(ULStringGeneratedDllImportMarshaler))] out string exception);
 
 		/// <summary>Check if can navigate backwards in history.</summary>
 		[GeneratedDllImport("Ultralight")]
@@ -147,7 +147,7 @@ namespace UltralightNet
 		public static extern void ulViewSetBeginLoadingCallback(IntPtr view, ULBeginLoadingCallback callback, IntPtr user_data);
 
 		[DllImport("Ultralight")]
-		public static extern void ulViewSetFinishLoadingCallback(IntPtr view, ULFinishLoadingCallback callback, IntPtr user_data);
+		public static extern void ulViewSetFinishLoadingCallback(IntPtr view, ULFinishLoadingCallback__PInvoke__ callback, IntPtr user_data);
 
 		[DllImport("Ultralight")]
 		public static extern void ulViewSetFailLoadingCallback(IntPtr view, ULFailLoadingCallback callback, IntPtr user_data);
@@ -252,7 +252,7 @@ namespace UltralightNet
 		public void SetAddConsoleMessageCallback(ULAddConsoleMessageCallback callback, IntPtr userData = default) => Methods.ulViewSetAddConsoleMessageCallback(Ptr, callback, userData);
 		public void SetCreateChildViewCallback(ULCreateChildViewCallback callback, IntPtr userData = default) => Methods.ulViewSetCreateChildViewCallback(Ptr, callback, userData);
 		public void SetBeginLoadingCallback(ULBeginLoadingCallback callback, IntPtr userData = default) => Methods.ulViewSetBeginLoadingCallback(Ptr, callback, userData);
-		public void SetFinishLoadingCallback(ULFinishLoadingCallback callback, IntPtr userData = default) => Methods.ulViewSetFinishLoadingCallback(Ptr, callback, userData);
+		public void SetFinishLoadingCallback(ULFinishLoadingCallback callback, IntPtr userData = default) => Methods.ulViewSetFinishLoadingCallback(Ptr, (user_data, caller, frame_id, is_main_frame, url) => callback(user_data, new View(caller), frame_id, is_main_frame != 0, ULStringMarshaler.NativeToManaged(url)), userData);
 		public void SetFailLoadingCallback(ULFailLoadingCallback callback, IntPtr userData = default) => Methods.ulViewSetFailLoadingCallback(Ptr, callback, userData);
 		public void SetWindowObjectReadyCallback(ULWindowObjectReadyCallback callback, IntPtr userData = default) => Methods.ulViewSetWindowObjectReadyCallback(Ptr, callback, userData);
 		public void SetDOMReadyCallback(ULDOMReadyCallback callback, IntPtr userData = default) => Methods.ulViewSetDOMReadyCallback(Ptr, callback, userData);

@@ -7,7 +7,6 @@ namespace UltralightNet.AppCore.TestApp
 	{
 		static void Main()
 		{
-			//AppCoreMethods.ulEnablePlatformFontLoader();
 			AppCoreMethods.ulEnableDefaultLogger("./log.txt");
 
 			ULApp app = new(new ULSettings()
@@ -19,7 +18,7 @@ namespace UltralightNet.AppCore.TestApp
 				UseGpu = false
 			});
 
-			ULWindow window = new(app.MainMonitor, 512, 512, false, ULWindowFlags.kWindowFlags_Titled | ULWindowFlags.kWindowFlags_Maximizable);
+			ULWindow window = new(app.MainMonitor, 512, 512, false, ULWindowFlags.Titled | ULWindowFlags.Maximizable);
 
 			window.Title = "test title";
 
@@ -32,12 +31,21 @@ namespace UltralightNet.AppCore.TestApp
 
 			view.SetFailLoadingCallback(
 				(user_data, caller, frame_id, is_main_frame, url, description, error_domain, error_code) =>
-					Console.WriteLine("ALARM")
+					throw new Exception("Failed loading")
 			);
 
 			view.SetFinishLoadingCallback((user_data, caller, frame_id, is_main_frame, url) => Console.WriteLine("loaded"));
 
 			view.HTML = "<html><body><p>123</p></body></html>";
+
+			ulong counter = 0;
+
+			app.SetUpdateCallback((_) =>
+			{
+				counter++;
+
+				//if (counter >= 1000) app.Quit();
+			});
 
 			app.Run();
 		}
