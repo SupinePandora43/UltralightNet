@@ -11,13 +11,17 @@ namespace UltralightNet
 		public static partial IntPtr ulCreateString([MarshalAs(UnmanagedType.LPStr)] string str);
 
 		/// <summary>Create string from UTF-8 buffer.</summary>
-#if NET5_0_OR_GREATER
 		[GeneratedDllImport("Ultralight")]
 		[Obsolete("Unexpected behaviour")]
-		public static partial IntPtr ulCreateStringUTF8([MarshalAs(UnmanagedType.LPUTF8Str)] string str, uint len);
+		public static partial IntPtr ulCreateStringUTF8(
+#if NET5_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
+			[MarshalAs(UnmanagedType.LPUTF8Str)]
 #else
-		public static partial IntPtr ulCreateStringUTF8([MarshalAs(UnmanagedType.LPStr)] string str, uint len);
+			[MarshalAs(UnmanagedType.LPStr)]
 #endif
+			string str,
+			uint len
+		);
 
 		/// <summary>Create string from UTF-16 buffer.</summary>
 		[GeneratedDllImport("Ultralight", CharSet = CharSet.Unicode)]
