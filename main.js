@@ -229,7 +229,7 @@ var assemblies = [
       { "name": "System.Runtime.InteropServices.NativeMarshallingAttribute", "rp": "UltralightNet_NativeMarshallingAttribute.html", "cl": 0, "ucl": 5, "cal": 5, "tl": 60, "ct": "LineCoverage", "mc": "-", "cb": 0, "tb": 0, "lch": [], "bch": [], "hc": [] },
       { "name": "UltralightNet.Matrix4x4Extensions", "rp": "UltralightNet_Matrix4x4Extensions.html", "cl": 0, "ucl": 1, "cal": 1, "tl": 22, "ct": "LineCoverage", "mc": "-", "cb": 0, "tb": 0, "lch": [], "bch": [], "hc": [] },
       { "name": "UltralightNet.Methods", "rp": "UltralightNet_Methods.html", "cl": 218, "ucl": 505, "cal": 723, "tl": 61, "ct": "LineCoverage", "mc": "-", "cb": 23, "tb": 102, "lch": [], "bch": [], "hc": [] },
-      { "name": "UltralightNet.Renderer", "rp": "UltralightNet_Renderer.html", "cl": 14, "ucl": 9, "cal": 23, "tl": 70, "ct": "LineCoverage", "mc": "-", "cb": 2, "tb": 2, "lch": [], "bch": [], "hc": [] },
+      { "name": "UltralightNet.Renderer", "rp": "UltralightNet_Renderer.html", "cl": 15, "ucl": 8, "cal": 23, "tl": 70, "ct": "LineCoverage", "mc": "-", "cb": 2, "tb": 2, "lch": [], "bch": [], "hc": [] },
       { "name": "UltralightNet.RenderTargetNative", "rp": "UltralightNet_RenderTargetNative.html", "cl": 0, "ucl": 23, "cal": 23, "tl": 69, "ct": "LineCoverage", "mc": "-", "cb": 0, "tb": 2, "lch": [], "bch": [], "hc": [] },
       { "name": "UltralightNet.Session", "rp": "UltralightNet_Session.html", "cl": 13, "ucl": 7, "cal": 20, "tl": 79, "ct": "LineCoverage", "mc": "-", "cb": 1, "tb": 2, "lch": [], "bch": [], "hc": [] },
       { "name": "UltralightNet.ULBitmap", "rp": "UltralightNet_ULBitmap.html", "cl": 0, "ucl": 37, "cal": 37, "tl": 199, "ct": "LineCoverage", "mc": "-", "cb": 0, "tb": 2, "lch": [], "bch": [], "hc": [] },
