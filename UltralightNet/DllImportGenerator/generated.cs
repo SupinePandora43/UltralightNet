@@ -11,6 +11,59 @@ using System.Runtime.InteropServices;
 
 namespace UltralightNet
 {
+    public static partial class Methods
+    {
+        public static partial global::System.IntPtr ulCreateKeyEvent(global::UltralightNet.ULKeyEventType type, global::UltralightNet.ULKeyEventModifiers modifiers, int virtual_key_code, int native_key_code, string text, string unmodified_text, bool is_keypad, bool is_auto_repeat, bool is_system_key)
+        {
+            unsafe
+            {
+                global::System.IntPtr __text_gen_native = default;
+                global::System.IntPtr __unmodified_text_gen_native = default;
+                byte __is_keypad_gen_native = default;
+                byte __is_auto_repeat_gen_native = default;
+                byte __is_system_key_gen_native = default;
+                global::System.IntPtr __retVal = default;
+                //
+                // Setup
+                //
+                global::UltralightNet.ULStringGeneratedDllImportMarshaler __text_gen_native__marshaler = default;
+                global::UltralightNet.ULStringGeneratedDllImportMarshaler __unmodified_text_gen_native__marshaler = default;
+                try
+                {
+                    //
+                    // Marshal
+                    //
+                    __text_gen_native__marshaler = new global::UltralightNet.ULStringGeneratedDllImportMarshaler(text);
+                    __text_gen_native = __text_gen_native__marshaler.Value;
+                    __unmodified_text_gen_native__marshaler = new global::UltralightNet.ULStringGeneratedDllImportMarshaler(unmodified_text);
+                    __unmodified_text_gen_native = __unmodified_text_gen_native__marshaler.Value;
+                    __is_keypad_gen_native = (byte)(is_keypad ? 1 : 0);
+                    __is_auto_repeat_gen_native = (byte)(is_auto_repeat ? 1 : 0);
+                    __is_system_key_gen_native = (byte)(is_system_key ? 1 : 0);
+                    //
+                    // Invoke
+                    //
+                    __retVal = ulCreateKeyEvent__PInvoke__(type, modifiers, virtual_key_code, native_key_code, __text_gen_native, __unmodified_text_gen_native, __is_keypad_gen_native, __is_auto_repeat_gen_native, __is_system_key_gen_native);
+                }
+                finally
+                {
+                    //
+                    // Cleanup
+                    //
+                    __text_gen_native__marshaler.FreeNative();
+                    __unmodified_text_gen_native__marshaler.FreeNative();
+                }
+
+                return __retVal;
+            }
+        }
+
+        [System.Runtime.InteropServices.DllImportAttribute("Ultralight", EntryPoint = "ulCreateKeyEvent")]
+        extern private static unsafe global::System.IntPtr ulCreateKeyEvent__PInvoke__(global::UltralightNet.ULKeyEventType type, global::UltralightNet.ULKeyEventModifiers modifiers, int virtual_key_code, int native_key_code, global::System.IntPtr text, global::System.IntPtr unmodified_text, byte is_keypad, byte is_auto_repeat, byte is_system_key);
+    }
+}
+namespace UltralightNet
+{
 	public static partial class Methods
 	{
 		public static partial bool ulSessionIsPersistent(global::System.IntPtr session)

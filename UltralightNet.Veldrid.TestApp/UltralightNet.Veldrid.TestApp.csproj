@@ -17,6 +17,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
+		<ProjectReference Include="..\UltralightNet.Veldrid.SDL2\UltralightNet.Veldrid.SDL2.csproj" />
 		<ProjectReference Include="..\UltralightNet.Veldrid\UltralightNet.Veldrid.csproj" />
 	</ItemGroup>
 

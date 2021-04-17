@@ -7,6 +7,7 @@ using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Text;
 using UltralightNet.AppCore;
+using UltralightNet.Veldrid.SDL2;
 using Veldrid;
 using Veldrid.Sdl2;
 using Veldrid.SPIRV;
@@ -17,6 +18,7 @@ namespace UltralightNet.Veldrid.TestApp
 	class Program
 	{
 		private const GraphicsBackend BACKEND = GraphicsBackend.Direct3D11;
+		private const bool TRANSPARENT = true;
 
 		private const uint Width = 1024;
 		private const uint Height = 512;
@@ -149,10 +151,10 @@ void main()
 				ForceRepaint = false
 			});
 
-			View view = new(renderer, Width, Height, true, Session.DefaultSession(renderer), false);
-			//View cpuView = new(renderer, Width, Height, true, Session.DefaultSession(renderer), true);
+			View view = new(renderer, Width, Height, TRANSPARENT, Session.DefaultSession(renderer), false);
+			//View cpuView = new(renderer, Width, Height, TRANSPARENT, Session.DefaultSession(renderer), true);
 
-			const string url = "https://github.com/SupinePandora43";
+			const string url = "https://en.key-test.ru/";//"https://github.com/SupinePandora43";
 
 			view.URL = url;
 			//cpuView.URL = url;
@@ -253,37 +255,14 @@ void main()
 
 			window.KeyDown += (kd) =>
 			{
-				/*ULKeyEvent kv = new(ULKeyEventType.Char, 0, 0, 0, "a", "a", false, false, false);
-				view.FireKeyEvent(kv);
-				cpuView.FireKeyEvent(kv);
-				*/
-				IntPtr keyIdentifier = ULStringMarshaler.ManagedToNative("");
-
-				GetKey(ULKeyCodes.GK_TAB, keyIdentifier);
-
-				string managedKeyIdentifier = ULStringMarshaler.NativeToManaged(keyIdentifier);
-
-				ULKeyEventModifiers modifiers = 0;
-
-				if ((kd.Modifiers & ModifierKeys.Alt) is ModifierKeys.Alt) modifiers |= ULKeyEventModifiers.AltKey;
-				if ((kd.Modifiers & ModifierKeys.Control) is ModifierKeys.Control) modifiers |= ULKeyEventModifiers.CtrlKey;
-				if ((kd.Modifiers & ModifierKeys.Shift) is ModifierKeys.Shift) modifiers |= ULKeyEventModifiers.ShiftKey;
-				if ((kd.Modifiers & ModifierKeys.Gui) is ModifierKeys.Gui) modifiers |= ULKeyEventModifiers.MetaKey;
-
-				ULKeyEvent ked = new(ULKeyEventType.KeyDown, modifiers, ULKeyCodes.GK_TAB, 0, "", null, false, false, false);
-
-				view.FireKeyEvent(ked);
-				//cpuView.FireKeyEvent(ked);
+				view.FireKeyEvent(kd.ToULKeyEvent());
+				//cpuView.FireKeyEvent(kd.ToULKeyEvent());
 			};
 
 			window.KeyUp += (ku) =>
 			{
-				IntPtr keyIdentifier = ULStringMarshaler.ManagedToNative("");
-				GetKey(ULKeyCodes.GK_TAB, keyIdentifier);
-				string managedKeyIdentifier = ULStringMarshaler.NativeToManaged(keyIdentifier);
-				ULKeyEvent ked = new(ULKeyEventType.KeyUp, 0, ULKeyCodes.GK_TAB, 0, "", null, false, false, false);
-				view.FireKeyEvent(ked);
-				//cpuView.FireKeyEvent(ked);
+				view.FireKeyEvent(ku.ToULKeyEvent());
+				//cpuView.FireKeyEvent(ku.ToULKeyEvent());
 			};
 
 			window.Resized += () =>
@@ -323,12 +302,12 @@ void main()
 			uint frame_of_second = 0;
 
 			framerateStopwatch.Restart();
-			
+
 			uint fps = 0;
 
 			while (window.Exists)
 			{
-				if(framerateStopwatch.ElapsedMilliseconds/1000 >= 1)
+				if (framerateStopwatch.ElapsedMilliseconds / 1000 >= 1)
 				{
 					fps = frame_of_second;
 					Console.WriteLine(fps);
@@ -341,7 +320,7 @@ void main()
 				//Console.WriteLine("Render");
 				renderer.Render();
 				//Console.WriteLine("Done");
-				
+
 				/*ULSurface surface = cpuView.Surface;
 				ULBitmap bitmap = surface.Bitmap;
 
@@ -375,15 +354,17 @@ void main()
 				//commandList.ClearColorTarget(0, new RgbaFloat(MathF.Sin(stopwatch.Elapsed.Milliseconds / 100f), 255, 0, 255));
 				//commandList.ClearColorTarget(0, RgbaFloat.Blue);
 
+				if (TRANSPARENT) commandList.ClearColorTarget(0, RgbaFloat.Clear);
+
 				commandList.SetVertexBuffer(0, quadV);
 				commandList.SetIndexBuffer(quadI, IndexFormat.UInt16);
 
 				//if (cpu)
 				//{
-					//commandList.SetGraphicsResourceSet(0, cpuTextureResourceSet);
+				//commandList.SetGraphicsResourceSet(0, cpuTextureResourceSet);
 				//}
 				//else
-					commandList.SetGraphicsResourceSet(0, gpuDriver.GetRenderTarget(view));
+				commandList.SetGraphicsResourceSet(0, gpuDriver.GetRenderTarget(view));
 
 				commandList.DrawIndexed(
 					4,
@@ -392,7 +373,7 @@ void main()
 					0,
 					0
 				);
-				
+
 				commandList.End();
 
 				graphicsDevice.SubmitCommands(commandList);
