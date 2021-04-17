@@ -58,12 +58,16 @@ namespace UltralightNet
 		[DllImport("Ultralight")]
 		public static extern void ulStringAssignString(IntPtr str, IntPtr newStr);
 
-#if NET5_0_OR_GREATER
-		[GeneratedDllImport("Ultralight", CharSet = CharSet.Ansi)]
-		public static partial void ulStringAssignCString(IntPtr str, [MarshalAs(UnmanagedType.LPUTF8Str)] string c_str);
+		[GeneratedDllImport("Ultralight")]
+		public static partial void ulStringAssignCString(
+			IntPtr str,
+			[MarshalAs(
+#if NET5_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
+				UnmanagedType.LPUTF8Str
 #else
-		public static partial void ulStringAssignCString(IntPtr str, [MarshalAs(UnmanagedType.LPStr)] string c_str);
+				UnmanagedType.LPStr
 #endif
+			)] string c_str);
 	}
 
 	public struct ULStringGeneratedDllImportMarshaler
@@ -93,7 +97,7 @@ namespace UltralightNet
 
 	public class ULStringMarshaler : ICustomMarshaler
 	{
-		#region Structures
+#region Structures
 		[StructLayout(LayoutKind.Sequential)]
 		private struct ULStringSTR
 		{
@@ -123,7 +127,7 @@ namespace UltralightNet
 				Marshal.FreeHGlobal(ulStringPTR.data_);
 			}
 		}
-		#endregion Structures
+#endregion Structures
 
 		private static readonly ULStringMarshaler instance = new();
 
@@ -137,7 +141,7 @@ namespace UltralightNet
 		public IntPtr MarshalManagedToNative(object ManagedObj) => ManagedToNative(ManagedObj as string);
 		public object MarshalNativeToManaged(IntPtr ptr) => NativeToManaged(ptr);
 
-		#region Code
+#region Code
 
 		/// <summary>
 		/// Creates ULString from <see cref="string"/>
