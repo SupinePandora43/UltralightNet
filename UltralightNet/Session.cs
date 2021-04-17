@@ -6,8 +6,8 @@ namespace UltralightNet
 	public static partial class Methods
 	{
 		/// <summary>Create a Session to store local data in (such as cookies, local storage, application cache, indexed db, etc).</summary>
-		[DllImport("Ultralight")]
-		public static extern IntPtr ulCreateSession(IntPtr renderer, [MarshalAs(UnmanagedType.I1)] bool is_persistent, [MarshalAs(UnmanagedType.CustomMarshaler, MarshalTypeRef = typeof(ULStringMarshaler))] string name);
+		[GeneratedDllImport("Ultralight")]
+		public static partial IntPtr ulCreateSession(IntPtr renderer, [MarshalAs(UnmanagedType.I1)] bool is_persistent, [MarshalUsing(typeof(ULStringGeneratedDllImportMarshaler))] string name);
 
 		/// <summary>Destroy a Session.</summary>
 		[DllImport("Ultralight")]
@@ -24,18 +24,18 @@ namespace UltralightNet
 		public static partial bool ulSessionIsPersistent(IntPtr session);
 
 		/// <summary>Unique name identifying the session (used for unique disk path).</summary>
-		[DllImport("Ultralight")]
-		[return: MarshalAs(UnmanagedType.CustomMarshaler, MarshalTypeRef = typeof(ULStringMarshaler))]
-		public static extern string ulSessionGetName(IntPtr session);
+		[GeneratedDllImport("Ultralight")]
+		[return: MarshalUsing(typeof(ULStringGeneratedDllImportMarshaler))]
+		public static partial string ulSessionGetName(IntPtr session);
 
 		/// <summary>Unique numeric Id for the session.</summary>
-		[GeneratedDllImport("Ultralight")]
-		public static partial ulong ulSessionGetId(IntPtr session);
+		[DllImport("Ultralight")]
+		public static extern ulong ulSessionGetId(IntPtr session);
 
 		/// <summary>The disk path to write to (used by persistent sessions only).</summary>
-		[DllImport("Ultralight")]
-		[return: MarshalAs(UnmanagedType.CustomMarshaler, MarshalTypeRef = typeof(ULStringMarshaler))]
-		public static extern string ulSessionGetDiskPath(IntPtr session);
+		[GeneratedDllImport("Ultralight")]
+		[return: MarshalUsing(typeof(ULStringGeneratedDllImportMarshaler))]
+		public static partial string ulSessionGetDiskPath(IntPtr session);
 	}
 
 	///<summary>Stores local data such as cookies, local storage, and application cache for one or more Views. </summary>

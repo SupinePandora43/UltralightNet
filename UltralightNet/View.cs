@@ -12,13 +12,13 @@ namespace UltralightNet
 		[DllImport("Ultralight")]
 		public static extern void ulDestroyView(IntPtr view);
 
-		[DllImport("Ultralight", CharSet = CharSet.Unicode)]
-		[return: MarshalAs(UnmanagedType.CustomMarshaler, MarshalTypeRef = typeof(ULStringMarshaler))]
-		public static extern string ulViewGetURL(IntPtr view);
+		[GeneratedDllImport("Ultralight", CharSet = CharSet.Unicode)]
+		[return: MarshalUsing(typeof(ULStringGeneratedDllImportMarshaler))]
+		public static partial string ulViewGetURL(IntPtr view);
 
-		[DllImport("Ultralight")]
-		[return: MarshalAs(UnmanagedType.CustomMarshaler, MarshalTypeRef = typeof(ULStringMarshaler))]
-		public static extern string ulViewGetTitle(IntPtr view);
+		[GeneratedDllImport("Ultralight")]
+		[return: MarshalUsing(typeof(ULStringGeneratedDllImportMarshaler))]
+		public static partial string ulViewGetTitle(IntPtr view);
 
 		[DllImport("Ultralight")]
 		public static extern uint ulViewGetWidth(IntPtr view);

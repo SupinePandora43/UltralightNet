@@ -17,7 +17,7 @@ namespace UltralightNet.Veldrid.TestApp
 {
 	class Program
 	{
-		private const GraphicsBackend BACKEND = GraphicsBackend.Direct3D11;
+		private const GraphicsBackend BACKEND = GraphicsBackend.OpenGL;
 		private const bool TRANSPARENT = true;
 
 		private const uint Width = 1024;
@@ -140,7 +140,7 @@ void main()
 
 			VeldridGPUDriver gpuDriver = new(graphicsDevice);
 
-			ULPlatform.SetLogger(new() { log_message = (lvl, msg) => Console.WriteLine(msg) }); ;
+			ULPlatform.SetLogger(new() { LogMessage = (lvl, msg) => Console.WriteLine(msg) }); ;
 			AppCoreMethods.ulEnablePlatformFontLoader();
 			ULPlatform.SetGPUDriver(gpuDriver.GetGPUDriver());
 
