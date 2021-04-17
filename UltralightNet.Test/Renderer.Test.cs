@@ -117,6 +117,8 @@ namespace UltralightNet.Test
 				Thread.Sleep(100);
 			}
 
+			renderer.Render();
+
 			view.SetChangeTitleCallback(null);
 			view.SetChangeURLCallback(null);
 
