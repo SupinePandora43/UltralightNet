@@ -1,5 +1,8 @@
+using System.Runtime.InteropServices;
+
 namespace UltralightNet
 {
+	[StructLayout(LayoutKind.Sequential)]
 	public struct ULGPUDriver
 	{
 		public ULGPUDriverCreateTextureCallback CreateTexture { set => _CreateTexture = (id, bitmap) => value(id, new ULBitmap(bitmap)); }

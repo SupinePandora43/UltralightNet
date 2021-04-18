@@ -6,6 +6,7 @@ using System.Numerics;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Text;
+using System.Threading;
 using UltralightNet.AppCore;
 using UltralightNet.Veldrid.SDL2;
 using Veldrid;
@@ -298,6 +299,7 @@ void main()
 				view.SetDOMReadyCallback(null);
 			});
 
+			IntPtr rendererPtr = renderer.Ptr;
 
 			uint frame_of_second = 0;
 
@@ -315,10 +317,10 @@ void main()
 					framerateStopwatch.Restart();
 				}
 				//Console.WriteLine("Update");
-				renderer.Update();
+				Methods.ulUpdate(rendererPtr);
 				gpuDriver.time = stopwatch.ElapsedTicks / 1000f;
 				//Console.WriteLine("Render");
-				renderer.Render();
+				Methods.ulRender(rendererPtr);
 				//Console.WriteLine("Done");
 
 				/*ULSurface surface = cpuView.Surface;
@@ -381,7 +383,11 @@ void main()
 				window.PumpEvents();
 
 				frame_of_second++;
+
+				Thread.Sleep(1000 / 60 / 10); // ~600 fps
 			}
+
+			renderer.Dispose();
 		}
 	}
 }

@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
@@ -156,7 +157,7 @@ namespace UltralightNet
 		public static extern void ulViewSetWindowObjectReadyCallback(IntPtr view, ULWindowObjectReadyCallback callback, IntPtr user_data);
 
 		[DllImport("Ultralight")]
-		public static extern void ulViewSetDOMReadyCallback(IntPtr view, ULDOMReadyCallback callback, IntPtr user_data);
+		public static extern void ulViewSetDOMReadyCallback(IntPtr view, ULDOMReadyCallback__PInvoke__ callback, IntPtr user_data);
 
 		[DllImport("Ultralight")]
 		public static extern void ulViewSetUpdateHistoryCallback(IntPtr view, ULUpdateHistoryCallback callback, IntPtr user_data);
@@ -187,6 +188,16 @@ namespace UltralightNet
 		public View(Renderer renderer, uint width, uint height, bool transparent, Session session, bool force_cpu_renderer)
 		{
 			Ptr = Methods.ulCreateView(renderer.Ptr, width, height, transparent, session.Ptr, force_cpu_renderer);
+		}
+
+		private readonly GCHandle[] handles = new GCHandle[12];
+		private void Handle(int key, GCHandle handle)
+		{
+			if (handles[key].IsAllocated)
+			{
+				handles[key].Free();
+			}
+			handles[key] = handle;
 		}
 
 		public string URL { get => Methods.ulViewGetURL(Ptr); set => Methods.ulViewLoadURL(Ptr, value); }
@@ -255,7 +266,20 @@ namespace UltralightNet
 		public void SetFinishLoadingCallback(ULFinishLoadingCallback callback, IntPtr userData = default) => Methods.ulViewSetFinishLoadingCallback(Ptr, (user_data, caller, frame_id, is_main_frame, url) => callback(user_data, new View(caller), frame_id, is_main_frame != 0, ULStringMarshaler.NativeToManaged(url)), userData);
 		public void SetFailLoadingCallback(ULFailLoadingCallback callback, IntPtr userData = default) => Methods.ulViewSetFailLoadingCallback(Ptr, callback, userData);
 		public void SetWindowObjectReadyCallback(ULWindowObjectReadyCallback callback, IntPtr userData = default) => Methods.ulViewSetWindowObjectReadyCallback(Ptr, callback, userData);
-		public void SetDOMReadyCallback(ULDOMReadyCallback callback, IntPtr userData = default) => Methods.ulViewSetDOMReadyCallback(Ptr, callback, userData);
+		public void SetDOMReadyCallback(ULDOMReadyCallback callback, IntPtr userData = default)
+		{
+			if (callback is not null)
+			{
+				ULDOMReadyCallback__PInvoke__ callback__PInvoke__ = (user_data, caller, frame_id, is_main_frame, url) => callback(user_data, new View(caller), frame_id, is_main_frame != 0, ULStringMarshaler.NativeToManaged(url));
+				Handle(10, GCHandle.Alloc(callback__PInvoke__, GCHandleType.Normal));
+				Methods.ulViewSetDOMReadyCallback(Ptr, callback__PInvoke__, userData);
+			}
+			else
+			{
+				Handle(10, default);
+				Methods.ulViewSetDOMReadyCallback(Ptr, null, userData);
+			}
+		}
 		public void SetUpdateHistoryCallback(ULUpdateHistoryCallback callback, IntPtr userData = default) => Methods.ulViewSetUpdateHistoryCallback(Ptr, callback, userData);
 
 		public bool NeedsPaint { get => Methods.ulViewGetNeedsPaint(Ptr); set => Methods.ulViewSetNeedsPaint(Ptr, value); }
@@ -266,6 +290,14 @@ namespace UltralightNet
 		~View() => Dispose();
 		public void Dispose()
 		{
+			foreach (GCHandle handle in handles)
+			{
+				if (handle.IsAllocated)
+				{
+					handle.Free();
+				}
+			}
+
 			if (IsDisposed) return;
 			Methods.ulDestroyView(Ptr);
 

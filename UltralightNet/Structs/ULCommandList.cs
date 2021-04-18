@@ -3,7 +3,6 @@ using System.Runtime.CompilerServices;
 
 namespace UltralightNet
 {
-	//todo
 	public struct ULCommandList
 	{
 		public uint size;

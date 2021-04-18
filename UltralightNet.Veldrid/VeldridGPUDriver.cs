@@ -89,8 +89,8 @@ namespace UltralightNet.Veldrid
 			NextGeometryId = NextGeometryId,
 			NextRenderBufferId = NextRenderBufferId,
 
-			CreateTexture = CreateTexture,
-			UpdateTexture = UpdateTexture,
+			_CreateTexture = CreateTexture,
+			_UpdateTexture = UpdateTexture,
 			DestroyTexture = DestroyTexture,
 
 			CreateGeometry = CreateGeometry,
@@ -124,7 +124,7 @@ namespace UltralightNet.Veldrid
 			return id;
 		}
 		[MethodImpl(MethodImplOptions.AggressiveOptimization)]
-		public uint NextGeometryId()
+		private uint NextGeometryId()
 		{
 			uint id = GetKey(GeometryEntries);
 			GeometryEntries.Add(id, new());
@@ -134,7 +134,7 @@ namespace UltralightNet.Veldrid
 			return id;
 		}
 		[MethodImpl(MethodImplOptions.AggressiveOptimization)]
-		public uint NextRenderBufferId()
+		private uint NextRenderBufferId()
 		{
 			uint id = GetKey(RenderBufferEntries);
 			RenderBufferEntries.Add(id, new());
@@ -149,7 +149,7 @@ namespace UltralightNet.Veldrid
 		/// Thx https://github.com/TechnologicalPizza
 		/// </summary>
 		[MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
-		private unsafe void Set2DTextureData(ReadOnlySpan<byte> pixels, uint width, uint height, int stride, int bpp, Texture dst, uint dstX, uint dstY, uint dstZ, uint dstMipLevel, uint dstArrayLayer)
+		private unsafe void Set2DTextureData(ReadOnlySpan<byte> pixels, uint width, uint height, int stride, uint bpp, Texture dst, uint dstX, uint dstY, uint dstZ, uint dstMipLevel, uint dstArrayLayer)
 		{
 			_commandList.Begin();
 
@@ -161,7 +161,7 @@ namespace UltralightNet.Veldrid
 			{
 				Span<byte> stagingSpan = new((void*)mappedStaging.Data, (int)mappedStaging.SizeInBytes);
 
-				int rowPitch = (int)width * bpp;
+				int rowPitch = (int)(width * bpp);
 				int mappedRowPitch = (int)mappedStaging.RowPitch;
 
 				for (int y = 0; y < height; y++)
@@ -188,27 +188,53 @@ namespace UltralightNet.Veldrid
 			_commandList.End();
 			graphicsDevice.SubmitCommands(_commandList);
 		}
-		private void CreateTexture(uint texture_id, ULBitmap bitmap)
+		[MethodImpl(MethodImplOptions.AggressiveOptimization)]
+		private void UploadTexture(Texture texture, IntPtr bitmap, uint width, uint height, uint bpp)
+		{
+			IntPtr pixels = Methods.ulBitmapLockPixels(bitmap);
+
+			uint rowBytes = Methods.ulBitmapGetRowBytes(bitmap);
+			uint offset = rowBytes - (width * bpp);
+
+			if (offset is 0)
+			{
+				graphicsDevice.UpdateTexture(texture, pixels, width * height * bpp, 0, 0, 0, width, height, 1, 0, 0);
+			}
+			else
+			{
+				unsafe
+				{
+					Set2DTextureData(new ReadOnlySpan<byte>((void*)pixels, (int)(rowBytes * height)), width, height, (int)rowBytes, bpp, texture, 0, 0, 0, 0, 0);
+				}
+			}
+
+			Methods.ulBitmapUnlockPixels(bitmap);
+		}
+		private void CreateTexture(uint texture_id, IntPtr bitmapPTR)
 		{
 #if DEBUG
 			Console.WriteLine($"CreateTexture({texture_id})");
 #endif
-			bool isRT = bitmap.IsEmpty;
+			bool isRT = Methods.ulBitmapIsEmpty(bitmapPTR);
 			TextureEntry entry = TextureEntries[texture_id];
+
+			uint width = Methods.ulBitmapGetWidth(bitmapPTR);
+			uint height = Methods.ulBitmapGetHeight(bitmapPTR);
+			uint bpp = Methods.ulBitmapGetBpp(bitmapPTR);
+
 			TextureDescription textureDescription = new()
 			{
 				Type = TextureType.Texture2D,
 				Usage = TextureUsage.Sampled,
-				Width = bitmap.Width,
-				Height = bitmap.Height,
+				Width = width,
+				Height = height,
 				MipLevels = isRT ? 1 : MipLevels,
 				SampleCount = isRT ? TextureSampleCount.Count1 : SampleCount,
 				ArrayLayers = 1,
 				Depth = 1
 			};
 
-			ULBitmapFormat format = bitmap.Format;
-			textureDescription.Format = format is ULBitmapFormat.A8_UNORM ? PixelFormat.R8_UNorm : PixelFormat.B8_G8_R8_A8_UNorm;
+			textureDescription.Format = bpp is 1 ? PixelFormat.R8_UNorm : PixelFormat.B8_G8_R8_A8_UNorm;
 
 			if (isRT)
 			{
@@ -220,7 +246,7 @@ namespace UltralightNet.Veldrid
 
 			if (!isRT)
 			{
-				UpdateTexture(texture_id, bitmap);
+				UploadTexture(entry.texture, bitmapPTR, width, height, bpp);
 			}
 
 			entry.resourceSet = graphicsDevice.ResourceFactory.CreateResourceSet(
@@ -231,64 +257,15 @@ namespace UltralightNet.Veldrid
 			);
 		}
 		[MethodImpl(MethodImplOptions.AggressiveOptimization)]
-		private void UpdateTexture(uint texture_id, ULBitmap bitmap)
+		private void UpdateTexture(uint texture_id, IntPtr bitmapPTR)
 		{
 			TextureEntry entry = TextureEntries[texture_id];
 
-			IntPtr pixels = bitmap.LockPixels();
+			uint height = Methods.ulBitmapGetHeight(bitmapPTR);
+			uint width = Methods.ulBitmapGetWidth(bitmapPTR);
+			uint bpp = Methods.ulBitmapGetBpp(bitmapPTR);
 
-			// localize values to not do pinvoke every time
-			// IS THAT A LUA REFERENCE ???
-			uint height = bitmap.Height;
-			uint width = bitmap.Width;
-			uint rowBytes = bitmap.RowBytes;
-			uint bpp = bitmap.Bpp;
-
-			uint offset = rowBytes - (width * bpp);
-
-			if (offset is 0)
-			{
-				graphicsDevice.UpdateTexture(entry.texture, pixels, width * height * bpp, 0, 0, 0, width, height, 1, 0, 0);
-			}
-			else
-			{
-				unsafe
-				{
-					//Stopwatch stopwatch = new();
-
-					//Console.Write($"({width}x{height})");
-
-					//stopwatch.Restart();
-					Set2DTextureData(new ReadOnlySpan<byte>((void*)pixels, (int)(rowBytes * height)), width, height, (int)rowBytes, (int)bpp, entry.texture, 0, 0, 0, 0, 0);
-					//Console.Write($" {stopwatch.ElapsedMilliseconds}");
-					//stopwatch.Restart();
-					//graphicsDevice.UpdateTexture(entry.texture, Unstrider.Unstride(pixels, width, height, bpp, offset), 0, 0, 0, width, height, 1, 0, 0);
-					//Console.Write($" {stopwatch.ElapsedMilliseconds}");
-
-					//stopwatch.Restart();
-					/*
-					ReadOnlySpan<byte> pixelsSpan = new((void*)pixels, (int)(rowBytes * height));
-					uint length = width * height * bpp;
-					byte[] unstridedPixels = new byte[length];
-
-					Span<byte> unstridedPixelsSpan = new(unstridedPixels);
-
-					int rowBytesInt = (int)rowBytes;
-					int idk = (int)(width * bpp);
-
-					for (int y = 0; y < height; y++)
-					{
-						ReadOnlySpan<byte> stridedRow = pixelsSpan.Slice(y * rowBytesInt, idk);
-						Span<byte> unstridedRow = unstridedPixelsSpan.Slice(y * idk, idk);
-						stridedRow.CopyTo(unstridedRow);
-					}
-
-					graphicsDevice.UpdateTexture(entry.texture, (ReadOnlySpan<byte>)unstridedPixelsSpan, 0, 0, 0, width, height, 1, 0, 0);
-					Console.WriteLine($" {stopwatch.ElapsedMilliseconds}");
-					*/
-				}
-			}
-			bitmap.UnlockPixels();
+			UploadTexture(entry.texture, bitmapPTR, width, height, bpp);
 
 			if (GenerateMipMaps)
 			{
