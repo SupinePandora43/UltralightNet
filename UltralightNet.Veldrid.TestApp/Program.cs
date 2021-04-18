@@ -191,13 +191,12 @@ void main()
 				x = (int)mm.MousePosition.X;
 				y = (int)mm.MousePosition.Y;
 
-				ULMouseEvent mouseEvent = new ULMouseEvent()
-				{
-					button = ULMouseEvent.Button.None,
-					type = ULMouseEvent.Type.MouseMoved,
-					x = x,
-					y = y
-				};
+				ULMouseEvent mouseEvent = new(
+					ULMouseEvent.ULMouseEventType.MouseMoved,
+					x,
+					y,
+					ULMouseEvent.Button.None
+				);
 
 				view.FireMouseEvent(mouseEvent);
 				//cpuView.FireMouseEvent(mouseEvent);
@@ -216,26 +215,35 @@ void main()
 					view.GoForward();
 					//cpuView.GoForward();
 				}
-				ULMouseEvent mouseEvent = new ULMouseEvent()
-				{
-					button = md.MouseButton == MouseButton.Left ? ULMouseEvent.Button.Left : ULMouseEvent.Button.Right,
-					type = ULMouseEvent.Type.MouseDown,
-					x = x,
-					y = y
-				};
+				ULMouseEvent mouseEvent = new(
+					ULMouseEvent.ULMouseEventType.MouseDown,
+					x,
+					y,
+					md.MouseButton switch {
+						MouseButton.Left => ULMouseEvent.Button.Left,
+						MouseButton.Right => ULMouseEvent.Button.Right,
+						MouseButton.Middle => ULMouseEvent.Button.Middle,
+						_ => ULMouseEvent.Button.None
+					}
+				);
 				view.FireMouseEvent(mouseEvent);
 				//cpuView.FireMouseEvent(mouseEvent);
 			};
 			window.MouseUp += (mu) =>
 			{
 				Console.WriteLine($"Mouse up {mu.Down} {mu.MouseButton}");
-				ULMouseEvent mouseEvent = new ULMouseEvent()
-				{
-					button = mu.MouseButton == MouseButton.Left ? ULMouseEvent.Button.Left : ULMouseEvent.Button.Right,
-					type = ULMouseEvent.Type.MouseUp,
-					x = x,
-					y = y
-				};
+				ULMouseEvent mouseEvent = new(
+					ULMouseEvent.ULMouseEventType.MouseUp,
+					x,
+					y,
+					mu.MouseButton switch
+					{
+						MouseButton.Left => ULMouseEvent.Button.Left,
+						MouseButton.Right => ULMouseEvent.Button.Right,
+						MouseButton.Middle => ULMouseEvent.Button.Middle,
+						_ => ULMouseEvent.Button.None
+					}
+				);
 				view.FireMouseEvent(mouseEvent);
 				//cpuView.FireMouseEvent(mouseEvent);
 			};

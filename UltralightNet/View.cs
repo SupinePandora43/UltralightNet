@@ -256,106 +256,147 @@ namespace UltralightNet
 		public void FireMouseEvent(ULMouseEvent mouseEvent) => Methods.ulViewFireMouseEvent(Ptr, mouseEvent.Ptr);
 		public void FireScrollEvent(ULScrollEvent scrollEvent) => Methods.ulViewFireScrollEvent(Ptr, scrollEvent);
 
-#region Callbacks
-		public void SetChangeTitleCallback(ULChangeTitleCallback callback, IntPtr userData = default){
-			if(callback is not null){
-				ULChangeTitleCallback__PInvoke__ callback__PInvoke__ = (user_data,caller,title) => callback(user_data, new View(caller), ULStringMarshaler.NativeToManaged(title));
+		#region Callbacks
+		public void SetChangeTitleCallback(ULChangeTitleCallback callback, IntPtr userData = default)
+		{
+			if (callback is not null)
+			{
+				ULChangeTitleCallback__PInvoke__ callback__PInvoke__ = (user_data, caller, title) => callback(user_data, new View(caller), ULStringMarshaler.NativeToManaged(title));
 				Handle(0, GCHandle.Alloc(callback__PInvoke__, GCHandleType.Normal));
 				Methods.ulViewSetChangeTitleCallback(Ptr, callback__PInvoke__, userData);
-			}else{
+			}
+			else
+			{
 				Handle(0, default);
 				Methods.ulViewSetChangeTitleCallback(Ptr, null, userData);
 			}
 		}
-		public void SetChangeURLCallback(ULChangeURLCallback callback, IntPtr userData = default){
-			if(callback is not null){
-				ULChangeURLCallback__PInvoke__ callback__PInvoke__ = (user_data,caller,url) => callback(user_data, new View(caller), ULStringMarshaler.NativeToManaged(url));
+		public void SetChangeURLCallback(ULChangeURLCallback callback, IntPtr userData = default)
+		{
+			if (callback is not null)
+			{
+				ULChangeURLCallback__PInvoke__ callback__PInvoke__ = (user_data, caller, url) => callback(user_data, new View(caller), ULStringMarshaler.NativeToManaged(url));
 				Handle(1, GCHandle.Alloc(callback__PInvoke__, GCHandleType.Normal));
 				Methods.ulViewSetChangeURLCallback(Ptr, callback__PInvoke__, userData);
-			}else{
+			}
+			else
+			{
 				Handle(1, default);
 				Methods.ulViewSetChangeURLCallback(Ptr, null, userData);
 			}
 		}
-		public void SetChangeTooltipCallback(ULChangeTooltipCallback callback, IntPtr userData = default){
-			if(callback is not null){
-				ULChangeTooltipCallback__PInvoke__ callback__PInvoke__ = (user_data,caller,tooltip) => callback(user_data, new View(caller), ULStringMarshaler.NativeToManaged(tooltip));
+		public void SetChangeTooltipCallback(ULChangeTooltipCallback callback, IntPtr userData = default)
+		{
+			if (callback is not null)
+			{
+				ULChangeTooltipCallback__PInvoke__ callback__PInvoke__ = (user_data, caller, tooltip) => callback(user_data, new View(caller), ULStringMarshaler.NativeToManaged(tooltip));
 				Handle(2, GCHandle.Alloc(callback__PInvoke__, GCHandleType.Normal));
 				Methods.ulViewSetChangeTooltipCallback(Ptr, callback__PInvoke__, userData);
-			}else{
+			}
+			else
+			{
 				Handle(2, default);
 				Methods.ulViewSetChangeTooltipCallback(Ptr, null, userData);
 			}
 		}
-		public void SetChangeCursorCallback(ULChangeCursorCallback callback, IntPtr userData = default){
-			if(callback is not null){
-				ULChangeCursorCallback__PInvoke__ callback__PInvoke__ = (user_data,caller,cursor) => callback(user_data, new View(caller), cursor);
+		public void SetChangeCursorCallback(ULChangeCursorCallback callback, IntPtr userData = default)
+		{
+			if (callback is not null)
+			{
+				ULChangeCursorCallback__PInvoke__ callback__PInvoke__ = (user_data, caller, cursor) => callback(user_data, new View(caller), cursor);
 				Handle(3, GCHandle.Alloc(callback__PInvoke__, GCHandleType.Normal));
 				Methods.ulViewSetChangeCursorCallback(Ptr, callback__PInvoke__, userData);
-			}else{
+			}
+			else
+			{
 				Handle(3, default);
 				Methods.ulViewSetChangeCursorCallback(Ptr, null, userData);
 			}
 		}
-		public void SetAddConsoleMessageCallback(ULAddConsoleMessageCallback callback, IntPtr userData = default){
-			if(callback is not null){
-				ULAddConsoleMessageCallback__PInvoke__ callback__PInvoke__ = (user_data,caller,source,line_number,column_number,source_id) => callback(user_data, new View(caller), source, line_number, column_number, ULStringMarshaler.NativeToManaged(source_id));
+		public void SetAddConsoleMessageCallback(ULAddConsoleMessageCallback callback, IntPtr userData = default)
+		{
+			if (callback is not null)
+			{
+				ULAddConsoleMessageCallback__PInvoke__ callback__PInvoke__ = (user_data, caller, source, line_number, column_number, source_id) => callback(user_data, new View(caller), source, line_number, column_number, ULStringMarshaler.NativeToManaged(source_id));
 				Handle(4, GCHandle.Alloc(callback__PInvoke__, GCHandleType.Normal));
 				Methods.ulViewSetAddConsoleMessageCallback(Ptr, callback__PInvoke__, userData);
-			}else{
+			}
+			else
+			{
 				Handle(4, default);
 				Methods.ulViewSetAddConsoleMessageCallback(Ptr, null, userData);
 			}
 		}
-		public void SetCreateChildViewCallback(ULCreateChildViewCallback callback, IntPtr userData = default){
-			if(callback is not null){
-				ULCreateChildViewCallback__PInvoke__ callback__PInvoke__ = (user_data, caller, opener_url, target_url, is_popup, popup_rect) => {
+		public void SetCreateChildViewCallback(ULCreateChildViewCallback callback, IntPtr userData = default)
+		{
+			if (callback is not null)
+			{
+				ULCreateChildViewCallback__PInvoke__ callback__PInvoke__ = (user_data, caller, opener_url, target_url, is_popup, popup_rect) =>
+				{
 					View view = callback(user_data, new View(caller), ULStringMarshaler.NativeToManaged(opener_url), ULStringMarshaler.NativeToManaged(target_url), is_popup != 0, popup_rect);
 					return view is null ? IntPtr.Zero : view.Ptr;
 				};
 				Handle(5, GCHandle.Alloc(callback__PInvoke__, GCHandleType.Normal));
 				Methods.ulViewSetCreateChildViewCallback(Ptr, callback__PInvoke__, userData);
-			}else{
+			}
+			else
+			{
 				Handle(5, default);
 				Methods.ulViewSetCreateChildViewCallback(Ptr, null, userData);
 			}
 		}
-		public void SetBeginLoadingCallback(ULBeginLoadingCallback callback, IntPtr userData = default){
-			if(callback is not null){
+		public void SetBeginLoadingCallback(ULBeginLoadingCallback callback, IntPtr userData = default)
+		{
+			if (callback is not null)
+			{
 				ULBeginLoadingCallback__PInvoke__ callback__PInvoke__ = (user_data, caller, frame_id, is_main_frame, url) => callback(user_data, new View(caller), frame_id, is_main_frame != 0, ULStringMarshaler.NativeToManaged(url));
 				Handle(6, GCHandle.Alloc(callback__PInvoke__, GCHandleType.Normal));
 				Methods.ulViewSetBeginLoadingCallback(Ptr, callback__PInvoke__, userData);
-			}else{
+			}
+			else
+			{
 				Handle(6, default);
 				Methods.ulViewSetBeginLoadingCallback(Ptr, null, userData);
 			}
 		}
-		public void SetFinishLoadingCallback(ULFinishLoadingCallback callback, IntPtr userData = default){
-			if(callback is not null){
+		public void SetFinishLoadingCallback(ULFinishLoadingCallback callback, IntPtr userData = default)
+		{
+			if (callback is not null)
+			{
 				ULFinishLoadingCallback__PInvoke__ callback__PInvoke__ = (user_data, caller, frame_id, is_main_frame, url) => callback(user_data, new View(caller), frame_id, is_main_frame != 0, ULStringMarshaler.NativeToManaged(url));
 				Handle(7, GCHandle.Alloc(callback__PInvoke__, GCHandleType.Normal));
 				Methods.ulViewSetFinishLoadingCallback(Ptr, callback__PInvoke__, userData);
-			}else{
+			}
+			else
+			{
 				Handle(7, default);
 				Methods.ulViewSetFinishLoadingCallback(Ptr, null, userData);
 			}
 		}
-		public void SetFailLoadingCallback(ULFailLoadingCallback callback, IntPtr userData = default){
-			if(callback is not null){
+		public void SetFailLoadingCallback(ULFailLoadingCallback callback, IntPtr userData = default)
+		{
+			if (callback is not null)
+			{
 				ULFailLoadingCallback__PInvoke__ callback__PInvoke__ = (user_data, caller, frame_id, is_main_frame, url, description, error_domain, error_code) => callback(user_data, new View(caller), frame_id, is_main_frame != 0, ULStringMarshaler.NativeToManaged(url), ULStringMarshaler.NativeToManaged(description), ULStringMarshaler.NativeToManaged(error_domain), error_code);
 				Handle(8, GCHandle.Alloc(callback__PInvoke__, GCHandleType.Normal));
 				Methods.ulViewSetFailLoadingCallback(Ptr, callback__PInvoke__, userData);
-			}else{
+			}
+			else
+			{
 				Handle(8, default);
 				Methods.ulViewSetFailLoadingCallback(Ptr, null, userData);
 			}
 		}
-		public void SetWindowObjectReadyCallback(ULWindowObjectReadyCallback callback, IntPtr userData = default){
-			if(callback is not null){
+		public void SetWindowObjectReadyCallback(ULWindowObjectReadyCallback callback, IntPtr userData = default)
+		{
+			if (callback is not null)
+			{
 				ULWindowObjectReadyCallback__PInvoke__ callback__PInvoke__ = (user_data, caller, frame_id, is_main_frame, url) => callback(user_data, new View(caller), frame_id, is_main_frame != 0, ULStringMarshaler.NativeToManaged(url));
 				Handle(9, GCHandle.Alloc(callback__PInvoke__, GCHandleType.Normal));
 				Methods.ulViewSetWindowObjectReadyCallback(Ptr, callback__PInvoke__, userData);
-			}else{
+			}
+			else
+			{
 				Handle(9, default);
 				Methods.ulViewSetWindowObjectReadyCallback(Ptr, null, userData);
 			}
@@ -374,18 +415,22 @@ namespace UltralightNet
 				Methods.ulViewSetDOMReadyCallback(Ptr, null, userData);
 			}
 		}
-		public void SetUpdateHistoryCallback(ULUpdateHistoryCallback callback, IntPtr userData = default){
-			if(callback is not null){
-				ULUpdateHistoryCallback__PInvoke__ callback__PInvoke__ = (user_data,caller) => callback(user_data, new View(caller));
+		public void SetUpdateHistoryCallback(ULUpdateHistoryCallback callback, IntPtr userData = default)
+		{
+			if (callback is not null)
+			{
+				ULUpdateHistoryCallback__PInvoke__ callback__PInvoke__ = (user_data, caller) => callback(user_data, new View(caller));
 				Handle(11, GCHandle.Alloc(callback__PInvoke__, GCHandleType.Normal));
 				Methods.ulViewSetUpdateHistoryCallback(Ptr, callback__PInvoke__, userData);
-			}else{
+			}
+			else
+			{
 				Handle(11, default);
 				Methods.ulViewSetUpdateHistoryCallback(Ptr, null, userData);
 			}
 		}
 
-#endregion Callbacks
+		#endregion Callbacks
 
 		public bool NeedsPaint { get => Methods.ulViewGetNeedsPaint(Ptr); set => Methods.ulViewSetNeedsPaint(Ptr, value); }
 
