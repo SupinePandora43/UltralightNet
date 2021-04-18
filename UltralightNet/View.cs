@@ -120,8 +120,8 @@ namespace UltralightNet
 		[DllImport("Ultralight")]
 		public static extern void ulViewFireKeyEvent(IntPtr view, IntPtr key_event);
 
-		[GeneratedDllImport("Ultralight")]
-		public static partial void ulViewFireMouseEvent(IntPtr view, ULMouseEvent mouse_event);
+		[DllImport("Ultralight")]
+		public static extern void ulViewFireMouseEvent(IntPtr view, IntPtr mouse_event);
 
 		[GeneratedDllImport("Ultralight")]
 		public static partial void ulViewFireScrollEvent(IntPtr view, ULScrollEvent scroll_event);
@@ -253,7 +253,7 @@ namespace UltralightNet
 		public bool HasInputFocus() => Methods.ulViewHasInputFocus(Ptr);
 
 		public void FireKeyEvent(ULKeyEvent keyEvent) => Methods.ulViewFireKeyEvent(Ptr, keyEvent.Ptr);
-		public void FireMouseEvent(ULMouseEvent mouseEvent) => Methods.ulViewFireMouseEvent(Ptr, mouseEvent);
+		public void FireMouseEvent(ULMouseEvent mouseEvent) => Methods.ulViewFireMouseEvent(Ptr, mouseEvent.Ptr);
 		public void FireScrollEvent(ULScrollEvent scrollEvent) => Methods.ulViewFireScrollEvent(Ptr, scrollEvent);
 
 #region Callbacks

@@ -81,6 +81,8 @@ namespace UltralightNet.Test
 
 			FSTest();
 
+			EventTest();
+
 			renderer.Dispose();
 		}
 
@@ -146,6 +148,13 @@ namespace UltralightNet.Test
 			View view = new(renderer, 256, 256, false, Session.DefaultSession(renderer), true);
 			view.URL = "file:///app.html";
 			// todo test using document.body.innerHTML
+		}
+
+		private void EventTest()
+		{
+			View view = new(renderer, 256, 256, false, Session.DefaultSession(renderer), true);
+
+			view.FireMouseEvent(new(ULMouseEvent.ULMouseEventType.MouseDown, 100, 100, ULMouseEvent.Button.Left));
 		}
 	}
 }

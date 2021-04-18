@@ -1673,30 +1673,6 @@ namespace UltralightNet
 {
 	public static partial class Methods
 	{
-		public static partial void ulViewFireMouseEvent(global::System.IntPtr view, global::UltralightNet.ULMouseEvent mouse_event)
-		{
-			unsafe
-			{
-				global::UltralightNet.ULMouseEventNative __mouse_event_gen_native = default;
-				//
-				// Marshal
-				//
-				__mouse_event_gen_native = new global::UltralightNet.ULMouseEventNative(mouse_event);
-				//
-				// Invoke
-				//
-				ulViewFireMouseEvent__PInvoke__(view, __mouse_event_gen_native);
-			}
-		}
-
-		[System.Runtime.InteropServices.DllImportAttribute("Ultralight", EntryPoint = "ulViewFireMouseEvent")]
-		extern private static unsafe void ulViewFireMouseEvent__PInvoke__(global::System.IntPtr view, global::UltralightNet.ULMouseEventNative mouse_event);
-	}
-}
-namespace UltralightNet
-{
-	public static partial class Methods
-	{
 		public static partial void ulViewFireScrollEvent(global::System.IntPtr view, global::UltralightNet.ULScrollEvent scroll_event)
 		{
 			unsafe
