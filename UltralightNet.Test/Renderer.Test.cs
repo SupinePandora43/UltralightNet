@@ -36,7 +36,7 @@ namespace UltralightNet.Test
 
 			ULPlatform.SetLogger(new()
 			{
-				log_message = (level, message) =>
+				LogMessage = (level, message) =>
 				{
 					Console.WriteLine(message);
 				}

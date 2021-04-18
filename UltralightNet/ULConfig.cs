@@ -19,8 +19,8 @@ namespace UltralightNet
 		public static partial void ulConfigSetResourcePath(IntPtr config, [MarshalUsing(typeof(ULStringGeneratedDllImportMarshaler))] string resource_path);
 
 		/// <summary>Set the file path to a writable directory that will be used to store cookies, cached resources, and other persistent data.</summary>
-		[DllImport("Ultralight")]
-		public static extern void ulConfigSetCachePath(IntPtr config, [MarshalAs(UnmanagedType.CustomMarshaler, MarshalTypeRef = typeof(ULStringMarshaler))] string cache_path);
+		[GeneratedDllImport("Ultralight")]
+		public static partial void ulConfigSetCachePath(IntPtr config, [MarshalUsing(typeof(ULStringGeneratedDllImportMarshaler))] string cache_path);
 
 		[GeneratedDllImport("Ultralight")]
 		public static partial void ulConfigSetUseGPURenderer(IntPtr config, [MarshalAs(UnmanagedType.I1)] bool use_gpu);
@@ -53,28 +53,28 @@ namespace UltralightNet
 		public static partial void ulConfigSetFontGamma(IntPtr config, double font_gamma = 1.8);
 
 		/// <summary>Set default font-family to use (Default = Times New Roman).</summary>
-		[DllImport("Ultralight")]
-		public static extern void ulConfigSetFontFamilyStandard(IntPtr config, [MarshalAs(UnmanagedType.CustomMarshaler, MarshalTypeRef = typeof(ULStringMarshaler))] string font_name);
+		[GeneratedDllImport("Ultralight")]
+		public static partial void ulConfigSetFontFamilyStandard(IntPtr config, [MarshalUsing(typeof(ULStringGeneratedDllImportMarshaler))] string font_name);
 
 		/// <summary>Set default font-family to use for fixed fonts, eg <pre> and <code> (Default = Courier New).</summary>
-		[DllImport("Ultralight")]
-		public static extern void ulConfigSetFontFamilyFixed(IntPtr config, [MarshalAs(UnmanagedType.CustomMarshaler, MarshalTypeRef = typeof(ULStringMarshaler))] string font_name);
+		[GeneratedDllImport("Ultralight")]
+		public static partial void ulConfigSetFontFamilyFixed(IntPtr config, [MarshalUsing(typeof(ULStringGeneratedDllImportMarshaler))] string font_name);
 
 		/// <summary>Set default font-family to use for serif fonts (Default = Times New Roman).</summary>
-		[DllImport("Ultralight")]
-		public static extern void ulConfigSetFontFamilySerif(IntPtr config, [MarshalAs(UnmanagedType.CustomMarshaler, MarshalTypeRef = typeof(ULStringMarshaler))] string font_name);
+		[GeneratedDllImport("Ultralight")]
+		public static partial void ulConfigSetFontFamilySerif(IntPtr config, [MarshalUsing(typeof(ULStringGeneratedDllImportMarshaler))] string font_name);
 
 		/// <summary>Set default font-family to use for sans-serif fonts (Default = Arial).</summary>
-		[DllImport("Ultralight")]
-		public static extern void ulConfigSetFontFamilySansSerif(IntPtr config, [MarshalAs(UnmanagedType.CustomMarshaler, MarshalTypeRef = typeof(ULStringMarshaler))] string font_name);
+		[GeneratedDllImport("Ultralight")]
+		public static partial void ulConfigSetFontFamilySansSerif(IntPtr config, [MarshalUsing(typeof(ULStringGeneratedDllImportMarshaler))] string font_name);
 
 		/// <summary>Set user agent string</summary>
-		[DllImport("Ultralight")]
-		public static extern void ulConfigSetUserAgent(IntPtr config, [MarshalAs(UnmanagedType.CustomMarshaler, MarshalTypeRef = typeof(ULStringMarshaler))] string font_name);
+		[GeneratedDllImport("Ultralight")]
+		public static partial void ulConfigSetUserAgent(IntPtr config, [MarshalUsing(typeof(ULStringGeneratedDllImportMarshaler))] string font_name);
 
 		/// <summary>Set user stylesheet (CSS) (Default = Empty).</summary>
-		[DllImport("Ultralight")]
-		public static extern void ulConfigSetUserStylesheet(IntPtr config, [MarshalAs(UnmanagedType.CustomMarshaler, MarshalTypeRef = typeof(ULStringMarshaler))] string font_name);
+		[GeneratedDllImport("Ultralight")]
+		public static partial void ulConfigSetUserStylesheet(IntPtr config, [MarshalUsing(typeof(ULStringGeneratedDllImportMarshaler))] string font_name);
 
 		/// <summary>Set whether or not we should continuously repaint any Views or compositor layers, regardless if they are dirty or not. This is mainly used to diagnose painting/shader issues.</summary>
 		[GeneratedDllImport("Ultralight")]
@@ -351,7 +351,7 @@ namespace UltralightNet
 		}
 
 		/// <summary>
-		/// Size of WebCore's memory cache in bytes. 
+		/// Size of WebCore's memory cache in bytes.
 		/// </summary>
 		/// <remarks>
 		/// You should increase this if you anticipate handling pages with

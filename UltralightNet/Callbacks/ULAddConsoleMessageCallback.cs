@@ -4,14 +4,20 @@ using System.Runtime.InteropServices;
 namespace UltralightNet
 {
 	[UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+	public delegate void ULAddConsoleMessageCallback__PInvoke__(
+		IntPtr user_data,
+		IntPtr caller,
+		ULMessageSource source,
+		uint line_number,
+		uint column_number,
+		IntPtr source_id
+	);
 	public delegate void ULAddConsoleMessageCallback(
 		IntPtr user_data,
-		[MarshalAs(UnmanagedType.CustomMarshaler, MarshalTypeRef = typeof(View.Marshaler))]
 		View caller,
 		ULMessageSource source,
 		uint line_number,
 		uint column_number,
-		[MarshalAs(UnmanagedType.CustomMarshaler, MarshalTypeRef = typeof(ULStringMarshaler))]
 		string source_id
 	);
 }

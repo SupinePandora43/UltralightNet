@@ -4,14 +4,18 @@ using System.Runtime.InteropServices;
 namespace UltralightNet
 {
 	[UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-	[return: MarshalAs(UnmanagedType.CustomMarshaler, MarshalTypeRef = typeof(View.Marshaler))]
+	public delegate IntPtr ULCreateChildViewCallback__PInvoke__(
+		IntPtr user_data,
+		IntPtr caller,
+		IntPtr opener_url,
+		IntPtr target_url,
+		byte is_popup,
+		ULIntRect popup_rect
+	);
 	public delegate View ULCreateChildViewCallback(
 		IntPtr user_data,
-		[MarshalAs(UnmanagedType.CustomMarshaler, MarshalTypeRef = typeof(View.Marshaler))]
 		View caller,
-		[MarshalAs(UnmanagedType.CustomMarshaler, MarshalTypeRef = typeof(ULStringMarshaler))]
 		string opener_url,
-		[MarshalAs(UnmanagedType.CustomMarshaler, MarshalTypeRef = typeof(ULStringMarshaler))]
 		string target_url,
 		bool is_popup,
 		ULIntRect popup_rect

@@ -365,6 +365,45 @@ namespace UltralightNet
 {
 	public static partial class Methods
 	{
+		public static partial void ulConfigSetCachePath(global::System.IntPtr config, string cache_path)
+		{
+			unsafe
+			{
+				global::System.IntPtr __cache_path_gen_native = default;
+				//
+				// Setup
+				//
+				global::UltralightNet.ULStringGeneratedDllImportMarshaler __cache_path_gen_native__marshaler = default;
+				try
+				{
+					//
+					// Marshal
+					//
+					__cache_path_gen_native__marshaler = new global::UltralightNet.ULStringGeneratedDllImportMarshaler(cache_path);
+					__cache_path_gen_native = __cache_path_gen_native__marshaler.Value;
+					//
+					// Invoke
+					//
+					ulConfigSetCachePath__PInvoke__(config, __cache_path_gen_native);
+				}
+				finally
+				{
+					//
+					// Cleanup
+					//
+					__cache_path_gen_native__marshaler.FreeNative();
+				}
+			}
+		}
+
+		[System.Runtime.InteropServices.DllImportAttribute("Ultralight", EntryPoint = "ulConfigSetCachePath")]
+		extern private static unsafe void ulConfigSetCachePath__PInvoke__(global::System.IntPtr config, global::System.IntPtr cache_path);
+	}
+}
+namespace UltralightNet
+{
+	public static partial class Methods
+	{
 		public static partial void ulConfigSetUseGPURenderer(global::System.IntPtr config, bool use_gpu)
 		{
 			unsafe
@@ -507,6 +546,240 @@ namespace UltralightNet
 
 		[System.Runtime.InteropServices.DllImportAttribute("Ultralight", EntryPoint = "ulConfigSetFontGamma")]
 		extern private static unsafe void ulConfigSetFontGamma__PInvoke__(global::System.IntPtr config, double font_gamma);
+	}
+}
+namespace UltralightNet
+{
+	public static partial class Methods
+	{
+		public static partial void ulConfigSetFontFamilyStandard(global::System.IntPtr config, string font_name)
+		{
+			unsafe
+			{
+				global::System.IntPtr __font_name_gen_native = default;
+				//
+				// Setup
+				//
+				global::UltralightNet.ULStringGeneratedDllImportMarshaler __font_name_gen_native__marshaler = default;
+				try
+				{
+					//
+					// Marshal
+					//
+					__font_name_gen_native__marshaler = new global::UltralightNet.ULStringGeneratedDllImportMarshaler(font_name);
+					__font_name_gen_native = __font_name_gen_native__marshaler.Value;
+					//
+					// Invoke
+					//
+					ulConfigSetFontFamilyStandard__PInvoke__(config, __font_name_gen_native);
+				}
+				finally
+				{
+					//
+					// Cleanup
+					//
+					__font_name_gen_native__marshaler.FreeNative();
+				}
+			}
+		}
+
+		[System.Runtime.InteropServices.DllImportAttribute("Ultralight", EntryPoint = "ulConfigSetFontFamilyStandard")]
+		extern private static unsafe void ulConfigSetFontFamilyStandard__PInvoke__(global::System.IntPtr config, global::System.IntPtr font_name);
+	}
+}
+namespace UltralightNet
+{
+	public static partial class Methods
+	{
+		public static partial void ulConfigSetFontFamilyFixed(global::System.IntPtr config, string font_name)
+		{
+			unsafe
+			{
+				global::System.IntPtr __font_name_gen_native = default;
+				//
+				// Setup
+				//
+				global::UltralightNet.ULStringGeneratedDllImportMarshaler __font_name_gen_native__marshaler = default;
+				try
+				{
+					//
+					// Marshal
+					//
+					__font_name_gen_native__marshaler = new global::UltralightNet.ULStringGeneratedDllImportMarshaler(font_name);
+					__font_name_gen_native = __font_name_gen_native__marshaler.Value;
+					//
+					// Invoke
+					//
+					ulConfigSetFontFamilyFixed__PInvoke__(config, __font_name_gen_native);
+				}
+				finally
+				{
+					//
+					// Cleanup
+					//
+					__font_name_gen_native__marshaler.FreeNative();
+				}
+			}
+		}
+
+		[System.Runtime.InteropServices.DllImportAttribute("Ultralight", EntryPoint = "ulConfigSetFontFamilyFixed")]
+		extern private static unsafe void ulConfigSetFontFamilyFixed__PInvoke__(global::System.IntPtr config, global::System.IntPtr font_name);
+	}
+}
+namespace UltralightNet
+{
+	public static partial class Methods
+	{
+		public static partial void ulConfigSetFontFamilySerif(global::System.IntPtr config, string font_name)
+		{
+			unsafe
+			{
+				global::System.IntPtr __font_name_gen_native = default;
+				//
+				// Setup
+				//
+				global::UltralightNet.ULStringGeneratedDllImportMarshaler __font_name_gen_native__marshaler = default;
+				try
+				{
+					//
+					// Marshal
+					//
+					__font_name_gen_native__marshaler = new global::UltralightNet.ULStringGeneratedDllImportMarshaler(font_name);
+					__font_name_gen_native = __font_name_gen_native__marshaler.Value;
+					//
+					// Invoke
+					//
+					ulConfigSetFontFamilySerif__PInvoke__(config, __font_name_gen_native);
+				}
+				finally
+				{
+					//
+					// Cleanup
+					//
+					__font_name_gen_native__marshaler.FreeNative();
+				}
+			}
+		}
+
+		[System.Runtime.InteropServices.DllImportAttribute("Ultralight", EntryPoint = "ulConfigSetFontFamilySerif")]
+		extern private static unsafe void ulConfigSetFontFamilySerif__PInvoke__(global::System.IntPtr config, global::System.IntPtr font_name);
+	}
+}
+namespace UltralightNet
+{
+	public static partial class Methods
+	{
+		public static partial void ulConfigSetFontFamilySansSerif(global::System.IntPtr config, string font_name)
+		{
+			unsafe
+			{
+				global::System.IntPtr __font_name_gen_native = default;
+				//
+				// Setup
+				//
+				global::UltralightNet.ULStringGeneratedDllImportMarshaler __font_name_gen_native__marshaler = default;
+				try
+				{
+					//
+					// Marshal
+					//
+					__font_name_gen_native__marshaler = new global::UltralightNet.ULStringGeneratedDllImportMarshaler(font_name);
+					__font_name_gen_native = __font_name_gen_native__marshaler.Value;
+					//
+					// Invoke
+					//
+					ulConfigSetFontFamilySansSerif__PInvoke__(config, __font_name_gen_native);
+				}
+				finally
+				{
+					//
+					// Cleanup
+					//
+					__font_name_gen_native__marshaler.FreeNative();
+				}
+			}
+		}
+
+		[System.Runtime.InteropServices.DllImportAttribute("Ultralight", EntryPoint = "ulConfigSetFontFamilySansSerif")]
+		extern private static unsafe void ulConfigSetFontFamilySansSerif__PInvoke__(global::System.IntPtr config, global::System.IntPtr font_name);
+	}
+}
+namespace UltralightNet
+{
+	public static partial class Methods
+	{
+		public static partial void ulConfigSetUserAgent(global::System.IntPtr config, string font_name)
+		{
+			unsafe
+			{
+				global::System.IntPtr __font_name_gen_native = default;
+				//
+				// Setup
+				//
+				global::UltralightNet.ULStringGeneratedDllImportMarshaler __font_name_gen_native__marshaler = default;
+				try
+				{
+					//
+					// Marshal
+					//
+					__font_name_gen_native__marshaler = new global::UltralightNet.ULStringGeneratedDllImportMarshaler(font_name);
+					__font_name_gen_native = __font_name_gen_native__marshaler.Value;
+					//
+					// Invoke
+					//
+					ulConfigSetUserAgent__PInvoke__(config, __font_name_gen_native);
+				}
+				finally
+				{
+					//
+					// Cleanup
+					//
+					__font_name_gen_native__marshaler.FreeNative();
+				}
+			}
+		}
+
+		[System.Runtime.InteropServices.DllImportAttribute("Ultralight", EntryPoint = "ulConfigSetUserAgent")]
+		extern private static unsafe void ulConfigSetUserAgent__PInvoke__(global::System.IntPtr config, global::System.IntPtr font_name);
+	}
+}
+namespace UltralightNet
+{
+	public static partial class Methods
+	{
+		public static partial void ulConfigSetUserStylesheet(global::System.IntPtr config, string font_name)
+		{
+			unsafe
+			{
+				global::System.IntPtr __font_name_gen_native = default;
+				//
+				// Setup
+				//
+				global::UltralightNet.ULStringGeneratedDllImportMarshaler __font_name_gen_native__marshaler = default;
+				try
+				{
+					//
+					// Marshal
+					//
+					__font_name_gen_native__marshaler = new global::UltralightNet.ULStringGeneratedDllImportMarshaler(font_name);
+					__font_name_gen_native = __font_name_gen_native__marshaler.Value;
+					//
+					// Invoke
+					//
+					ulConfigSetUserStylesheet__PInvoke__(config, __font_name_gen_native);
+				}
+				finally
+				{
+					//
+					// Cleanup
+					//
+					__font_name_gen_native__marshaler.FreeNative();
+				}
+			}
+		}
+
+		[System.Runtime.InteropServices.DllImportAttribute("Ultralight", EntryPoint = "ulConfigSetUserStylesheet")]
+		extern private static unsafe void ulConfigSetUserStylesheet__PInvoke__(global::System.IntPtr config, global::System.IntPtr font_name);
 	}
 }
 namespace UltralightNet

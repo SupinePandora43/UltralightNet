@@ -127,40 +127,40 @@ namespace UltralightNet
 		public static partial void ulViewFireScrollEvent(IntPtr view, ULScrollEvent scroll_event);
 
 		[DllImport("Ultralight")]
-		public static extern void ulViewSetChangeTitleCallback(IntPtr view, ULChangeTitleCallback callback, IntPtr user_data);
+		public static extern void ulViewSetChangeTitleCallback(IntPtr view, ULChangeTitleCallback__PInvoke__ callback, IntPtr user_data);
 
 		[DllImport("Ultralight")]
-		public static extern void ulViewSetChangeURLCallback(IntPtr view, ULChangeURLCallback callback, IntPtr user_data);
+		public static extern void ulViewSetChangeURLCallback(IntPtr view, ULChangeURLCallback__PInvoke__ callback, IntPtr user_data);
 
 		[DllImport("Ultralight")]
-		public static extern void ulViewSetChangeTooltipCallback(IntPtr view, ULChangeTooltipCallback callback, IntPtr user_data);
+		public static extern void ulViewSetChangeTooltipCallback(IntPtr view, ULChangeTooltipCallback__PInvoke__ callback, IntPtr user_data);
 
 		[DllImport("Ultralight")]
-		public static extern void ulViewSetChangeCursorCallback(IntPtr view, ULChangeCursorCallback callback, IntPtr user_data);
+		public static extern void ulViewSetChangeCursorCallback(IntPtr view, ULChangeCursorCallback__PInvoke__ callback, IntPtr user_data);
 
 		[DllImport("Ultralight")]
-		public static extern void ulViewSetAddConsoleMessageCallback(IntPtr view, ULAddConsoleMessageCallback callback, IntPtr user_data);
+		public static extern void ulViewSetAddConsoleMessageCallback(IntPtr view, ULAddConsoleMessageCallback__PInvoke__ callback, IntPtr user_data);
 
 		[DllImport("Ultralight")]
-		public static extern void ulViewSetCreateChildViewCallback(IntPtr view, ULCreateChildViewCallback callback, IntPtr user_data);
+		public static extern void ulViewSetCreateChildViewCallback(IntPtr view, ULCreateChildViewCallback__PInvoke__ callback, IntPtr user_data);
 
 		[DllImport("Ultralight")]
-		public static extern void ulViewSetBeginLoadingCallback(IntPtr view, ULBeginLoadingCallback callback, IntPtr user_data);
+		public static extern void ulViewSetBeginLoadingCallback(IntPtr view, ULBeginLoadingCallback__PInvoke__ callback, IntPtr user_data);
 
 		[DllImport("Ultralight")]
 		public static extern void ulViewSetFinishLoadingCallback(IntPtr view, ULFinishLoadingCallback__PInvoke__ callback, IntPtr user_data);
 
 		[DllImport("Ultralight")]
-		public static extern void ulViewSetFailLoadingCallback(IntPtr view, ULFailLoadingCallback callback, IntPtr user_data);
+		public static extern void ulViewSetFailLoadingCallback(IntPtr view, ULFailLoadingCallback__PInvoke__ callback, IntPtr user_data);
 
 		[DllImport("Ultralight")]
-		public static extern void ulViewSetWindowObjectReadyCallback(IntPtr view, ULWindowObjectReadyCallback callback, IntPtr user_data);
+		public static extern void ulViewSetWindowObjectReadyCallback(IntPtr view, ULWindowObjectReadyCallback__PInvoke__ callback, IntPtr user_data);
 
 		[DllImport("Ultralight")]
 		public static extern void ulViewSetDOMReadyCallback(IntPtr view, ULDOMReadyCallback__PInvoke__ callback, IntPtr user_data);
 
 		[DllImport("Ultralight")]
-		public static extern void ulViewSetUpdateHistoryCallback(IntPtr view, ULUpdateHistoryCallback callback, IntPtr user_data);
+		public static extern void ulViewSetUpdateHistoryCallback(IntPtr view, ULUpdateHistoryCallback__PInvoke__ callback, IntPtr user_data);
 
 		[GeneratedDllImport("Ultralight")]
 		public static partial void ulViewSetNeedsPaint(IntPtr view, [MarshalAs(UnmanagedType.I1)] bool needs_paint);
@@ -256,16 +256,110 @@ namespace UltralightNet
 		public void FireMouseEvent(ULMouseEvent mouseEvent) => Methods.ulViewFireMouseEvent(Ptr, mouseEvent);
 		public void FireScrollEvent(ULScrollEvent scrollEvent) => Methods.ulViewFireScrollEvent(Ptr, scrollEvent);
 
-		public void SetChangeTitleCallback(ULChangeTitleCallback callback, IntPtr userData = default) => Methods.ulViewSetChangeTitleCallback(Ptr, callback, userData);
-		public void SetChangeURLCallback(ULChangeURLCallback callback, IntPtr userData = default) => Methods.ulViewSetChangeURLCallback(Ptr, callback, userData);
-		public void SetChangeTooltipCallback(ULChangeTooltipCallback callback, IntPtr userData = default) => Methods.ulViewSetChangeTooltipCallback(Ptr, callback, userData);
-		public void SetChangeCursorCallback(ULChangeCursorCallback callback, IntPtr userData = default) => Methods.ulViewSetChangeCursorCallback(Ptr, callback, userData);
-		public void SetAddConsoleMessageCallback(ULAddConsoleMessageCallback callback, IntPtr userData = default) => Methods.ulViewSetAddConsoleMessageCallback(Ptr, callback, userData);
-		public void SetCreateChildViewCallback(ULCreateChildViewCallback callback, IntPtr userData = default) => Methods.ulViewSetCreateChildViewCallback(Ptr, callback, userData);
-		public void SetBeginLoadingCallback(ULBeginLoadingCallback callback, IntPtr userData = default) => Methods.ulViewSetBeginLoadingCallback(Ptr, callback, userData);
-		public void SetFinishLoadingCallback(ULFinishLoadingCallback callback, IntPtr userData = default) => Methods.ulViewSetFinishLoadingCallback(Ptr, (user_data, caller, frame_id, is_main_frame, url) => callback(user_data, new View(caller), frame_id, is_main_frame != 0, ULStringMarshaler.NativeToManaged(url)), userData);
-		public void SetFailLoadingCallback(ULFailLoadingCallback callback, IntPtr userData = default) => Methods.ulViewSetFailLoadingCallback(Ptr, callback, userData);
-		public void SetWindowObjectReadyCallback(ULWindowObjectReadyCallback callback, IntPtr userData = default) => Methods.ulViewSetWindowObjectReadyCallback(Ptr, callback, userData);
+#region Callbacks
+		public void SetChangeTitleCallback(ULChangeTitleCallback callback, IntPtr userData = default){
+			if(callback is not null){
+				ULChangeTitleCallback__PInvoke__ callback__PInvoke__ = (user_data,caller,title) => callback(user_data, new View(caller), ULStringMarshaler.NativeToManaged(title));
+				Handle(0, GCHandle.Alloc(callback__PInvoke__, GCHandleType.Normal));
+				Methods.ulViewSetChangeTitleCallback(Ptr, callback__PInvoke__, userData);
+			}else{
+				Handle(0, default);
+				Methods.ulViewSetChangeTitleCallback(Ptr, null, userData);
+			}
+		}
+		public void SetChangeURLCallback(ULChangeURLCallback callback, IntPtr userData = default){
+			if(callback is not null){
+				ULChangeURLCallback__PInvoke__ callback__PInvoke__ = (user_data,caller,url) => callback(user_data, new View(caller), ULStringMarshaler.NativeToManaged(url));
+				Handle(1, GCHandle.Alloc(callback__PInvoke__, GCHandleType.Normal));
+				Methods.ulViewSetChangeURLCallback(Ptr, callback__PInvoke__, userData);
+			}else{
+				Handle(1, default);
+				Methods.ulViewSetChangeURLCallback(Ptr, null, userData);
+			}
+		}
+		public void SetChangeTooltipCallback(ULChangeTooltipCallback callback, IntPtr userData = default){
+			if(callback is not null){
+				ULChangeTooltipCallback__PInvoke__ callback__PInvoke__ = (user_data,caller,tooltip) => callback(user_data, new View(caller), ULStringMarshaler.NativeToManaged(tooltip));
+				Handle(2, GCHandle.Alloc(callback__PInvoke__, GCHandleType.Normal));
+				Methods.ulViewSetChangeTooltipCallback(Ptr, callback__PInvoke__, userData);
+			}else{
+				Handle(2, default);
+				Methods.ulViewSetChangeTooltipCallback(Ptr, null, userData);
+			}
+		}
+		public void SetChangeCursorCallback(ULChangeCursorCallback callback, IntPtr userData = default){
+			if(callback is not null){
+				ULChangeCursorCallback__PInvoke__ callback__PInvoke__ = (user_data,caller,cursor) => callback(user_data, new View(caller), cursor);
+				Handle(3, GCHandle.Alloc(callback__PInvoke__, GCHandleType.Normal));
+				Methods.ulViewSetChangeCursorCallback(Ptr, callback__PInvoke__, userData);
+			}else{
+				Handle(3, default);
+				Methods.ulViewSetChangeCursorCallback(Ptr, null, userData);
+			}
+		}
+		public void SetAddConsoleMessageCallback(ULAddConsoleMessageCallback callback, IntPtr userData = default){
+			if(callback is not null){
+				ULAddConsoleMessageCallback__PInvoke__ callback__PInvoke__ = (user_data,caller,source,line_number,column_number,source_id) => callback(user_data, new View(caller), source, line_number, column_number, ULStringMarshaler.NativeToManaged(source_id));
+				Handle(4, GCHandle.Alloc(callback__PInvoke__, GCHandleType.Normal));
+				Methods.ulViewSetAddConsoleMessageCallback(Ptr, callback__PInvoke__, userData);
+			}else{
+				Handle(4, default);
+				Methods.ulViewSetAddConsoleMessageCallback(Ptr, null, userData);
+			}
+		}
+		public void SetCreateChildViewCallback(ULCreateChildViewCallback callback, IntPtr userData = default){
+			if(callback is not null){
+				ULCreateChildViewCallback__PInvoke__ callback__PInvoke__ = (user_data, caller, opener_url, target_url, is_popup, popup_rect) => {
+					View view = callback(user_data, new View(caller), ULStringMarshaler.NativeToManaged(opener_url), ULStringMarshaler.NativeToManaged(target_url), is_popup != 0, popup_rect);
+					return view is null ? IntPtr.Zero : view.Ptr;
+				};
+				Handle(5, GCHandle.Alloc(callback__PInvoke__, GCHandleType.Normal));
+				Methods.ulViewSetCreateChildViewCallback(Ptr, callback__PInvoke__, userData);
+			}else{
+				Handle(5, default);
+				Methods.ulViewSetCreateChildViewCallback(Ptr, null, userData);
+			}
+		}
+		public void SetBeginLoadingCallback(ULBeginLoadingCallback callback, IntPtr userData = default){
+			if(callback is not null){
+				ULBeginLoadingCallback__PInvoke__ callback__PInvoke__ = (user_data, caller, frame_id, is_main_frame, url) => callback(user_data, new View(caller), frame_id, is_main_frame != 0, ULStringMarshaler.NativeToManaged(url));
+				Handle(6, GCHandle.Alloc(callback__PInvoke__, GCHandleType.Normal));
+				Methods.ulViewSetBeginLoadingCallback(Ptr, callback__PInvoke__, userData);
+			}else{
+				Handle(6, default);
+				Methods.ulViewSetBeginLoadingCallback(Ptr, null, userData);
+			}
+		}
+		public void SetFinishLoadingCallback(ULFinishLoadingCallback callback, IntPtr userData = default){
+			if(callback is not null){
+				ULFinishLoadingCallback__PInvoke__ callback__PInvoke__ = (user_data, caller, frame_id, is_main_frame, url) => callback(user_data, new View(caller), frame_id, is_main_frame != 0, ULStringMarshaler.NativeToManaged(url));
+				Handle(7, GCHandle.Alloc(callback__PInvoke__, GCHandleType.Normal));
+				Methods.ulViewSetFinishLoadingCallback(Ptr, callback__PInvoke__, userData);
+			}else{
+				Handle(7, default);
+				Methods.ulViewSetFinishLoadingCallback(Ptr, null, userData);
+			}
+		}
+		public void SetFailLoadingCallback(ULFailLoadingCallback callback, IntPtr userData = default){
+			if(callback is not null){
+				ULFailLoadingCallback__PInvoke__ callback__PInvoke__ = (user_data, caller, frame_id, is_main_frame, url, description, error_domain, error_code) => callback(user_data, new View(caller), frame_id, is_main_frame != 0, ULStringMarshaler.NativeToManaged(url), ULStringMarshaler.NativeToManaged(description), ULStringMarshaler.NativeToManaged(error_domain), error_code);
+				Handle(8, GCHandle.Alloc(callback__PInvoke__, GCHandleType.Normal));
+				Methods.ulViewSetFailLoadingCallback(Ptr, callback__PInvoke__, userData);
+			}else{
+				Handle(8, default);
+				Methods.ulViewSetFailLoadingCallback(Ptr, null, userData);
+			}
+		}
+		public void SetWindowObjectReadyCallback(ULWindowObjectReadyCallback callback, IntPtr userData = default){
+			if(callback is not null){
+				ULWindowObjectReadyCallback__PInvoke__ callback__PInvoke__ = (user_data, caller, frame_id, is_main_frame, url) => callback(user_data, new View(caller), frame_id, is_main_frame != 0, ULStringMarshaler.NativeToManaged(url));
+				Handle(9, GCHandle.Alloc(callback__PInvoke__, GCHandleType.Normal));
+				Methods.ulViewSetWindowObjectReadyCallback(Ptr, callback__PInvoke__, userData);
+			}else{
+				Handle(9, default);
+				Methods.ulViewSetWindowObjectReadyCallback(Ptr, null, userData);
+			}
+		}
 		public void SetDOMReadyCallback(ULDOMReadyCallback callback, IntPtr userData = default)
 		{
 			if (callback is not null)
@@ -280,7 +374,18 @@ namespace UltralightNet
 				Methods.ulViewSetDOMReadyCallback(Ptr, null, userData);
 			}
 		}
-		public void SetUpdateHistoryCallback(ULUpdateHistoryCallback callback, IntPtr userData = default) => Methods.ulViewSetUpdateHistoryCallback(Ptr, callback, userData);
+		public void SetUpdateHistoryCallback(ULUpdateHistoryCallback callback, IntPtr userData = default){
+			if(callback is not null){
+				ULUpdateHistoryCallback__PInvoke__ callback__PInvoke__ = (user_data,caller) => callback(user_data, new View(caller));
+				Handle(11, GCHandle.Alloc(callback__PInvoke__, GCHandleType.Normal));
+				Methods.ulViewSetUpdateHistoryCallback(Ptr, callback__PInvoke__, userData);
+			}else{
+				Handle(11, default);
+				Methods.ulViewSetUpdateHistoryCallback(Ptr, null, userData);
+			}
+		}
+
+#endregion Callbacks
 
 		public bool NeedsPaint { get => Methods.ulViewGetNeedsPaint(Ptr); set => Methods.ulViewSetNeedsPaint(Ptr, value); }
 
@@ -320,7 +425,7 @@ namespace UltralightNet
 		{
 			private static readonly Marshaler instance = new();
 
-			public static ICustomMarshaler GetInstance(string cookie) => instance;
+			public static ICustomMarshaler GetInstance(string _) => instance;
 
 			public void CleanUpManagedData(object ManagedObj) { }
 

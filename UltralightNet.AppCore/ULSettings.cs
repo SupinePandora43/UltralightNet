@@ -11,14 +11,14 @@ namespace UltralightNet.AppCore
 		[DllImport("AppCore")]
 		public static extern void ulDestroySettings(IntPtr settings);
 
-		[DllImport("AppCore")]
-		public static extern void ulSettingsSetDeveloperName(IntPtr settings, [MarshalAs(UnmanagedType.CustomMarshaler, MarshalTypeRef = typeof(ULStringMarshaler))] string name);
+		[GeneratedDllImport("AppCore")]
+		public static partial void ulSettingsSetDeveloperName(IntPtr settings, [MarshalUsing(typeof(ULStringGeneratedDllImportMarshaler))] string name);
 
-		[DllImport("AppCore")]
-		public static extern void ulSettingsSetAppName(IntPtr settings, [MarshalAs(UnmanagedType.CustomMarshaler, MarshalTypeRef = typeof(ULStringMarshaler))] string name);
+		[GeneratedDllImport("AppCore")]
+		public static partial void ulSettingsSetAppName(IntPtr settings, [MarshalUsing(typeof(ULStringGeneratedDllImportMarshaler))] string name);
 
-		[DllImport("AppCore")]
-		public static extern void ulSettingsSetFileSystemPath(IntPtr settings, [MarshalAs(UnmanagedType.CustomMarshaler, MarshalTypeRef = typeof(ULStringMarshaler))] string path);
+		[GeneratedDllImport("AppCore")]
+		public static partial void ulSettingsSetFileSystemPath(IntPtr settings, [MarshalUsing(typeof(ULStringGeneratedDllImportMarshaler))] string path);
 
 		[GeneratedDllImport("AppCore")]
 		public static partial void ulSettingsSetLoadShadersFromFileSystem(IntPtr settings, [MarshalAs(UnmanagedType.I1)] bool enabled);

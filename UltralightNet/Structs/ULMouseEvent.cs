@@ -47,6 +47,7 @@ namespace UltralightNet
 	}
 
 	[BlittableType]
+	[StructLayout(LayoutKind.Sequential)]
 	internal struct ULMouseEventNative
 	{
 		public int type;
