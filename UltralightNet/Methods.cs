@@ -9,6 +9,19 @@ namespace UltralightNet
 	{
 		static Methods() => Preload();
 
+		[GeneratedDllImport("Ultralight", CharSet = CharSet.Ansi)]
+		[return: MarshalAs(UnmanagedType.LPStr)]
+		public static partial string ulVersionString();
+
+		[DllImport("Ultralight")]
+		public static extern uint ulVersionMajor();
+
+		[DllImport("Ultralight")]
+		public static extern uint ulVersionMinor();
+
+		[DllImport("Ultralight")]
+		public static extern uint ulVersionPatch();
+
 		/// <summary>
 		/// Preload OSX Ultralight binaries
 		/// </summary>

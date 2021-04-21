@@ -13,6 +13,50 @@ namespace UltralightNet
 {
     public static partial class Methods
     {
+        public static partial string ulVersionString()
+        {
+            unsafe
+            {
+                string __retVal = default;
+                byte *__retVal_gen_native = default;
+                //
+                // Invoke
+                //
+                __retVal_gen_native = ulVersionString__PInvoke__();
+				//
+				// Unmarshal
+				//
+#if NETSTANDARD
+				if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+                {
+#endif
+                    __retVal = __retVal_gen_native == null ? null : new string ((sbyte *)__retVal_gen_native);
+#if NETSTANDARD
+				}
+                else
+                {
+                    __retVal = System.Runtime.InteropServices.Marshal.
+#if NETSTANDARD2_1_OR_GREATER
+						PtrToStringUTF8
+#else
+						PtrToStringAnsi
+#endif
+						((System.IntPtr)__retVal_gen_native);
+                }
+#endif
+
+					return __retVal;
+            }
+        }
+
+        [System.Runtime.InteropServices.DllImportAttribute("Ultralight", CharSet = System.Runtime.InteropServices.CharSet.Ansi, EntryPoint = "ulVersionString")]
+        extern private static unsafe byte *ulVersionString__PInvoke__();
+    }
+}
+namespace UltralightNet
+{
+    public static partial class Methods
+    {
         public static partial global::System.IntPtr ulCreateKeyEvent(global::UltralightNet.ULKeyEventType type, global::UltralightNet.ULKeyEventModifiers modifiers, int virtual_key_code, int native_key_code, string text, string unmodified_text, bool is_keypad, bool is_auto_repeat, bool is_system_key)
         {
             unsafe

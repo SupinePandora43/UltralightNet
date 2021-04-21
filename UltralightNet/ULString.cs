@@ -27,10 +27,11 @@ namespace UltralightNet
 		[GeneratedDllImport("Ultralight", CharSet = CharSet.Unicode)]
 		public static partial IntPtr ulCreateStringUTF16([MarshalAs(UnmanagedType.LPWStr)] string str, uint len);
 
-		/// <summary>Create string from copy of existing string.</summary>
-		[DllImport("Ultralight")]
-		[Obsolete("missing")]
-		public static extern IntPtr ulCreateStringFromCopy(IntPtr str);
+		// <summary>Create string from copy of existing string.</summary>
+		// [DllImport("Ultralight")]
+		// [Obsolete("missing")]
+		// public static extern IntPtr ulCreateStringFromCopy(IntPtr str);
+		public static IntPtr ulCreateStringFromCopy() => throw new EntryPointNotFoundException();
 
 		/// <summary>Destroy string (you should destroy any strings you explicitly Create).</summary>
 		[DllImport("Ultralight")]

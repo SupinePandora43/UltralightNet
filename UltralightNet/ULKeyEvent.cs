@@ -15,11 +15,54 @@ namespace UltralightNet
 			[MarshalAs(UnmanagedType.I1)] bool is_auto_repeat,
 			[MarshalAs(UnmanagedType.I1)] bool is_system_key);
 
+#if NETSTANDARD || NETFRAMEWORK
 		[DllImport("Ultralight")]
 		public static extern IntPtr ulCreateKeyEventWindows(ULKeyEventType type, UIntPtr wparam, IntPtr lparam);
-
+#if !NETFRAMEWORK
 		[DllImport("Ultralight")]
 		public static extern IntPtr ulCreateKeyEventMacOS(IntPtr evt);
+#endif
+#else
+
+		public static IntPtr ulCreateKeyEventWindows(ULKeyEventType type, UIntPtr wparam, IntPtr lparam)
+		{
+			IntPtr ul = NativeLibrary.Load("Ultralight");
+			IntPtr ulCreateKeyEventWindows__C = NativeLibrary.GetExport(ul, "ulCreateKeyEventWindows");
+
+			IntPtr retVal;
+			
+			unsafe
+			{
+				delegate* unmanaged[Cdecl]<ULKeyEventType, UIntPtr, IntPtr, IntPtr> @delegate = (delegate* unmanaged[Cdecl]<ULKeyEventType, UIntPtr, IntPtr, IntPtr>)ulCreateKeyEventWindows__C;
+
+				retVal = @delegate(type, wparam, lparam);
+			}
+
+			NativeLibrary.Free(ul);
+
+			return retVal;
+		}
+
+		public static IntPtr ulCreateKeyEventMacOS(IntPtr nsevent)
+		{
+			IntPtr ul = NativeLibrary.Load("Ultralight");
+			IntPtr ulCreateKeyEventMacOS__C = NativeLibrary.GetExport(ul, "ulCreateKeyEventMacOS");
+
+			IntPtr retVal;
+
+			unsafe
+			{
+				delegate* unmanaged[Cdecl]<IntPtr, IntPtr> @delegate = (delegate* unmanaged[Cdecl]<IntPtr, IntPtr>)ulCreateKeyEventMacOS__C;
+
+				retVal = @delegate(nsevent);
+			}
+
+			NativeLibrary.Free(ul);
+
+			return retVal;
+		}
+
+#endif
 
 		[DllImport("Ultralight")]
 		public static extern void ulDestroyKeyEvent(IntPtr evt);
@@ -68,7 +111,7 @@ namespace UltralightNet
 #endif
 			Ptr = Methods.ulCreateKeyEventWindows(type, wparam, lparam);
 		}
-
+		/*
 		/// <summary>
 		/// Create a key event from native macOS event.
 		/// </summary>
@@ -82,7 +125,7 @@ namespace UltralightNet
 			if (!RuntimeInformation.IsOSPlatform(OSPlatform.OSX)) throw new PlatformNotSupportedException("MacOS only");
 			return new(Methods.ulCreateKeyEventMacOS(evt), true);
 #endif
-		}
+		}*/
 
 		~ULKeyEvent() => Dispose();
 
