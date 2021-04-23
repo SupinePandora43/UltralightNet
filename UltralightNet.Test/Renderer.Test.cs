@@ -103,7 +103,15 @@ namespace UltralightNet.Test
 
 			EventTest();
 
-			renderer.Dispose();
+			MemoryTest();
+
+			// ~Renderer() => Dispose()
+
+			renderer = null;
+
+			GC.Collect();
+			GC.WaitForPendingFinalizers();
+			GC.Collect();
 		}
 
 		private void SessionTest()
@@ -204,6 +212,13 @@ namespace UltralightNet.Test
 			View view = new(renderer, 256, 256, false, Session.DefaultSession(renderer), true);
 
 			view.FireMouseEvent(new(ULMouseEvent.ULMouseEventType.MouseDown, 100, 100, ULMouseEvent.Button.Left));
+		}
+
+		private void MemoryTest()
+		{
+			renderer.LogMemoryUsage();
+			renderer.PurgeMemory();
+			renderer.LogMemoryUsage();
 		}
 	}
 }
