@@ -317,7 +317,7 @@ namespace UltralightNet
 		{
 			if (callback is not null)
 			{
-				ULAddConsoleMessageCallback__PInvoke__ callback__PInvoke__ = (user_data, caller, source, line_number, column_number, source_id) => callback(user_data, new View(caller), source, line_number, column_number, ULStringMarshaler.NativeToManaged(source_id));
+				ULAddConsoleMessageCallback__PInvoke__ callback__PInvoke__ = (user_data, caller, source, level, message, line_number, column_number, source_id) => callback(user_data, new View(caller), source, level, ULStringMarshaler.NativeToManaged(message), line_number, column_number, ULStringMarshaler.NativeToManaged(source_id));
 				Handle(4, GCHandle.Alloc(callback__PInvoke__, GCHandleType.Normal));
 				Methods.ulViewSetAddConsoleMessageCallback(Ptr, callback__PInvoke__, userData);
 			}

@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Net;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading;
@@ -14,7 +15,7 @@ namespace UltralightNet.Test
 		private Renderer renderer;
 
 		private Dictionary<int, FileStream> handles = new();
-
+		
 		private bool getFileSize(int handle, out long size)
 		{
 			Console.WriteLine($"get_file_size({handle})");
@@ -50,6 +51,14 @@ namespace UltralightNet.Test
 				}
 			});
 			AppCoreMethods.ulEnableDefaultLogger("./ullog.txt");
+
+			WebRequest request = WebRequest.CreateHttp("https://raw.githubusercontent.com/SupinePandora43/UltralightNet/gh-pages/index.html");
+			WebResponse response = request.GetResponse();
+
+
+
+			File.WriteAllText("test.html", new StreamReader(response.GetResponseStream()).ReadToEnd(), Encoding.UTF8);
+
 			ULFileSystemGetFileSizeCallback get_file_size = getFileSize;
 			ULFileSystemGetFileMimeTypeCallback get_file_mime_type = getFileMimeType;
 			ULFileSystemReadFromFileCallback read_from_file = readFromFile;
@@ -159,9 +168,9 @@ namespace UltralightNet.Test
 			View view = new(renderer, 256, 256, false, Session.DefaultSession(renderer), true);
 			view.URL = "file:///test.html";
 
-			view.SetAddConsoleMessageCallback((user_data, caller, source, line_number, column_number, source_id) =>
+			view.SetAddConsoleMessageCallback((user_data, caller, source, level, message, line_number, column_number, source_id) =>
 			{
-				Console.WriteLine($"{source_id}: {line_number}, {column_number} ({source})");
+				Console.WriteLine($"{source_id} {level}: {line_number}, {column_number} ({source}) - {message}");
 			});
 
 			bool loaded = false;

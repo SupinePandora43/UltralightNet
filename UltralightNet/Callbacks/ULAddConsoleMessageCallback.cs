@@ -8,6 +8,8 @@ namespace UltralightNet
 		IntPtr user_data,
 		IntPtr caller,
 		ULMessageSource source,
+		ULMessageLevel level,
+		IntPtr message,
 		uint line_number,
 		uint column_number,
 		IntPtr source_id
@@ -16,6 +18,8 @@ namespace UltralightNet
 		IntPtr user_data,
 		View caller,
 		ULMessageSource source,
+		ULMessageLevel level,
+		string message,
 		uint line_number,
 		uint column_number,
 		string source_id
