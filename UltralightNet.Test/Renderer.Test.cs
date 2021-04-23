@@ -1,5 +1,8 @@
 using System;
+using System.Collections.Generic;
+using System.IO;
 using System.Runtime.InteropServices;
+using System.Text;
 using System.Threading;
 using UltralightNet.AppCore;
 using Xunit;
@@ -10,23 +13,28 @@ namespace UltralightNet.Test
 	{
 		private Renderer renderer;
 
+		private Dictionary<int, FileStream> handles = new();
+
 		private bool getFileSize(int handle, out long size)
 		{
 			Console.WriteLine($"get_file_size({handle})");
-			size = "<html><body><p>text</p></body></html>".Length;
+			//size = "<html><body><p>123</p></body></html>".Length;
+			size = handles[handle].Length;
 			return true;
 		}
-		private bool getFileMimeType(string path, out string result)
+		private bool getFileMimeType(IntPtr path, IntPtr result)
 		{
-			Console.WriteLine($"get_file_mime_type({path})");
-			result = "text/html";
-			return false;
+			Console.WriteLine($"get_file_mime_type({ULStringMarshaler.NativeToManaged(path)})");
+			Methods.ulStringAssignCString(result, "text/html");
+			return true;
 		}
-		private long readFromFile(int handle, out string data, long length)
+		private long readFromFile(int handle, out byte[] data, long length)
 		{
 			Console.WriteLine($"readFromFile({handle}, out data, {length})");
-			data = "<html><body><p>text</p></body></html>";
-			return data.Length;
+			//Assert.Equal("<html><body><p>123</p></body></html>".Length, length);
+			//data = "<html><body><p>123</p></body></html>";
+			data = new byte[length];
+			return handles[handle].Read(data, 0, (int)length);
 		}
 		[Fact]
 		public void TestRenderer()
@@ -47,22 +55,25 @@ namespace UltralightNet.Test
 			ULFileSystemReadFromFileCallback read_from_file = readFromFile;
 			ULPlatform.SetFileSystem(new()
 			{
-				file_exists = (path) => {
+				FileExists = (path) =>
+				{
 					Console.WriteLine($"file_exists({path})");
-					return false;
+					return File.Exists(path);
 				},
-				get_file_size = get_file_size,
-				get_file_mime_type = get_file_mime_type,
-				open_file = (string path, bool open_for_writing) =>
-				{
-					Console.WriteLine($"open_file({path}, {open_for_writing})");
-					return -1;
-				},
-				close_file = (handle) =>
-				{
-					Console.WriteLine($"close_file({handle})");
-				},
-				read_from_file = read_from_file
+				GetFileSize = get_file_size,
+				GetFileMimeType = get_file_mime_type,
+				OpenFile = (path, open_for_writing) =>
+				 {
+					 Console.WriteLine($"open_file({path}, {open_for_writing})");
+					 int handle = new Random().Next(0, 100);
+					 handles[handle] = File.OpenRead(path);
+					 return handle;
+				 },
+				CloseFile = (handle) =>
+				 {
+					 Console.WriteLine($"close_file({handle})");
+				 },
+				ReadFromFile = read_from_file
 			});
 
 			ULConfig config = new()
@@ -146,8 +157,37 @@ namespace UltralightNet.Test
 		private void FSTest()
 		{
 			View view = new(renderer, 256, 256, false, Session.DefaultSession(renderer), true);
-			view.URL = "file:///app.html";
-			// todo test using document.body.innerHTML
+			view.URL = "file:///test.html";
+
+			view.SetAddConsoleMessageCallback((user_data, caller, source, line_number, column_number, source_id) =>
+			{
+				Console.WriteLine($"{source_id}: {line_number}, {column_number} ({source})");
+			});
+
+			bool loaded = false;
+
+			view.SetFinishLoadingCallback((user_data, caller, frame_id, is_main_frame, url) =>
+			{
+				loaded = true;
+			});
+
+			while (!loaded)
+			{
+				renderer.Update();
+				renderer.Render();
+
+				Thread.Sleep(10);
+			}
+
+			for(uint i = 0; i < 100; i++)
+			{
+				renderer.Update();
+				renderer.Render();
+
+				Thread.Sleep(10);
+			}
+
+			view.Surface.Bitmap.WritePng("test_FS.png");
 		}
 
 		private void EventTest()

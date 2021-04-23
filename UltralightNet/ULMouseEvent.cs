@@ -32,6 +32,9 @@ namespace UltralightNet
 		{
 			None,
 			Left,
+			/// <summary>
+			/// Probably a click on mouse wheel
+			/// </summary>
 			Middle,
 			Right
 		}

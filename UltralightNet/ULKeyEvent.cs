@@ -111,7 +111,7 @@ namespace UltralightNet
 #endif
 			Ptr = Methods.ulCreateKeyEventWindows(type, wparam, lparam);
 		}
-		/*
+		
 		/// <summary>
 		/// Create a key event from native macOS event.
 		/// </summary>
@@ -125,7 +125,7 @@ namespace UltralightNet
 			if (!RuntimeInformation.IsOSPlatform(OSPlatform.OSX)) throw new PlatformNotSupportedException("MacOS only");
 			return new(Methods.ulCreateKeyEventMacOS(evt), true);
 #endif
-		}*/
+		}
 
 		~ULKeyEvent() => Dispose();
 
