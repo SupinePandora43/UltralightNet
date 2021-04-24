@@ -392,7 +392,7 @@ void main()
 
 				frame_of_second++;
 
-				Thread.Sleep(1000 / 60 / 10); // ~600 fps
+				// Thread.Sleep(1000 / 60 / 10); // ~600 fps
 			}
 
 			renderer.Dispose();
