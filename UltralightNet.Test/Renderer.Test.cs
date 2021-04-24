@@ -108,14 +108,8 @@ namespace UltralightNet.Test
 
 			// ~Renderer() => Dispose()
 
-			Console.WriteLine("Disposing 1/4");
-			renderer = null;
-			Console.WriteLine("Disposing 2/4");
-			GC.Collect();
-			Console.WriteLine("Disposing 3/4");
-			GC.WaitForPendingFinalizers();
-			Console.WriteLine("Disposing 4/4");
-			GC.Collect();
+			Console.WriteLine("Disposing");
+			renderer.Dispose();
 			Console.WriteLine("Disposed");
 		}
 
