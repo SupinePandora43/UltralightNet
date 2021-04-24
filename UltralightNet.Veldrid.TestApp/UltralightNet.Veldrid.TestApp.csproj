@@ -16,6 +16,11 @@
 		<PackageReference Include="Microsoft.DotNet.ILCompiler" Version="6.0.0-*" />
 	</ItemGroup>
 
+	<!--ItemGroup>
+		<DirectPInvoke Include="Ultralight" />
+		<NativeLibrary Include="Ultralight.lib" />
+	</ItemGroup-->
+	
 	<ItemGroup>
 		<ProjectReference Include="..\UltralightNet.Veldrid.SDL2\UltralightNet.Veldrid.SDL2.csproj" />
 		<ProjectReference Include="..\UltralightNet.Veldrid\UltralightNet.Veldrid.csproj" />
