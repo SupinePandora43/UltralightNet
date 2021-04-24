@@ -15,7 +15,7 @@ namespace UltralightNet.Test
 		private Renderer renderer;
 
 		private Dictionary<int, FileStream> handles = new();
-		
+
 		private bool getFileSize(int handle, out long size)
 		{
 			Console.WriteLine($"get_file_size({handle})");
@@ -190,19 +190,16 @@ namespace UltralightNet.Test
 			while (!loaded)
 			{
 				renderer.Update();
-				renderer.Render();
-
 				Thread.Sleep(10);
 			}
 
-			for(uint i = 0; i < 100; i++)
+			for (uint i = 0; i < 100; i++)
 			{
 				renderer.Update();
-				renderer.Render();
-
 				Thread.Sleep(10);
 			}
 
+			renderer.Render();
 			view.Surface.Bitmap.WritePng("test_FS.png");
 		}
 
