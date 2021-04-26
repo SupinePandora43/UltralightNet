@@ -1,4 +1,5 @@
 using System;
+using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
@@ -23,8 +24,13 @@ namespace UltralightNet.WPF
 			view.Focus();
 			MouseWheel += (sender, e) =>
 			{
-				view.FireScrollEvent(new ULScrollEvent() { deltaY = e.Delta, type = ULScrollEvent.Type.ByPage });
+				view.FireScrollEvent(new ULScrollEvent() { deltaY = e.Delta });
 			};
+		}
+
+		protected override void OnRenderSizeChanged(SizeChangedInfo sizeInfo)
+		{
+			view.Resize((uint)sizeInfo.NewSize.Width, (uint)sizeInfo.NewSize.Height);
 		}
 
 		protected override void OnRender(DrawingContext drawingContext)

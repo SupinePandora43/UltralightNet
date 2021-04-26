@@ -149,7 +149,7 @@ void main()
 			{
 				ResourcePath = "./resources/",
 				UseGpu = true,
-				ForceRepaint = false
+				ForceRepaint = true
 			});
 
 			View view = new(renderer, Width, Height, TRANSPARENT, Session.DefaultSession(renderer), false);
@@ -356,6 +356,8 @@ void main()
 				//gpuDriver.Render();
 
 				commandList.Begin();
+
+				gpuDriver.Render(commandList);
 
 				commandList.SetPipeline(pipeline);
 

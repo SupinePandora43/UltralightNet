@@ -29,7 +29,7 @@ namespace UltralightNet.Veldrid
 
 		private readonly Queue<ULCommand> commands = new();
 
-		private readonly CommandList commandList;
+		private CommandList commandList;
 		private readonly CommandList _commandList;
 
 		public bool NeedsDraw => commands.Count is not 0;
@@ -172,7 +172,7 @@ namespace UltralightNet.Veldrid
 				}
 			}
 #if DEBUG
-			catch(Exception e)
+			catch (Exception e)
 			{
 				Console.WriteLine(e);
 			}
@@ -229,7 +229,7 @@ namespace UltralightNet.Veldrid
 				Width = width,
 				Height = height,
 				MipLevels = isRT ? 1 : MipLevels,
-				SampleCount = isRT ? TextureSampleCount.Count1 : SampleCount,
+				SampleCount = isRT ? SampleCount : TextureSampleCount.Count1,
 				ArrayLayers = 1,
 				Depth = 1
 			};
@@ -507,6 +507,21 @@ namespace UltralightNet.Veldrid
 			commands.Clear();
 		}
 
+		[MethodImpl(MethodImplOptions.AggressiveOptimization)]
+		public void Render(CommandList commandList)
+		{
+			if (!NeedsDraw) return;
+
+			this.commandList = commandList;
+
+			foreach (ULCommand command in commands)
+			{
+				RunCommand(command);
+			}
+
+			commands.Clear();
+		}
+
 		/// <remarks>will throw exception when view doesn't have RenderTarget</remarks>
 		/// <exception cref="KeyNotFoundException">When called on view without RenderTarget</exception>
 		[MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
@@ -707,7 +722,8 @@ namespace UltralightNet.Veldrid
 				1,
 				PixelFormat.B8_G8_R8_A8_UNorm,
 				TextureUsage.RenderTarget,
-				TextureType.Texture2D));
+				TextureType.Texture2D,
+				SampleCount));
 
 			pipelineOutputFramebuffer = graphicsDevice.ResourceFactory.CreateFramebuffer(
 				new FramebufferDescription()
