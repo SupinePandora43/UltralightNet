@@ -1,4 +1,5 @@
 using System;
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
 namespace UltralightNet
@@ -41,7 +42,7 @@ namespace UltralightNet
 	///<summary>Stores local data such as cookies, local storage, and application cache for one or more Views. </summary>
 	public class Session : IDisposable
 	{
-		public IntPtr Ptr { get; private set; }
+		public readonly IntPtr Ptr;
 		public bool IsDisposed { get; private set; }
 
 		public Session(IntPtr ptr, bool dispose = false)
@@ -54,6 +55,7 @@ namespace UltralightNet
 		/// <param name="is_persistent">Whether or not to store the session on disk.<br/>Persistent sessions will be written to the path set in <see cref="ULConfig.CachePath"/></param>
 		/// <param name="name">A unique name for this session, this will be used to generate a unique disk path for persistent sessions.</param>
 		public Session(Renderer renderer, bool is_persistent, string name) => Ptr = Methods.ulCreateSession(renderer.Ptr, is_persistent, name);
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public static Session DefaultSession(Renderer renderer) => new(Methods.ulDefaultSession(renderer.Ptr));
 
 		/// <summary>Whether or not this session is written to disk.</summary>

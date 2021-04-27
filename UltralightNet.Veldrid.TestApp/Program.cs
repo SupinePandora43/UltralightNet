@@ -55,6 +55,8 @@ namespace UltralightNet.Veldrid.TestApp
 				BACKEND);
 			ResourceFactory factory = graphicsDevice.ResourceFactory;
 
+			CommandList commandList = factory.CreateCommandList();
+
 			ResourceLayout basicQuadResourceLayout = factory.CreateResourceLayout(
 				new ResourceLayoutDescription(
 					new ResourceLayoutElementDescription("_texture",
@@ -141,6 +143,8 @@ void main()
 
 			VeldridGPUDriver gpuDriver = new(graphicsDevice);
 
+			gpuDriver.CommandList = commandList;
+
 			ULPlatform.SetLogger(new() { LogMessage = (lvl, msg) => Console.WriteLine(msg) }); ;
 			AppCoreMethods.ulEnablePlatformFontLoader();
 			ULPlatform.SetGPUDriver(gpuDriver.GetGPUDriver());
@@ -149,7 +153,7 @@ void main()
 			{
 				ResourcePath = "./resources/",
 				UseGpu = true,
-				ForceRepaint = true
+				ForceRepaint = false
 			});
 
 			View view = new(renderer, Width, Height, TRANSPARENT, Session.DefaultSession(renderer), false);
@@ -293,7 +297,6 @@ void main()
 			DeviceBuffer quadI = factory.CreateBuffer(new(sizeof(short) * 4, BufferUsage.IndexBuffer));
 			graphicsDevice.UpdateBuffer(quadI, 0, new short[] { 0, 1, 2, 3 });
 
-			CommandList commandList = factory.CreateCommandList();
 			Stopwatch stopwatch = new();
 			stopwatch.Start();
 
@@ -324,11 +327,14 @@ void main()
 					frame_of_second = 0;
 					framerateStopwatch.Restart();
 				}
+
+				commandList.Begin();
 				//Console.WriteLine("Update");
 				Methods.ulUpdate(rendererPtr);
 				gpuDriver.time = stopwatch.ElapsedTicks / 1000f;
 				//Console.WriteLine("Render");
 				Methods.ulRender(rendererPtr);
+				renderer.Render();
 				//Console.WriteLine("Done");
 
 				/*ULSurface surface = cpuView.Surface;
@@ -355,9 +361,6 @@ void main()
 				*/
 				//gpuDriver.Render();
 
-				commandList.Begin();
-
-				gpuDriver.Render(commandList);
 
 				commandList.SetPipeline(pipeline);
 
