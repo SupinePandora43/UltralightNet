@@ -122,7 +122,11 @@ namespace UltralightNet
 			get => Methods.ulBitmapGetHeight(Ptr);
 		}
 
-		public ULBitmapFormat Format => Methods.ulBitmapGetFormat(Ptr);
+		public ULBitmapFormat Format
+		{
+			[MethodImpl(MethodImplOptions.AggressiveInlining)]
+			get => Methods.ulBitmapGetFormat(Ptr);
+		}
 		public uint Bpp
 		{
 			[MethodImpl(MethodImplOptions.AggressiveInlining)]
