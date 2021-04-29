@@ -212,16 +212,21 @@ namespace UltralightNet.Test
 		private void EventTest()
 		{
 			View view = new(renderer, 256, 256, viewConfig, Session.DefaultSession(renderer));
-
+			Console.Write("KeyEvent");
 			view.FireKeyEvent(new(ULKeyEventType.Char, ULKeyEventModifiers.ShiftKey, 0, 0, "A", "A", false, false, false));
+			Console.Write("MouseEvent");
 			view.FireMouseEvent(new(ULMouseEvent.ULMouseEventType.MouseDown, 100, 100, ULMouseEvent.Button.Left));
+			Console.Write("ScrollEvent");
 			view.FireScrollEvent(new() { type = ULScrollEvent.Type.ByPage, deltaX = 23, deltaY = 123 });
 		}
 
 		private void MemoryTest()
 		{
+			Console.Write("LogMemoryUsage");
 			renderer.LogMemoryUsage();
+			Console.Write("PurgeMemory");
 			renderer.PurgeMemory();
+			Console.Write("LogMemoryUsage");
 			renderer.LogMemoryUsage();
 		}
 	}
