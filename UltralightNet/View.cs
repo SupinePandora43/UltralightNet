@@ -7,8 +7,8 @@ namespace UltralightNet
 {
 	public static partial class Methods
 	{
-		[GeneratedDllImport("Ultralight")]
-		public static partial IntPtr ulCreateView(IntPtr renderer, uint width, uint height, [MarshalAs(UnmanagedType.I1)] bool transparent, IntPtr session, [MarshalAs(UnmanagedType.I1)] bool force_cpu_renderer);
+		[DllImport("Ultralight")]
+		public static extern IntPtr ulCreateView(IntPtr renderer, uint width, uint height, IntPtr view_config, IntPtr session);
 
 		[DllImport("Ultralight")]
 		public static extern void ulDestroyView(IntPtr view);
@@ -185,9 +185,9 @@ namespace UltralightNet
 			Ptr = ptr;
 			IsDisposed = !dispose;
 		}
-		public View(Renderer renderer, uint width, uint height, bool transparent, Session session, bool force_cpu_renderer)
+		public View(Renderer renderer, uint width, uint height, ULViewConfig view_config, Session session)
 		{
-			Ptr = Methods.ulCreateView(renderer.Ptr, width, height, transparent, session.Ptr, force_cpu_renderer);
+			Ptr = Methods.ulCreateView(renderer.Ptr, width, height, view_config.Ptr, session.Ptr);
 		}
 
 		private readonly GCHandle[] handles = new GCHandle[12];
