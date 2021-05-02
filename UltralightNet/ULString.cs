@@ -80,6 +80,7 @@ namespace UltralightNet
 			ptr = ULStringMarshaler.ManagedToNative(str);
 		}
 
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public string ToManaged() => ULStringMarshaler.NativeToManaged(ptr);
 
 		public IntPtr Value
@@ -90,6 +91,7 @@ namespace UltralightNet
 			set => ptr = value;
 		}
 
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public void FreeNative()
 		{
 			ULStringMarshaler.CleanUpNative(ptr);

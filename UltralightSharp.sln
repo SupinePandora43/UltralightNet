@@ -28,6 +28,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution 
 		.github\workflows\cd.yml = .github\workflows\cd.yml
 		.github\workflows\coverage.yml = .github\workflows\coverage.yml
 		nuget.config = nuget.config
+		pack.bat = pack.bat
 		README.md = README.md
 	EndProjectSection
 EndProject
@@ -55,9 +56,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Supine.Unstride", "Supine.U
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UltralightNet.Veldrid.SDL2", "UltralightNet.Veldrid.SDL2\UltralightNet.Veldrid.SDL2.csproj", "{D2C07055-8EBB-4327-995E-612B566E4B8E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UltralightNet.WPF", "UltralightNet.WPF\UltralightNet.WPF.csproj", "{390F46AF-9830-4EAE-900D-8398445172ED}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UltralightNet.WPF", "UltralightNet.WPF\UltralightNet.WPF.csproj", "{390F46AF-9830-4EAE-900D-8398445172ED}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UltralightNet.WPF.TestApp", "UltralightNet.WPF.TestApp\UltralightNet.WPF.TestApp.csproj", "{4856DE81-7D8D-421B-BD10-78E411C21732}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UltralightNet.WPF.TestApp", "UltralightNet.WPF.TestApp\UltralightNet.WPF.TestApp.csproj", "{4856DE81-7D8D-421B-BD10-78E411C21732}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

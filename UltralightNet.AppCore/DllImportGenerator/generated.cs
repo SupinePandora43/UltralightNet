@@ -454,7 +454,6 @@ namespace UltralightNet.AppCore
 {
     public static partial class AppCoreMethods
     {
-        [System.Runtime.CompilerServices.SkipLocalsInitAttribute]
         public static partial bool ulWindowIsVisible(global::System.IntPtr window)
         {
             unsafe
