@@ -450,6 +450,33 @@ namespace UltralightNet.AppCore
 		extern private static unsafe void ulWindowSetTitle__PInvoke__(global::System.IntPtr window, byte* title);
 	}
 }
+namespace UltralightNet.AppCore
+{
+    public static partial class AppCoreMethods
+    {
+        [System.Runtime.CompilerServices.SkipLocalsInitAttribute]
+        public static partial bool ulWindowIsVisible(global::System.IntPtr window)
+        {
+            unsafe
+            {
+                bool __retVal = default;
+                byte __retVal_gen_native = default;
+                //
+                // Invoke
+                //
+                __retVal_gen_native = ulWindowIsVisible__PInvoke__(window);
+                //
+                // Unmarshal
+                //
+                __retVal = __retVal_gen_native != 0;
+                return __retVal;
+            }
+        }
+
+        [System.Runtime.InteropServices.DllImportAttribute("AppCore", EntryPoint = "ulWindowIsVisible")]
+        extern private static unsafe byte ulWindowIsVisible__PInvoke__(global::System.IntPtr window);
+    }
+}
 
 #pragma warning restore IDE0059
 
