@@ -9,7 +9,6 @@ namespace UltralightNetTestApplication
 		{
 			ULConfig config = new();
 			config.ResourcePath = "./resources/";
-			config.UseGpu = false;
 
 			Renderer renderer = new(config);
 
@@ -22,7 +21,7 @@ namespace UltralightNetTestApplication
 
 			//Ultralight.View view = new(renderer.Ptr, 512, 512, false, session.Ptr);
 			//IntPtr view = ulCreateView(renderer.Ptr, 256, 256, 0, IntPtr.Zero, 0);
-			View view = new(renderer, 512, 512, false, session, false);
+			View view = new(renderer, 512, 512);
 
 		}
 	}
