@@ -217,7 +217,7 @@ namespace UltralightNet.Test
 			Console.WriteLine("MouseEvent");
 			view.FireMouseEvent(new(ULMouseEvent.ULMouseEventType.MouseDown, 100, 100, ULMouseEvent.Button.Left));
 			Console.WriteLine("ScrollEvent");
-			view.FireScrollEvent(new() { type = ULScrollEvent.Type.ByPage, deltaX = 23, deltaY = 123 });
+			view.FireScrollEvent(new() { type = ULScrollEvent.ScrollType.ByPage, deltaX = 23, deltaY = 123 });
 		}
 
 		private void MemoryTest()
