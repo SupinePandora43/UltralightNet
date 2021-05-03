@@ -15,14 +15,11 @@ namespace UltralightNet.AppCore.TestApp
 			}, new ULConfig()
 			{
 				ResourcePath = "./resources",
-				UseGpu = false
 			});
 
-			ULWindow window = new(app.MainMonitor, 512, 512, false, ULWindowFlags.Titled | ULWindowFlags.Maximizable);
+			ULWindow window = new(app.MainMonitor, 512, 512, false, ULWindowFlags.Titled | ULWindowFlags.Resizable);
 
 			window.Title = "test title";
-
-			app.Window = window;
 
 			ULOverlay overlay = new(window, 512, 512, 0, 0);
 
