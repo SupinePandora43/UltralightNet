@@ -1287,27 +1287,31 @@ namespace UltralightNet
 }
 namespace UltralightNet
 {
-	public static partial class Methods
-	{
-		public static partial void ulViewFireScrollEvent(global::System.IntPtr view, global::UltralightNet.ULScrollEvent scroll_event)
-		{
-			unsafe
-			{
-				global::UltralightNet.ULScrollEventNative __scroll_event_gen_native = default;
-				//
-				// Marshal
-				//
-				__scroll_event_gen_native = new global::UltralightNet.ULScrollEventNative(scroll_event);
-				//
-				// Invoke
-				//
-				ulViewFireScrollEvent__PInvoke__(view, __scroll_event_gen_native);
-			}
-		}
+    public static partial class Methods
+    {
+        public static partial void ulViewFireScrollEvent(global::System.IntPtr view, ref global::UltralightNet.ULScrollEvent scroll_event)
+        {
+            unsafe
+            {
+                global::UltralightNet.ULScrollEventNative __scroll_event_gen_native = default;
+                //
+                // Marshal
+                //
+                __scroll_event_gen_native = new global::UltralightNet.ULScrollEventNative(scroll_event);
+                //
+                // Invoke
+                //
+                ulViewFireScrollEvent__PInvoke__(view, &__scroll_event_gen_native);
+                //
+                // Unmarshal
+                //
+                scroll_event = __scroll_event_gen_native.ToManaged();
+            }
+        }
 
-		[System.Runtime.InteropServices.DllImportAttribute("Ultralight", EntryPoint = "ulViewFireScrollEvent")]
-		extern private static unsafe void ulViewFireScrollEvent__PInvoke__(global::System.IntPtr view, global::UltralightNet.ULScrollEventNative scroll_event);
-	}
+        [System.Runtime.InteropServices.DllImportAttribute("Ultralight", EntryPoint = "ulViewFireScrollEvent")]
+        extern private static unsafe void ulViewFireScrollEvent__PInvoke__(global::System.IntPtr view, global::UltralightNet.ULScrollEventNative*scroll_event);
+    }
 }
 namespace UltralightNet
 {

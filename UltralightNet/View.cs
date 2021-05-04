@@ -124,7 +124,7 @@ namespace UltralightNet
 		public static extern void ulViewFireMouseEvent(IntPtr view, IntPtr mouse_event);
 
 		[GeneratedDllImport("Ultralight")]
-		public static partial void ulViewFireScrollEvent(IntPtr view, ULScrollEvent scroll_event);
+		public static partial void ulViewFireScrollEvent(IntPtr view,ref ULScrollEvent scroll_event);
 
 		[DllImport("Ultralight")]
 		public static extern void ulViewSetChangeTitleCallback(IntPtr view, ULChangeTitleCallback__PInvoke__ callback, IntPtr user_data);
@@ -255,7 +255,8 @@ namespace UltralightNet
 
 		public void FireKeyEvent(ULKeyEvent keyEvent) => Methods.ulViewFireKeyEvent(Ptr, keyEvent.Ptr);
 		public void FireMouseEvent(ULMouseEvent mouseEvent) => Methods.ulViewFireMouseEvent(Ptr, mouseEvent.Ptr);
-		public void FireScrollEvent(ULScrollEvent scrollEvent) => Methods.ulViewFireScrollEvent(Ptr, scrollEvent);
+		public void FireScrollEvent(ref ULScrollEvent scrollEvent) => Methods.ulViewFireScrollEvent(Ptr, ref scrollEvent);
+		public void FireScrollEvent(ULScrollEvent scrollEvent) => Methods.ulViewFireScrollEvent(Ptr, ref scrollEvent);
 
 		#region Callbacks
 		public void SetChangeTitleCallback(ULChangeTitleCallback callback, IntPtr userData = default)
