@@ -35,6 +35,7 @@
 	<ItemGroup>
 		<ProjectReference Include="..\UltralightNet.Resources\UltralightNet.Resources.csproj" />
 		<ProjectReference Include="..\UltralightNet\UltralightNet.csproj" />
+		<ProjectReference Include="..\UltralightNet.AppCore\UltralightNet.AppCore.csproj" />
 	</ItemGroup>
 
 </Project>
