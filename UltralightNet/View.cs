@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
@@ -124,7 +123,7 @@ namespace UltralightNet
 		public static extern void ulViewFireMouseEvent(IntPtr view, IntPtr mouse_event);
 
 		[GeneratedDllImport("Ultralight")]
-		public static partial void ulViewFireScrollEvent(IntPtr view,ref ULScrollEvent scroll_event);
+		public static partial void ulViewFireScrollEvent(IntPtr view, ref ULScrollEvent scroll_event);
 
 		[DllImport("Ultralight")]
 		public static extern void ulViewSetChangeTitleCallback(IntPtr view, ULChangeTitleCallback__PInvoke__ callback, IntPtr user_data);
@@ -258,7 +257,7 @@ namespace UltralightNet
 		public void FireScrollEvent(ref ULScrollEvent scrollEvent) => Methods.ulViewFireScrollEvent(Ptr, ref scrollEvent);
 		public void FireScrollEvent(ULScrollEvent scrollEvent) => Methods.ulViewFireScrollEvent(Ptr, ref scrollEvent);
 
-		#region Callbacks
+#region Callbacks
 		public void SetChangeTitleCallback(ULChangeTitleCallback callback, IntPtr userData = default)
 		{
 			if (callback is not null)
@@ -432,7 +431,7 @@ namespace UltralightNet
 			}
 		}
 
-		#endregion Callbacks
+#endregion Callbacks
 
 		public bool NeedsPaint { get => Methods.ulViewGetNeedsPaint(Ptr); set => Methods.ulViewSetNeedsPaint(Ptr, value); }
 
