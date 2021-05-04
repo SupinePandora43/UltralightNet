@@ -15,6 +15,7 @@ namespace UltralightNet.AppCore
 		public static extern void ulAppSetUpdateCallback(IntPtr app, ULUpdateCallback callback, IntPtr user_data);
 
 		[GeneratedDllImport("AppCore")]
+		[return: MarshalAs(UnmanagedType.I1)]
 		public static partial bool ulAppIsRunning(IntPtr app);
 
 		[DllImport("AppCore")]

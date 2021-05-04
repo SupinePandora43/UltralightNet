@@ -302,29 +302,29 @@ namespace UltralightNet.AppCore
 }
 namespace UltralightNet.AppCore
 {
-	public static partial class AppCoreMethods
-	{
-		public static partial bool ulAppIsRunning(global::System.IntPtr app)
-		{
-			unsafe
-			{
-				bool __retVal = default;
-				int __retVal_gen_native = default;
-				//
-				// Invoke
-				//
-				__retVal_gen_native = ulAppIsRunning__PInvoke__(app);
-				//
-				// Unmarshal
-				//
-				__retVal = __retVal_gen_native != 0;
-				return __retVal;
-			}
-		}
+    public static partial class AppCoreMethods
+    {
+        public static partial bool ulAppIsRunning(global::System.IntPtr app)
+        {
+            unsafe
+            {
+                bool __retVal = default;
+                byte __retVal_gen_native = default;
+                //
+                // Invoke
+                //
+                __retVal_gen_native = ulAppIsRunning__PInvoke__(app);
+                //
+                // Unmarshal
+                //
+                __retVal = __retVal_gen_native != 0;
+                return __retVal;
+            }
+        }
 
-		[System.Runtime.InteropServices.DllImportAttribute("AppCore", EntryPoint = "ulAppIsRunning")]
-		extern private static unsafe int ulAppIsRunning__PInvoke__(global::System.IntPtr app);
-	}
+        [System.Runtime.InteropServices.DllImportAttribute("AppCore", EntryPoint = "ulAppIsRunning")]
+        extern private static unsafe byte ulAppIsRunning__PInvoke__(global::System.IntPtr app);
+    }
 }
 namespace UltralightNet.AppCore
 {
