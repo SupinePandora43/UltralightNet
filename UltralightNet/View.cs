@@ -257,7 +257,7 @@ namespace UltralightNet
 		public void FireScrollEvent(ref ULScrollEvent scrollEvent) => Methods.ulViewFireScrollEvent(Ptr, ref scrollEvent);
 		public void FireScrollEvent(ULScrollEvent scrollEvent) => Methods.ulViewFireScrollEvent(Ptr, ref scrollEvent);
 
-#region Callbacks
+		#region Callbacks
 		public void SetChangeTitleCallback(ULChangeTitleCallback callback, IntPtr userData = default)
 		{
 			if (callback is not null)
@@ -431,7 +431,7 @@ namespace UltralightNet
 			}
 		}
 
-#endregion Callbacks
+		#endregion Callbacks
 
 		public bool NeedsPaint { get => Methods.ulViewGetNeedsPaint(Ptr); set => Methods.ulViewSetNeedsPaint(Ptr, value); }
 
