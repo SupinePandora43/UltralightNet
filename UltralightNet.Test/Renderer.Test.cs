@@ -14,6 +14,12 @@ namespace UltralightNet.Test
 	{
 		private Renderer renderer;
 
+		private ULViewConfig viewConfig = new()
+		{
+			IsAccelerated = false,
+			IsTransparent = false
+		};
+
 		private Dictionary<int, FileStream> handles = new();
 
 		private bool getFileSize(int handle, out long size)
@@ -121,7 +127,7 @@ namespace UltralightNet.Test
 
 		private void GenericTest()
 		{
-			View view = new(renderer, 512, 512, false, Session.DefaultSession(renderer), true);
+			View view = new(renderer, 512, 512, viewConfig, Session.DefaultSession(renderer));
 
 			Assert.Equal(512u, view.Width);
 			Assert.Equal(512u, view.Height);
@@ -157,7 +163,7 @@ namespace UltralightNet.Test
 
 		private void JSTest()
 		{
-			View view = new(renderer, 2, 2, false, Session.DefaultSession(renderer), true);
+			View view = new(renderer, 2, 2, viewConfig, Session.DefaultSession(renderer));
 			Assert.Equal("3", view.EvaluateScript("1+2", out string exception));
 			Assert.True(string.IsNullOrEmpty(exception));
 			view.Dispose();
@@ -165,14 +171,14 @@ namespace UltralightNet.Test
 
 		private void HTMLTest()
 		{
-			View view = new(renderer, 512, 512, false, Session.DefaultSession(renderer), true);
+			View view = new(renderer, 512, 512, viewConfig, Session.DefaultSession(renderer));
 			view.HTML = "<html />";
 			view.Dispose();
 		}
 
 		private void FSTest()
 		{
-			View view = new(renderer, 256, 256, false, Session.DefaultSession(renderer), true);
+			View view = new(renderer, 256, 256, viewConfig, Session.DefaultSession(renderer));
 			view.URL = "file:///test.html";
 
 			view.SetAddConsoleMessageCallback((user_data, caller, source, level, message, line_number, column_number, source_id) =>
@@ -205,17 +211,22 @@ namespace UltralightNet.Test
 
 		private void EventTest()
 		{
-			View view = new(renderer, 256, 256, false, Session.DefaultSession(renderer), true);
-
+			View view = new(renderer, 256, 256, viewConfig, Session.DefaultSession(renderer));
+			Console.WriteLine("KeyEvent");
 			view.FireKeyEvent(new(ULKeyEventType.Char, ULKeyEventModifiers.ShiftKey, 0, 0, "A", "A", false, false, false));
+			Console.WriteLine("MouseEvent");
 			view.FireMouseEvent(new(ULMouseEvent.ULMouseEventType.MouseDown, 100, 100, ULMouseEvent.Button.Left));
-			view.FireScrollEvent(new() { type = ULScrollEvent.Type.ByPage, deltaX = 23, deltaY = 123 });
+			Console.WriteLine("ScrollEvent");
+			view.FireScrollEvent(new() { type = ULScrollEvent.ScrollType.ByPage, deltaX = 23, deltaY = 123 });
 		}
 
 		private void MemoryTest()
 		{
+			Console.WriteLine("LogMemoryUsage");
 			renderer.LogMemoryUsage();
+			Console.WriteLine("PurgeMemory");
 			renderer.PurgeMemory();
+			Console.WriteLine("LogMemoryUsage");
 			renderer.LogMemoryUsage();
 		}
 	}

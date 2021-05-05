@@ -12,15 +12,10 @@ namespace UltralightNet.AppCore
 		public static extern void ulDestroyApp(IntPtr app);
 
 		[DllImport("AppCore")]
-		public static extern void ulAppSetWindow(IntPtr app, IntPtr window);
-
-		[DllImport("AppCore")]
-		public static extern IntPtr ulAppGetWindow(IntPtr app);
-
-		[DllImport("AppCore")]
 		public static extern void ulAppSetUpdateCallback(IntPtr app, ULUpdateCallback callback, IntPtr user_data);
 
 		[GeneratedDllImport("AppCore")]
+		[return: MarshalAs(UnmanagedType.I1)]
 		public static partial bool ulAppIsRunning(IntPtr app);
 
 		[DllImport("AppCore")]
@@ -40,6 +35,8 @@ namespace UltralightNet.AppCore
 		public IntPtr Ptr { get; private set; }
 		public bool IsDisposed { get; private set; }
 
+		private GCHandle updateHandle;
+
 		public ULApp(IntPtr ptr, bool dispose = false)
 		{
 			Ptr = ptr;
@@ -51,13 +48,20 @@ namespace UltralightNet.AppCore
 			Ptr = AppCoreMethods.ulCreateApp(settings.Ptr, config.Ptr);
 		}
 
-		public ULWindow Window
+		public void SetUpdateCallback(ULUpdateCallback callback, IntPtr userData = default)
 		{
-			get => new(AppCoreMethods.ulAppGetWindow(Ptr));
-			set => AppCoreMethods.ulAppSetWindow(Ptr, value.Ptr);
+			if (callback is not null)
+			{
+				if (updateHandle.IsAllocated) updateHandle.Free();
+				updateHandle = GCHandle.Alloc(callback, GCHandleType.Normal);
+				AppCoreMethods.ulAppSetUpdateCallback(Ptr, callback, userData);
+			}
+			else
+			{
+				if (updateHandle.IsAllocated) updateHandle.Free();
+				AppCoreMethods.ulAppSetUpdateCallback(Ptr, null, userData);
+			}
 		}
-
-		public void SetUpdateCallback(ULUpdateCallback callback, IntPtr userData = default) => AppCoreMethods.ulAppSetUpdateCallback(Ptr, callback, userData);
 
 		public bool IsRunning => AppCoreMethods.ulAppIsRunning(Ptr);
 
@@ -72,6 +76,8 @@ namespace UltralightNet.AppCore
 
 		public void Dispose()
 		{
+			if (updateHandle.IsAllocated) updateHandle.Free();
+
 			if (IsDisposed) return;
 			AppCoreMethods.ulDestroyApp(Ptr);
 

@@ -152,11 +152,14 @@ void main()
 			Renderer renderer = new(new ULConfig()
 			{
 				ResourcePath = "./resources/",
-				UseGpu = true,
 				ForceRepaint = false
 			});
 
-			View view = new(renderer, Width, Height, TRANSPARENT, Session.DefaultSession(renderer), false);
+			View view = new(renderer, Width, Height, new ULViewConfig()
+			{
+				IsAccelerated = true,
+				IsTransparent = true
+			});
 			//View cpuView = new(renderer, Width, Height, TRANSPARENT, Session.DefaultSession(renderer), true);
 
 			const string url = "https://en.key-test.ru/";//"https://github.com/SupinePandora43";
@@ -223,7 +226,8 @@ void main()
 					ULMouseEvent.ULMouseEventType.MouseDown,
 					x,
 					y,
-					md.MouseButton switch {
+					md.MouseButton switch
+					{
 						MouseButton.Left => ULMouseEvent.Button.Left,
 						MouseButton.Right => ULMouseEvent.Button.Right,
 						MouseButton.Middle => ULMouseEvent.Button.Middle,
@@ -255,7 +259,7 @@ void main()
 			{
 				ULScrollEvent scrollEvent = new ULScrollEvent()
 				{
-					type = ULScrollEvent.Type.ByPixel,
+					type = ULScrollEvent.ScrollType.ByPixel,
 					deltaY = (int)mw.WheelDelta * 100
 				};
 				view.FireScrollEvent(scrollEvent);

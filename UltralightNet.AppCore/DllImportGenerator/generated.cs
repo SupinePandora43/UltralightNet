@@ -6,43 +6,42 @@ using System;
 
 namespace UltralightNet.AppCore
 {
-
 	public static partial class AppCoreMethods
-{
-	public static partial void ulSettingsSetDeveloperName(global::System.IntPtr settings, string name)
 	{
-		unsafe
+		public static partial void ulSettingsSetDeveloperName(global::System.IntPtr settings, string name)
 		{
-			global::System.IntPtr __name_gen_native = default;
-			//
-			// Setup
-			//
-			global::UltralightNet.ULStringGeneratedDllImportMarshaler __name_gen_native__marshaler = default;
-			try
+			unsafe
 			{
+				global::UltralightNet.ULStringMarshaler.ULStringPTR* __name_gen_native = default;
 				//
-				// Marshal
+				// Setup
 				//
-				__name_gen_native__marshaler = new global::UltralightNet.ULStringGeneratedDllImportMarshaler(name);
-				__name_gen_native = __name_gen_native__marshaler.Value;
-				//
-				// Invoke
-				//
-				ulSettingsSetDeveloperName__PInvoke__(settings, __name_gen_native);
-			}
-			finally
-			{
-				//
-				// Cleanup
-				//
-				__name_gen_native__marshaler.FreeNative();
+				global::UltralightNet.ULStringGeneratedDllImportMarshaler __name_gen_native__marshaler = default;
+				try
+				{
+					//
+					// Marshal
+					//
+					__name_gen_native__marshaler = new global::UltralightNet.ULStringGeneratedDllImportMarshaler(name);
+					__name_gen_native = __name_gen_native__marshaler.Value;
+					//
+					// Invoke
+					//
+					ulSettingsSetDeveloperName__PInvoke__(settings, __name_gen_native);
+				}
+				finally
+				{
+					//
+					// Cleanup
+					//
+					__name_gen_native__marshaler.FreeNative();
+				}
 			}
 		}
-	}
 
-	[System.Runtime.InteropServices.DllImportAttribute("AppCore", EntryPoint = "ulSettingsSetDeveloperName")]
-	extern private static unsafe void ulSettingsSetDeveloperName__PInvoke__(global::System.IntPtr settings, global::System.IntPtr name);
-}
+		[System.Runtime.InteropServices.DllImportAttribute("AppCore", EntryPoint = "ulSettingsSetDeveloperName")]
+		extern private static unsafe void ulSettingsSetDeveloperName__PInvoke__(global::System.IntPtr settings, global::UltralightNet.ULStringMarshaler.ULStringPTR* name);
+	}
 }
 namespace UltralightNet.AppCore
 {
@@ -52,7 +51,7 @@ namespace UltralightNet.AppCore
 		{
 			unsafe
 			{
-				global::System.IntPtr __name_gen_native = default;
+				global::UltralightNet.ULStringMarshaler.ULStringPTR* __name_gen_native = default;
 				//
 				// Setup
 				//
@@ -80,7 +79,7 @@ namespace UltralightNet.AppCore
 		}
 
 		[System.Runtime.InteropServices.DllImportAttribute("AppCore", EntryPoint = "ulSettingsSetAppName")]
-		extern private static unsafe void ulSettingsSetAppName__PInvoke__(global::System.IntPtr settings, global::System.IntPtr name);
+		extern private static unsafe void ulSettingsSetAppName__PInvoke__(global::System.IntPtr settings, global::UltralightNet.ULStringMarshaler.ULStringPTR* name);
 	}
 }
 namespace UltralightNet.AppCore
@@ -91,7 +90,7 @@ namespace UltralightNet.AppCore
 		{
 			unsafe
 			{
-				global::System.IntPtr __path_gen_native = default;
+				global::UltralightNet.ULStringMarshaler.ULStringPTR* __path_gen_native = default;
 				//
 				// Setup
 				//
@@ -119,7 +118,7 @@ namespace UltralightNet.AppCore
 		}
 
 		[System.Runtime.InteropServices.DllImportAttribute("AppCore", EntryPoint = "ulSettingsSetFileSystemPath")]
-		extern private static unsafe void ulSettingsSetFileSystemPath__PInvoke__(global::System.IntPtr settings, global::System.IntPtr path);
+		extern private static unsafe void ulSettingsSetFileSystemPath__PInvoke__(global::System.IntPtr settings, global::UltralightNet.ULStringMarshaler.ULStringPTR* path);
 	}
 }
 namespace UltralightNet.AppCore
@@ -230,7 +229,7 @@ namespace UltralightNet.AppCore
 		{
 			unsafe
 			{
-				global::System.IntPtr __base_dir_gen_native = default;
+				global::UltralightNet.ULStringMarshaler.ULStringPTR* __base_dir_gen_native = default;
 				//
 				// Setup
 				//
@@ -258,7 +257,7 @@ namespace UltralightNet.AppCore
 		}
 
 		[System.Runtime.InteropServices.DllImportAttribute("AppCore", EntryPoint = "ulEnablePlatformFileSystem")]
-		extern private static unsafe void ulEnablePlatformFileSystem__PInvoke__(global::System.IntPtr base_dir);
+		extern private static unsafe void ulEnablePlatformFileSystem__PInvoke__(global::UltralightNet.ULStringMarshaler.ULStringPTR* base_dir);
 	}
 }
 namespace UltralightNet.AppCore
@@ -269,7 +268,7 @@ namespace UltralightNet.AppCore
 		{
 			unsafe
 			{
-				global::System.IntPtr __log_path_gen_native = default;
+				global::UltralightNet.ULStringMarshaler.ULStringPTR* __log_path_gen_native = default;
 				//
 				// Setup
 				//
@@ -297,34 +296,34 @@ namespace UltralightNet.AppCore
 		}
 
 		[System.Runtime.InteropServices.DllImportAttribute("AppCore", EntryPoint = "ulEnableDefaultLogger")]
-		extern private static unsafe void ulEnableDefaultLogger__PInvoke__(global::System.IntPtr log_path);
+		extern private static unsafe void ulEnableDefaultLogger__PInvoke__(global::UltralightNet.ULStringMarshaler.ULStringPTR* log_path);
 	}
 }
 namespace UltralightNet.AppCore
 {
-	public static partial class AppCoreMethods
-	{
-		public static partial bool ulAppIsRunning(global::System.IntPtr app)
-		{
-			unsafe
-			{
-				bool __retVal = default;
-				int __retVal_gen_native = default;
-				//
-				// Invoke
-				//
-				__retVal_gen_native = ulAppIsRunning__PInvoke__(app);
-				//
-				// Unmarshal
-				//
-				__retVal = __retVal_gen_native != 0;
-				return __retVal;
-			}
-		}
+    public static partial class AppCoreMethods
+    {
+        public static partial bool ulAppIsRunning(global::System.IntPtr app)
+        {
+            unsafe
+            {
+                bool __retVal = default;
+                byte __retVal_gen_native = default;
+                //
+                // Invoke
+                //
+                __retVal_gen_native = ulAppIsRunning__PInvoke__(app);
+                //
+                // Unmarshal
+                //
+                __retVal = __retVal_gen_native != 0;
+                return __retVal;
+            }
+        }
 
-		[System.Runtime.InteropServices.DllImportAttribute("AppCore", EntryPoint = "ulAppIsRunning")]
-		extern private static unsafe int ulAppIsRunning__PInvoke__(global::System.IntPtr app);
-	}
+        [System.Runtime.InteropServices.DllImportAttribute("AppCore", EntryPoint = "ulAppIsRunning")]
+        extern private static unsafe byte ulAppIsRunning__PInvoke__(global::System.IntPtr app);
+    }
 }
 namespace UltralightNet.AppCore
 {
@@ -449,6 +448,32 @@ namespace UltralightNet.AppCore
 		[System.Runtime.InteropServices.DllImportAttribute("AppCore", CharSet = System.Runtime.InteropServices.CharSet.Ansi, EntryPoint = "ulWindowSetTitle")]
 		extern private static unsafe void ulWindowSetTitle__PInvoke__(global::System.IntPtr window, byte* title);
 	}
+}
+namespace UltralightNet.AppCore
+{
+    public static partial class AppCoreMethods
+    {
+        public static partial bool ulWindowIsVisible(global::System.IntPtr window)
+        {
+            unsafe
+            {
+                bool __retVal = default;
+                byte __retVal_gen_native = default;
+                //
+                // Invoke
+                //
+                __retVal_gen_native = ulWindowIsVisible__PInvoke__(window);
+                //
+                // Unmarshal
+                //
+                __retVal = __retVal_gen_native != 0;
+                return __retVal;
+            }
+        }
+
+        [System.Runtime.InteropServices.DllImportAttribute("AppCore", EntryPoint = "ulWindowIsVisible")]
+        extern private static unsafe byte ulWindowIsVisible__PInvoke__(global::System.IntPtr window);
+    }
 }
 
 #pragma warning restore IDE0059

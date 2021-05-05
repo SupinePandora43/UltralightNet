@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
@@ -7,8 +6,8 @@ namespace UltralightNet
 {
 	public static partial class Methods
 	{
-		[GeneratedDllImport("Ultralight")]
-		public static partial IntPtr ulCreateView(IntPtr renderer, uint width, uint height, [MarshalAs(UnmanagedType.I1)] bool transparent, IntPtr session, [MarshalAs(UnmanagedType.I1)] bool force_cpu_renderer);
+		[DllImport("Ultralight")]
+		public static extern IntPtr ulCreateView(IntPtr renderer, uint width, uint height, IntPtr view_config, IntPtr session);
 
 		[DllImport("Ultralight")]
 		public static extern void ulDestroyView(IntPtr view);
@@ -124,7 +123,7 @@ namespace UltralightNet
 		public static extern void ulViewFireMouseEvent(IntPtr view, IntPtr mouse_event);
 
 		[GeneratedDllImport("Ultralight")]
-		public static partial void ulViewFireScrollEvent(IntPtr view, ULScrollEvent scroll_event);
+		public static partial void ulViewFireScrollEvent(IntPtr view, ref ULScrollEvent scroll_event);
 
 		[DllImport("Ultralight")]
 		public static extern void ulViewSetChangeTitleCallback(IntPtr view, ULChangeTitleCallback__PInvoke__ callback, IntPtr user_data);
@@ -185,9 +184,10 @@ namespace UltralightNet
 			Ptr = ptr;
 			IsDisposed = !dispose;
 		}
-		public View(Renderer renderer, uint width, uint height, bool transparent, Session session, bool force_cpu_renderer)
+		//public View(Renderer renderer, uint width, uint height, ULViewConfig view_config) : this(renderer, width, height, view_config, Session.DefaultSession(renderer)) {}
+		public View(Renderer renderer, uint width, uint height, ULViewConfig view_config = default, Session session = default)
 		{
-			Ptr = Methods.ulCreateView(renderer.Ptr, width, height, transparent, session.Ptr, force_cpu_renderer);
+			Ptr = Methods.ulCreateView(renderer.Ptr, width, height, (view_config is default(ULViewConfig)) ? new ULViewConfig().Ptr : view_config.Ptr, (session is default(Session)) ? Session.DefaultSession(renderer).Ptr : session.Ptr);
 		}
 
 		private readonly GCHandle[] handles = new GCHandle[12];
@@ -254,7 +254,8 @@ namespace UltralightNet
 
 		public void FireKeyEvent(ULKeyEvent keyEvent) => Methods.ulViewFireKeyEvent(Ptr, keyEvent.Ptr);
 		public void FireMouseEvent(ULMouseEvent mouseEvent) => Methods.ulViewFireMouseEvent(Ptr, mouseEvent.Ptr);
-		public void FireScrollEvent(ULScrollEvent scrollEvent) => Methods.ulViewFireScrollEvent(Ptr, scrollEvent);
+		public void FireScrollEvent(ref ULScrollEvent scrollEvent) => Methods.ulViewFireScrollEvent(Ptr, ref scrollEvent);
+		public void FireScrollEvent(ULScrollEvent scrollEvent) => Methods.ulViewFireScrollEvent(Ptr, ref scrollEvent);
 
 		#region Callbacks
 		public void SetChangeTitleCallback(ULChangeTitleCallback callback, IntPtr userData = default)

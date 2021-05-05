@@ -12,7 +12,7 @@ namespace UltralightNet.GettingStarted
 			// Set Logger
 			ULPlatform.SetLogger(new ULLogger()
 			{
-				log_message = (level, message) =>
+				LogMessage = (level, message) =>
 				{
 					Console.WriteLine($"({level}): {message}");
 				}
@@ -31,8 +31,7 @@ namespace UltralightNet.GettingStarted
 			Renderer renderer = new(config);
 
 			// Create View
-			// Session.DefaultSession - get default renderer session (used for saving cookies etc)
-			View view = new(renderer, 512, 512, false, Session.DefaultSession(renderer), false);
+			View view = new(renderer, 512, 512);
 
 			// Load URL
 

@@ -11,7 +11,7 @@ namespace UltralightNet
 		/// <summary>
 		/// Type of event
 		/// </summary>
-		public enum Type
+		public enum ScrollType
 		{
 			ByPixel,
 			ByPage
@@ -20,7 +20,7 @@ namespace UltralightNet
 		/// <summary>
 		/// Type of event
 		/// </summary>
-		public Type type;
+		public ScrollType type;
 		/// <summary>
 		/// horizontal scroll
 		/// </summary>
@@ -32,6 +32,7 @@ namespace UltralightNet
 	}
 
 	[BlittableType]
+	[StructLayout(LayoutKind.Sequential)]
 	internal struct ULScrollEventNative
 	{
 		public int type;
@@ -47,7 +48,7 @@ namespace UltralightNet
 
 		public ULScrollEvent ToManaged() => new()
 		{
-			type = (ULScrollEvent.Type)type,
+			type = (ULScrollEvent.ScrollType)type,
 			deltaX = deltaX,
 			deltaY = deltaY
 		};

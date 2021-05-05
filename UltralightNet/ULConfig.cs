@@ -22,55 +22,20 @@ namespace UltralightNet
 		[GeneratedDllImport("Ultralight")]
 		public static partial void ulConfigSetCachePath(IntPtr config, [MarshalUsing(typeof(ULStringGeneratedDllImportMarshaler))] string cache_path);
 
-		[GeneratedDllImport("Ultralight")]
-		public static partial void ulConfigSetUseGPURenderer(IntPtr config, [MarshalAs(UnmanagedType.I1)] bool use_gpu);
-
-		/// <summary>Set the amount that the application DPI has been scaled, used for scaling device coordinates to pixels and oversampling raster shapes.</summary>
-		[GeneratedDllImport("Ultralight")]
-		public static partial void ulConfigSetDeviceScale(IntPtr config, double value = 1.0);
-
 		/// <summary>The winding order for front-facing triangles.</summary>
 		/// <see cref="ULFaceWinding"/>
 		/// <remarks>This is only used with custom GPUDrivers</remarks>
-		[GeneratedDllImport("Ultralight")]
-		public static partial void ulConfigSetFaceWinding(IntPtr config, ULFaceWinding winding);
-
-		/// <summary>Set whether images should be enabled.</summary>
-		[GeneratedDllImport("Ultralight")]
-		public static partial void ulConfigSetEnableImages(IntPtr config, [MarshalAs(UnmanagedType.I1)] bool enabled);
-
-		/// <summary>Set whether JavaScript should be eanbled.</summary>
-		[GeneratedDllImport("Ultralight")]
-		public static partial void ulConfigSetEnableJavaScript(IntPtr config, [MarshalAs(UnmanagedType.I1)] bool enabled);
+		[DllImport("Ultralight")]
+		public static extern void ulConfigSetFaceWinding(IntPtr config, ULFaceWinding winding);
 
 		/// <summary>The hinting algorithm to use when rendering fonts.</summary>
 		/// <see cref="ULFontHinting"/>
-		[GeneratedDllImport("Ultralight")]
-		public static partial void ulConfigSetFontHinting(IntPtr config, ULFontHinting font_hinting = ULFontHinting.Normal);
+		[DllImport("Ultralight")]
+		public static extern void ulConfigSetFontHinting(IntPtr config, ULFontHinting font_hinting = ULFontHinting.Normal);
 
 		/// <summary>The gamma to use when compositing font glyphs, change this value to adjust contrast (Adobe and Apple prefer 1.8, others may prefer 2.2).</summary>
-		[GeneratedDllImport("Ultralight")]
-		public static partial void ulConfigSetFontGamma(IntPtr config, double font_gamma = 1.8);
-
-		/// <summary>Set default font-family to use (Default = Times New Roman).</summary>
-		[GeneratedDllImport("Ultralight")]
-		public static partial void ulConfigSetFontFamilyStandard(IntPtr config, [MarshalUsing(typeof(ULStringGeneratedDllImportMarshaler))] string font_name);
-
-		/// <summary>Set default font-family to use for fixed fonts, eg <pre> and <code> (Default = Courier New).</summary>
-		[GeneratedDllImport("Ultralight")]
-		public static partial void ulConfigSetFontFamilyFixed(IntPtr config, [MarshalUsing(typeof(ULStringGeneratedDllImportMarshaler))] string font_name);
-
-		/// <summary>Set default font-family to use for serif fonts (Default = Times New Roman).</summary>
-		[GeneratedDllImport("Ultralight")]
-		public static partial void ulConfigSetFontFamilySerif(IntPtr config, [MarshalUsing(typeof(ULStringGeneratedDllImportMarshaler))] string font_name);
-
-		/// <summary>Set default font-family to use for sans-serif fonts (Default = Arial).</summary>
-		[GeneratedDllImport("Ultralight")]
-		public static partial void ulConfigSetFontFamilySansSerif(IntPtr config, [MarshalUsing(typeof(ULStringGeneratedDllImportMarshaler))] string font_name);
-
-		/// <summary>Set user agent string</summary>
-		[GeneratedDllImport("Ultralight")]
-		public static partial void ulConfigSetUserAgent(IntPtr config, [MarshalUsing(typeof(ULStringGeneratedDllImportMarshaler))] string font_name);
+		[DllImport("Ultralight")]
+		public static extern void ulConfigSetFontGamma(IntPtr config, double font_gamma = 1.8);
 
 		/// <summary>Set user stylesheet (CSS) (Default = Empty).</summary>
 		[GeneratedDllImport("Ultralight")]
@@ -81,16 +46,16 @@ namespace UltralightNet
 		public static partial void ulConfigSetForceRepaint(IntPtr config, [MarshalAs(UnmanagedType.I1)] bool enabled = false);
 
 		/// <summary>Set the amount of time to wait before triggering another repaint when a CSS animation is active.</summary>
-		[GeneratedDllImport("Ultralight")]
-		public static partial void ulConfigSetAnimationTimerDelay(IntPtr config, double delay = 1.0 / 60.0);
+		[DllImport("Ultralight")]
+		public static extern void ulConfigSetAnimationTimerDelay(IntPtr config, double delay = 1.0 / 60.0);
 
 		/// <summary>When a smooth scroll animation is active, the amount of time (in seconds) to wait before triggering another repaint.</summary>
-		[GeneratedDllImport("Ultralight")]
-		public static partial void ulConfigSetScrollTimerDelay(IntPtr config, double delay = 1.0 / 60.0);
+		[DllImport("Ultralight")]
+		public static extern void ulConfigSetScrollTimerDelay(IntPtr config, double delay = 1.0 / 60.0);
 
 		/// <summary>The amount of time (in seconds) to wait before running the recycler (will attempt to return excess memory back to the system).</summary>
-		[GeneratedDllImport("Ultralight")]
-		public static partial void ulConfigSetRecycleDelay(IntPtr config, double delay = 4.0);
+		[DllImport("Ultralight")]
+		public static extern void ulConfigSetRecycleDelay(IntPtr config, double delay = 4.0);
 
 		/// <summary>Set the size of WebCore's memory cache for decoded images, scripts, and other assets in bytes.</summary>
 		[DllImport("Ultralight")]
@@ -128,27 +93,7 @@ namespace UltralightNet
 		/// <summary>The file path to a writable directory that will be used to store cookies, cached resources, and other persistent data.</summary>
 		public ULStringMarshaler.ULStringPTR cache_path;
 
-		/// <remarks>
-		/// When enabled, each View will be rendered to an offscreen GPU texture<br/>
-		/// using the GPU driver set in ulPlatformSetGPUDriver. You can fetch<br/>
-		/// details for the texture via ulViewGetRenderTarget.<br/>
-		/// <br/>
-		/// When disabled (the default), each View will be rendered to an offscreen<br/>
-		/// pixel buffer. This pixel buffer can optionally be provided by the user--<br/>
-		/// for more info see ulViewGetSurface.
-		/// </remarks>
-		[MarshalAs(UnmanagedType.I1)]
-		public bool use_gpu_renderer;
-		public double device_scale;
-
 		public ULFaceWinding face_winding;
-
-		/// <summary>Whether or not images should be enabled.</summary>
-		[MarshalAs(UnmanagedType.I1)]
-		public bool enable_images;
-		/// <summary>Whether or not JavaScript should be enabled.</summary>
-		[MarshalAs(UnmanagedType.I1)]
-		public bool enable_javascript;
 
 		/// <summary>The hinting algorithm to use when rendering fonts.</summary>
 		/// <see cref="ULFontHinting"/>
@@ -157,12 +102,6 @@ namespace UltralightNet
 		/// <summary>The gamma to use when compositing font glyphs, change this value to adjust contrast (Adobe and Apple prefer 1.8, others may prefer 2.2).</summary>
 		public double font_gamma;
 
-		public ULStringMarshaler.ULStringPTR font_family_standard;
-		public ULStringMarshaler.ULStringPTR font_family_fixed;
-		public ULStringMarshaler.ULStringPTR font_family_serif;
-		public ULStringMarshaler.ULStringPTR font_family_sans_serif;
-
-		public ULStringMarshaler.ULStringPTR user_agent;
 		public ULStringMarshaler.ULStringPTR user_stylesheet;
 
 		[MarshalAs(UnmanagedType.I1)]
@@ -213,48 +152,12 @@ namespace UltralightNet
 			set => Methods.ulConfigSetCachePath(Ptr, value);
 		}
 
-		/// <remarks>
-		/// When enabled, each View will be rendered to an offscreen GPU texture<br/>
-		/// using the GPU driver set in ulPlatformSetGPUDriver. You can fetch<br/>
-		/// details for the texture via ulViewGetRenderTarget.<br/>
-		/// <br/>
-		/// When disabled (the default), each View will be rendered to an offscreen<br/>
-		/// pixel buffer. This pixel buffer can optionally be provided by the user--<br/>
-		/// for more info see ulViewGetSurface.
-		/// </remarks>
-		public bool UseGpu
-		{
-			get => ULConfig_C.use_gpu_renderer;
-			set => Methods.ulConfigSetUseGPURenderer(Ptr, value);
-		}
-
-		/// <summary>The amount that the application DPI has been scaled (200% = 2.0).<br/>This should match the device scale set for the current monitor.</summary>
-		/// <remarks>Device scales are rounded to nearest 1/8th (eg, 0.125).</remarks>
-		public double DeviceScale
-		{
-			get => ULConfig_C.device_scale;
-			set => Methods.ulConfigSetDeviceScale(Ptr, value);
-		}
-
 		/// <summary>The winding order for front-facing triangles. <see cref="ULFaceWinding"/></summary>
 		/// <remarks>This is only used when the GPU renderer is enabled.</remarks>
 		public ULFaceWinding FaceWinding
 		{
 			get => ULConfig_C.face_winding;
 			set => Methods.ulConfigSetFaceWinding(Ptr, value);
-		}
-
-		/// <summary>Whether or not images should be enabled.</summary>
-		public bool EnableImages
-		{
-			get => ULConfig_C.enable_images;
-			set => Methods.ulConfigSetEnableImages(Ptr, value);
-		}
-		/// <summary>Whether or not JavaScript should be enabled.</summary>
-		public bool EnableJavaScript
-		{
-			get => ULConfig_C.enable_javascript;
-			set => Methods.ulConfigSetEnableJavaScript(Ptr, value);
 		}
 
 		/// <summary>The hinting algorithm to use when rendering fonts. <see cref="ULFontHinting"/></summary>
@@ -270,36 +173,7 @@ namespace UltralightNet
 			get => ULConfig_C.font_gamma;
 			set => Methods.ulConfigSetFontGamma(Ptr, value);
 		}
-		/// <summary>Default font-family to use.</summary>
-		public string FontFamilyStandard
-		{
-			get => ULConfig_C.font_family_standard.ToManaged();
-			set => Methods.ulConfigSetFontFamilyStandard(Ptr, value);
-		}
-		/// <summary>Default font-family to use for fixed fonts. (pre/code)</summary>
-		public string FontFamilyFixed
-		{
-			get => ULConfig_C.font_family_fixed.ToManaged();
-			set => Methods.ulConfigSetFontFamilyFixed(Ptr, value);
-		}
-		/// <summary>Default font-family to use for serif fonts.</summary>
-		public string FontFamilySerif
-		{
-			get => ULConfig_C.font_family_serif.ToManaged();
-			set => Methods.ulConfigSetFontFamilySerif(Ptr, value);
-		}
-		/// <summary>Default font-family to use for sans-serif fonts.</summary>
-		public string FontFamilySansSerif
-		{
-			get => ULConfig_C.font_family_sans_serif.ToManaged();
-			set => Methods.ulConfigSetFontFamilySansSerif(Ptr, value);
-		}
-		/// <summary>Default user-agent string.</summary>
-		public string UserAgent
-		{
-			get => ULConfig_C.user_agent.ToManaged();
-			set => Methods.ulConfigSetUserAgent(Ptr, value);
-		}
+
 		/// <summary>
 		/// Default user stylesheet. You should set this to your own custom CSS
 		/// string to define default styles for various DOM elements, scrollbars,

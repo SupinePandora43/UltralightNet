@@ -73,32 +73,46 @@ namespace UltralightNet
 
 	public struct ULStringGeneratedDllImportMarshaler
 	{
-		public IntPtr ptr;
+		public ULStringMarshaler.ULStringPTR ptr;
 
 		public ULStringGeneratedDllImportMarshaler(string str)
 		{
-			ptr = ULStringMarshaler.ManagedToNative(str);
+			ptr = new()
+			{
+				data_ = Marshal.StringToCoTaskMemUni(str),
+				length_ = (nuint)str.Length
+			};
 		}
 
-		public string ToManaged() => ULStringMarshaler.NativeToManaged(ptr);
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		public string ToManaged()
+		{
+			return Marshal.PtrToStringUni(ptr.data_, (int)ptr.length_);
+		}
 
-		public IntPtr Value
+		public unsafe ULStringMarshaler.ULStringPTR* Value
 		{
 			[MethodImpl(MethodImplOptions.AggressiveInlining)]
-			get => ptr;
+			get
+			{
+				fixed (ULStringMarshaler.ULStringPTR* valuePtr = &ptr)
+					return valuePtr;
+			}
+
 			[MethodImpl(MethodImplOptions.AggressiveInlining)]
-			set => ptr = value;
+			set => ptr = *value;
 		}
 
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public void FreeNative()
 		{
-			ULStringMarshaler.CleanUpNative(ptr);
+			Marshal.FreeCoTaskMem(ptr.data_);
 		}
 	}
 
 	public class ULStringMarshaler : ICustomMarshaler
 	{
-#region Structures
+		#region Structures
 		[StructLayout(LayoutKind.Sequential)]
 		private struct ULStringSTR
 		{
@@ -128,7 +142,7 @@ namespace UltralightNet
 				Marshal.FreeHGlobal(ulStringPTR.data_);
 			}
 		}
-#endregion Structures
+		#endregion Structures
 
 		private static readonly ULStringMarshaler instance = new();
 
@@ -142,7 +156,7 @@ namespace UltralightNet
 		public IntPtr MarshalManagedToNative(object ManagedObj) => ManagedToNative(ManagedObj as string);
 		public object MarshalNativeToManaged(IntPtr ptr) => NativeToManaged(ptr);
 
-#region Code
+		#region Code
 
 		/// <summary>
 		/// Creates ULString from <see cref="string"/>
@@ -215,6 +229,6 @@ namespace UltralightNet
 			//Marshal.FreeHGlobal(ptr);
 		}
 
-#endregion Code
+		#endregion Code
 	}
 }
