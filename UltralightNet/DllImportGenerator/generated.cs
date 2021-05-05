@@ -55,131 +55,131 @@ namespace UltralightNet
 }
 namespace UltralightNet
 {
-    public static partial class Methods
-    {
-        public static partial global::System.IntPtr ulCreateKeyEvent(global::UltralightNet.ULKeyEventType type, global::UltralightNet.ULKeyEventModifiers modifiers, int virtual_key_code, int native_key_code, string text, string unmodified_text, bool is_keypad, bool is_auto_repeat, bool is_system_key)
-        {
-            unsafe
-            {
-                global::System.IntPtr __text_gen_native = default;
-                global::System.IntPtr __unmodified_text_gen_native = default;
-                byte __is_keypad_gen_native = default;
-                byte __is_auto_repeat_gen_native = default;
-                byte __is_system_key_gen_native = default;
-                global::System.IntPtr __retVal = default;
-                //
-                // Setup
-                //
-                global::UltralightNet.ULStringGeneratedDllImportMarshaler __text_gen_native__marshaler = default;
-                global::UltralightNet.ULStringGeneratedDllImportMarshaler __unmodified_text_gen_native__marshaler = default;
-                try
-                {
-                    //
-                    // Marshal
-                    //
-                    __text_gen_native__marshaler = new global::UltralightNet.ULStringGeneratedDllImportMarshaler(text);
-                    __text_gen_native = __text_gen_native__marshaler.Value;
-                    __unmodified_text_gen_native__marshaler = new global::UltralightNet.ULStringGeneratedDllImportMarshaler(unmodified_text);
-                    __unmodified_text_gen_native = __unmodified_text_gen_native__marshaler.Value;
-                    __is_keypad_gen_native = (byte)(is_keypad ? 1 : 0);
-                    __is_auto_repeat_gen_native = (byte)(is_auto_repeat ? 1 : 0);
-                    __is_system_key_gen_native = (byte)(is_system_key ? 1 : 0);
-                    //
-                    // Invoke
-                    //
-                    __retVal = ulCreateKeyEvent__PInvoke__(type, modifiers, virtual_key_code, native_key_code, __text_gen_native, __unmodified_text_gen_native, __is_keypad_gen_native, __is_auto_repeat_gen_native, __is_system_key_gen_native);
-                }
-                finally
-                {
-                    //
-                    // Cleanup
-                    //
-                    __text_gen_native__marshaler.FreeNative();
-                    __unmodified_text_gen_native__marshaler.FreeNative();
-                }
+	public static partial class Methods
+	{
+		public static partial global::System.IntPtr ulCreateKeyEvent(global::UltralightNet.ULKeyEventType type, global::UltralightNet.ULKeyEventModifiers modifiers, int virtual_key_code, int native_key_code, string text, string unmodified_text, bool is_keypad, bool is_auto_repeat, bool is_system_key)
+		{
+			unsafe
+			{
+				global::UltralightNet.ULStringMarshaler.ULStringPTR* __text_gen_native = default;
+				global::UltralightNet.ULStringMarshaler.ULStringPTR* __unmodified_text_gen_native = default;
+				byte __is_keypad_gen_native = default;
+				byte __is_auto_repeat_gen_native = default;
+				byte __is_system_key_gen_native = default;
+				global::System.IntPtr __retVal = default;
+				//
+				// Setup
+				//
+				global::UltralightNet.ULStringGeneratedDllImportMarshaler __text_gen_native__marshaler = default;
+				global::UltralightNet.ULStringGeneratedDllImportMarshaler __unmodified_text_gen_native__marshaler = default;
+				try
+				{
+					//
+					// Marshal
+					//
+					__text_gen_native__marshaler = new global::UltralightNet.ULStringGeneratedDllImportMarshaler(text);
+					__text_gen_native = __text_gen_native__marshaler.Value;
+					__unmodified_text_gen_native__marshaler = new global::UltralightNet.ULStringGeneratedDllImportMarshaler(unmodified_text);
+					__unmodified_text_gen_native = __unmodified_text_gen_native__marshaler.Value;
+					__is_keypad_gen_native = (byte)(is_keypad ? 1 : 0);
+					__is_auto_repeat_gen_native = (byte)(is_auto_repeat ? 1 : 0);
+					__is_system_key_gen_native = (byte)(is_system_key ? 1 : 0);
+					//
+					// Invoke
+					//
+					__retVal = ulCreateKeyEvent__PInvoke__(type, modifiers, virtual_key_code, native_key_code, __text_gen_native, __unmodified_text_gen_native, __is_keypad_gen_native, __is_auto_repeat_gen_native, __is_system_key_gen_native);
+				}
+				finally
+				{
+					//
+					// Cleanup
+					//
+					__text_gen_native__marshaler.FreeNative();
+					__unmodified_text_gen_native__marshaler.FreeNative();
+				}
 
-                return __retVal;
-            }
-        }
+				return __retVal;
+			}
+		}
 
-        [System.Runtime.InteropServices.DllImportAttribute("Ultralight", EntryPoint = "ulCreateKeyEvent")]
-        extern private static unsafe global::System.IntPtr ulCreateKeyEvent__PInvoke__(global::UltralightNet.ULKeyEventType type, global::UltralightNet.ULKeyEventModifiers modifiers, int virtual_key_code, int native_key_code, global::System.IntPtr text, global::System.IntPtr unmodified_text, byte is_keypad, byte is_auto_repeat, byte is_system_key);
-    }
+		[System.Runtime.InteropServices.DllImportAttribute("Ultralight", EntryPoint = "ulCreateKeyEvent")]
+		extern private static unsafe global::System.IntPtr ulCreateKeyEvent__PInvoke__(global::UltralightNet.ULKeyEventType type, global::UltralightNet.ULKeyEventModifiers modifiers, int virtual_key_code, int native_key_code, global::UltralightNet.ULStringMarshaler.ULStringPTR* text, global::UltralightNet.ULStringMarshaler.ULStringPTR* unmodified_text, byte is_keypad, byte is_auto_repeat, byte is_system_key);
+	}
 }
 namespace UltralightNet
 {
-    public static partial class Methods
-    {
-        public static partial global::System.IntPtr ulCreateSession(global::System.IntPtr renderer, bool is_persistent, string name)
-        {
-            unsafe
-            {
-                byte __is_persistent_gen_native = default;
-                global::System.IntPtr __name_gen_native = default;
-                global::System.IntPtr __retVal = default;
-                //
-                // Setup
-                //
-                global::UltralightNet.ULStringGeneratedDllImportMarshaler __name_gen_native__marshaler = default;
-                try
-                {
-                    //
-                    // Marshal
-                    //
-                    __is_persistent_gen_native = (byte)(is_persistent ? 1 : 0);
-                    __name_gen_native__marshaler = new global::UltralightNet.ULStringGeneratedDllImportMarshaler(name);
-                    __name_gen_native = __name_gen_native__marshaler.Value;
-                    //
-                    // Invoke
-                    //
-                    __retVal = ulCreateSession__PInvoke__(renderer, __is_persistent_gen_native, __name_gen_native);
-                }
-                finally
-                {
-                    //
-                    // Cleanup
-                    //
-                    __name_gen_native__marshaler.FreeNative();
-                }
+	public static partial class Methods
+	{
+		public static partial global::System.IntPtr ulCreateSession(global::System.IntPtr renderer, bool is_persistent, string name)
+		{
+			unsafe
+			{
+				byte __is_persistent_gen_native = default;
+				global::UltralightNet.ULStringMarshaler.ULStringPTR* __name_gen_native = default;
+				global::System.IntPtr __retVal = default;
+				//
+				// Setup
+				//
+				global::UltralightNet.ULStringGeneratedDllImportMarshaler __name_gen_native__marshaler = default;
+				try
+				{
+					//
+					// Marshal
+					//
+					__is_persistent_gen_native = (byte)(is_persistent ? 1 : 0);
+					__name_gen_native__marshaler = new global::UltralightNet.ULStringGeneratedDllImportMarshaler(name);
+					__name_gen_native = __name_gen_native__marshaler.Value;
+					//
+					// Invoke
+					//
+					__retVal = ulCreateSession__PInvoke__(renderer, __is_persistent_gen_native, __name_gen_native);
+				}
+				finally
+				{
+					//
+					// Cleanup
+					//
+					__name_gen_native__marshaler.FreeNative();
+				}
 
-                return __retVal;
-            }
-        }
+				return __retVal;
+			}
+		}
 
-        [System.Runtime.InteropServices.DllImportAttribute("Ultralight", EntryPoint = "ulCreateSession")]
-        extern private static unsafe global::System.IntPtr ulCreateSession__PInvoke__(global::System.IntPtr renderer, byte is_persistent, global::System.IntPtr name);
-    }
+		[System.Runtime.InteropServices.DllImportAttribute("Ultralight", EntryPoint = "ulCreateSession")]
+		extern private static unsafe global::System.IntPtr ulCreateSession__PInvoke__(global::System.IntPtr renderer, byte is_persistent, global::UltralightNet.ULStringMarshaler.ULStringPTR* name);
+	}
 }
 namespace UltralightNet
 {
-    public static partial class Methods
-    {
-        public static partial string ulSessionGetName(global::System.IntPtr session)
-        {
-            unsafe
-            {
-                string __retVal = default;
-                global::System.IntPtr __retVal_gen_native = default;
-                //
-                // Setup
-                //
-                global::UltralightNet.ULStringGeneratedDllImportMarshaler __retVal_gen_native__marshaler = default;
-                //
-                // Invoke
-                //
-                __retVal_gen_native = ulSessionGetName__PInvoke__(session);
-                //
-                // Unmarshal
-                //
-                __retVal_gen_native__marshaler.Value = __retVal_gen_native;
-                __retVal = __retVal_gen_native__marshaler.ToManaged();
-                return __retVal;
-            }
-        }
+	public static partial class Methods
+	{
+		public static partial string ulSessionGetName(global::System.IntPtr session)
+		{
+			unsafe
+			{
+				string __retVal = default;
+				global::UltralightNet.ULStringMarshaler.ULStringPTR* __retVal_gen_native = default;
+				//
+				// Setup
+				//
+				global::UltralightNet.ULStringGeneratedDllImportMarshaler __retVal_gen_native__marshaler = default;
+				//
+				// Invoke
+				//
+				__retVal_gen_native = ulSessionGetName__PInvoke__(session);
+				//
+				// Unmarshal
+				//
+				__retVal_gen_native__marshaler.Value = __retVal_gen_native;
+				__retVal = __retVal_gen_native__marshaler.ToManaged();
+				return __retVal;
+			}
+		}
 
-        [System.Runtime.InteropServices.DllImportAttribute("Ultralight", EntryPoint = "ulSessionGetName")]
-        extern private static unsafe global::System.IntPtr ulSessionGetName__PInvoke__(global::System.IntPtr session);
-    }
+		[System.Runtime.InteropServices.DllImportAttribute("Ultralight", EntryPoint = "ulSessionGetName")]
+		extern private static unsafe global::UltralightNet.ULStringMarshaler.ULStringPTR* ulSessionGetName__PInvoke__(global::System.IntPtr session);
+	}
 }
 namespace UltralightNet
 {
@@ -209,34 +209,34 @@ namespace UltralightNet
 }
 namespace UltralightNet
 {
-    public static partial class Methods
-    {
-        public static partial string ulSessionGetDiskPath(global::System.IntPtr session)
-        {
-            unsafe
-            {
-                string __retVal = default;
-                global::System.IntPtr __retVal_gen_native = default;
-                //
-                // Setup
-                //
-                global::UltralightNet.ULStringGeneratedDllImportMarshaler __retVal_gen_native__marshaler = default;
-                //
-                // Invoke
-                //
-                __retVal_gen_native = ulSessionGetDiskPath__PInvoke__(session);
-                //
-                // Unmarshal
-                //
-                __retVal_gen_native__marshaler.Value = __retVal_gen_native;
-                __retVal = __retVal_gen_native__marshaler.ToManaged();
-                return __retVal;
-            }
-        }
+	public static partial class Methods
+	{
+		public static partial string ulSessionGetDiskPath(global::System.IntPtr session)
+		{
+			unsafe
+			{
+				string __retVal = default;
+				global::UltralightNet.ULStringMarshaler.ULStringPTR* __retVal_gen_native = default;
+				//
+				// Setup
+				//
+				global::UltralightNet.ULStringGeneratedDllImportMarshaler __retVal_gen_native__marshaler = default;
+				//
+				// Invoke
+				//
+				__retVal_gen_native = ulSessionGetDiskPath__PInvoke__(session);
+				//
+				// Unmarshal
+				//
+				__retVal_gen_native__marshaler.Value = __retVal_gen_native;
+				__retVal = __retVal_gen_native__marshaler.ToManaged();
+				return __retVal;
+			}
+		}
 
-        [System.Runtime.InteropServices.DllImportAttribute("Ultralight", EntryPoint = "ulSessionGetDiskPath")]
-        extern private static unsafe global::System.IntPtr ulSessionGetDiskPath__PInvoke__(global::System.IntPtr session);
-    }
+		[System.Runtime.InteropServices.DllImportAttribute("Ultralight", EntryPoint = "ulSessionGetDiskPath")]
+		extern private static unsafe global::UltralightNet.ULStringMarshaler.ULStringPTR* ulSessionGetDiskPath__PInvoke__(global::System.IntPtr session);
+	}
 }
 namespace UltralightNet
 {
@@ -413,7 +413,7 @@ namespace UltralightNet
 		{
 			unsafe
 			{
-				global::System.IntPtr __cache_path_gen_native = default;
+				global::UltralightNet.ULStringMarshaler.ULStringPTR* __cache_path_gen_native = default;
 				//
 				// Setup
 				//
@@ -441,7 +441,7 @@ namespace UltralightNet
 		}
 
 		[System.Runtime.InteropServices.DllImportAttribute("Ultralight", EntryPoint = "ulConfigSetCachePath")]
-		extern private static unsafe void ulConfigSetCachePath__PInvoke__(global::System.IntPtr config, global::System.IntPtr cache_path);
+		extern private static unsafe void ulConfigSetCachePath__PInvoke__(global::System.IntPtr config, global::UltralightNet.ULStringMarshaler.ULStringPTR* cache_path);
 	}
 }
 namespace UltralightNet
@@ -452,7 +452,7 @@ namespace UltralightNet
 		{
 			unsafe
 			{
-				global::System.IntPtr __font_name_gen_native = default;
+				global::UltralightNet.ULStringMarshaler.ULStringPTR* __font_name_gen_native = default;
 				//
 				// Setup
 				//
@@ -480,7 +480,7 @@ namespace UltralightNet
 		}
 
 		[System.Runtime.InteropServices.DllImportAttribute("Ultralight", EntryPoint = "ulConfigSetUserStylesheet")]
-		extern private static unsafe void ulConfigSetUserStylesheet__PInvoke__(global::System.IntPtr config, global::System.IntPtr font_name);
+		extern private static unsafe void ulConfigSetUserStylesheet__PInvoke__(global::System.IntPtr config, global::UltralightNet.ULStringMarshaler.ULStringPTR* font_name);
 	}
 }
 namespace UltralightNet
@@ -515,7 +515,7 @@ namespace UltralightNet
 		{
 			unsafe
 			{
-				global::System.IntPtr __resource_path_gen_native = default;
+				global::UltralightNet.ULStringMarshaler.ULStringPTR* __resource_path_gen_native = default;
 				//
 				// Setup
 				//
@@ -543,7 +543,7 @@ namespace UltralightNet
 		}
 
 		[System.Runtime.InteropServices.DllImportAttribute("Ultralight", EntryPoint = "ulConfigSetResourcePath")]
-		extern private static unsafe void ulConfigSetResourcePath__PInvoke__(global::System.IntPtr config, global::System.IntPtr resource_path);
+		extern private static unsafe void ulConfigSetResourcePath__PInvoke__(global::System.IntPtr config, global::UltralightNet.ULStringMarshaler.ULStringPTR* resource_path);
 	}
 }
 namespace UltralightNet
@@ -937,65 +937,65 @@ namespace UltralightNet
 }
 namespace UltralightNet
 {
-    public static partial class Methods
-    {
-        public static partial string ulViewGetURL(global::System.IntPtr view)
-        {
-            unsafe
-            {
-                string __retVal = default;
-                global::System.IntPtr __retVal_gen_native = default;
-                //
-                // Setup
-                //
-                global::UltralightNet.ULStringGeneratedDllImportMarshaler __retVal_gen_native__marshaler = default;
-                //
-                // Invoke
-                //
-                __retVal_gen_native = ulViewGetURL__PInvoke__(view);
-                //
-                // Unmarshal
-                //
-                __retVal_gen_native__marshaler.Value = __retVal_gen_native;
-                __retVal = __retVal_gen_native__marshaler.ToManaged();
-                return __retVal;
-            }
-        }
+	public static partial class Methods
+	{
+		public static partial string ulViewGetURL(global::System.IntPtr view)
+		{
+			unsafe
+			{
+				string __retVal = default;
+				global::UltralightNet.ULStringMarshaler.ULStringPTR* __retVal_gen_native = default;
+				//
+				// Setup
+				//
+				global::UltralightNet.ULStringGeneratedDllImportMarshaler __retVal_gen_native__marshaler = default;
+				//
+				// Invoke
+				//
+				__retVal_gen_native = ulViewGetURL__PInvoke__(view);
+				//
+				// Unmarshal
+				//
+				__retVal_gen_native__marshaler.Value = __retVal_gen_native;
+				__retVal = __retVal_gen_native__marshaler.ToManaged();
+				return __retVal;
+			}
+		}
 
-        [System.Runtime.InteropServices.DllImportAttribute("Ultralight", CharSet = System.Runtime.InteropServices.CharSet.Unicode, EntryPoint = "ulViewGetURL")]
-        extern private static unsafe global::System.IntPtr ulViewGetURL__PInvoke__(global::System.IntPtr view);
-    }
+		[System.Runtime.InteropServices.DllImportAttribute("Ultralight", CharSet = System.Runtime.InteropServices.CharSet.Unicode, EntryPoint = "ulViewGetURL")]
+		extern private static unsafe global::UltralightNet.ULStringMarshaler.ULStringPTR* ulViewGetURL__PInvoke__(global::System.IntPtr view);
+	}
 }
 namespace UltralightNet
 {
-    public static partial class Methods
-    {
-        public static partial string ulViewGetTitle(global::System.IntPtr view)
-        {
-            unsafe
-            {
-                string __retVal = default;
-                global::System.IntPtr __retVal_gen_native = default;
-                //
-                // Setup
-                //
-                global::UltralightNet.ULStringGeneratedDllImportMarshaler __retVal_gen_native__marshaler = default;
-                //
-                // Invoke
-                //
-                __retVal_gen_native = ulViewGetTitle__PInvoke__(view);
-                //
-                // Unmarshal
-                //
-                __retVal_gen_native__marshaler.Value = __retVal_gen_native;
-                __retVal = __retVal_gen_native__marshaler.ToManaged();
-                return __retVal;
-            }
-        }
+	public static partial class Methods
+	{
+		public static partial string ulViewGetTitle(global::System.IntPtr view)
+		{
+			unsafe
+			{
+				string __retVal = default;
+				global::UltralightNet.ULStringMarshaler.ULStringPTR* __retVal_gen_native = default;
+				//
+				// Setup
+				//
+				global::UltralightNet.ULStringGeneratedDllImportMarshaler __retVal_gen_native__marshaler = default;
+				//
+				// Invoke
+				//
+				__retVal_gen_native = ulViewGetTitle__PInvoke__(view);
+				//
+				// Unmarshal
+				//
+				__retVal_gen_native__marshaler.Value = __retVal_gen_native;
+				__retVal = __retVal_gen_native__marshaler.ToManaged();
+				return __retVal;
+			}
+		}
 
-        [System.Runtime.InteropServices.DllImportAttribute("Ultralight", EntryPoint = "ulViewGetTitle")]
-        extern private static unsafe global::System.IntPtr ulViewGetTitle__PInvoke__(global::System.IntPtr view);
-    }
+		[System.Runtime.InteropServices.DllImportAttribute("Ultralight", EntryPoint = "ulViewGetTitle")]
+		extern private static unsafe global::UltralightNet.ULStringMarshaler.ULStringPTR* ulViewGetTitle__PInvoke__(global::System.IntPtr view);
+	}
 }
 namespace UltralightNet
 {
@@ -1057,7 +1057,7 @@ namespace UltralightNet
 		{
 			unsafe
 			{
-				global::System.IntPtr __html_string_gen_native = default;
+				global::UltralightNet.ULStringMarshaler.ULStringPTR* __html_string_gen_native = default;
 				//
 				// Setup
 				//
@@ -1085,7 +1085,7 @@ namespace UltralightNet
 		}
 
 		[System.Runtime.InteropServices.DllImportAttribute("Ultralight", EntryPoint = "ulViewLoadHTML")]
-		extern private static unsafe void ulViewLoadHTML__PInvoke__(global::System.IntPtr view, global::System.IntPtr html_string);
+		extern private static unsafe void ulViewLoadHTML__PInvoke__(global::System.IntPtr view, global::UltralightNet.ULStringMarshaler.ULStringPTR* html_string);
 	}
 }
 namespace UltralightNet
@@ -1096,7 +1096,7 @@ namespace UltralightNet
 		{
 			unsafe
 			{
-				global::System.IntPtr __url_string_gen_native = default;
+				global::UltralightNet.ULStringMarshaler.ULStringPTR* __url_string_gen_native = default;
 				//
 				// Setup
 				//
@@ -1124,7 +1124,7 @@ namespace UltralightNet
 		}
 
 		[System.Runtime.InteropServices.DllImportAttribute("Ultralight", EntryPoint = "ulViewLoadURL")]
-		extern private static unsafe void ulViewLoadURL__PInvoke__(global::System.IntPtr view, global::System.IntPtr url_string);
+		extern private static unsafe void ulViewLoadURL__PInvoke__(global::System.IntPtr view, global::UltralightNet.ULStringMarshaler.ULStringPTR* url_string);
 	}
 }
 namespace UltralightNet
@@ -1135,11 +1135,11 @@ namespace UltralightNet
 		{
 			unsafe
 			{
-				global::System.IntPtr __js_string_gen_native = default;
+				global::UltralightNet.ULStringMarshaler.ULStringPTR* __js_string_gen_native = default;
 				exception = default;
-				global::System.IntPtr __exception_gen_native = default;
+				global::UltralightNet.ULStringMarshaler.ULStringPTR* __exception_gen_native = default;
 				string __retVal = default;
-				global::System.IntPtr __retVal_gen_native = default;
+				global::UltralightNet.ULStringMarshaler.ULStringPTR* __retVal_gen_native = default;
 				//
 				// Setup
 				//
@@ -1178,7 +1178,7 @@ namespace UltralightNet
 		}
 
 		[System.Runtime.InteropServices.DllImportAttribute("Ultralight", EntryPoint = "ulViewEvaluateScript")]
-		extern private static unsafe global::System.IntPtr ulViewEvaluateScript__PInvoke__(global::System.IntPtr view, global::System.IntPtr js_string, global::System.IntPtr* exception);
+		extern private static unsafe global::UltralightNet.ULStringMarshaler.ULStringPTR* ulViewEvaluateScript__PInvoke__(global::System.IntPtr view, global::UltralightNet.ULStringMarshaler.ULStringPTR* js_string, global::UltralightNet.ULStringMarshaler.ULStringPTR** exception);
 	}
 }
 namespace UltralightNet
@@ -1492,7 +1492,7 @@ namespace UltralightNet
 		{
 			unsafe
 			{
-				global::System.IntPtr __font_name_gen_native = default;
+				global::UltralightNet.ULStringMarshaler.ULStringPTR* __font_name_gen_native = default;
 				//
 				// Setup
 				//
@@ -1520,7 +1520,7 @@ namespace UltralightNet
 		}
 
 		[System.Runtime.InteropServices.DllImportAttribute("Ultralight", EntryPoint = "ulViewConfigSetFontFamilyStandard")]
-		extern private static unsafe void ulViewConfigSetFontFamilyStandard__PInvoke__(global::System.IntPtr config, global::System.IntPtr font_name);
+		extern private static unsafe void ulViewConfigSetFontFamilyStandard__PInvoke__(global::System.IntPtr config, global::UltralightNet.ULStringMarshaler.ULStringPTR* font_name);
 	}
 }
 namespace UltralightNet
@@ -1531,7 +1531,7 @@ namespace UltralightNet
 		{
 			unsafe
 			{
-				global::System.IntPtr __font_name_gen_native = default;
+				global::UltralightNet.ULStringMarshaler.ULStringPTR* __font_name_gen_native = default;
 				//
 				// Setup
 				//
@@ -1559,7 +1559,7 @@ namespace UltralightNet
 		}
 
 		[System.Runtime.InteropServices.DllImportAttribute("Ultralight", EntryPoint = "ulViewConfigSetFontFamilyFixed")]
-		extern private static unsafe void ulViewConfigSetFontFamilyFixed__PInvoke__(global::System.IntPtr config, global::System.IntPtr font_name);
+		extern private static unsafe void ulViewConfigSetFontFamilyFixed__PInvoke__(global::System.IntPtr config, global::UltralightNet.ULStringMarshaler.ULStringPTR* font_name);
 	}
 }
 namespace UltralightNet
@@ -1570,7 +1570,7 @@ namespace UltralightNet
 		{
 			unsafe
 			{
-				global::System.IntPtr __font_name_gen_native = default;
+				global::UltralightNet.ULStringMarshaler.ULStringPTR* __font_name_gen_native = default;
 				//
 				// Setup
 				//
@@ -1598,7 +1598,7 @@ namespace UltralightNet
 		}
 
 		[System.Runtime.InteropServices.DllImportAttribute("Ultralight", EntryPoint = "ulViewConfigSetFontFamilySerif")]
-		extern private static unsafe void ulViewConfigSetFontFamilySerif__PInvoke__(global::System.IntPtr config, global::System.IntPtr font_name);
+		extern private static unsafe void ulViewConfigSetFontFamilySerif__PInvoke__(global::System.IntPtr config, global::UltralightNet.ULStringMarshaler.ULStringPTR* font_name);
 	}
 }
 namespace UltralightNet
@@ -1609,7 +1609,7 @@ namespace UltralightNet
 		{
 			unsafe
 			{
-				global::System.IntPtr __font_name_gen_native = default;
+				global::UltralightNet.ULStringMarshaler.ULStringPTR* __font_name_gen_native = default;
 				//
 				// Setup
 				//
@@ -1637,7 +1637,7 @@ namespace UltralightNet
 		}
 
 		[System.Runtime.InteropServices.DllImportAttribute("Ultralight", EntryPoint = "ulViewConfigSetFontFamilySansSerif")]
-		extern private static unsafe void ulViewConfigSetFontFamilySansSerif__PInvoke__(global::System.IntPtr config, global::System.IntPtr font_name);
+		extern private static unsafe void ulViewConfigSetFontFamilySansSerif__PInvoke__(global::System.IntPtr config, global::UltralightNet.ULStringMarshaler.ULStringPTR* font_name);
 	}
 }
 namespace UltralightNet
@@ -1648,7 +1648,7 @@ namespace UltralightNet
 		{
 			unsafe
 			{
-				global::System.IntPtr __agent_string_gen_native = default;
+				global::UltralightNet.ULStringMarshaler.ULStringPTR* __agent_string_gen_native = default;
 				//
 				// Setup
 				//
@@ -1676,7 +1676,7 @@ namespace UltralightNet
 		}
 
 		[System.Runtime.InteropServices.DllImportAttribute("Ultralight", EntryPoint = "ulViewConfigSetUserAgent")]
-		extern private static unsafe void ulViewConfigSetUserAgent__PInvoke__(global::System.IntPtr config, global::System.IntPtr agent_string);
+		extern private static unsafe void ulViewConfigSetUserAgent__PInvoke__(global::System.IntPtr config, global::UltralightNet.ULStringMarshaler.ULStringPTR* agent_string);
 	}
 }
 
