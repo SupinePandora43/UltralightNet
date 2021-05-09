@@ -95,7 +95,7 @@ namespace UltralightNet
 			[MethodImpl(MethodImplOptions.AggressiveInlining)]
 			get
 			{
-				fixed (ULStringMarshaler.ULStringPTR* valuePtr = &ptr)
+				fixed (ULStringMarshaler.ULStringPTR* valuePtr = ptr)
 					return valuePtr;
 			}
 
