@@ -6,7 +6,8 @@
 		<CollectCoverage>true</CollectCoverage>
 
 		<LangVersion>preview</LangVersion>
-
+		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+		
 		<IncludeSymbols>true</IncludeSymbols>
 		<UseSourceLink>true</UseSourceLink>
 	</PropertyGroup>
