@@ -49,7 +49,7 @@ namespace UltralightNet.Test
 			if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX)) return;
 			AppCoreMethods.ulEnablePlatformFontLoader();
 
-			ULPlatform.SetLogger(new()
+			ULPlatform.SetLogger(new ULLogger()
 			{
 				LogMessage = (level, message) =>
 				{
@@ -68,7 +68,7 @@ namespace UltralightNet.Test
 			ULFileSystemGetFileSizeCallback get_file_size = getFileSize;
 			ULFileSystemGetFileMimeTypeCallback get_file_mime_type = getFileMimeType;
 			ULFileSystemReadFromFileCallback read_from_file = readFromFile;
-			ULPlatform.SetFileSystem(new()
+			ULPlatform.SetFileSystem(new ULFileSystem()
 			{
 				FileExists = (path) =>
 				{
