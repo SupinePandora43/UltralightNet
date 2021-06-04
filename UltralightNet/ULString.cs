@@ -116,10 +116,46 @@ namespace UltralightNet
 		public ushort* data;
 		public nuint length;
 
+		/*
+		public string ToManaged()
+		{
+			return new((char*)data, 0, (int)length);
+		}
+		*/
+
 		public static unsafe string NativeToManaged(ULString* ulString)
 		{
 			return new((char*)ulString->data, 0, (int)ulString->length);
 		}
+
+		/*
+		public static unsafe ULString* ManagedToNative(string managed)
+		{
+			ULString ulString = new();
+			fixed (char* data = managed)
+				ulString.data = (ushort*)data;
+			ulString.length = (nuint)managed.Length;
+			return &ulString;
+		}
+		// requires FREE
+		public static unsafe ULString* ManagedToNativeSafe(string managed)
+		{
+			ULString ulString = new();
+			ulString.data = (ushort*)Marshal.StringToHGlobalUni(managed);
+			ulString.length = (nuint)managed.Length;
+			return &ulString;
+		}
+		// requires FREE (x2)
+		public static unsafe ULString* ManagedToNativeSafest(string managed)
+		{
+			ULString ulString = new();
+			ulString.data = (ushort*)Marshal.StringToHGlobalUni(managed);
+			ulString.length = (nuint)managed.Length;
+			IntPtr address = Marshal.AllocHGlobal(sizeof(ULString));
+			Marshal.StructureToPtr(ulString, address, false);
+			return (ULString*)address;
+		}
+		*/
 	}
 
 	public class ULStringMarshaler : ICustomMarshaler
