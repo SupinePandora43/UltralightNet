@@ -28,10 +28,17 @@ namespace Benchmarks
 		{
 			return ULString.NativeToManaged(str);
 		}
+
+		public static unsafe string NativeToManaged2(ULString* ulString)
+		{
+			ULString ported = *ulString;
+			return new((char*)ported.data, 0, (int)ported.length);
+		}
+
 		[Benchmark]
 		public string Second()
 		{
-			return ULString.NativeToManaged2(str);
+			return NativeToManaged2(str);
 		}
 
 		[Benchmark]
