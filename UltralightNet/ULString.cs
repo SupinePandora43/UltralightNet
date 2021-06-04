@@ -110,6 +110,18 @@ namespace UltralightNet
 		}
 	}
 
+	[StructLayout(LayoutKind.Sequential)]
+	public unsafe struct ULString
+	{
+		public ushort* data;
+		public nuint length;
+
+		public static unsafe string NativeToManaged(ULString* ulString)
+		{
+			return new((char*)ulString->data, 0, (int)ulString->length);
+		}
+	}
+
 	public class ULStringMarshaler : ICustomMarshaler
 	{
 		#region Structures
@@ -146,9 +158,9 @@ namespace UltralightNet
 
 		private static readonly ULStringMarshaler instance = new();
 
-		public static ICustomMarshaler GetInstance(string cookie) => instance;
+		public static ICustomMarshaler GetInstance(string _) => instance;
 
-		public int GetNativeDataSize() => 16;
+		public int GetNativeDataSize() => 16; // idk what this means
 
 		public void CleanUpManagedData(object ManagedObj) { }
 		public void CleanUpNativeData(IntPtr ptr) => CleanUpNative(ptr);
