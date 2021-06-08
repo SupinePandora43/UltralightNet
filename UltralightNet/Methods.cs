@@ -36,7 +36,7 @@ namespace UltralightNet
 				string[] libs = new[] { "libUltralightCore.dylib", "libWebCore.dylib", "libUltralight.dylib" };
 				foreach(string lib in libs)
 				{
-					string path = $"runtimes/osx-x64/native/{lib}";
+					string path = Path.Combine(Path.GetDirectoryName(typeof(Methods).Assembly.Location), "runtimes", "osx-x64", "native", lib);
 					if (File.Exists(path))
 					{
 						NativeLibrary.Load(path);
