@@ -13,7 +13,7 @@
 		<PackageReference Include="Veldrid" Version="4.9.0-ga769c2971c" />
 		<PackageReference Include="Veldrid.SDL2" Version="4.8.0" />
 		<PackageReference Include="Veldrid.StartupUtilities" Version="4.8.0" />
-		<PackageReference Include="Microsoft.DotNet.ILCompiler" Version="6.0.0-*" />
+		<!--<PackageReference Include="Microsoft.DotNet.ILCompiler" Version="6.0.0-*" />-->
 	</ItemGroup>
 
 	<!--ItemGroup>
@@ -23,6 +23,8 @@
 	
 	<ItemGroup>
 		<ProjectReference Include="..\UltralightNet.Veldrid.SDL2\UltralightNet.Veldrid.SDL2.csproj" />
+		<ProjectReference Include="..\UltralightNet\UltralightNet.csproj" />
+		<ProjectReference Include="..\UltralightNet.AppCore\UltralightNet.AppCore.csproj" />
 		<ProjectReference Include="..\UltralightNet.Veldrid\UltralightNet.Veldrid.csproj" />
 	</ItemGroup>
 
