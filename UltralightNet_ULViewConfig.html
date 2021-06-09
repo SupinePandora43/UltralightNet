@@ -24,322 +24,7 @@ h1 a.button i { position: relative; top: 1px; }
 .containerright { width: 340px; min-width: 340px; background-color: #e5e5e5; height: 100%; }
 .containerrightfixed { position: fixed; padding: 0 20px 20px 20px; border-left: solid 1px #6f6f6f; width: 300px; overflow-y: auto; height: 100%; top: 0; bottom: 0; }
 .containerrightfixed h1 { background-color: #c00; }
-.containerrightfixed label, .containerright a { white-space: nowrap; overflow: hidden; display: inline-block; width: 100%; max-width: 300px; text-overflow: ellipsis; }
-.containerright a { margin-bottom: 3px; }
-
-@media screen and (max-width:1200px){ 
-    .container { box-shadow: none; width: 100%; }
-    .containerright { display: none; }
-}
-
-.footer { font-size: 0.7em; text-align: center; margin-top: 35px; }
-
-th { text-align: left; }
-.table-fixed { table-layout: fixed; }
-.overview { border: solid 1px #c1c1c1; border-collapse: collapse; width: 100%; word-wrap: break-word; }
-.overview th { border: solid 1px #c1c1c1; border-collapse: collapse; padding: 2px 4px 2px 4px; background-color: #ddd; }
-.overview tr.namespace th { background-color: #dcdcdc; }
-.overview thead th { background-color: #d1d1d1; }
-.overview th a { color: #000; }
-.overview tr.namespace a { margin-left: 15px; display: block; }
-.overview td { border: solid 1px #c1c1c1; border-collapse: collapse; padding: 2px 5px 2px 5px; }
-div.currenthistory { margin: -2px -5px 0 -5px; padding: 2px 5px 2px 5px; height: 16px; }
-.coverage { border: solid 1px #c1c1c1; border-collapse: collapse; font-size: 5px; height: 10px; }
-.coverage td { padding: 0; border: none; }
-.stripped tr:nth-child(2n+1) { background-color: #F3F3F3; }
-
-.customizebox { font-size: 0.75em; margin-bottom: 7px; }
-.customizebox>div { width: 25%; display: inline-block; }
-.customizebox div.right input { font-size: 0.8em; width: 150px; }
-#namespaceslider { width: 200px; display: inline-block; margin-left: 8px; }
-
-.percentagebar {
-    padding-left: 3px;
-}
-a.percentagebar {
-    padding-left: 6px;
-}
-.percentagebarundefined {
-    border-left: 2px solid #fff;
-}
-.percentagebar0 {
-    border-left: 2px solid #c10909;
-}
-.percentagebar10 {
-    border-left: 2px solid;
-    border-image: linear-gradient(to bottom, #c10909 90%, #0aad0a 90%, #0aad0a 100%) 1;
-}
-.percentagebar20 {
-    border-left: 2px solid;
-    border-image: linear-gradient(to bottom, #c10909 80%, #0aad0a 80%, #0aad0a 100%) 1;
-}
-.percentagebar30 {
-    border-left: 2px solid;
-    border-image: linear-gradient(to bottom, #c10909 70%, #0aad0a 70%, #0aad0a 100%) 1;
-}
-.percentagebar40 {
-    border-left: 2px solid;
-    border-image: linear-gradient(to bottom, #c10909 60%, #0aad0a 60%, #0aad0a 100%) 1;
-}
-.percentagebar50 {
-    border-left: 2px solid;
-    border-image: linear-gradient(to bottom, #c10909 50%, #0aad0a 50%, #0aad0a 100%) 1;
-}
-.percentagebar60 {
-    border-left: 2px solid;
-    border-image: linear-gradient(to bottom, #c10909 40%, #0aad0a 40%, #0aad0a 100%) 1;
-}
-.percentagebar70 {
-    border-left: 2px solid;
-    border-image: linear-gradient(to bottom, #c10909 30%, #0aad0a 30%, #0aad0a 100%) 1;
-}
-.percentagebar80 {
-    border-left: 2px solid;
-    border-image: linear-gradient(to bottom, #c10909 20%, #0aad0a 20%, #0aad0a 100%) 1;
-}
-.percentagebar90 {
-    border-left: 2px solid;
-    border-image: linear-gradient(to bottom, #c10909 10%, #0aad0a 10%, #0aad0a 100%) 1;
-}
-.percentagebar100 {
-    border-left: 2px solid #0aad0a;
-}
-
-.hidden, .ng-hide { display: none; }
-.right { text-align: right; }
-.center { text-align: center; }
-.rightmargin  { padding-right: 8px; }
-.leftmargin { padding-left: 5px; }
-.green { background-color: #0aad0a; }
-.lightgreen { background-color: #dcf4dc; }
-.red { background-color: #c10909; }
-.lightred { background-color: #f7dede; }
-.orange { background-color: #FFA500; }
-.lightorange { background-color: #FFEFD5; }
-.gray { background-color: #dcdcdc; }
-.lightgray { color: #888888; }
-.lightgraybg { background-color: #dadada; }
-
-.toggleZoom { text-align:right; }
-
-.ct-chart { position: relative; }
-.ct-chart .ct-line { stroke-width: 2px !important; }
-.ct-chart .ct-point { stroke-width: 6px !important; transition: stroke-width .2s; }
-.ct-chart .ct-point:hover { stroke-width: 10px !important; }
-.ct-chart .ct-series.ct-series-a .ct-line, .ct-chart .ct-series.ct-series-a .ct-point { stroke: #c00 !important;}
-.ct-chart .ct-series.ct-series-b .ct-line, .ct-chart .ct-series.ct-series-b .ct-point { stroke: #1c2298 !important;}
-
-.tinylinecoveragechart, .tinybranchcoveragechart { background-color: #fff; margin-left: -3px; float: left; border: solid 1px #c1c1c1; width: 30px; height: 18px; }
-.historiccoverageoffset { margin-top: 7px; }
-
-.tinylinecoveragechart .ct-line, .tinybranchcoveragechart .ct-line { stroke-width: 1px !important; }
-.tinybranchcoveragechart .ct-series.ct-series-a .ct-line { stroke: #1c2298 !important; }
-
-.linecoverage { background-color: #c00; width: 10px; height: 8px; border: 1px solid #000; display: inline-block; }
-.branchcoverage { background-color: #1c2298; width: 10px; height: 8px; border: 1px solid #000; display: inline-block; }
-
-.tooltip { position: absolute; display: none; padding: 5px; background: #F4C63D; color: #453D3F; pointer-events: none; z-index: 1; min-width: 250px; }
-
-.column1324 { max-width: 1324px; }
-.column674 { max-width: 674px; }
-.column60 { width: 60px; }
-.column70 { width: 70px; }
-.column90 { width: 90px; }
-.column98 { width: 98px; }
-.column100 { width: 100px; }
-.column105 { width: 105px; }
-.column112 { width: 112px; }
-.column135 { width: 135px; }
-.column150 { width: 150px; }
-
-.covered0 { width: 0px; }
-.covered1 { width: 1px; }
-.covered2 { width: 2px; }
-.covered3 { width: 3px; }
-.covered4 { width: 4px; }
-.covered5 { width: 5px; }
-.covered6 { width: 6px; }
-.covered7 { width: 7px; }
-.covered8 { width: 8px; }
-.covered9 { width: 9px; }
-.covered10 { width: 10px; }
-.covered11 { width: 11px; }
-.covered12 { width: 12px; }
-.covered13 { width: 13px; }
-.covered14 { width: 14px; }
-.covered15 { width: 15px; }
-.covered16 { width: 16px; }
-.covered17 { width: 17px; }
-.covered18 { width: 18px; }
-.covered19 { width: 19px; }
-.covered20 { width: 20px; }
-.covered21 { width: 21px; }
-.covered22 { width: 22px; }
-.covered23 { width: 23px; }
-.covered24 { width: 24px; }
-.covered25 { width: 25px; }
-.covered26 { width: 26px; }
-.covered27 { width: 27px; }
-.covered28 { width: 28px; }
-.covered29 { width: 29px; }
-.covered30 { width: 30px; }
-.covered31 { width: 31px; }
-.covered32 { width: 32px; }
-.covered33 { width: 33px; }
-.covered34 { width: 34px; }
-.covered35 { width: 35px; }
-.covered36 { width: 36px; }
-.covered37 { width: 37px; }
-.covered38 { width: 38px; }
-.covered39 { width: 39px; }
-.covered40 { width: 40px; }
-.covered41 { width: 41px; }
-.covered42 { width: 42px; }
-.covered43 { width: 43px; }
-.covered44 { width: 44px; }
-.covered45 { width: 45px; }
-.covered46 { width: 46px; }
-.covered47 { width: 47px; }
-.covered48 { width: 48px; }
-.covered49 { width: 49px; }
-.covered50 { width: 50px; }
-.covered51 { width: 51px; }
-.covered52 { width: 52px; }
-.covered53 { width: 53px; }
-.covered54 { width: 54px; }
-.covered55 { width: 55px; }
-.covered56 { width: 56px; }
-.covered57 { width: 57px; }
-.covered58 { width: 58px; }
-.covered59 { width: 59px; }
-.covered60 { width: 60px; }
-.covered61 { width: 61px; }
-.covered62 { width: 62px; }
-.covered63 { width: 63px; }
-.covered64 { width: 64px; }
-.covered65 { width: 65px; }
-.covered66 { width: 66px; }
-.covered67 { width: 67px; }
-.covered68 { width: 68px; }
-.covered69 { width: 69px; }
-.covered70 { width: 70px; }
-.covered71 { width: 71px; }
-.covered72 { width: 72px; }
-.covered73 { width: 73px; }
-.covered74 { width: 74px; }
-.covered75 { width: 75px; }
-.covered76 { width: 76px; }
-.covered77 { width: 77px; }
-.covered78 { width: 78px; }
-.covered79 { width: 79px; }
-.covered80 { width: 80px; }
-.covered81 { width: 81px; }
-.covered82 { width: 82px; }
-.covered83 { width: 83px; }
-.covered84 { width: 84px; }
-.covered85 { width: 85px; }
-.covered86 { width: 86px; }
-.covered87 { width: 87px; }
-.covered88 { width: 88px; }
-.covered89 { width: 89px; }
-.covered90 { width: 90px; }
-.covered91 { width: 91px; }
-.covered92 { width: 92px; }
-.covered93 { width: 93px; }
-.covered94 { width: 94px; }
-.covered95 { width: 95px; }
-.covered96 { width: 96px; }
-.covered97 { width: 97px; }
-.covered98 { width: 98px; }
-.covered99 { width: 99px; }
-.covered100 { width: 100px; }
-
- @media print {
-    html, body { background-color: #fff; }
-    .container { max-width:in right"></td><td class="rightmargin right"><a id="file0_line11"></a><code>11</code></td><td></td><td class="lightgray"><code>&nbsp;&nbsp;&nbsp;&nbsp;[DllImport(&quot;Ultralight&quot;)]</code></td></tr>
-<tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line12"></a><code>12</code></td><td></td><td class="lightgray"><code>&nbsp;&nbsp;&nbsp;&nbsp;public&nbsp;static&nbsp;extern&nbsp;void&nbsp;ulDestroyViewConfig(IntPtr&nbsp;config);</code></td></tr>
-<tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line13"></a><code>13</code></td><td></td><td class="lightgray"><code></code></td></tr>
-<tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line14"></a><code>14</code></td><td></td><td class="lightgray"><code>&nbsp;&nbsp;&nbsp;&nbsp;[GeneratedDllImport(&quot;Ultralight&quot;)]</code></td></tr>
-<tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line15"></a><code>15</code></td><td></td><td class="lightgray"><code>&nbsp;&nbsp;&nbsp;&nbsp;public&nbsp;static&nbsp;partial&nbsp;void&nbsp;ulViewConfigSetIsAccelerated(IntPtr&nbsp;config,&nbsp;[MarshalAs(UnmanagedType.I1)]&nbsp;bool&nbsp;is_acceler</code></td></tr>
-<tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line16"></a><code>16</code></td><td></td><td class="lightgray"><code></code></td></tr>
-<tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line17"></a><code>17</code></td><td></td><td class="lightgray"><code>&nbsp;&nbsp;&nbsp;&nbsp;[GeneratedDllImport(&quot;Ultralight&quot;)]</code></td></tr>
-<tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line18"></a><code>18</code></td><td></td><td class="lightgray"><code>&nbsp;&nbsp;&nbsp;&nbsp;public&nbsp;static&nbsp;partial&nbsp;void&nbsp;ulViewConfigSetIsTransparent(IntPtr&nbsp;config,&nbsp;[MarshalAs(UnmanagedType.I1)]&nbsp;bool&nbsp;is_transpa</code></td></tr>
-<tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line19"></a><code>19</code></td><td></td><td class="lightgray"><code></code></td></tr>
-<tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line20"></a><code>20</code></td><td></td><td class="lightgray"><code>&nbsp;&nbsp;&nbsp;&nbsp;[DllImport(&quot;Ultralight&quot;)]</code></td></tr>
-<tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line21"></a><code>21</code></td><td></td><td class="lightgray"><code>&nbsp;&nbsp;&nbsp;&nbsp;public&nbsp;static&nbsp;extern&nbsp;void&nbsp;ulViewConfigSetInitialDeviceScale(IntPtr&nbsp;config,&nbsp;double&nbsp;initial_device_scale);</code></td></tr>
-<tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line22"></a><code>22</code></td><td></td><td class="lightgray"><code></code></td></tr>
-<tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line23"></a><code>23</code></td><td></td><td class="lightgray"><code>&nbsp;&nbsp;&nbsp;&nbsp;[GeneratedDllImport(&quot;Ultralight&quot;)]</code></td></tr>
-<tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line24"></a><code>24</code></td><td></td><td class="lightgray"><code>&nbsp;&nbsp;&nbsp;&nbsp;public&nbsp;static&nbsp;partial&nbsp;void&nbsp;ulViewConfigSetInitialFocus(IntPtr&nbsp;config,&nbsp;[MarshalAs(UnmanagedType.I1)]&nbsp;bool&nbsp;is_focused)</code></td></tr>
-<tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line25"></a><code>25</code></td><td></td><td class="lightgray"><code></code></td></tr>
-<tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line26"></a><code>26</code></td><td></td><td class="lightgray"><code>&nbsp;&nbsp;&nbsp;&nbsp;[GeneratedDllImport(&quot;Ultralight&quot;)]</code></td></tr>
-<tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line27"></a><code>27</code></td><td></td><td class="lightgray"><code>&nbsp;&nbsp;&nbsp;&nbsp;public&nbsp;static&nbsp;partial&nbsp;void&nbsp;ulViewConfigSetEnableImages(IntPtr&nbsp;config,&nbsp;[MarshalAs(UnmanagedType.I1)]&nbsp;bool&nbsp;enabled);</code></td></tr>
-<tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line28"></a><code>28</code></td><td></td><td class="lightgray"><code></code></td></tr>
-<tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line29"></a><code>29</code></td><td></td><td class="lightgray"><code>&nbsp;&nbsp;&nbsp;&nbsp;[GeneratedDllImport(&quot;Ultralight&quot;)]</code></td></tr>
-<tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line30"></a><code>30</code></td><td></td><td class="lightgray"><code>&nbsp;&nbsp;&nbsp;&nbsp;public&nbsp;static&nbsp;partial&nbsp;void&nbsp;ulViewConfigSetEnableJavaScript(IntPtr&nbsp;config,&nbsp;[MarshalAs(UnmanagedType.I1)]&nbsp;bool&nbsp;enabled</code></td></tr>
-<tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line31"></a><code>31</code></td><td></td><td class="lightgray"><code></code></td></tr>
-<tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line32"></a><code>32</code></td><td></td><td class="lightgray"><code>&nbsp;&nbsp;&nbsp;&nbsp;[GeneratedDllImport(&quot;Ultralight&quot;)]</code></td></tr>
-<tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line33"></a><code>33</code></td><td></td><td class="lightgray"><code>&nbsp;&nbsp;&nbsp;&nbsp;public&nbsp;static&nbsp;partial&nbsp;void&nbsp;ulViewConfigSetFontFamilyStandard(IntPtr&nbsp;config,&nbsp;[MarshalUsing(typeof(ULStringGeneratedDl</code></td></tr>
-<tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line34"></a><code>34</code></td><td></td><td class="lightgray"><code></code></td></tr>
-<tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line35"></a><code>35</code></td><td></td><td class="lightgray"><code>&nbsp;&nbsp;&nbsp;&nbsp;[GeneratedDllImport(&quot;Ultralight&quot;)]</code></td></tr>
-<tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line36"></a><code>36</code></td><td></td><td class="lightgray"><code>&nbsp;&nbsp;&nbsp;&nbsp;public&nbsp;static&nbsp;partial&nbsp;void&nbsp;ulViewConfigSetFontFamilyFixed(IntPtr&nbsp;config,&nbsp;[MarshalUsing(typeof(ULStringGeneratedDllIm</code></td></tr>
-<tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line37"></a><code>37</code></td><td></td><td class="lightgray"><code></code></td></tr>
-<tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line38"></a><code>38</code></td><td></td><td class="lightgray"><code>&nbsp;&nbsp;&nbsp;&nbsp;[GeneratedDllImport(&quot;Ultralight&quot;)]</code></td></tr>
-<tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line39"></a><code>39</code></td><td></td><td class="lightgray"><code>&nbsp;&nbsp;&nbsp;&nbsp;public&nbsp;static&nbsp;partial&nbsp;void&nbsp;ulViewConfigSetFontFamilySerif(IntPtr&nbsp;config,&nbsp;[MarshalUsing(typeof(ULStringGeneratedDllIm</code></td></tr>
-<tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line40"></a><code>40</code></td><td></td><td class="lightgray"><code></code></td></tr>
-<tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line41"></a><code>41</code></td><td></td><td class="lightgray"><code>&nbsp;&nbsp;&nbsp;&nbsp;[GeneratedDllImport(&quot;Ultralight&quot;)]</code></td></tr>
-<tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line42"></a><code>42</code></td><td></td><td class="lightgray"><code>&nbsp;&nbsp;&nbsp;&nbsp;public&nbsp;static&nbsp;partial&nbsp;void&nbsp;ulViewConfigSetFontFamilySansSerif(IntPtr&nbsp;config,&nbsp;[MarshalUsing(typeof(ULStringGeneratedD</code></td></tr>
-<tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line43"></a><code>43</code></td><td></td><td class="lightgray"><code></code></td></tr>
-<tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line44"></a><code>44</code></td><td></td><td class="lightgray"><code>&nbsp;&nbsp;&nbsp;&nbsp;[GeneratedDllImport(&quot;Ultralight&quot;)]</code></td></tr>
-<tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line45"></a><code>45</code></td><td></td><td class="lightgray"><code>&nbsp;&nbsp;&nbsp;&nbsp;public&nbsp;static&nbsp;partial&nbsp;void&nbsp;ulViewConfigSetUserAgent(IntPtr&nbsp;config,&nbsp;[MarshalUsing(typeof(ULStringGeneratedDllImportMa</code></td></tr>
-<tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line46"></a><code>46</code></td><td></td><td class="lightgray"><code></code></td></tr>
-<tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line47"></a><code>47</code></td><td></td><td class="lightgray"><code>&nbsp;&nbsp;}</code></td></tr>
-<tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line48"></a><code>48</code></td><td></td><td class="lightgray"><code></code></td></tr>
-<tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line49"></a><code>49</code></td><td></td><td class="lightgray"><code>&nbsp;&nbsp;public&nbsp;class&nbsp;ULViewConfig&nbsp;:&nbsp;IDisposable</code></td></tr>
-<tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line50"></a><code>50</code></td><td></td><td class="lightgray"><code>&nbsp;&nbsp;{</code></td></tr>
-<tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line51"></a><code>51</code></td><td></td><td class="lightgray"><code>&nbsp;&nbsp;&nbsp;&nbsp;public&nbsp;readonly&nbsp;IntPtr&nbsp;Ptr;</code></td></tr>
-<tr class="coverableline" title="Covered (8 visits)" data-coverage="{'AllTestMethods': {'VC': '8', 'LVS': 'green'}}"><td class="green">&nbsp;</td><td class="leftmargin rightmargin right">8</td><td class="rightmargin right"><a id="file0_line52"></a><code>52</code></td><td></td><td class="lightgreen"><code>&nbsp;&nbsp;&nbsp;&nbsp;public&nbsp;bool&nbsp;IsDisposed&nbsp;{&nbsp;get;&nbsp;private&nbsp;set;&nbsp;}</code></td></tr>
-<tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line53"></a><code>53</code></td><td></td><td class="lightgray"><code></code></td></tr>
-<tr class="coverableline" title="Covered (6 visits)" data-coverage="{'AllTestMethods': {'VC': '6', 'LVS': 'green'}}"><td class="green">&nbsp;</td><td class="leftmargin rightmargin right">6</td><td class="rightmargin right"><a id="file0_line54"></a><code>54</code></td><td></td><td class="lightgreen"><code>&nbsp;&nbsp;&nbsp;&nbsp;public&nbsp;ULViewConfig()</code></td></tr>
-<tr class="coverableline" title="Covered (6 visits)" data-coverage="{'AllTestMethods': {'VC': '6', 'LVS': 'green'}}"><td class="green">&nbsp;</td><td class="leftmargin rightmargin right">6</td><td class="rightmargin right"><a id="file0_line55"></a><code>55</code></td><td></td><td class="lightgreen"><code>&nbsp;&nbsp;&nbsp;&nbsp;{</code></td></tr>
-<tr class="coverableline" title="Covered (6 visits)" data-coverage="{'AllTestMethods': {'VC': '6', 'LVS': 'green'}}"><td class="green">&nbsp;</td><td class="leftmargin rightmargin right">6</td><td class="rightmargin right"><a id="file0_line56"></a><code>56</code></td><td></td><td class="lightgreen"><code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Ptr&nbsp;=&nbsp;Methods.ulCreateViewConfig();</code></td></tr>
-<tr class="coverableline" title="Covered (6 visits)" data-coverage="{'AllTestMethods': {'VC': '6', 'LVS': 'green'}}"><td class="green">&nbsp;</td><td class="leftmargin rightmargin right">6</td><td class="rightmargin right"><a id="file0_line57"></a><code>57</code></td><td></td><td class="lightgreen"><code>&nbsp;&nbsp;&nbsp;&nbsp;}</code></td></tr>
-<tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line58"></a><code>58</code></td><td></td><td class="lightgray"><code></code></td></tr>
-<tr class="coverableline" title="Covered (4 visits)" data-coverage="{'AllTestMethods': {'VC': '4', 'LVS': 'green'}}"><td class="green">&nbsp;</td><td class="leftmargin rightmargin right">4</td><td class="rightmargin right"><a id="file0_line59"></a><code>59</code></td><td></td><td class="lightgreen"><code>&nbsp;&nbsp;&nbsp;&nbsp;~ULViewConfig()&nbsp;=&gt;&nbsp;Dispose();</code></td></tr>
-<tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line60"></a><code>60</code></td><td></td><td class="lightgray"><code></code></td></tr>
-<tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line61"></a><code>61</code></td><td></td><td class="lightgray"><code>&nbsp;&nbsp;&nbsp;&nbsp;public&nbsp;void&nbsp;Dispose()</code></td></tr>
-<tr class="coverableline" title="Covered (4 visits)" data-coverage="{'AllTestMethods': {'VC': '4', 'LVS': 'green'}}"><td class="green">&nbsp;</td><td class="leftmargin rightmargin right">4</td><td class="rightmargin right"><a id="file0_line62"></a><code>62</code></td><td></td><td class="lightgreen"><code>&nbsp;&nbsp;&nbsp;&nbsp;{</code></td></tr>
-<tr class="coverableline" title="Covered (4 visits, 2 of 2 branches are covered)" data-coverage="{'AllTestMethods': {'VC': '4', 'LVS': 'green'}}"><td class="green">&nbsp;</td><td class="leftmargin rightmargin right">4</td><td class="rightmargin right"><a id="file0_line63"></a><code>63</code></td><td class="percentagebar percentagebar100"><i class="icon-fork"></i></td><td class="lightgreen"><code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;if&nbsp;(IsDisposed)&nbsp;return;</code></td></tr>
-<tr class="coverableline" title="Covered (4 visits)" data-coverage="{'AllTestMethods': {'VC': '4', 'LVS': 'green'}}"><td class="green">&nbsp;</td><td class="leftmargin rightmargin right">4</td><td class="rightmargin right"><a id="file0_line64"></a><code>64</code></td><td></td><td class="lightgreen"><code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Methods.ulDestroyViewConfig(Ptr);</code></td></tr>
-<tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line65"></a><code>65</code></td><td></td><td class="lightgray"><code></code></td></tr>
-<tr class="coverableline" title="Covered (4 visits)" data-coverage="{'AllTestMethods': {'VC': '4', 'LVS': 'green'}}"><td class="green">&nbsp;</td><td class="leftmargin rightmargin right">4</td><td class="rightmargin right"><a id="fisplay:block;float:left;content:"";width:0;height:0;padding-bottom:60%}.ct-major-sixth:after{display:table}.ct-major-sixth>svg{display:block;position:absolute;top:0;left:0}.ct-minor-seventh{display:block;position:relative;width:100%}.ct-minor-seventh:before{display:block;float:left;content:"";width:0;height:0;padding-bottom:56.25%}.ct-minor-seventh:after{display:table}.ct-minor-seventh>svg{display:block;position:absolute;top:0;left:0}.ct-major-seventh{display:block;position:relative;width:100%}.ct-major-seventh:before{display:block;float:left;content:"";width:0;height:0;padding-bottom:53.3333333333%}.ct-major-seventh:after{display:table}.ct-major-seventh>svg{display:block;position:absolute;top:0;left:0}.ct-octave{display:block;position:relative;width:100%}.ct-octave:before{display:block;float:left;content:"";width:0;height:0;padding-bottom:50%}.ct-octave:after{display:table}.ct-octave>svg{display:block;position:absolute;top:0;left:0}.ct-major-tenth{display:block;position:relative;width:100%}.ct-major-tenth:before{display:block;float:left;content:"";width:0;height:0;padding-bottom:40%}.ct-major-tenth:after{display:table}.ct-major-tenth>svg{display:block;position:absolute;top:0;left:0}.ct-major-eleventh{display:block;position:relative;width:100%}.ct-major-eleventh:before{display:block;float:left;content:"";width:0;height:0;padding-bottom:37.5%}.ct-major-eleventh:after{display:table}.ct-major-eleventh>svg{display:block;position:absolute;top:0;left:0}.ct-major-twelfth{display:block;position:relative;width:100%}.ct-major-twelfth:before{display:block;float:left;content:"";width:0;height:0;padding-bottom:33.3333333333%}.ct-major-twelfth:after{display:table}.ct-major-twelfth>svg{display:block;position:absolute;top:0;left:0}.ct-double-octave{display:block;position:relative;width:100%}.ct-double-octave:before{display:block;float:left;content:"";width:0;height:0;padding-bottom:25%}.ct-double-octave:after{display:table}.ct-double-octave>svg{display:block;position:absolute;top:0;left:0}</style>
-</head><body><div class="container"><div class="containerleft">
-<h1><a href="index.html" class="back">&lt;</a> Summary</h1>
-<table class="overview table-fixed">
-<colgroup>
-<col class="column150" />
-<col />
-</colgroup>
-<tbody>
-<tr><th>Class:</th><td>UltralightNet.ULViewConfig</td></tr>
-<tr><th>Assembly:</th><td>UltralightNet</td></tr>
-<tr><th>File(s):</th><td><a href="#httpsrawgithubusercontentcomSupinePandora43UltralightNetd7a2f1c4878ca48ff24db12e3192d56ce45bb6a1UltralightNetULViewConfigcs" class="navigatetohash">https://raw.githubusercontent.com/SupinePandora43/UltralightNet/d7a2f1c4878ca48ff24db12e3192d56ce45bb6a1/UltralightNet/ULViewConfig.cs</a></td></tr>
-<tr><th>Covered lines:</th><td>14</td></tr>
-<tr><th>Uncovered lines:</th><td>22</td></tr>
-<tr><th>Coverable lines:</th><td>36</td></tr>
-<tr><th>Total lines:</th><td>160</td></tr>
-<tr><th>Line coverage:</th><td>38.8% (14 of 36)</td></tr>
-<tr><th>Covered branches:</th><td>2</td></tr>
-<tr><th>Total branches:</th><td>2</td></tr>
-<tr><th>Branch coverage:</th><td>100% (2 of 2)</td></tr>
-<tr><th>Tag:</th><td>213_921726779</td></tr>
-</tbody>
-</table>
-<h1>Metrics</h1>
-<table class="overview table-fixed">
-<thead><tr><th>Method</th><th>Branch coverage <a href="https://en.wikipedia.org/wiki/Code_coverage"><i class="icon-info-circled"></i></a></th><th>Cyclomatic complexity <a href="https://en.wikipedia.org/wiki/Cyclomatic_complexity"><i class="icon-info-circled"></i></a></th><th>Line coverage <a href="https://en.wikipedia.org/wiki/Code_coverage"><i class="icon-info-circled"></i></a></th></tr></thead>
-<tbody>
-<tr><td title="get_IsDisposed()"><a href="#file0_line52" class="navigatetohash">get_IsDisposed()</a></td><td>100%</td><td>1</td><td>100%</td></tr>
-<tr><td title=".ctor()"><a href="#file0_line54" class="navigatetohash">.ctor()</a></td><td>100%</td><td>1</td><td>100%</td></tr>
+.containerrightfixed label, .containerright a { white-space: nowrap; overflow: hidden; display: inline-block; widtle=".ctor()"><a href="#file0_line54" class="navigatetohash">.ctor()</a></td><td>100%</td><td>1</td><td>100%</td></tr>
 <tr><td title="Finalize()"><a href="#file0_line59" class="navigatetohash">Finalize()</a></td><td>100%</td><td>1</td><td>100%</td></tr>
 <tr><td title="Dispose()"><a href="#file0_line62" class="navigatetohash">Dispose()</a></td><td>100%</td><td>2</td><td>100%</td></tr>
 <tr><td title="get_ULViewConfig_C()"><a href="#file0_line94" class="navigatetohash">get_ULViewConfig_C()</a></td><td>100%</td><td>1</td><td>0%</td></tr>
@@ -369,7 +54,7 @@ a.percentagebar {
 </tbody>
 </table>
 <h1>File(s)</h1>
-<h2 id="httpsrawgithubusercontentcomSupinePandora43UltralightNetd7a2f1c4878ca48ff24db12e3192d56ce45bb6a1UltralightNetULViewConfigcs">https://raw.githubusercontent.com/SupinePandora43/UltralightNet/d7a2f1c4878ca48ff24db12e3192d56ce45bb6a1/UltralightNet/ULViewConfig.cs</h2>
+<h2 id="httpsrawgithubusercontentcomSupinePandora43UltralightNet8df85aeaa01ae69ad31002bdfb04da4dd2a73137UltralightNetULViewConfigcs">https://raw.githubusercontent.com/SupinePandora43/UltralightNet/8df85aeaa01ae69ad31002bdfb04da4dd2a73137/UltralightNet/ULViewConfig.cs</h2>
 <table class="lineAnalysis">
 <thead><tr><th></th><th>#</th><th>Line</th><th></th><th>Line coverage</th></tr></thead>
 <tbody>
@@ -449,19 +134,178 @@ a.percentagebar {
 <tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line74"></a><code>74</code></td><td></td><td class="lightgray"><code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[MarshalAs(UnmanagedType.I1)]</code></td></tr>
 <tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line75"></a><code>75</code></td><td></td><td class="lightgray"><code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;public&nbsp;bool&nbsp;is_transparent;</code></td></tr>
 <tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line76"></a><code>76</code></td><td></td><td class="lightgray"><code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;public&nbsp;double&nbsp;initial_device_scale;</code></td></tr>
-<tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line77"></a><code>77</code></td><td></td><td class="lightgray"><code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[MarshalAs(UnmanagedType.I1)]</code></td></tr>
-<tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line78"></a><code>78</code></td><td></td><td class="lightgray"><code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;public&nbsp;bool&nbsp;initial_focus;</code></td></tr>
-<tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line79"></a><code>79</code></td><td></td><td class="lightgray"><code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[MarshalAs(UnmanagedType.I1)]</code></td></tr>
-<tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line80"></a><code>80</code></td><td></td><td class="lightgray"><code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;public&nbsp;bool&nbsp;enable_images;</code></td></tr>
-<tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line81"></a><code>81</code></td><td></td><td class="lightgray"><code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[MarshalAs(UnmanagedType.I1)]</code></td></tr>
-<tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line82"></a><code>82</code></td><td></td><td class="lightgray"><code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;public&nbsp;bool&nbsp;enable_javascript;</code></td></tr>
-<tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line83"></a><code>83</code></td><td></td><td class="lightgray"><code></code></td></tr>
-<tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line84"></a><code>84</code></td><td></td><td class="lightgray"><code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;public&nbsp;ULStringMarshaler.ULStringPTR&nbsp;font_family_standard;</code></td></tr>
-<tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line85"></a><code>85</code></td><td></td><td class="lightgray"><code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;public&nbsp;ULStringMarshaler.ULStringPTR&nbsp;font_family_fixed;</code></td></tr>
-<tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line86"></a><code>86</code></td><td></td><td class="lightgray"><code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;public&nbsp;ULStringMarshaler.ULStringPTR&nbsp;font_family_serif;</code></td></tr>
-<tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line87"></a><code>87</code></td><td></td><td class="lightgray"><code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;public&nbsp;ULStringMarshaler.ULStringPTR&nbsp;font_family_sans_serif;</code></td></tr>
-<tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line88"></a><code>88</code></td><td></td><td class="lightgray"><code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;public&nbsp;ULStringMarshaler.ULStringPTR&nbsp;user_agent;</code></td></tr>
-<tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line89"></a><code>89</code></td><td></td><td class="lightgray"><code>&nbsp;&nbsp;&nbsp;&nbsp;}</code></td></tr>
+<tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line77"></a><code>77</code></td><td></td><td class="lightgray"><code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;[MarshalAs(UnmanagedType.I1)]</code></td>><td>100%</td><td>2</td><td>100%</td></tr>
+<tr><td title="get_ULViewConfig_C()"><a href="#file0_line94" class="navigatetohash">get_ULViewConfig_C()</a></td><td>100%</td><td>1</td><td>0%</td></tr>
+<tr><td title="get_ULViewConfig_C()"><a href="#file0_line96" class="navigatetohash">get_ULViewConfig_C()</a></td><td>100%</td><td>1</td><td>0%</td></tr>
+<tr><td title="get_IsAccelerated()"><a href="#file0_line102" class="navigatetohash">get_IsAccelerated()</a></td><td>100%</td><td>1</td><td>0%</td></tr>
+<tr><td title="set_IsAccelerated(System.Boolean)"><a href="#file0_line103" class="navigatetohash">set_IsAccelerated(...)</a></td><td>100%</td><td>1</td><td>100%</td></tr>
+<tr><td title="get_IsTransparent()"><a href="#file0_line107" class="navigatetohash">get_IsTransparent()</a></td><td>100%</td><td>1</td><td>0%</td></tr>
+<tr><td title="set_IsTransparent(System.Boolean)"><a href="#file0_line108" class="navigatetohash">set_IsTransparent(...)</a></td><td>100%</td><td>1</td><td>100%</td></tr>
+<tr><td title="get_InitialDeviceScale()"><a href="#file0_line113" class="navigatetohash">get_InitialDeviceScale()</a></td><td>100%</td><td>1</td><td>0%</td></tr>
+<tr><td title="set_InitialDeviceScale(System.Double)"><a href="#file0_line114" class="navigatetohash">set_InitialDeviceScale(...)</a></td><td>100%</td><td>1</td><td>0%</td></tr>
+<tr><td title="get_InitialFocus()"><a href="#file0_line119" class="navigatetohash">get_InitialFocus()</a></td><td>100%</td><td>1</td><td>0%</td></tr>
+<tr><td title="set_InitialFocus(System.Boolean)"><a href="#file0_line120" class="navigatetohash">set_InitialFocus(...)</a></td><td>100%</td><td>1</td><td>0%</td></tr>
+<tr><td title="get_EnableImages()"><a href="#file0_line124" class="navigatetohash">get_EnableImages()</a></td><td>100%</td><td>1</td><td>0%</td></tr>
+<tr><td title="set_EnableImages(System.Boolean)"><a href="#file0_line125" class="navigatetohash">set_EnableImages(...)</a></td><td>100%</td><td>1</td><td>0%</td></tr>
+<tr><td title="get_EnableJavaScript()"><a href="#file0_line129" class="navigatetohash">get_EnableJavaScript()</a></td><td>100%</td><td>1</td><td>0%</td></tr>
+<tr><td title="set_EnableJavaScript(System.Boolean)"><a href="#file0_line130" class="navigatetohash">set_EnableJavaScript(...)</a></td><td>100%</td><td>1</td><td>0%</td></tr>
+<tr><td title="get_FontFamilyStandard()"><a href="#file0_line135" class="navigatetohash">get_FontFamilyStandard()</a></td><td>100%</td><td>1</td><td>0%</td></tr>
+<tr><td title="set_FontFamilyStandard(System.String)"><a href="#file0_line136" class="navigatetohash">set_FontFamilyStandard(...)</a></td><td>100%</td><td>1</td><td>0%</td></tr>
+<tr><td title="get_FontFamilyFixed()"><a href="#file0_line140" class="navigatetohash">get_FontFamilyFixed()</a></td><td>100%</td><td>1</td><td>0%</td></tr>
+<tr><td title="set_FontFamilyFixed(System.String)"><a href="#file0_line141" class="navigatetohash">set_FontFamilyFixed(...)</a></td><td>100%</td><td>1</td><td>0%</td></tr>
+<tr><td title="get_FontFamilySerif()"><a href="#file0_line145" class="navigatetohash">get_FontFamilySerif()</a></td><td>100%</td><td>1</td><td>0%</td></tr>
+<tr><td title="set_FontFamilySerif(System.String)"><a href="#file0_line146" class="navigatetohash">set_FontFamilySerif(...)</a></td><td>100%</td><td>1</td><td>0%</td></tr>
+<tr><td title="get_FontFamilySansSerif()"><a href="#file0_line150" class="navigatetohash">get_FontFamilySansSerif()</a></td><td>100%</td><td>1</td><td>0%</td></tr>
+<tr><td title="set_FontFamilySansSerif(System.String)"><a href="#file0_line151" class="navigatetohash">set_FontFamilySansSerif(...)</a></td><td>100%</td><td>1</td><td>0%</td></tr>
+<tr><td title="get_UserAgent()"><a href="#file0_line155" class="navigatetohash">get_UserAgent()</a></td><td>100%</td><td>1</td><td>0%</td></tr>
+<tr><td title="set_UserAgent(System.String)"><a href="#file0_line156" class="navigatetohash">set_UserAgent(...)</a></td><td>100%</td><td>1</td><td>0%</td></tr>
+</tbody>
+</table>
+<h1>File(s)</h1>
+<h2 id="httpsrawgithubusercontentcomSupinePandora43UltralightNet8df85aeaa01ae69ad31002bdfb04da4dd2a73137UltralightNetULViewConfigcs">https://raw.githubusercontent.com/SupinePandora43/UltralightNet/8df85aeaa01ae69ad31002bdfb04da4dd2a73137/UltralightNet/ULViewConfig.cs</h2>
+<table class="lineAnalysis">
+<thead><tr><th></th><th>#</th><th>Line</th><th></th><th>Line coverage</th></tr></thead>
+<tbody>
+<tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line1"></a><code>1</code></td><td></td><td class="lightgray"><code>using&nbsp;System;</code></td></tr>
+<tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line2"></a><code>2</code></td><td></td><td class="lightgray"><code>using&nbsp;System.Runtime.InteropServices;</code></td></tr>
+<tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line3"></a><code>3</code></td><td></td><td class="lightgray"><code></code></td></tr>
+<tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line4"></a><code>4</code></td><td></td><td class="lightgray"><code>namespace&nbsp;UltralightNet</code></td></tr>
+<tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line5"></a><code>5</code></td><td></td><td class="lightgray"><code>{</code></td></tr>
+<tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line6"></a><code>6</code></td><td></td><td class="lightgray"><code>&nbsp;&nbsp;public&nbsp;static&nbsp;partial&nbsp;class&nbsp;Methods</code></td></tr>
+<tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line7"></a><code>7</code></td><td></td><td class="lightgray"><code>&nbsp;&nbsp;{</code></td></tr>
+<tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line8"></a><code>8</code></td><td></td><td class="lightgray"><code>&nbsp;&nbsp;&nbsp;&nbsp;[DllImport(&quot;Ultralight&quot;)]</code></td></tr>
+<tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line9"></a><code>9</code></td><td></td><td class="lightgray"><code>&nbsp;&nbsp;&nbsp;&nbsp;public&nbsp;static&nbsp;extern&nbsp;IntPtr&nbsp;ulCreateViewConfig();</code></td></tr>
+<tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line10"></a><code>10</code></td><td></td><td class="lightgray"><code></code></td></tr>
+<tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line11"></a><code>11</code></td><td></td><td class="lightgray"><code>&nbsp;&nbsp;&nbsp;&nbsp;[DllImport(&quot;Ultralight&quot;)]</code></td></tr>
+<tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line12"></a><code>12</code></td><td></td><td class="lightgray"><code>&nbsp;&nbsp;&nbsp;&nbsp;public&nbsp;static&nbsp;extern&nbsp;void&nbsp;ulDestroyViewConfig(IntPtr&nbsp;config);</code></td></tr>
+<tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line13"></a><code>13</code></td><td></td><td class="lightgray"><code></code></td></tr>
+<tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line14"></a><code>14</code></td><td></td><td class="lightgray"><code>&nbsp;&nbsp;&nbsp;&nbsp;[GeneratedDllImport(&quot;Ultralight&quot;)]</code></td></tr>
+<tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line15"></a><code>15</code></td><td></td><td class="lightgray"><code>&nbsp;&nbsp;&nbsp;&nbsp;public&nbsp;static&nbsp;partial&nbsp;void&nbsp;ulViewConfigSetIsAccelerated(IntPtr&nbsp;config,&nbsp;[MarshalAs(UnmanagedType.I1)]&nbsp;bool&nbsp;is_acceler</code></td></tr>
+<tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line16"></a><code>16</code></td><td></td><td class="lightgray"><code></code></td></tr>
+<tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line17"></a><code>17</code></td><td></td><td class="lightgray"><code>&nbsp;&nbsp;&nbsp;&nbsp;[GeneratedDllImport(&quot;Ultralight&quot;)]</code></td></tr>
+<tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line18"></a><code>18</code></td><td></td><td class="lightgray"><code>&nbsp;&nbsp;&nbsp;&nbsp;public&nbsp;static&nbsp;partial&nbsp;void&nbsp;ulViewConfigSetIsTransparent(IntPtr&nbsp;config,&nbsp;[MarshalAs(UnmanagedType.I1)]&nbsp;bool&nbsp;is_transpa</code></td></tr>
+<tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line19"></a><code>19</code></td><td></td><td class="lightgray"><code></code></td></tr>
+<tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line20"></a><code>20</code></td><td></td><td class="lightgray"><code>&nbsp;&nbsp;&nbsp;&nbsp;[DllImport(&quot;Ultralight&quot;)]</code></td></tr>
+<tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line21"></a><code>21</code></td><td></td><td class="lightgray"><code>&nbsp;&nbsp;&nbsp;&nbsp;public&nbsp;static&nbsp;extern&nbsp;void&nbsp;ulViewConfigSetInitialDeviceScale(IntPtr&nbsp;config,&nbsp;double&nbsp;initial_device_scale);</code></td></tr>
+<tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line22"></a><code>22</code></td><td></td><td class="lightgray"><code></code></td></tr>
+<tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line23"></a><code>23</code></td><td></td><td class="lightgray"><code>&nbsp;&nbsp;&nbsp;&nbsp;[GeneratedDllImport(&quot;Ultralight&quot;)]</code></td></tr>
+<tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line24"></a><code>24</code></td><td></td><td class="lightgray"><code>&nbsp;&nbsp;&nbsp;&nbsp;public&nbsp;static&nbsp;partial&nbsp;void&nbsp;ulViewConfigSetInitialFocus(IntPtr&nbsp;config,&nbsp;[MarshalAs(UnmanagedType.I1)]&nbsp;bool&nbsp;is_focused)</code></td></tr>
+<tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line25"></a><code>25</code></td><td></td><td class="lightgray"><code></code></td></tr>
+<tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line26"></a><code>26</code></td><td></td><td class="lightgray"><code>&nbsp;&nbsp;&nbsp;&nbsp;[GeneratedDllImport(&quot;Ultralight&quot;)]</code></td></tr>
+<tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line27"></a><code>27</code></td><td></td><td class="lightgray"><code>&nbsp;&nbsp;&nbsp;&nbsp;public&nbsp;static&nbsp;partial&nbsp;void&nbsp;ulViewConfigSetEnableImages(IntPtr&nbsp;config,&nbsp;[MarshalAs(UnmanagedType.I1)]&nbsp;bool&nbsp;enabled);</code></td></tr>
+<tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line28"></a><code>28</code></td><td></td><td class="lightgray"><code></code></td></tr>
+<tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line29"></a><code>29</code></td><td></td><td class="lightgray"><code>&nbsp;&nbsp;&nbsp;&nbsp;[GeneratedDllImport(&quot;Ultralight&quot;)]</code></td></tr>
+<tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line30"></a><code>30</code></td><td></td><td class="lightgray"><code>&nbsp;&nbsp;&nbsp;&nbsp;public&nbsp;static&nbsp;partial&nbsp;void&nbsp;ulViewConfigSetEnableJavaScript(IntPtr&nbsp;config,&nbsp;[MarshalAs(UnmanagedType.I1)]&nbsp;bool&nbsp;enabled</code></td></tr>
+<tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line31"></a><code>31</code></td><td></td><td class="lightgray"><code></code></td></tr>
+<tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line32"></a><code>32</code></td><td></td><td class="lightgray"><code>&nbsp;&nbsp;&nbsp;&nbsp;[GeneratedDllImport(&quot;Ultralight&quot;)]</code></td></tr>
+<tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line33"></a><code>33</code></td><td></td><td class="lightgray"><code>&nbsp;&nbsp;&nbsp;&nbsp;public&nbsp;static&nbsp;partial&nbsp;void&nbsp;ulViewConfigSetFontFamilyStandard(IntPtr&nbsp;config,&nbsp;[MarshalUsing(typeof(ULStringGeneratedDl</code></td></tr>
+<tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line34"></a><code>34</code></td><td></td><td class="lightgray"><code></code></td></tr>
+<tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line35"></a><code>35</code></td><td></td><td class="lightgray"><code>&nbsp;&nbsp;&nbsp;&nbsp;[GeneratedDllImport(&quot;Ultralight&quot;)]</code></td></tr>
+<tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line36"></a><code>36</code></td><td></td><td class="lightgray"><code>&nbsp;&nbsp;&nbsp;&nbsp;public&nbsp;static&nbsp;partial&nbsp;void&nbsp;ulViewConfigSetFontFamilyFixed(IntPtr&nbsp;config,&nbsp;[MarshalUsing(typeof(ULStringGeneratedDllIm</code></td></tr>
+<tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line37"></a><code>37</code></td><td></td><td class="lightgray"><code></code></td></tr>
+<tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line38"></a><code>38</code></td><td></td><td class="lightgray"><code>&nbsp;&nbsp;&nbsp;&nbsp;[GeneratedDllImport(&quot;Ultralight&quot;)]</code></td></tr>
+<tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line39"></a><code>39</code></td><td></td><td class="lightgray"><code>&nbsp;&nbsp;&nbsp;&nbsp;public&nbsp;static&nbsp;partial&nbsp;void&nbsp;ulViewConfigSetFontFamilySerif(IntPtr&nbsp;config,&nbsp;[MarshalUsing(typeof(ULStringGeneratedDllIm</code></td></tr>
+<tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line40"></a><code>40</code></td><td></td><td class="lightgray"><code></code></td></tr>
+<tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line41"></a><code>41</code></td><td></td><td class="lightgray"><code>&nbsp;&nbsp;&nbsp;&nbsp;[GeneratedDllImport(&quot;Ultralight&quot;)]</code></td></tr>
+<tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line42"></a><code>42</code></td><td></td><td class="lightgray"><code>&nbsp;&nbsp;&nbsp;&nbsp;public&nbsp;static&nbsp;partial&nbsp;void&nbsp;ulViewConfigSetFontFamilySansSerif(IntPtr&nbsp;config,&nbsp;[MarshalUsing(typeof(ULStringGeneratedD</code></td></tr>
+<tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line43"></a><code>43</code></td><td></td><td class="lightgray"><code></code></td></tr>
+<tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line44"></a><code>44</code></td><td></td><td class="lightgray"><code>&nbsp;&nbsp;&nbsp;&nbsp;[GeneratedDllImport(&quot;Ultralight&quot;)]</code></td></tr>
+<tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line45"></a><code>45</code></td><td></td><td class="lightgray"><code>&nbsp;&nbsp;&nbsp;&nbsp;public&nbsp;static&nbsp;partial&nbsp;void&nbsp;ulViewConfigSetUserAgent(IntPtr&nbsp;config,&nbsp;[MarshalUsing(typeof(ULStringGeneratedDllImportMa</code></td></tr>
+<tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line46"></a><code>46</code></td><td></td><td class="lightgray"><code></code></td></tr>
+<tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line47"></a><code>47</code></td><td></td><td class="lightgray"><code>&nbsp;&nbsp;}</code></td></tr>
+<tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line48"></a><code>48</code></td><td></td><td class="lightgray"><code></code></td></tr>
+<tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line49"></a><code>49</code></td><td></td><td class="lightgray"><code>&nbsp;&nbsp;public&nbsp;class&nbsp;ULViewConfig&nbsp;:&nbsp;IDisposable</code></td></tr>
+<tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line50"></a><code>50</code></td><td></td><td class="lightgray"><code>&nbsp;&nbsp;{</code></td></tr>
+<tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line51"></a><code>51</code></td><td></td><td class="lightgray"><code>&nbsp;&nbsp;&nbsp;&nbsp;public&nbsp;readonly&nbsp;IntPtr&nbsp;Ptr;</code></td></tr>
+<tr class="coverableline" title="Covered (8 visits)" data-coverage="{'AllTestMethods': {'VC': '8', 'LVS': 'green'}}"><td class="green">&nbsp;</td><td class="leftmargin rightmargin right">8</td><td class="rightmargin right"><a id="file0_line52"></a><code>52</code></td><td></td><td class="lightgreen"><code>&nbsp;&nbsp;&nbsp;&nbsp;public&nbsp;bool&nbsp;IsDisposed&nbsp;{&nbsp;get;&nbsp;private&nbsp;set;&nbsp;}</code></td></tr>
+<tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line53"></a><code>53</code></td><td></td><td class="lightgray"><code></code></td></tr>
+<tr class="coverableline" title="Covered (6 visits)" data-coverage="{'AllTestMethods': {'VC': '6', 'LVS': 'green'}}"><td class="green">&nbsp;</td><td class="leftmargin rightmargin right">6</td><td class="rightmargin right"><a id="file0_line54"></a><code>54</code></td><td></td><td class="lightgreen"><code>&nbsp;&nbsp;&nbsp;&nbsp;public&nbsp;ULViewConfig()</code></td></tr>
+<tr class="coverableline" title="Covered (6 visits)" data-coverage="{'AllTestMethods': {'VC': '6', 'LVS': 'green'}}"><td class="green">&nbsp;</td><td class="leftmargin rightmargin right">6</td><td class="rightmargin right"><a id="file0_line55"></a><code>55</code></td><td></td><td class="lightgreen"><code>&nbsp;&nbsp;&nbsp;&nbsp;{</code></td></tr>
+<tr class="coverableline" title="Covered (6 visits)" data-coverage="{'AllTestMethods': {'VC': '6', 'LVS': 'green'}}"><td class="green">&nbsp;</td><td class="leftmargin rightmargin right">6</td><td class="rightmargin right"><a id="file0_line56"></a><code>56</code></td><td></td><td class="lightgreen"><code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Ptr&nbsp;=&nbsp;Methods.ulCreateViewConfig();</code></td></tr>
+<tr class="coverableline" title="Covered (6 visits)" data-coverage="{'AllTestMethods': {'VC': '6', 'LVS': 'green'}}"><td class="green">&nbsp;</td><td class="leftmargin rightmargin right">6</td><td class="rightmargin right"><a id="file0_line57"></a><code>57</code></td><td></td><td class="lightgreen"><code>&nbsp;&nbsp;&nbsp;&nbsp;}</code></td></tr>
+<tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line58"></a><code>58</code></td><td></td><td class="lightgray"><code></code></td></tr>
+<tr class="coverableline" title="Covered (4 visits)" data-coverage="{'AllTestMethods': {'VC': '4', 'LVS': 'green'}}"><td class="green">&nbsp;</td><td class="leftmargin rightmargin right">4</td><td class="rightmargin right"><a id="file0_line59"></a><code>59</code></td><td></td><td class="lightgreen"><code>&nbsp;&nbsp;&nbsp;&nbsp;~ULViewConfig()&nbsp;=&gt;&nbsp;Dispose();</code></td></tr>
+<tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line60"></a><code>60</code></td><td></td><td class="lightgray"><code></code></td></tr>
+<tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line61"></a><code>61</code></td><td></td><td class="lightgray"><code>&nbsp;&nbsp;&nbsp;&nbsp;public&nbsp;void&nbsp;Dispose()</code></td></tr>
+<tr class="coverableline" title="Covered (4 visits)" data-coverage="{'AllTestMethods': {'VC': '4', 'LVS': 'green'}}"><td class="green">&nbsp;</td><td class="leftmargin rightmargin right">4</td><td class="rightmargin right"><a id="file0_line62"></a><code>62</code></td><td></td><td class="lightgreen"><code>&nbsp;&nbsp;&nbsp;&nbsp;{</code></td></tr>
+<tr class="coverableline" title="Covered (4 visits, 2 of 2 branches are covered)" data-coverage="{'AllTestMethods': {'VC': '4', 'LVS': 'green'}}"><td class="green">&nbsp;</td><td class="leftmargin rightmargin right">4</td><td class="rightmargin right"><a id="file0_line63"></a><code>63</code></td><td class="percentagebar percentagebar100"><i class="icon-fork"></i></td><td class="lightgreen"><code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;if&nbsp;(IsDisposed)&nbsp;return;</code></td></tr>
+<tr class="coverableline" title="Covered (4 visits)" data-coverage="{'AllTestMethods': {'VC': '4', 'LVS': 'green'}}"><td class="green">&nbsp;</td><td class="leftmargin rightmargin right">4</td><td class="rightmargin right"><a id="file0_line64"></a><code>64</code></td><td></td><td class="lightgreen"><code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Methods.ulDestroyViewConfig(Ptr);</code></td></tr>
+<tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line65"></a><code>65</code></td><td></td><td class="lightgray"><code></code></td></tr>
+<tr class="coverableline" title="Covered (4 visits)" data-coverage="{'AllTestMethods': {'VC': '4', 'LVS': 'green'}}"><td class="green">&nbsp;</td><td class="leftmargin rightmargin right">4</td><td class="rightmargin right"><a id="file0_line66"></a><code>66</code></td><td></td><td class="lightgreen"><code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;GC.SuppressFinalize(this);</code></td></tr>
+<tr class="coverableline" title="Covered (4 visits)" data-coverage="{'AllTestMethods': {'VC': '4', 'LVS': 'green'}}"><td class="green">&nbsp;</td><td class="leftmargin rightmargin right">4<t;&nbsp;ULViewConfig_C.user_agent.ToManaged();</code></td></tr>
+<tr class="coverableline" title="Not covered (0 visits)" data-coverage="{'AllTestMethods': {'VC': '0', 'LVS': 'red'}}"><td class="red">&nbsp;</td><td class="leftmargin rightmargin right">0</td><td class="rightmargin right"><a id="file0_line156"></a><code>156</code></td><td></td><td class="lightred"><code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;set&nbsp;=&gt;&nbsp;Methods.ulViewConfigSetUserAgent(Ptr,&nbsp;value);</code></td></tr>
+<tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line157"></a><code>157</code></td><td></td><td class="lightgray"><code>&nbsp;&nbsp;&nbsp;&nbsp;}</code></td></tr>
+<tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line158"></a><code>158</code></td><td></td><td class="lightgray"><code>&nbsp;&nbsp;}</code></td></tr>
+<tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line159"></a><code>159</code></td><td></td><td class="lightgray"><code>}</code></td></tr>
+<tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line160"></a><code>160</code></td><td></td><td class="lightgray"><code></code></td></tr>
+</tbody>
+</table>
+<div class="footer">Generated by: ReportGenerator 4.8.7.0<br />06/09/2021 - 17:15:43<br /><a href="https://github.com/danielpalme/ReportGenerator">GitHub</a> | <a href="http://www.palmmedia.de">www.palmmedia.de</a></div></div>
+<div class="containerright">
+<div class="containerrightfixed">
+<h1>Methods/Properties</h1>
+<a href="#file0_line52" class="navigatetohash percentagebar percentagebar100" title="Line coverage: 100% - get_IsDisposed()"><i class="icon-cube"></i>get_IsDisposed()</a><br />
+<a href="#file0_line54" class="navigatetohash percentagebar percentagebar100" title="Line coverage: 100% - .ctor()"><i class="icon-cube"></i>.ctor()</a><br />
+<a href="#file0_line59" class="navigatetohash percentagebar percentagebar100" title="Line coverage: 100% - Finalize()"><i class="icon-cube"></i>Finalize()</a><br />
+<a href="#file0_line62" class="navigatetohash percentagebar percentagebar100" title="Line coverage: 100% - Dispose()"><i class="icon-cube"></i>Dispose()</a><br />
+<a href="#file0_line94" class="navigatetohash percentagebar percentagebar0" title="Line coverage: 0% - get_ULViewConfig_C()"><i class="icon-cube"></i>get_ULViewConfig_C()</a><br />
+<a href="#file0_line96" class="navigatetohash percentagebar percentagebar0" title="Line coverage: 0% - get_ULViewConfig_C()"><i class="icon-cube"></i>get_ULViewConfig_C()</a><br />
+<a href="#file0_line102" class="navigatetohash percentagebar percentagebar0" title="Line coverage: 0% - get_IsAccelerated()"><i class="icon-cube"></i>get_IsAccelerated()</a><br />
+<a href="#file0_line103" class="navigatetohash percentagebar percentagebar100" title="Line coverage: 100% - set_IsAccelerated(...)"><i class="icon-cube"></i>set_IsAccelerated(...)</a><br />
+<a href="#file0_line107" class="navigatetohash percentagebar percentagebar0" title="Line coverage: 0% - get_IsTransparent()"><i class="icon-cube"></i>get_IsTransparent()</a><br />
+<a href="#file0_line108" class="navigatetohash percentagebar percentagebar100" title="Line coverage: 100% - set_IsTransparent(...)"><i class="icon-cube"></i>set_IsTransparent(...)</a><br />
+<a href="#file0_line113" class="navigatetohash percentagebar percentagebar0" title="Line coverage: 0% - get_InitialDeviceScale()"><i class="icon-cube"></i>get_InitialDeviceScale()</a><br />
+<a href="#file0_line114" class="navigatetohash percentagebar percentagebar0" title="Line coverage: 0% - set_InitialDeviceScale(...)"><i class="icon-cube"></i>set_InitialDeviceScale(...)</a><br />
+<a href="#file0_line119" class="navigatetohash percentagebar percentagebar0" title="Line coverage: 0% - get_InitialFocus()"><i class="icon-cube"></i>get_InitialFocus()</a><br />
+<a href="#file0_line120" class="navigatetohash percentagebar percentagebar0" title="Line coverage: 0% - set_InitialFocus(...)"><i class="icon-cube"></i>set_InitialFocus(...)</a><br />
+<a href="#file0_line124" class="navigatetohash percentagebar percentagebar0" title="Line coverage: 0% - get_EnableImages()"><i class="icon-cube"></i>get_EnableImages()</a><br />
+<a href="#file0_line125" class="navigatetohash percentagebar percentagebar0" title="Line coverage: 0% - set_EnableImages(...)"><i class="icon-cube"></i>set_EnableImages(...)</a><br />
+<a href="#file0_line129" class="navigatetohash percentagebar percentagebar0" title="Line coverage: 0% - get_EnableJavaScript()"><i class="icon-cube"></i>get_EnableJavaScript()</a><br />
+<a href="#file0_line130" class="navigatetohash percentagebar percentagebar0" title="Line coverage: 0% - set_EnableJavaScript(...)"><i class="icon-cube"></i>set_EnableJavaScript(...)</a><br />
+<a href="#file0_line135" class="navigatetohash percentagebar percentagebar0" title="Line coverage: 0% - get_FontFamilyStandard()"><i class="icon-cube"></i>get_FontFamilyStandard()</a><br />
+<a href="#file0_line136" class="navigatetohash percentagebar percentagebar0" title="Line coverage: 0% - set_FontFamilyStandard(...)"><i class="icon-cube"></i>set_FontFamilyStandard(...)</a><br />
+<a href="#file0_line140" class="navigatetohash percentagebar percentagebar0" title="Line coverage: 0% - get_FontFamilyFixed()"><i class="icon-cube"></i>get_FontFamilyFixed()</a><br />
+<a href="#file0_line141" class="navigatetohash percentagebar percentagebar0" title="Line coverage: 0% - set_FontFamilyFixed(...)"><i class="icon-cube"></i>set_FontFamilyFixed(...)</a><br />
+<a href="#file0_line145" class="navigatetohash percentagebar percentagebar0" title="Line coverage: 0% - get_FontFamilySerif()"><i class="icon-cube"></i>get_FontFamilySerif()</a><br />
+<a href="#file0_line146" class="navigatetohash percentagebar percentagebar0" title="Line coverage: 0% - set_FontFamilySerif(...)"><i class="icon-cube"></i>set_FontFamilySerif(...)</a><br />
+<a href="#file0_line150" class="navigatetohash percentagebar percentagebar0" title="Line coverage: 0% - get_FontFamilySansSerif()"><i class="icon-cube"></i>get_FontFamilySansSerif()</a><br />
+<a href="#file0_line151" class="navigatetohash percentagebar percentagebar0" title="Line coverage: 0% - set_FontFamilySansSerif(...)"><i class="icon-cube"></i>set_FontFamilySansSerif(...)</a><br />
+<a href="#file0_line155" class="navigatetohash percentagebar percentagebar0" title="Line coverage: 0% - get_UserAgent()"><i class="icon-cube"></i>get_UserAgent()</a><br />
+<a href="#file0_line156" class="navigatetohash percentagebar percentagebar0" title="Line coverage: 0% - set_UserAgent(...)"><i class="icon-cube"></i>set_UserAgent(...)</a><br />
+<br/></div>
+</div></div>
+<script type="text/javascript">
+/* <![CDATA[ */
+(function() {
+    var url = window.location.href;
+    var startOfQueryString = url.indexOf('?');
+    var queryString = startOfQueryString > -1 ? url.substr(startOfQueryString) : '';
+
+    if (startOfQueryString > -1) {
+        var i = 0, href= null;
+        var css = document.getElementsByTagName('link');
+
+        for (i = 0; i < css.length; i++) {
+            if (css[i].getAttribute('rel') !== 'stylesheet') {
+            continue;
+            }
+
+            href = css[i].getAttribute('href');
+
+            if (href) {
+            css[i].setAttribute('href', href + queryString);
+            }
+        }
+
+        var links = document.getElementsByTagName('a');
+
+        for (i = 0; i < links.length; i++) {
+            href = links[i].getAttribute('href');
+
+            if (href
+                && !href.startsWith('http://')
+                && !href.startsWith('https://')
+ightgray"><code>&nbsp;&nbsp;&nbsp;&nbsp;}</code></td></tr>
 <tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line90"></a><code>90</code></td><td></td><td class="lightgray"><code></code></td></tr>
 <tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line91"></a><code>91</code></td><td></td><td class="lightgray"><code>&nbsp;&nbsp;&nbsp;&nbsp;public&nbsp;STRUCT&nbsp;ULViewConfig_C</code></td></tr>
 <tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line92"></a><code>92</code></td><td></td><td class="lightgray"><code>&nbsp;&nbsp;&nbsp;&nbsp;{</code></td></tr>
@@ -535,7 +379,7 @@ a.percentagebar {
 <tr class="" title="Not coverable" data-coverage="{'AllTestMethods': {'VC': '', 'LVS': 'gray'}}"><td class="gray">&nbsp;</td><td class="leftmargin rightmargin right"></td><td class="rightmargin right"><a id="file0_line160"></a><code>160</code></td><td></td><td class="lightgray"><code></code></td></tr>
 </tbody>
 </table>
-<div class="footer">Generated by: ReportGenerator 4.8.7.0<br />06/09/2021 - 12:46:08<br /><a href="https://github.com/danielpalme/ReportGenerator">GitHub</a> | <a href="http://www.palmmedia.de">www.palmmedia.de</a></div></div>
+<div class="footer">Generated by: ReportGenerator 4.8.7.0<br />06/09/2021 - 17:15:43<br /><a href="https://github.com/danielpalme/ReportGenerator">GitHub</a> | <a href="http://www.palmmedia.de">www.palmmedia.de</a></div></div>
 <div class="containerright">
 <div class="containerrightfixed">
 <h1>Methods/Properties</h1>
