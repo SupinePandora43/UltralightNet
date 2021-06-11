@@ -1,6 +1,6 @@
 # UltralightNet
 
-[![NuGet](https://img.shields.io/nuget/v/UltralightNet.svg)](https://www.nuget.org/packages/UltralightNet/) ![Build & Test](https://github.com/SupinePandora43/UltralightNet/workflows/Build%20&%20Test/badge.svg)
+[![NuGet](https://img.shields.io/nuget/v/UltralightNet.svg)](https://www.nuget.org/packages/UltralightNet/) [![Build & Test](https://github.com/SupinePandora43/UltralightNet/actions/workflows/build.yml/badge.svg)](https://github.com/SupinePandora43/UltralightNet/actions/workflows/build.yml)
 [![Coverage](https://raw.githubusercontent.com/SupinePandora43/UltralightNet/gh-pages/badge_linecoverage.svg)](https://supinepandora43.github.io/UltralightNet/)
 
 [Ultralight](https://ultralig.ht) .NET bindings
