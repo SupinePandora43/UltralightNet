@@ -23,4 +23,26 @@ namespace UltralightNet
 		public ULGPUDriverDestroyGeometryCallback DestroyGeometry;
 		public ULGPUDriverUpdateCommandListCallback UpdateCommandList;
 	}
+
+	/// <summary>
+	/// ULGPUDriver with delegate* types
+	/// </summary>
+	[StructLayout(LayoutKind.Sequential)]
+	public unsafe struct _ULGPUDriver
+	{
+		public delegate* unmanaged[Cdecl]<void> BeginSynchronize;
+		public delegate* unmanaged[Cdecl]<void> EndSynchronize;
+		public delegate* unmanaged[Cdecl]<uint> NextTextureId;
+		public delegate* unmanaged[Cdecl]<uint, void*, void> CreateTexture;
+		public delegate* unmanaged[Cdecl]<uint, void*, void> UpdateTexture;
+		public delegate* unmanaged[Cdecl]<uint, void> DestroyTexture;
+		public delegate* unmanaged[Cdecl]<uint> NextRenderBufferId;
+		public delegate* unmanaged[Cdecl]<uint, ULRenderBuffer, void> CreateRenderBuffer;
+		public delegate* unmanaged[Cdecl]<uint, void> DestroyRenderBuffer;
+		public delegate* unmanaged[Cdecl]<uint> NextGeometryId;
+		public delegate* unmanaged[Cdecl]<uint, ULVertexBuffer, ULIndexBuffer, void> CreateGeometry;
+		public delegate* unmanaged[Cdecl]<uint, ULVertexBuffer, ULIndexBuffer, void> UpdateGeometry;
+		public delegate* unmanaged[Cdecl]<uint, void> DestroyGeometry;
+		public delegate* unmanaged[Cdecl]<ULCommandList, void> UpdateCommandList;
+	}
 }

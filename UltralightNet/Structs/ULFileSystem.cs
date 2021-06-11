@@ -35,4 +35,16 @@ namespace UltralightNet
 			}
 		}
 	}
+
+	[StructLayout(LayoutKind.Sequential)]
+	public unsafe struct _ULFileSystem
+	{
+		// return byte? :P
+		public delegate* unmanaged[Cdecl]<ULStringMarshaler.ULStringPTR*, bool> FileExists;
+		public delegate* unmanaged[Cdecl]<int, long*, bool> GetFileSize;
+		public delegate* unmanaged[Cdecl]<ULStringMarshaler.ULStringPTR*, ULStringMarshaler.ULStringPTR*, bool> GetFileMimeType;
+		public delegate* unmanaged[Cdecl]<ULStringMarshaler.ULStringPTR*, bool, int> OpenFile;
+		public delegate* unmanaged[Cdecl]<int, void> CloseFile;
+		public delegate* unmanaged[Cdecl]<int, byte*, long, long> ReadFromFile;
+	}
 }

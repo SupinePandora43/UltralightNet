@@ -4,28 +4,32 @@ namespace UltralightNet
 {
 	public static partial class Methods
 	{
-		[DllImport("Ultralight")]
-		public static extern void ulPlatformSetLogger(ULLogger logger);
-
-		[DllImport("Ultralight")]
-		public static extern void ulPlatformSetFileSystem(ULFileSystem file_system);
-
-		[DllImport("Ultralight")]
-		public static extern void ulPlatformSetSurfaceDefinition(ULSurfaceDefinition surface_definition);
-
-		[DllImport("Ultralight")]
-		public static extern void ulPlatformSetGPUDriver(ULGPUDriver gpu_driver);
-
-		[DllImport("Ultralight")]
-		public static extern void ulPlatformSetClipboard(ULClipboard clipboard);
+		/// <see cref="ULPlatform"/>
 	}
 
 	public static class ULPlatform
 	{
-		public static void SetLogger(ULLogger logger) => Methods.ulPlatformSetLogger(logger);
-		public static void SetFileSystem(ULFileSystem file_system) => Methods.ulPlatformSetFileSystem(file_system);
-		public static void SetGPUDriver(ULGPUDriver gpu_driver) => Methods.ulPlatformSetGPUDriver(gpu_driver);
-		public static void SetSurfaceDefinition(ULSurfaceDefinition surface_definition) => Methods.ulPlatformSetSurfaceDefinition(surface_definition);
-		public static void SetClipboard(ULClipboard clipboard) => Methods.ulPlatformSetClipboard(clipboard);
+		[DllImport("Ultralight", EntryPoint = "ulPlatformSetLogger")]
+		public static extern void SetLogger(ULLogger logger);
+		[DllImport("Ultralight", EntryPoint = "ulPlatformSetLogger")]
+		public static extern void SetLogger(_ULLogger logger);
+
+		[DllImport("Ultralight", EntryPoint = "ulPlatformSetFileSystem")]
+		public static extern void SetFileSystem(ULFileSystem file_system);
+		[DllImport("Ultralight", EntryPoint = "ulPlatformSetFileSystem")]
+		public static extern void SetFileSystem(_ULFileSystem file_system);
+
+		[DllImport("Ultralight", EntryPoint = "ulPlatformSetGPUDriver")]
+		public static extern void SetGPUDriver(ULGPUDriver gpu_driver);
+		[DllImport("Ultralight", EntryPoint = "ulPlatformSetGPUDriver")]
+		public static extern void SetGPUDriver(_ULGPUDriver gpu_driver);
+
+		[DllImport("Ultralight", EntryPoint = "ulPlatformSetSurfaceDefinition")]
+		public static extern void SetSurfaceDefinition(ULSurfaceDefinition surface_definition);
+
+		[DllImport("Ultralight", EntryPoint = "ulPlatformSetClipboard")]
+		public static extern void SetClipboard(ULClipboard clipboard);
+		[DllImport("Ultralight", EntryPoint = "ulPlatformSetClipboard")]
+		public static extern void SetClipboard(_ULClipboard clipboard);
 	}
 }

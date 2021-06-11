@@ -3,17 +3,17 @@ using System.Runtime.CompilerServices;
 
 namespace UltralightNet
 {
-	public struct ULCommandList
+	public unsafe struct ULCommandList
 	{
 		public uint size;
-		public IntPtr commandsPtr;
+		public ULCommand* commandsPtr;
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public ReadOnlySpan<ULCommand> ToSpan()
 		{
 			unsafe
 			{
-				return new((void*)commandsPtr, (int)size);
+				return new(commandsPtr, (int)size);
 			}
 		}
 	}
