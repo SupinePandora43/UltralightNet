@@ -9,6 +9,6 @@ namespace UltralightNet
 
 	[UnmanagedFunctionPointer(CallingConvention.Cdecl)]
 	public unsafe delegate void ULClipboardWritePlainTextCallback__PInvoke__(
-		IntPtr text
+		ULString* text
 	);
 }

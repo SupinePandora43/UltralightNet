@@ -6,10 +6,33 @@ namespace UltralightNet
 	public struct ULClipboard
 	{
 		public ULClipboardClearCallback Clear;
-		public ULClipboardReadPlainTextCallback ReadPlainText;
+		public ULClipboardReadPlainTextCallback__PInvoke__ _ReadPlainText;
 		public ULClipboardWritePlainTextCallback__PInvoke__ _WritePlainText;
 
-		public ULClipboardWritePlainTextCallback WritePlainText { set { unsafe { _WritePlainText = (text) => value(ULStringMarshaler.NativeToManaged(text)); } } }
+		/// <summary>
+		/// untested
+		/// </summary>
+		public ULClipboardReadPlainTextCallback ReadPlainText { set
+			{
+				unsafe
+				{
+					_ReadPlainText = (result) =>
+					{
+						value(out string managedResult);
+
+						result->data = (ushort*)Marshal.StringToHGlobalUni(managedResult);
+						result->length = (nuint)managedResult.Length;
+					};
+				}
+			}
+		}
+
+		public ULClipboardWritePlainTextCallback WritePlainText { set {
+				unsafe {
+					_WritePlainText = (text) => value(ULString.NativeToManaged(text));
+				}
+			}
+		}
 	}
 
 	[StructLayout(LayoutKind.Sequential)]

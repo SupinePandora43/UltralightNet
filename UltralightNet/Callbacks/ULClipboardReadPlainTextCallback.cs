@@ -1,16 +1,11 @@
-using System;
 using System.Runtime.InteropServices;
 
 namespace UltralightNet
 {
-	// todo: out string
-	/// <summary>
-	/// 
-	/// </summary>
-	/// <param name="result">pointer to write to</param>
-	/// <example>
-	/// ULStringMarshaler.ManagedToNative("idk", result);
-	/// </example>
+	public delegate void ULClipboardReadPlainTextCallback(out string result);
+
 	[UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-	public delegate void ULClipboardReadPlainTextCallback(IntPtr result);
+	public unsafe delegate void ULClipboardReadPlainTextCallback__PInvoke__(
+		ULString* result
+	);
 }
