@@ -53,7 +53,106 @@ namespace UltralightNet
         extern private static unsafe byte *ulVersionString__PInvoke__();
     }
 }
+#if NETSTANDARD
 namespace UltralightNet
+{
+	public static partial class Methods
+	{
+		private static partial class NativeLibrary
+		{
+#if !NETSTANDARD2_1_OR_GREATER
+			// Source: dotnet/runtime https://github.com/dotnet/runtime/blob/27baae9f91d2c2e6f5309dba1de641dbb7546849/src/libraries/System.Private.CoreLib/src/System/Runtime/InteropServices/Marshal.cs#L1059-L1081
+			private static unsafe IntPtr StringToCoTaskMemUTF8(string s)
+			{
+				int nb = System.Text.Encoding.UTF8.GetMaxByteCount(s.Length);
+
+				IntPtr pMem = Marshal.AllocCoTaskMem(nb + 1);
+
+				int nbWritten;
+				byte* pbMem = (byte*)pMem;
+
+				fixed (char* firstChar = s)
+				{
+					nbWritten = System.Text.Encoding.UTF8.GetBytes(firstChar, s.Length, pbMem, nb);
+				}
+
+				pbMem[nbWritten] = 0;
+
+				return pMem;
+			}
+#endif
+
+			private static partial global::System.IntPtr dlopen(string path, int mode)
+			{
+				unsafe
+				{
+					byte* __path_gen_native = default;
+					global::System.IntPtr __retVal = default;
+					//
+					// Setup
+					//
+					bool path__allocated = false;
+					try
+					{
+						//
+						// Marshal
+						//
+						if (path != null)
+						{
+							int path__bytelen = (path.Length + 1) * 3 + 1;
+							if (path__bytelen > 260)
+							{
+#if NETSTANDARD2_1_OR_GREATER
+								__path_gen_native = (byte*)System.Runtime.InteropServices.Marshal.StringToCoTaskMemUTF8(path);
+#else
+								__path_gen_native = (byte*)StringToCoTaskMemUTF8(path);
+#endif
+								path__allocated = true;
+							}
+							else
+							{
+								byte* path__stackptr = stackalloc byte[path__bytelen];
+								{
+#if NETSTANDARD2_1_OR_GREATER
+									path__bytelen = System.Text.Encoding.UTF8.GetBytes(path, new Span<byte>(path__stackptr, path__bytelen));
+#else
+									fixed(char* path__charptr = path)
+										path__bytelen = System.Text.Encoding.UTF8.GetBytes(path__charptr, path.Length, path__stackptr, path__bytelen);
+#endif
+									path__stackptr[path__bytelen] = 0;
+								}
+
+								__path_gen_native = (byte*)path__stackptr;
+							}
+						}
+
+						//
+						// Invoke
+						//
+						__retVal = dlopen__PInvoke__(__path_gen_native, mode);
+					}
+					finally
+					{
+						//
+						// Cleanup
+						//
+						if (path__allocated)
+						{
+							System.Runtime.InteropServices.Marshal.FreeCoTaskMem((System.IntPtr)__path_gen_native);
+						}
+					}
+
+					return __retVal;
+				}
+			}
+
+			[System.Runtime.InteropServices.DllImportAttribute("libdl", EntryPoint = "dlopen")]
+			extern private static unsafe global::System.IntPtr dlopen__PInvoke__(byte* path, int mode);
+		}
+	}
+}
+#endif
+	namespace UltralightNet
 {
 	public static partial class Methods
 	{
