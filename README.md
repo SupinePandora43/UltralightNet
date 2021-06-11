@@ -13,10 +13,10 @@
 | linux   | linux-x64 | upstream |
 | osx     | osx-x64   | upstream |
 
-## Known Issues
+## Reporting issues
 
-* not all api covered
-* * ping me in discord `SupinePandora43#3399`
+* [issues page on github](https://github.com/SupinePandora43/UltralightNet/issues)
+* Discord `SupinePandora43#3399`
 
 # Getting Started
 
@@ -26,7 +26,7 @@ you need to install at least:
 
 * `UltralightNet`
 * `UltralightNet.Binaries`
-* `UltralightNet.AppCore` because only AppCore provides c api for font loader
+* `UltralightNet.AppCore` because only AppCore provides font loader
 
 to have fully functional Ultralight renderer
 
