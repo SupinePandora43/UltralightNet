@@ -65,10 +65,10 @@ namespace UltralightNet.Veldrid.SDL2
 			#region CTRL - Shift
 			if (key > 0 && key < (Key)5)
 			{
-				return (int)key + 160;
+				return (int)key + 159;
 			}
 			#endregion
-
+			
 			#region F1 - F24
 			if (key > (Key)9)
 			{
