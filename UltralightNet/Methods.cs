@@ -1,3 +1,4 @@
+using System;
 using System.IO;
 using System.Runtime.InteropServices;
 
@@ -23,29 +24,61 @@ namespace UltralightNet
 		public static extern uint ulVersionPatch();
 
 		/// <summary>
-		/// Preload OSX Ultralight binaries
+		/// Preload Ultralight binaries on OSX/MacOS
 		/// </summary>
 		/// <remarks>UltralightCore, WebCore, Ultralight</remarks>
 		public static void Preload()
 		{
+#if !NETFRAMEWORK
+			if (
 #if NET5_0_OR_GREATER
-			// i don't have iphone/mac, and probably never
-			// so it will not work for ios, i'm sure 100%%%
-			if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX))
+				OperatingSystem.IsMacOS()
+#else
+				RuntimeInformation.IsOSPlatform(OSPlatform.OSX)
+#endif
+				)
 			{
-				string[] libs = new[] { "libUltralightCore.dylib", "libWebCore.dylib", "libUltralight.dylib" };
-				foreach(string lib in libs)
+				ReadOnlySpan<string> libs = new[] { "libUltralightCore.dylib", "libWebCore.dylib", "libUltralight.dylib" };
+
+				string absoluteAssemblyLocationDir = Path.GetDirectoryName(typeof(Methods).Assembly.Location);
+				string absoluteRuntimeNativesDir = Path.Combine(absoluteAssemblyLocationDir, "runtimes", "osx-x64", "native");
+
+				foreach (string lib in libs)
 				{
-					string path = $"runtimes/osx-x64/native/{lib}";
-					if (File.Exists(path))
+					string absoluteRuntimeNative = Path.Combine(absoluteRuntimeNativesDir, lib);
+					if (File.Exists(absoluteRuntimeNative))
 					{
-						NativeLibrary.Load(path);
+						NativeLibrary.Load(absoluteRuntimeNative);
 						continue;
 					}
-					NativeLibrary.Load(lib);
+					else
+					{
+						string absoluteAssemblyLocation = Path.Combine(absoluteAssemblyLocationDir, lib);
+						if (File.Exists(absoluteAssemblyLocation))
+						{
+							NativeLibrary.Load(absoluteAssemblyLocation);
+						}
+						else
+							try
+							{
+								NativeLibrary.Load(lib); // last hope (will not work)
+							}
+							catch (DllNotFoundException) { } // will cause DllNotFoundException somewhere else
+					}
 				}
 			}
 #endif
 		}
+
+#if NETSTANDARD
+		private static partial class NativeLibrary
+		{
+			public static IntPtr Load(string libraryPath) => dlopen(libraryPath, 0x002); // RTLD_NOW
+
+			// LPUTF8Str = 48
+			[GeneratedDllImport("libdl")]
+			private static partial IntPtr dlopen([MarshalAs(48)] string path, int mode);
+		}
+#endif
 	}
 }

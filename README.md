@@ -1,6 +1,6 @@
 # UltralightNet
 
-[![NuGet](https://img.shields.io/nuget/v/UltralightNet.svg)](https://www.nuget.org/packages/UltralightNet/) ![Build & Test](https://github.com/SupinePandora43/UltralightNet/workflows/Build%20&%20Test/badge.svg)
+[![NuGet](https://img.shields.io/nuget/v/UltralightNet.svg)](https://www.nuget.org/packages/UltralightNet/) [![Build & Test](https://github.com/SupinePandora43/UltralightNet/actions/workflows/build.yml/badge.svg)](https://github.com/SupinePandora43/UltralightNet/actions/workflows/build.yml)
 [![Coverage](https://raw.githubusercontent.com/SupinePandora43/UltralightNet/gh-pages/badge_linecoverage.svg)](https://supinepandora43.github.io/UltralightNet/)
 
 [Ultralight](https://ultralig.ht) .NET bindings
@@ -13,10 +13,10 @@
 | linux   | linux-x64 | upstream |
 | osx     | osx-x64   | upstream |
 
-## Known Issues
+## Reporting issues
 
-* not all api covered
-* * ping me in discord `SupinePandora43#3399`
+* [issues page on github](https://github.com/SupinePandora43/UltralightNet/issues)
+* Discord `SupinePandora43#3399`
 
 # Getting Started
 
@@ -26,7 +26,7 @@ you need to install at least:
 
 * `UltralightNet`
 * `UltralightNet.Binaries`
-* `UltralightNet.AppCore` because only AppCore provides c api for font loader
+* `UltralightNet.AppCore` because only AppCore provides font loader
 
 to have fully functional Ultralight renderer
 
@@ -61,7 +61,7 @@ namespace UltralightNet.GettingStarted
 			// Set Logger
 			ULPlatform.SetLogger(new ULLogger()
 			{
-				log_message = (level, message) =>
+				LogMessage = (level, message) =>
 				{
 					Console.WriteLine($"({level}): {message}");
 				}
@@ -81,7 +81,7 @@ namespace UltralightNet.GettingStarted
 
 			// Create View
 			// Session.DefaultSession - get default renderer session (used for saving cookies etc)
-			View view = new(renderer, 512, 512, false, Session.DefaultSession(renderer), false);
+			View view = new(renderer, 512, 512);
 
 			// Load URL
 

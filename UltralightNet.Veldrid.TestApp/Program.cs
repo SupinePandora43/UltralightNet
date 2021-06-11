@@ -145,7 +145,7 @@ void main()
 
 			gpuDriver.CommandList = commandList;
 
-			ULPlatform.SetLogger(new() { LogMessage = (lvl, msg) => Console.WriteLine(msg) }); ;
+			ULPlatform.SetLogger(new ULLogger() { LogMessage = (lvl, msg) => Console.WriteLine(msg) }); ;
 			AppCoreMethods.ulEnablePlatformFontLoader();
 			ULPlatform.SetGPUDriver(gpuDriver.GetGPUDriver());
 
