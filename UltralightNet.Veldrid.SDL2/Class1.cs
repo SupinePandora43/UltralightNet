@@ -68,7 +68,7 @@ namespace UltralightNet.Veldrid.SDL2
 				return (int)key + 159;
 			}
 			#endregion
-			
+
 			#region F1 - F24
 			if (key > (Key)9)
 			{
@@ -87,11 +87,39 @@ namespace UltralightNet.Veldrid.SDL2
 
 			int key_code = key switch
 			{
+				Key.NumLock => ULKeyCodes.GK_NUMLOCK,
 				Key.KeypadDivide => ULKeyCodes.GK_DIVIDE,
 				Key.KeypadMultiply => ULKeyCodes.GK_MULTIPLY,
 				Key.KeypadSubtract => ULKeyCodes.GK_SUBTRACT,
 				Key.KeypadAdd => ULKeyCodes.GK_ADD,
 				Key.KeypadDecimal => ULKeyCodes.GK_DECIMAL,
+
+				Key.Escape => ULKeyCodes.GK_ESCAPE,
+				Key.Tilde => ULKeyCodes.GK_OEM_3,
+				Key.Tab => ULKeyCodes.GK_TAB,
+				Key.CapsLock => ULKeyCodes.GK_CAPITAL,
+				Key.AltLeft or Key.AltRight => ULKeyCodes.GK_MENU,
+				Key.Space => ULKeyCodes.GK_SPACE,
+
+				Key.Slash => ULKeyCodes.GK_OEM_2,
+
+
+				Key.PrintScreen => ULKeyCodes.GK_SNAPSHOT,
+				Key.ScrollLock => ULKeyCodes.GK_SCROLL,
+				
+				Key.Insert => ULKeyCodes.GK_INSERT,
+				Key.Delete => ULKeyCodes.GK_DELETE,
+				Key.Home => ULKeyCodes.GK_HOME,
+				Key.End => ULKeyCodes.GK_END,
+				Key.PageUp => ULKeyCodes.GK_PRIOR,
+				Key.PageDown => ULKeyCodes.GK_NEXT,
+
+				Key.Left => ULKeyCodes.GK_LEFT,
+				Key.Right=> ULKeyCodes.GK_RIGHT,
+				Key.Up => ULKeyCodes.GK_UP,
+				Key.Down => ULKeyCodes.GK_DOWN,
+
+
 				_ => (int)key + 29
 			};
 
