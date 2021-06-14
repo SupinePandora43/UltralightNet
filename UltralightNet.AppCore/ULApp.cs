@@ -13,6 +13,8 @@ namespace UltralightNet.AppCore
 
 		[DllImport("AppCore")]
 		public static extern void ulAppSetUpdateCallback(IntPtr app, ULUpdateCallback callback, IntPtr user_data);
+		[DllImport("AppCore")]
+		public static extern unsafe void ulAppSetUpdateCallback(IntPtr app, delegate* unmanaged[Cdecl]<void*, void> callback, void* user_data);
 
 		[GeneratedDllImport("AppCore")]
 		[return: MarshalAs(UnmanagedType.I1)]
@@ -61,6 +63,9 @@ namespace UltralightNet.AppCore
 				if (updateHandle.IsAllocated) updateHandle.Free();
 				AppCoreMethods.ulAppSetUpdateCallback(Ptr, null, userData);
 			}
+		}
+		public unsafe void SetUpdateCallback(delegate* unmanaged[Cdecl]<void*, void> callback, void* userData = null){
+			AppCoreMethods.ulAppSetUpdateCallback(Ptr, callback, userData);
 		}
 
 		public bool IsRunning => AppCoreMethods.ulAppIsRunning(Ptr);
