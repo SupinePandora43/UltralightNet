@@ -20,7 +20,7 @@ namespace UltralightNet.WPF
 		{
 			this.renderer = renderer;
 
-			view = new(renderer, (uint)Width, (uint)Height, true, Session.DefaultSession(renderer), true);
+			view = new(renderer, (uint)Width, (uint)Height);
 			view.Focus();
 			MouseWheel += (sender, e) =>
 			{
