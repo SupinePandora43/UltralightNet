@@ -127,7 +127,7 @@ namespace VeldridSandbox
 			view = new(renderer, (uint)width, (uint)height, false, session, false);
 			bool loaded = false;
 			view.SetFinishLoadingCallback((IntPtr userData, View caller, ulong frameId, bool isMainFrame,
-	  string? url) =>
+	  string url) =>
 			{ loaded = true; }, default);
 			view.LoadUrl("https://youtube.com"); //https://github.com
 			Stream html = assembly.GetManifestResourceStream("VeldridSandbox.embedded.index.html");
