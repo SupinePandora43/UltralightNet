@@ -9,7 +9,7 @@
 		<PackageReference Include="UltralightNet.AppCore" Version="$(Version)" />
 		<PackageReference Include="UltralightNet.Binaries" Version="$(Version)" />
 		<PackageReference Include="UltralightNet.Resources" Version="$(Version)" />
-		<PackageReference Include="Microsoft.DotNet.ILCompiler" Version="6.0.0-*" />
+		<!--PackageReference Include="Microsoft.DotNet.ILCompiler" Version="6.0.0-*" /-->
 	</ItemGroup>
 
 	<ItemGroup>
