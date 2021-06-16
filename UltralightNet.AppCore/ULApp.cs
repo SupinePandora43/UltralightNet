@@ -64,9 +64,7 @@ namespace UltralightNet.AppCore
 				AppCoreMethods.ulAppSetUpdateCallback(Ptr, null, userData);
 			}
 		}
-		public unsafe void SetUpdateCallback(delegate* unmanaged[Cdecl]<void*, void> callback, void* userData = null){
-			AppCoreMethods.ulAppSetUpdateCallback(Ptr, callback, userData);
-		}
+		public unsafe void SetUpdateCallback(delegate* unmanaged[Cdecl]<void*, void> callback, void* userData = null) => AppCoreMethods.ulAppSetUpdateCallback(Ptr, callback, userData);
 
 		public bool IsRunning => AppCoreMethods.ulAppIsRunning(Ptr);
 
