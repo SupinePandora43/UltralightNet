@@ -1,7 +1,9 @@
+using System.Runtime.InteropServices;
 using System.Numerics;
 
 namespace UltralightNet
 {
+	[StructLayout(LayoutKind.Sequential)]
 	public struct ULGPUState
 	{
 		public uint viewport_width;
@@ -10,8 +12,10 @@ namespace UltralightNet
 
 		public Matrix4x4 transform;
 
+		[MarshalAs(UnmanagedType.I1)]
 		public bool enable_texturing;
 
+		[MarshalAs(UnmanagedType.I1)]
 		public bool enable_blend;
 
 		public ULShaderType shader_type;
@@ -53,6 +57,7 @@ namespace UltralightNet
 		public Matrix4x4 clip_6;
 		public Matrix4x4 clip_7;
 
+		[MarshalAs(UnmanagedType.I1)]
 		public bool enable_scissor;
 
 		public ULIntRect scissor_rect;
