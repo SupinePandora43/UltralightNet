@@ -151,7 +151,7 @@ void main()
 
 			Renderer renderer = new(new ULConfig()
 			{
-				ResourcePath = "./resources/",
+				ResourcePath = Path.Combine(Path.GetDirectoryName(typeof(Program).Assembly.Location), "resources"),
 				ForceRepaint = false
 			});
 
