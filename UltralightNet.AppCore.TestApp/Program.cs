@@ -35,15 +35,6 @@ namespace UltralightNet.AppCore.TestApp
 
 			view.HTML = "<html><body><p>123</p></body></html>";
 
-			ulong counter = 0;
-
-			app.SetUpdateCallback((_) =>
-			{
-				counter++;
-
-				//if (counter >= 1000) app.Quit();
-			});
-
 			app.Run();
 		}
 	}
