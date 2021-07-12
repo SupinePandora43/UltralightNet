@@ -5,7 +5,7 @@ namespace UltralightNet
 	[StructLayout(LayoutKind.Sequential)]
 	public struct ULLogger
 	{
-		public ULLoggerLogMessageCallback LogMessage { set => _LogMessage = (level, msg) => value(level, ULStringMarshaler.NativeToManaged(msg)); }
+		public ULLoggerLogMessageCallback LogMessage { set { unsafe { _LogMessage = (level, msg) => value(level, ULString.NativeToManaged(msg)); } } }
 
 		public ULLoggerLogMessageCallback__PInvoke__ _LogMessage;
 	}
@@ -21,6 +21,6 @@ namespace UltralightNet
 		///	marshaler.Value = message;
 		///	string messageString = marshaler.ToManaged();
 		/// </example>
-		public delegate* unmanaged[Cdecl]<ULLogLevel, ULStringMarshaler.ULStringPTR*, void> LogMessage;
+		public delegate* unmanaged[Cdecl]<ULLogLevel, ULString*, void> LogMessage;
 	}
 }

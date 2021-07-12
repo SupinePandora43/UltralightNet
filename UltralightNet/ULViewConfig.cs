@@ -81,11 +81,11 @@ namespace UltralightNet
 			[MarshalAs(UnmanagedType.I1)]
 			public bool enable_javascript;
 
-			public ULStringMarshaler.ULStringPTR font_family_standard;
-			public ULStringMarshaler.ULStringPTR font_family_fixed;
-			public ULStringMarshaler.ULStringPTR font_family_serif;
-			public ULStringMarshaler.ULStringPTR font_family_sans_serif;
-			public ULStringMarshaler.ULStringPTR user_agent;
+			public ULString font_family_standard;
+			public ULString font_family_fixed;
+			public ULString font_family_serif;
+			public ULString font_family_sans_serif;
+			public ULString user_agent;
 		}
 
 		public STRUCT ULViewConfig_C

@@ -89,9 +89,9 @@ namespace UltralightNet
 	public struct ULConfig_C
 	{
 		/// <summary>The file path to the directory that contains Ultralight's bundled resources (eg, cacert.pem and other localized resources).</summary>
-		public ULStringMarshaler.ULStringPTR resource_path;
+		public ULString resource_path;
 		/// <summary>The file path to a writable directory that will be used to store cookies, cached resources, and other persistent data.</summary>
-		public ULStringMarshaler.ULStringPTR cache_path;
+		public ULString cache_path;
 
 		public ULFaceWinding face_winding;
 
@@ -102,7 +102,7 @@ namespace UltralightNet
 		/// <summary>The gamma to use when compositing font glyphs, change this value to adjust contrast (Adobe and Apple prefer 1.8, others may prefer 2.2).</summary>
 		public double font_gamma;
 
-		public ULStringMarshaler.ULStringPTR user_stylesheet;
+		public ULString user_stylesheet;
 
 		[MarshalAs(UnmanagedType.I1)]
 		public bool force_repaint;

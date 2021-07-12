@@ -29,9 +29,9 @@ namespace UltralightNet.AppCore
 
 	public struct ULSettings_C
 	{
-		public ULStringMarshaler.ULStringPTR developer_name;
-		public ULStringMarshaler.ULStringPTR app_name;
-		public ULStringMarshaler.ULStringPTR file_system_path;
+		public ULString developer_name;
+		public ULString app_name;
+		public ULString file_system_path;
 		[MarshalAs(UnmanagedType.I1)]
 		public bool load_shaders_from_file_system;
 		[MarshalAs(UnmanagedType.I1)]

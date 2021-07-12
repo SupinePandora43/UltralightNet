@@ -127,8 +127,7 @@ namespace UltralightNet
 		public ushort* data;
 		public nuint length;
 
-		
-		[Obsolete("Slow")]
+		/// <summary>Do not use on pointers</summary>
 		public string ToManaged()
 		{
 			return new((char*)data, 0, (int)length);
