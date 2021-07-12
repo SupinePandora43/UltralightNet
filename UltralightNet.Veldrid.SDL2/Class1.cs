@@ -8,7 +8,7 @@ namespace UltralightNet.Veldrid.SDL2
 		{
 			ULKeyEventType type = k.Down ? ULKeyEventType.RawKeyDown : ULKeyEventType.KeyUp;
 			ULKeyEventModifiers modifiers = 0;
-			int keycode = 0;
+			int keycode;
 			string text = "";
 
 			if ((k.Modifiers & ModifierKeys.Alt) is ModifierKeys.Alt) modifiers |= ULKeyEventModifiers.AltKey;

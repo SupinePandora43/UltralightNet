@@ -14,13 +14,13 @@ namespace UltralightNet.Test
 	{
 		private Renderer renderer;
 
-		private ULViewConfig viewConfig = new()
+		private readonly ULViewConfig viewConfig = new()
 		{
 			IsAccelerated = false,
 			IsTransparent = false
 		};
 
-		private Dictionary<int, FileStream> handles = new();
+		private readonly Dictionary<int, FileStream> handles = new();
 
 		private bool getFileSize(int handle, out long size)
 		{

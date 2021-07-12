@@ -10,5 +10,7 @@
 		<SolutionDir>$(MSBuildThisFileDirectory)</SolutionDir>
 		<PackageOutputPath>$(SolutionDir)</PackageOutputPath>
 		<DebugType>Portable</DebugType>
+
+		<NoWarn>1006</NoWarn>
 	</PropertyGroup>
 </Project>

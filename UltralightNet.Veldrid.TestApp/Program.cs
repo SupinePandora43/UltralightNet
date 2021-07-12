@@ -257,7 +257,7 @@ void main()
 			};
 			window.MouseWheel += (mw) =>
 			{
-				ULScrollEvent scrollEvent = new ULScrollEvent()
+				ULScrollEvent scrollEvent = new()
 				{
 					type = ULScrollEvent.ScrollType.ByPixel,
 					deltaY = (int)mw.WheelDelta * 100

@@ -691,8 +691,8 @@ namespace UltralightNet.Veldrid
 				{
 					SourceColorFactor = BlendFactor.One,
 					SourceAlphaFactor = BlendFactor.One,
-					DestinationColorFactor = BlendFactor.Zero,
-					DestinationAlphaFactor = BlendFactor.Zero,
+					DestinationColorFactor = BlendFactor.InverseSourceAlpha,
+					DestinationAlphaFactor = BlendFactor.InverseSourceAlpha,
 
 					BlendEnabled = false
 				}

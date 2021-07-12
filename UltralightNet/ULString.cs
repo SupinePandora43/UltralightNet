@@ -73,29 +73,36 @@ namespace UltralightNet
 
 	public struct ULStringGeneratedDllImportMarshaler
 	{
-		public ULStringMarshaler.ULStringPTR ptr;
+		public ULString ptr;
 
 		public ULStringGeneratedDllImportMarshaler(string str)
 		{
-			ptr = new()
+			unsafe
 			{
-				data_ = Marshal.StringToCoTaskMemUni(str),
-				length_ = (nuint)str.Length
-			};
+				ptr = new()
+				{
+					data = (ushort*)Marshal.StringToCoTaskMemUni(str),
+					length = (nuint)str.Length
+				};
+			}
 		}
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public string ToManaged()
 		{
-			return Marshal.PtrToStringUni(ptr.data_, (int)ptr.length_);
+			unsafe
+			{
+				//return Marshal.PtrToStringUni((IntPtr)ptr.data, (int)ptr.length);
+				return new((char*)ptr.data, 0, (int)ptr.length);
+			}
 		}
 
-		public unsafe ULStringMarshaler.ULStringPTR* Value
+		public unsafe ULString* Value
 		{
 			[MethodImpl(MethodImplOptions.AggressiveInlining)]
 			get
 			{
-				fixed (ULStringMarshaler.ULStringPTR* valuePtr = &ptr)
+				fixed (ULString* valuePtr = &ptr)
 					return valuePtr;
 			}
 
@@ -106,58 +113,34 @@ namespace UltralightNet
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public void FreeNative()
 		{
-			Marshal.FreeCoTaskMem(ptr.data_);
+			unsafe
+			{
+				Marshal.FreeCoTaskMem((IntPtr)ptr.data);
+			}
 		}
 	}
 
+	[BlittableType]
 	[StructLayout(LayoutKind.Sequential)]
 	public unsafe struct ULString
 	{
 		public ushort* data;
 		public nuint length;
 
-		/*
+		
+		[Obsolete("Slow")]
 		public string ToManaged()
 		{
 			return new((char*)data, 0, (int)length);
 		}
-		*/
 
 		public static unsafe string NativeToManaged(ULString* ulString)
 		{
 			return new((char*)ulString->data, 0, (int)ulString->length);
 		}
-
-		/*
-		public static unsafe ULString* ManagedToNative(string managed)
-		{
-			ULString ulString = new();
-			fixed (char* data = managed)
-				ulString.data = (ushort*)data;
-			ulString.length = (nuint)managed.Length;
-			return &ulString;
-		}
-		// requires FREE
-		public static unsafe ULString* ManagedToNativeSafe(string managed)
-		{
-			ULString ulString = new();
-			ulString.data = (ushort*)Marshal.StringToHGlobalUni(managed);
-			ulString.length = (nuint)managed.Length;
-			return &ulString;
-		}
-		// requires FREE (x2)
-		public static unsafe ULString* ManagedToNativeSafest(string managed)
-		{
-			ULString ulString = new();
-			ulString.data = (ushort*)Marshal.StringToHGlobalUni(managed);
-			ulString.length = (nuint)managed.Length;
-			IntPtr address = Marshal.AllocHGlobal(sizeof(ULString));
-			Marshal.StructureToPtr(ulString, address, false);
-			return (ULString*)address;
-		}
-		*/
 	}
 
+	[Obsolete("Slow")]
 	public class ULStringMarshaler : ICustomMarshaler
 	{
 		#region Structures

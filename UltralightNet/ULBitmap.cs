@@ -186,7 +186,7 @@ namespace UltralightNet
 		{
 			private static readonly Marshaler instance = new();
 
-			public static ICustomMarshaler GetInstance(string cookie) => instance;
+			public static ICustomMarshaler GetInstance(string _) => instance;
 
 			public void CleanUpManagedData(object ManagedObj) { }
 

@@ -10,9 +10,9 @@ namespace Benchmarks
 {
     public class Program
     {
-        static void Main(string[] args)
+        static void Main()
         {
-			var summary = BenchmarkRunner.Run<MyBenchmark>();
+			BenchmarkRunner.Run<MyBenchmark>();
 			//BenchmarkSwitcher.FromAssembly(typeof(Program).Assembly).Run(args, new DebugInProcessConfig());
 		}
 	}

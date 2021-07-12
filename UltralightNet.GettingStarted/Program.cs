@@ -7,7 +7,7 @@ namespace UltralightNet.GettingStarted
 {
 	class Program
 	{
-		static void Main(string[] args)
+		static void Main()
 		{
 			// Set Logger
 			ULPlatform.SetLogger(new ULLogger()

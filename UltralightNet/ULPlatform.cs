@@ -7,6 +7,8 @@ namespace UltralightNet
 		/// <see cref="ULPlatform"/>
 	}
 
+	[System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE1006:Naming Styles", Justification = "<Pending>")]
+	[System.Diagnostics.CodeAnalysis.SuppressMessage("Interoperability", "CA1401:P/Invokes should not be visible", Justification = "<Pending>")]
 	public static class ULPlatform
 	{
 		[DllImport("Ultralight", EntryPoint = "ulPlatformSetLogger")]
