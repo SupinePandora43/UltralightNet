@@ -29,19 +29,18 @@ namespace UltralightNet.Test
 			size = handles[handle].Length;
 			return true;
 		}
-		private bool getFileMimeType(IntPtr path, IntPtr result)
+		private bool getFileMimeType(string path, out string result)
 		{
-			Console.WriteLine($"get_file_mime_type({ULStringMarshaler.NativeToManaged(path)})");
-			Methods.ulStringAssignCString(result, "text/html");
+			Console.WriteLine($"get_file_mime_type({path})");
+			result = "text/html";
 			return true;
 		}
-		private long readFromFile(int handle, out byte[] data, long length)
+		private long readFromFile(int handle, Span<byte> data, long length)
 		{
-			Console.WriteLine($"readFromFile({handle}, out data, {length})");
+			Console.WriteLine($"readFromFile({handle}, Span<byte> data, {length})");
 			//Assert.Equal("<html><body><p>123</p></body></html>".Length, length);
 			//data = "<html><body><p>123</p></body></html>";
-			data = new byte[length];
-			return handles[handle].Read(data, 0, (int)length);
+			return handles[handle].Read(data);
 		}
 		[Fact]
 		public void TestRenderer()
