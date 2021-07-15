@@ -88,8 +88,6 @@ namespace UltralightNet
 	/// <summary>Configuration settings for Ultralight.</summary>
 	public struct ULConfig_C
 	{
-		/// <summary>The file path to the directory that contains Ultralight's bundled resources (eg, cacert.pem and other localized resources).</summary>
-		public ULString resource_path;
 		/// <summary>The file path to a writable directory that will be used to store cookies, cached resources, and other persistent data.</summary>
 		public ULString cache_path;
 
@@ -139,11 +137,12 @@ namespace UltralightNet
 			Ptr = Methods.ulCreateConfig();
 			IsDisposed = !dispose;
 		}
-		/// <summary>The file path to the directory that contains Ultralight's bundled resources (eg, cacert.pem and other localized resources).</summary>
+		
+		[Obsolete("ResourcePath was removed")]
 		public string ResourcePath
 		{
-			get => ULConfig_C.resource_path.ToManaged();
-			set => Methods.ulConfigSetResourcePath(Ptr, value);
+			get => throw new FieldAccessException("ResourcePath was removed");
+			set => throw new FieldAccessException("ResourcePath was removed");
 		}
 		/// <summary>The file path to a writable directory that will be used to store cookies, cached resources, and other persistent data.</summary>
 		public string CachePath
