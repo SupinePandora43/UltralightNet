@@ -8,12 +8,6 @@ namespace UltralightNet.Test
 		private ULConfig config = new();
 
 		[Fact]
-		public void ResourcePathTest()
-		{
-			config.ResourcePath = "./resources";
-			Assert.Equal("./resources", config.ResourcePath);
-		}
-		[Fact]
 		public void CachePathTest()
 		{
 			config.CachePath = "./cache";
