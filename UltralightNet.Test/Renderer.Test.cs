@@ -90,10 +90,7 @@ namespace UltralightNet.Test
 				ReadFromFile = read_from_file
 			});
 
-			ULConfig config = new()
-			{
-				ResourcePath = "./resources"
-			};
+			ULConfig config = new();
 			renderer = new(config);
 
 			SessionTest();
