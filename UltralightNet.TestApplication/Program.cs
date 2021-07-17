@@ -25,7 +25,9 @@ namespace UltralightNetTestApplication
 
 
 			unsafe {
-				ULString* str = (ULString*)Methods.ulCreateString("лол");
+				ULString* str = (ULString*)Methods.ulCreateString("test123тест123");
+				Console.WriteLine(str->ToManaged());
+				//Console.WriteLine(Marshal.PtrToStringUni(Methods.ulStringGetData((IntPtr)str), (int)Methods.ulStringGetLength((IntPtr)str)));
 				Console.WriteLine(Marshal.PtrToStringUni((IntPtr)str->data, (int)str->length));
 			}
 		}
