@@ -23,5 +23,7 @@ jobs:
           dotnet pack UltralightNet
           dotnet pack UltralightNet.AppCore
           dotnet pack UltralightNet.Resources
+      - name: Test Application
+        run: dotnet run --project UltralightNet.TestApplication
       - name: Test
         run: dotnet test UltralightNet.Test/UltralightNet.Test.csproj --verbosity normal

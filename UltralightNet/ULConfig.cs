@@ -86,6 +86,7 @@ namespace UltralightNet
 	}
 
 	/// <summary>Configuration settings for Ultralight.</summary>
+	[StructLayout(LayoutKind.Sequential)]
 	public struct ULConfig_C
 	{
 		/// <summary>The file path to a writable directory that will be used to store cookies, cached resources, and other persistent data.</summary>

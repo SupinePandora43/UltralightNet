@@ -149,11 +149,13 @@ void main()
 			AppCoreMethods.ulEnablePlatformFontLoader();
 			ULPlatform.SetGPUDriver(gpuDriver.GetGPUDriver());
 
-			Renderer renderer = new(new ULConfig()
+			var c = new ULConfig()
 			{
-				ResourcePath = Path.Combine(Path.GetDirectoryName(typeof(Program).Assembly.Location), "resources"),
-				ForceRepaint = false
-			});
+				ForceRepaint = false,
+				CachePath = "./cache/"
+			};
+			Console.WriteLine(c.CachePath);
+			Renderer renderer = new(c);
 
 			View view = new(renderer, Width, Height, new ULViewConfig()
 			{

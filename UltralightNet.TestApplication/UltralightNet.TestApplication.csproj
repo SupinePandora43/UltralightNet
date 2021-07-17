@@ -5,6 +5,7 @@
 		<TargetFramework>net5.0</TargetFramework>
 		
 		<LangVersion>preview</LangVersion>
+		<AllowUnsafeBlocks>True</AllowUnsafeBlocks>
 	</PropertyGroup>
 
 	<ItemGroup>
@@ -14,6 +15,7 @@
 
 	<ItemGroup>
 		<ProjectReference Include="..\UltralightNet\UltralightNet.csproj" />
+		<ProjectReference Include="..\UltralightNet.AppCore\UltralightNet.AppCore.csproj" />
 	</ItemGroup>
 
 </Project>

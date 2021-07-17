@@ -14,7 +14,7 @@ namespace UltralightNet.AppCore.TestApp
 				ForceCPURenderer = true
 			}, new ULConfig()
 			{
-				ResourcePath = "./resources",
+				// ResourcePath = "./resources",
 			});
 
 			ULWindow window = new(app.MainMonitor, 512, 512, false, ULWindowFlags.Titled | ULWindowFlags.Resizable);
