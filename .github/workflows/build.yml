@@ -28,7 +28,7 @@ jobs:
           sudo apt update
           sudo apt install libpng12-0
           find /usr/lib -name "libffi.so*"
-          sudo ln -s /usr/lib/libffi.so.7 /usr/lib/libffi.so.6
+          sudo ln -s  /usr/lib/x86_64-linux-gnu/libffi.so.7  /usr/lib/x86_64-linux-gnu/libffi.so.6
         if: matrix.os=='ubuntu-latest'
       - name: Test Application
         run: dotnet run --project UltralightNet.TestApplication
