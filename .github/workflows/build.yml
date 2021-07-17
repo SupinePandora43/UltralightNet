@@ -23,6 +23,8 @@ jobs:
           dotnet pack UltralightNet
           dotnet pack UltralightNet.AppCore
           dotnet pack UltralightNet.Resources
+      - run: sudo apt install  libpng12-0
+        if: matrix.os=="windows-latest"
       - name: Test Application
         run: dotnet run --project UltralightNet.TestApplication
       - name: Test
