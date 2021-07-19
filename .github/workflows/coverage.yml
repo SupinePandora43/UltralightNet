@@ -38,6 +38,7 @@ jobs:
           sudo apt install libpng12-0
           find /usr/lib -name "libffi.so*"
           sudo ln -s  /usr/lib/x86_64-linux-gnu/libffi.so.7.1.0  /usr/lib/x86_64-linux-gnu/libffi.so.6
+        if: matrix.os=='ubuntu-latest'
       - name: Test
         continue-on-error: true
         run: dotnet test UltralightNet.Test/UltralightNet.Test.csproj --runtime ${{ matrix.rid }} --collect:"XPlat Code Coverage" -- DataCollectionRunSettings.DataCollectors.DataCollector.Configuration.Format=cobertura,opencover -- DataCollectionRunSettings.DataCollectors.DataCollector.Configuration.UseSourceLink=true
