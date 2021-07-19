@@ -49,7 +49,7 @@ jobs:
         uses: actions/upload-artifact@v2
         with:
           name: coverage-${{ matrix.os }}
-          path: UltralightNet.Test/TestResults/**/coverage.cobertura.xml
+          path: UltralightNet.Test/TestResults/**/coverage.opencover.xml
   Coverage:
     runs-on: ubuntu-latest
     needs: Test
@@ -83,16 +83,20 @@ jobs:
       continue-on-error: true
     - name: Install ReportGenerator
       run: dotnet tool install -g dotnet-reportgenerator-globaltool
-    - name: Generate Badge
-      uses: danielpalme/ReportGenerator-GitHub-Action@4.8.7
-      with:
-        reports: 'Coverage/*/coverage.cobertura.xml;Coverage/*/coverage.opencover.xml' # REQUIRED # The coverage reports that should be parsed (separated by semicolon). Globbing is supported.
-        targetdir: 'coveragereport' # REQUIRED # The directory where the generated report should be saved.
-        reporttypes: 'Badges;Html;HtmlChart;HtmlInline;HtmlSummary;PngChart' # The output formats and scope (separated by semicolon) Values: Badges, Clover, Cobertura, CsvSummary, Html, HtmlChart, HtmlInline, HtmlInline_AzurePipelines, HtmlInline_AzurePipelines_Dark, HtmlSummary, JsonSummary, Latex, LatexSummary, lcov, MHtml, PngChart, SonarQube, TeamCitySummary, TextSummary, Xml, XmlSummary
-    - name: Deploy
-      uses: s0/git-publish-subdir-action@develop
-      env:
-        REPO: self
-        BRANCH: gh-pages
-        FOLDER: coveragereport
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    #- name: Generate Badge
+    #  uses: danielpalme/ReportGenerator-GitHub-Action@4.8.7
+    #  with:
+    #    reports: 'Coverage/*/coverage.cobertura.xml;Coverage/*/coverage.opencover.xml' # REQUIRED # The coverage reports that should be parsed (separated by semicolon). Globbing is supported.
+    #    targetdir: 'coveragereport' # REQUIRED # The directory where the generated report should be saved.
+    #    reporttypes: 'Badges;Html;HtmlChart;HtmlInline;HtmlSummary;PngChart' # The output formats and scope (separated by semicolon) Values: Badges, Clover, Cobertura, CsvSummary, Html, HtmlChart, HtmlInline, HtmlInline_AzurePipelines, HtmlInline_AzurePipelines_Dark, HtmlSummary, JsonSummary, Latex, LatexSummary, lcov, MHtml, PngChart, SonarQube, TeamCitySummary, TextSummary, Xml, XmlSummary
+    - run: |
+        curl -s https://codecov.io/bash > codecov
+        chmod +x codecov
+        ./codecov -f "Coverage/*/coverage.opencover.xml"
+    #- name: Deploy
+    #  uses: s0/git-publish-subdir-action@develop
+    #  env:
+    #    REPO: self
+    #    BRANCH: gh-pages
+    #    FOLDER: coveragereport
+    #    GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
