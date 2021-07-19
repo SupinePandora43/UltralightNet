@@ -45,6 +45,7 @@ namespace UltralightNet.Test
 		[Fact]
 		public void TestRenderer()
 		{
+            return;
 			if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX)) return;
 			AppCoreMethods.ulEnablePlatformFontLoader();
 
@@ -90,10 +91,7 @@ namespace UltralightNet.Test
 				ReadFromFile = read_from_file
 			});
 
-			ULConfig config = new()
-			{
-				ResourcePath = "./resources"
-			};
+			ULConfig config = new();
 			renderer = new(config);
 
 			SessionTest();

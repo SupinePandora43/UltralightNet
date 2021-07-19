@@ -30,20 +30,22 @@ namespace UltralightNet
 		public static void Preload()
 		{
 #if !NETFRAMEWORK
-			if (
 #if NET5_0_OR_GREATER
-				OperatingSystem.IsMacOS()
+			bool isLinux = OperatingSystem.IsLinux();
+			bool isOSX = OperatingSystem.IsMacOS();
 #else
-				RuntimeInformation.IsOSPlatform(OSPlatform.OSX)
+			bool isLinux = RuntimeInformation.IsOSPlatform(OSPlatform.Linux);
+			bool isOSX = RuntimeInformation.IsOSPlatform(OSPlatform.OSX);
 #endif
-				)
+			if (isLinux || isOSX)
 			{
-				ReadOnlySpan<string> libs = new[] { "libUltralightCore.dylib", "libWebCore.dylib", "libUltralight.dylib" };
+				ReadOnlySpan<string> libsLinux = new[] { "libgstreamer-full-1.0.so", "libUltralightCore.so", "libWebCore.so", "libUltralight.so" };
+				ReadOnlySpan<string> libsOSX = new[] { "libgstreamer-full-1.0.dylib", "libUltralightCore.dylib", "libWebCore.dylib", "libUltralight.dylib" };
 
 				string absoluteAssemblyLocationDir = Path.GetDirectoryName(typeof(Methods).Assembly.Location);
 				string absoluteRuntimeNativesDir = Path.Combine(absoluteAssemblyLocationDir, "runtimes", "osx-x64", "native");
 
-				foreach (string lib in libs)
+				foreach (string lib in (isLinux ? libsLinux : libsOSX))
 				{
 					string absoluteRuntimeNative = Path.Combine(absoluteRuntimeNativesDir, lib);
 					if (File.Exists(absoluteRuntimeNative))

@@ -14,10 +14,6 @@ namespace UltralightNet
 		[DllImport("Ultralight")]
 		public static extern void ulDestroyConfig(IntPtr config);
 
-		/// <summary>Set the file path to the directory that contains Ultralight's bundled resources (eg, cacert.pem and other localized resources).</summary>
-		[GeneratedDllImport("Ultralight")]
-		public static partial void ulConfigSetResourcePath(IntPtr config, [MarshalUsing(typeof(ULStringGeneratedDllImportMarshaler))] string resource_path);
-
 		/// <summary>Set the file path to a writable directory that will be used to store cookies, cached resources, and other persistent data.</summary>
 		[GeneratedDllImport("Ultralight")]
 		public static partial void ulConfigSetCachePath(IntPtr config, [MarshalUsing(typeof(ULStringGeneratedDllImportMarshaler))] string cache_path);
@@ -86,10 +82,9 @@ namespace UltralightNet
 	}
 
 	/// <summary>Configuration settings for Ultralight.</summary>
+	[StructLayout(LayoutKind.Sequential)]
 	public struct ULConfig_C
 	{
-		/// <summary>The file path to the directory that contains Ultralight's bundled resources (eg, cacert.pem and other localized resources).</summary>
-		public ULString resource_path;
 		/// <summary>The file path to a writable directory that will be used to store cookies, cached resources, and other persistent data.</summary>
 		public ULString cache_path;
 
@@ -139,12 +134,7 @@ namespace UltralightNet
 			Ptr = Methods.ulCreateConfig();
 			IsDisposed = !dispose;
 		}
-		/// <summary>The file path to the directory that contains Ultralight's bundled resources (eg, cacert.pem and other localized resources).</summary>
-		public string ResourcePath
-		{
-			get => ULConfig_C.resource_path.ToManaged();
-			set => Methods.ulConfigSetResourcePath(Ptr, value);
-		}
+		
 		/// <summary>The file path to a writable directory that will be used to store cookies, cached resources, and other persistent data.</summary>
 		public string CachePath
 		{

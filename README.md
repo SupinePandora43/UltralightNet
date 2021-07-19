@@ -30,24 +30,26 @@ you need to install at least:
 
 to have fully functional Ultralight renderer
 
-## Algorithm
+## idk
 
 1. Set Logger (optional)
 2. Set Font Loader (or crash)
-3. Create renderer (configurable, using ULConfig)
-4. Create View (html page)
-5. Load page: Page (raw html string) or URL (requires `UltralightNet.Resources` package, and ULConfig.ResourcePath set to `./resources`)
-6. Update renderer until page is loaded
-7. Render
-8. Get View's Surface
-9. Get Surface's Bitmap
-10. Swap Red and Blue channels
-11. Save bitmap to png file
+3. Set FileSystem (used by ultralight to load "resources" folder content)
+4. Create renderer (configurable, using ULConfig)
+5. Create View (html page)
+6. Load page: Page (raw html string) or URL (requires `UltralightNet.Resources` package, and ULConfig.ResourcePath set to `./resources`)
+7. Update renderer until page is loaded
+8. Render
+9. Get View's Surface
+10. Get Surface's Bitmap
+11. Swap Red and Blue channels
+12. Save bitmap to png file
 
 ## Code
 
 ```cs
 using System;
+using System.IO;
 using System.Threading;
 using UltralightNet;
 using UltralightNet.AppCore;
@@ -56,7 +58,7 @@ namespace UltralightNet.GettingStarted
 {
 	class Program
 	{
-		static void Main(string[] args)
+		static void Main()
 		{
 			// Set Logger
 			ULPlatform.SetLogger(new ULLogger()
@@ -70,17 +72,16 @@ namespace UltralightNet.GettingStarted
 			// Set Font Loader
 			AppCoreMethods.ulEnablePlatformFontLoader();
 
+			// Set filesystem (Ultralight requires "resources/icudt67l.dat", and probably cacert.pem too)
+			AppCoreMethods.ulEnablePlatformFileSystem(Path.GetDirectoryName(typeof(Program).Assembly.Location));
+
 			// Create config, used for specifying resources folder (used for URL loading)
-			ULConfig config = new()
-			{
-				ResourcePath = "./resources" // Requires "UltralightNet.Resources"
-			};
+			ULConfig config = new();
 
 			// Create Renderer
 			Renderer renderer = new(config);
 
 			// Create View
-			// Session.DefaultSession - get default renderer session (used for saving cookies etc)
 			View view = new(renderer, 512, 512);
 
 			// Load URL
