@@ -139,12 +139,6 @@ namespace UltralightNet
 			IsDisposed = !dispose;
 		}
 		
-		[Obsolete("ResourcePath was removed")]
-		public string ResourcePath
-		{
-			get => throw new FieldAccessException("ResourcePath was removed");
-			set => throw new FieldAccessException("ResourcePath was removed");
-		}
 		/// <summary>The file path to a writable directory that will be used to store cookies, cached resources, and other persistent data.</summary>
 		public string CachePath
 		{

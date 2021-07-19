@@ -51,6 +51,13 @@ namespace UltralightNetTestApplication
 				//Console.WriteLine(Marshal.PtrToStringUni(Methods.ulStringGetData((IntPtr)str), (int)Methods.ulStringGetLength((IntPtr)str)));
 				Console.WriteLine(Marshal.PtrToStringUni((IntPtr)str->data, (int)str->length));
 			}
+			AppCoreMethods.ulEnablePlatformFontLoader();
+			AppCoreMethods.ulEnableDefaultLogger("./ullog.txt");
+			AppCoreMethods.ulEnablePlatformFileSystem(Path.GetDirectoryName(typeof(Program).Assembly.Location));
+			Console.WriteLine("creating renderer");
+			ULConfig cfg = new();
+			Renderer renderer = new(cfg);
+			Console.WriteLine("done");
 		}
 	}
 }
