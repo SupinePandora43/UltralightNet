@@ -1,4 +1,5 @@
 using System;
+using System.IO;
 using System.Threading;
 using UltralightNet;
 using UltralightNet.AppCore;
@@ -21,11 +22,11 @@ namespace UltralightNet.GettingStarted
 			// Set Font Loader
 			AppCoreMethods.ulEnablePlatformFontLoader();
 
+			// Set filesystem (Ultralight requires "resources/icudt67l.dat", and probably cacert.pem too)
+			AppCoreMethods.ulEnablePlatformFileSystem(Path.GetDirectoryName(typeof(Program).Assembly.Location));
+
 			// Create config, used for specifying resources folder (used for URL loading)
-			ULConfig config = new()
-			{
-				ResourcePath = "./resources" // Requires "UltralightNet.Resources"
-			};
+			ULConfig config = new();
 
 			// Create Renderer
 			Renderer renderer = new(config);
