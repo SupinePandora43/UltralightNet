@@ -23,7 +23,7 @@ jobs:
           dotnet pack UltralightNet
           dotnet pack UltralightNet.AppCore
           dotnet pack UltralightNet.Resources
-      - run: |
+      - run: | # missing libraries workaround
           sudo add-apt-repository ppa:linuxuprising/libpng12
           sudo apt update
           sudo apt install libpng12-0
@@ -33,4 +33,4 @@ jobs:
       - name: Test Application
         run: dotnet run --project UltralightNet.TestApplication
       - name: Test
-        run: dotnet test UltralightNet.Test/UltralightNet.Test.csproj --verbosity normal
+        run: dotnet test UltralightNet.Test/UltralightNet.Test.csproj
