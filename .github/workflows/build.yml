@@ -40,6 +40,6 @@ jobs:
           ./codecov -f "UltralightNet.Test/TestResults/*/coverage.opencover.xml"
   deploy:
     runs-on: ubuntu-latest
-    if: github.ref=='master'
+    if: github.head_ref=='master'
     steps:
       - run: echo hi!
