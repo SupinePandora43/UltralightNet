@@ -33,4 +33,8 @@ jobs:
       - name: Test Application
         run: dotnet run --project UltralightNet.TestApplication
       - name: Test
-        run: dotnet test UltralightNet.Test/UltralightNet.Test.csproj
+        run: dotnet test UltralightNet.Test/UltralightNet.Test.csproj --collect:"XPlat Code Coverage" -- DataCollectionRunSettings.DataCollectors.DataCollector.Configuration.Format=cobertura,opencover -- DataCollectionRunSettings.DataCollectors.DataCollector.Configuration.UseSourceLink=true
+      - run: |
+          curl -s https://codecov.io/bash > codecov
+          chmod +x codecov
+          ./codecov -f "UltralightNet.Test/TestResults/*/coverage.opencover.xml"
