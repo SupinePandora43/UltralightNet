@@ -610,45 +610,6 @@ namespace UltralightNet
 {
 	public static partial class Methods
 	{
-		public static partial void ulConfigSetResourcePath(global::System.IntPtr config, string resource_path)
-		{
-			unsafe
-			{
-				global::UltralightNet.ULString* __resource_path_gen_native = default;
-				//
-				// Setup
-				//
-				global::UltralightNet.ULStringGeneratedDllImportMarshaler __resource_path_gen_native__marshaler = default;
-				try
-				{
-					//
-					// Marshal
-					//
-					__resource_path_gen_native__marshaler = new global::UltralightNet.ULStringGeneratedDllImportMarshaler(resource_path);
-					__resource_path_gen_native = __resource_path_gen_native__marshaler.Value;
-					//
-					// Invoke
-					//
-					ulConfigSetResourcePath__PInvoke__(config, __resource_path_gen_native);
-				}
-				finally
-				{
-					//
-					// Cleanup
-					//
-					__resource_path_gen_native__marshaler.FreeNative();
-				}
-			}
-		}
-
-		[System.Runtime.InteropServices.DllImportAttribute("Ultralight", EntryPoint = "ulConfigSetResourcePath")]
-		extern private static unsafe void ulConfigSetResourcePath__PInvoke__(global::System.IntPtr config, global::UltralightNet.ULString* resource_path);
-	}
-}
-namespace UltralightNet
-{
-	public static partial class Methods
-	{
 		public static partial bool ulIntRectIsEmpty(global::UltralightNet.ULIntRect rect)
 		{
 			unsafe
