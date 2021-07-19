@@ -38,3 +38,8 @@ jobs:
           curl -s https://codecov.io/bash > codecov
           chmod +x codecov
           ./codecov -f "UltralightNet.Test/TestResults/*/coverage.opencover.xml"
+  deploy:
+    runs-on: ubuntu-latest
+    if: github.ref=='master'
+    steps:
+      - run: echo hi!
