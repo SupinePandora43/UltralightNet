@@ -43,7 +43,10 @@ namespace UltralightNetTestApplication
 			}
 			unsafe {
 				Console.WriteLine("test123тест123");
-				ULString* str = (ULString*)Methods.ulCreateString("test123тест123");
+				ULStringGeneratedDllImportMarshaler marshaler = new("test123тест123");
+				Console.WriteLine(marshaler.ToManaged());
+				marshaler.FreeNative();
+				ULString* str = (ULString*)Methods.ulCreateStringUTF16("test123тест123", (uint)"test123тест123".Length);
 				Console.WriteLine(str->ToManaged());
 				//Console.WriteLine(Marshal.PtrToStringUni(Methods.ulStringGetData((IntPtr)str), (int)Methods.ulStringGetLength((IntPtr)str)));
 				Console.WriteLine(Marshal.PtrToStringUni((IntPtr)str->data, (int)str->length));
