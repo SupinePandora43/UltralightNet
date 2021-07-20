@@ -1,4 +1,5 @@
 using System;
+using System.IO;
 using System.Threading;
 
 namespace UltralightNet.AppCore.TestApp
@@ -8,15 +9,9 @@ namespace UltralightNet.AppCore.TestApp
 		static void Main()
 		{
 			AppCoreMethods.ulEnableDefaultLogger("./log.txt");
+			AppCoreMethods.ulEnablePlatformFileSystem(Path.GetDirectoryName(typeof(Program).Assembly.Location));
 
-			ULApp app = new(new ULSettings()
-			{
-				ForceCPURenderer = true
-			}, new ULConfig()
-			{
-				// ResourcePath = "./resources",
-			});
-
+			ULApp app = new(new ULSettings(), new ULConfig());
 			ULWindow window = new(app.MainMonitor, 512, 512, false, ULWindowFlags.Titled | ULWindowFlags.Resizable);
 
 			window.Title = "test title";
