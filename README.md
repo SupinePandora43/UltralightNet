@@ -7,11 +7,36 @@
 
 ## Supported platforms
 
-|         | x86_64    | arm64    |
-|---------|-----------|----------|
-| windows | win-x64   | upstream |
-| linux   | linux-x64 | upstream |
-| osx     | osx-x64   | upstream |
+NOTE: ultralight supports only x64 processors
+NOTE: At that time, ultralight doesn't support arm. (eg. Android phones or macs on M1)
+
+- Windows
+- Linux
+- OSX
+
+## UltralightSharp
+
+UltralightNet was a fork of UltralightSharp.
+But it was too complicated for me to update generated bindings.
+So i decided to rewrite it from scratch.
+
+### Differences
+
+#### Packages
+
+- `UltralightNet.Binaries` is `UltralightSharp.Core.LinuxX64`, `UltralightSharp.Core.OsxX64` and `UltralightSharp.Core.WinX64` at same time.
+- `UltralightNet.Binaries` doesn't contain [AppCore](https://github.com/ultralight-ux/AppCore) binaries, they're in `UltralightNet.AppCore`
+- `UltralightNet.Resources` contains only `resources` folder, as `UltralightSharp.Core`
+
+#### Code
+
+UltralightSharp uses a lot of IL injection, UltralightNet doesn't.
+
+name conflicts like `System.String` and `ImpromptuNinjas.UltralightSharp.String`: UltralightNet just adds `UL` prefix.
+
+Managed (`string`) versions vs Unmanaged (`ULString*`) versions: UltralightSharp has two different namespaces for that, UltralightNet just adds `_` prefix. Example: `ULFileSystem.OpenFile` and `ULFileSystem._OpenFile` (also `_ULFileSystem.OpenFile` for `[UnmanagedCallersOnlyAttribute]` scenario)
+
+Marshaling: UltralightNet heavily relies on [DllImportGenerator](https://github.com/dotnet/runtimelab/tree/feature/DllImportGenerator) for Native interop, it lets us easily marshal values without NET's `CustomMarshaler` overhead.
 
 ## Reporting issues
 
@@ -30,7 +55,7 @@ you need to install at least:
 
 to have fully functional Ultralight renderer
 
-## idk
+## How to render a static page
 
 1. Set Logger (optional)
 2. Set Font Loader (or crash)
