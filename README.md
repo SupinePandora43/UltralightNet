@@ -5,6 +5,22 @@
 
 [Ultralight](https://ultralig.ht) .NET bindings
 
+## Table of Content
+- [UltralightNet](#ultralightnet)
+	- [Table of Content](#table-of-content)
+	- [Supported platforms](#supported-platforms)
+	- [UltralightSharp](#ultralightsharp)
+		- [Differences](#differences)
+			- [Packages](#packages)
+			- [Code](#code)
+	- [Reporting issues](#reporting-issues)
+- [Getting Started](#getting-started)
+	- [Nuget packages](#nuget-packages)
+	- [How to render a static page](#how-to-render-a-static-page)
+	- [Code](#code-1)
+	- [Ready to run project](#ready-to-run-project)
+	- [Result](#result)
+
 ## Supported platforms
 
 NOTE: ultralight supports only x64 processors
