@@ -4,15 +4,24 @@ using UltralightNet.AppCore;
 using System;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
+using System.Runtime.CompilerServices;
 
 namespace UltralightNetTestApplication
 {
 	class Program
 	{
+		[UnmanagedCallersOnly(CallConvs = new Type[] { typeof(CallConvCdecl) })]
+		public unsafe static void Log(ULLogLevel level, ULString* ulStr)
+		{
+			Console.WriteLine(ULString.NativeToManaged(ulStr));
+		}
 		static void Main()
 		{
-			ULPlatform.SetLogger(new ULLogger(){LogMessage=(level, message)=>Console.WriteLine(message)});
-			
+			unsafe
+			{
+				ULPlatform.SetLogger(new _ULLogger() { LogMessage = &Log });
+			}
+		//	AppCoreMethods.ulEnableDefaultLogger("./ullog.txt");
 			ULFileSystem fs = new();
 
 			Dictionary<int, FileStream> files = new();
@@ -52,7 +61,13 @@ namespace UltralightNetTestApplication
 			fs.GetFileMimeType = (string path, out string result) =>
 			{
 				Console.WriteLine($"GetFileMimeType {path}");
-				result = "";
+				if(path.EndsWith("js"))
+					result = "application/javascript";
+				else if(path.EndsWith("css"))
+					result = "text/css";
+				else if(path.EndsWith("dat"))
+					result = "application/octet-stream";
+				else result = "application/octet-stream";
 				return true;
 			};
 
@@ -72,6 +87,10 @@ namespace UltralightNetTestApplication
 			Renderer renderer = new(cfg);
 
 			View view = new(renderer, 512, 512);
+
+			Console.WriteLine("done");
+
+			ULPlatform.Free();
 		}
 	}
 }
