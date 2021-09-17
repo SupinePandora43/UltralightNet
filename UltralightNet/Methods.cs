@@ -53,7 +53,11 @@ namespace UltralightNet
 					string absoluteRuntimeNative = Path.Combine(absoluteRuntimeNativesDir, lib);
 					if (File.Exists(absoluteRuntimeNative))
 					{
-						NativeLibrary.Load(absoluteRuntimeNative, assembly, DllImportSearchPath.UseDllDirectoryForDependencies);
+						NativeLibrary.Load(absoluteRuntimeNative
+#if !NETSTANDARD
+							, assembly, DllImportSearchPath.UseDllDirectoryForDependencies
+#endif
+							);
 						continue;
 					}
 					else
@@ -61,14 +65,23 @@ namespace UltralightNet
 						string absoluteAssemblyLocation = Path.Combine(absoluteAssemblyLocationDir, lib);
 						if (File.Exists(absoluteAssemblyLocation))
 						{
-							NativeLibrary.Load(absoluteAssemblyLocation, assembly, DllImportSearchPath.UseDllDirectoryForDependencies);
+							NativeLibrary.Load(absoluteAssemblyLocation
+#if !NETSTANDARD
+								, assembly, DllImportSearchPath.UseDllDirectoryForDependencies
+#endif
+								);
 						}
 						else
 							try
 							{
-								NativeLibrary.Load(lib, assembly, DllImportSearchPath.UseDllDirectoryForDependencies); // last hope (will not work)
+								NativeLibrary.Load(lib
+#if !NETSTANDARD
+									, assembly, DllImportSearchPath.UseDllDirectoryForDependencies
+#endif
+									); // last hope (will not work)
 							}
-							catch (DllNotFoundException) {
+							catch (DllNotFoundException)
+							{
 #if DEBUG
 								Console.WriteLine($"UltralightNet: failed to load {lib}");
 #endif
