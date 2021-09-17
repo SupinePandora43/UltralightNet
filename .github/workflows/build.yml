@@ -30,8 +30,8 @@ jobs:
           find /usr/lib -name "libffi.so*"
           sudo ln -s  /usr/lib/x86_64-linux-gnu/libffi.so.7.1.0  /usr/lib/x86_64-linux-gnu/libffi.so.6
         if: matrix.os=='ubuntu-latest'
-      - name: Test Application
-        run: dotnet run --project UltralightNet.TestApplication
+      #- name: Test Application
+      #  run: dotnet run --project UltralightNet.TestApplication
       - name: Test
         run: dotnet test UltralightNet.Test/UltralightNet.Test.csproj --collect:"XPlat Code Coverage" -- DataCollectionRunSettings.DataCollectors.DataCollector.Configuration.Format=cobertura,opencover -- DataCollectionRunSettings.DataCollectors.DataCollector.Configuration.UseSourceLink=true
       - run: |
