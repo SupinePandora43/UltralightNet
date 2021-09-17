@@ -12,6 +12,8 @@ namespace UltralightNet
 	[System.Diagnostics.CodeAnalysis.SuppressMessage("Interoperability", "CA1401:P/Invokes should not be visible", Justification = "<Pending>")]
 	public static class ULPlatform
 	{
+		static ULPlatform() => Methods.Preload();
+
 		private static readonly List<GCHandle> handles = new();
 
 		private static void Handle(GCHandle handle){
