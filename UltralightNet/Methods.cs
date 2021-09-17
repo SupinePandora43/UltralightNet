@@ -46,8 +46,13 @@ namespace UltralightNet
 				string absoluteAssemblyLocationDir = Path.GetDirectoryName(typeof(Methods).Assembly.Location);
 				string absoluteRuntimeNativesDir = Path.Combine(absoluteAssemblyLocationDir, "runtimes", "osx-x64", "native");
 
+#if !NETSTANDARD
 				Assembly assembly = typeof(Methods).Assembly;
-
+				DllImportSearchPath searchPath =
+					DllImportSearchPath.UseDllDirectoryForDependencies |
+					DllImportSearchPath.AssemblyDirectory |
+					DllImportSearchPath.ApplicationDirectory;
+#endif
 				foreach (string lib in (isLinux ? libsLinux : libsOSX))
 				{
 					string absoluteRuntimeNative = Path.Combine(absoluteRuntimeNativesDir, lib);
@@ -55,7 +60,7 @@ namespace UltralightNet
 					{
 						NativeLibrary.Load(absoluteRuntimeNative
 #if !NETSTANDARD
-							, assembly, DllImportSearchPath.UseDllDirectoryForDependencies
+							, assembly, searchPath
 #endif
 							);
 						continue;
@@ -67,7 +72,7 @@ namespace UltralightNet
 						{
 							NativeLibrary.Load(absoluteAssemblyLocation
 #if !NETSTANDARD
-								, assembly, DllImportSearchPath.UseDllDirectoryForDependencies
+								, assembly, searchPath
 #endif
 								);
 						}
@@ -76,7 +81,7 @@ namespace UltralightNet
 							{
 								NativeLibrary.Load(lib
 #if !NETSTANDARD
-									, assembly, DllImportSearchPath.UseDllDirectoryForDependencies
+									, assembly, searchPath
 #endif
 									); // last hope (will not work)
 							}
