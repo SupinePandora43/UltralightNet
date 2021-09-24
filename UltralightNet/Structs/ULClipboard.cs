@@ -39,7 +39,7 @@ namespace UltralightNet
 	public unsafe struct _ULClipboard
 	{
 		public delegate* unmanaged[Cdecl]<void> Clear;
-		public delegate* unmanaged[Cdecl]<ULStringMarshaler.ULStringPTR*, void> ReadPlainText;
-		public delegate* unmanaged[Cdecl]<ULStringMarshaler.ULStringPTR*, void> WritePlainText;
+		public delegate* unmanaged[Cdecl]<ULString*, void> ReadPlainText;
+		public delegate* unmanaged[Cdecl]<ULString*, void> WritePlainText;
 	}
 }
