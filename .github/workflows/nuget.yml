@@ -1,0 +1,36 @@
+name: Development builds
+on:
+  push:
+    branches: [ master ]
+jobs:
+  build-publish:
+    name: Build and publish on Github Packages
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Set up .NET
+        uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: "5.0.x"
+
+      - name: Add Github Packages to NuGet sources
+        run: dotnet nuget add source --username ${{ github.actor }} --password ${{ github.token }} --store-password-in-clear-text --name github "https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json"
+
+      - name: Define a version suffix
+        run: echo "version_suffix=dev-$(date -u +%Y%m%d%H%M%S)-$(git rev-parse --short ${{ github.sha }})" >> $GITHUB_ENV
+
+      - name: Pack UltralightNet.Binaries
+        run: dotnet pack UltralightNet.Binaries -c Release --version-suffix ${{ env.version_suffix }}
+
+      - name: Pack UltralightNet
+        run: dotnet pack UltralightNet -c Release --version-suffix ${{ env.version_suffix }}
+
+      - name: Pack UltralightNet.AppCore
+        run: dotnet pack UltralightNet.AppCore -c Release --version-suffix ${{ env.version_suffix }}
+
+      - name: Pack UltralightNet.Resources
+        run: dotnet pack UltralightNet.Resources -c Release --version-suffix ${{ env.version_suffix }}
+
+      - name: Publish to NuGet
+        run: dotnet nuget push *.nupkg --api-key ${{ github.token }} --source github
