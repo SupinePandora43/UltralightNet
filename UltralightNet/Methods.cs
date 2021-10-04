@@ -1,5 +1,6 @@
 using System;
 using System.IO;
+using System.Reflection;
 using System.Runtime.InteropServices;
 
 namespace UltralightNet
@@ -43,14 +44,25 @@ namespace UltralightNet
 				ReadOnlySpan<string> libsOSX = new[] { "libgstreamer-full-1.0.dylib", "libUltralightCore.dylib", "libWebCore.dylib", "libUltralight.dylib" };
 
 				string absoluteAssemblyLocationDir = Path.GetDirectoryName(typeof(Methods).Assembly.Location);
-				string absoluteRuntimeNativesDir = Path.Combine(absoluteAssemblyLocationDir, "runtimes", "osx-x64", "native");
+				string absoluteRuntimeNativesDir = Path.Combine(absoluteAssemblyLocationDir, "runtimes", isLinux ? "linux-x64" : "osx-x64", "native");
 
+#if !NETSTANDARD
+				Assembly assembly = typeof(Methods).Assembly;
+				DllImportSearchPath searchPath =
+					DllImportSearchPath.UseDllDirectoryForDependencies |
+					DllImportSearchPath.AssemblyDirectory |
+					DllImportSearchPath.ApplicationDirectory;
+#endif
 				foreach (string lib in (isLinux ? libsLinux : libsOSX))
 				{
 					string absoluteRuntimeNative = Path.Combine(absoluteRuntimeNativesDir, lib);
 					if (File.Exists(absoluteRuntimeNative))
 					{
-						NativeLibrary.Load(absoluteRuntimeNative);
+						NativeLibrary.Load(absoluteRuntimeNative
+#if !NETSTANDARD
+							, assembly, searchPath
+#endif
+							);
 						continue;
 					}
 					else
@@ -58,19 +70,26 @@ namespace UltralightNet
 						string absoluteAssemblyLocation = Path.Combine(absoluteAssemblyLocationDir, lib);
 						if (File.Exists(absoluteAssemblyLocation))
 						{
-							NativeLibrary.Load(absoluteAssemblyLocation);
+							NativeLibrary.Load(absoluteAssemblyLocation
+#if !NETSTANDARD
+								, assembly, searchPath
+#endif
+								);
 						}
 						else
 							try
 							{
-								NativeLibrary.Load(lib); // last hope (will not work)
+								NativeLibrary.Load(lib
+#if !NETSTANDARD
+									, assembly, searchPath
+#endif
+									); // last hope (will not work)
 							}
-							catch (DllNotFoundException e)
+							catch (DllNotFoundException)
 							{
 #if DEBUG
 								Console.WriteLine($"UltralightNet: failed to load {lib}");
 #endif
-								throw e;
 							} // will cause DllNotFoundException somewhere else
 					}
 				}

@@ -30,6 +30,8 @@ namespace UltralightNet
 	[System.Diagnostics.CodeAnalysis.SuppressMessage("Interoperability", "CA1401:P/Invokes should not be visible", Justification = "<Pending>")]
 	public static class ULPlatform
 	{
+		static void ULPLatform() => Methods.Preload();
+
 		private static readonly Dictionary<ULLogger, List<GCHandle>> loggerHandles = new(1);
 		private static readonly Dictionary<ULFileSystem, List<GCHandle>> filesystemHandles = new(1);
 		private static readonly Dictionary<ULGPUDriver, List<GCHandle>> gpudriverHandles = new(1);
@@ -252,13 +254,13 @@ namespace UltralightNet
 				{
 					string cacertpem = "resources/cacert.pem";
 					string icudt67ldat = "resources/icudt67l.dat";
-					
+
 					fixed(char* cacertpemCharacters = cacertpem)
 					fixed(char* icudt67ldatCharacters = icudt67ldat)
 					{
 						ULString cacertpemULSTR = new(){ data = (ushort*) cacertpemCharacters, length = (nuint) cacertpem.Length};
 						ULString icudt67ldatULSTR = new(){ data = (ushort*) icudt67ldatCharacters, length = (nuint) icudt67ldat.Length};
-					
+
 						if (!(_filesystem.__FileExists(&cacertpemULSTR) && _filesystem.__FileExists(&icudt67ldatULSTR)))
 						{
 							throw new FileNotFoundException($"{typeof(ULFileSystem)} doesn't provide cacert.pem or icudt67l.dat from resources/ folder");
