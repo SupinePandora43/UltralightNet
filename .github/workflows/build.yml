@@ -31,7 +31,7 @@ jobs:
           find /usr/lib -name "libffi.so*"
           sudo ln -s  /usr/lib/x86_64-linux-gnu/libffi.so.7.1.0  /usr/lib/x86_64-linux-gnu/libffi.so.6
           # libpulse0
-          apt-get install libpulse0
+          sudo apt-get install libpulse0
         if: matrix.os=='ubuntu-latest'
       #- name: Test Application
       #  run: dotnet run --project UltralightNet.TestApplication
