@@ -24,11 +24,14 @@ jobs:
           dotnet pack UltralightNet.AppCore
           dotnet pack UltralightNet.Resources
       - run: | # missing libraries workaround
+          # libpng12
           sudo add-apt-repository ppa:linuxuprising/libpng12
           sudo apt update
           sudo apt install libpng12-0
           find /usr/lib -name "libffi.so*"
           sudo ln -s  /usr/lib/x86_64-linux-gnu/libffi.so.7.1.0  /usr/lib/x86_64-linux-gnu/libffi.so.6
+          # libpulse0
+          apt-get install libpulse0
         if: matrix.os=='ubuntu-latest'
       #- name: Test Application
       #  run: dotnet run --project UltralightNet.TestApplication
