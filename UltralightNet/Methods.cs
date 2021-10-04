@@ -40,7 +40,7 @@ namespace UltralightNet
 #endif
 			if (isLinux || isOSX)
 			{
-				ReadOnlySpan<string> libsLinux = new[] { "libgstreamer-full-1.0.so", "libUltralightCore.so", "libWebCore.so", "libUltralight.so" };
+				ReadOnlySpan<string> libsLinux = new[] { "libgthread-2.0.so.0.6800.3", "libgobject-2.0.so.0.6800.3", "libgmodule-2.0.so.0.6800.3", "libglib-2.0.so.0.6800.3", "libgio-2.0.so.0.6800.3", /* --- */ "libgstreamer-full-1.0.so", "libUltralightCore.so", "libWebCore.so", "libUltralight.so" };
 				ReadOnlySpan<string> libsOSX = new[] { "libgstreamer-full-1.0.dylib", "libUltralightCore.dylib", "libWebCore.dylib", "libUltralight.dylib" };
 
 				string absoluteAssemblyLocationDir = Path.GetDirectoryName(typeof(Methods).Assembly.Location);
