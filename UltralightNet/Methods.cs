@@ -85,11 +85,12 @@ namespace UltralightNet
 #endif
 									); // last hope (will not work)
 							}
-							catch (DllNotFoundException)
+							catch (DllNotFoundException e)
 							{
 #if DEBUG
 								Console.WriteLine($"UltralightNet: failed to load {lib}");
 #endif
+								throw e;
 							} // will cause DllNotFoundException somewhere else
 					}
 				}
