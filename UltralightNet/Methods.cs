@@ -59,7 +59,7 @@ namespace UltralightNet
 					if (File.Exists(absoluteRuntimeNative))
 					{
 						NativeLibrary.Load(absoluteRuntimeNative
-#if !NETSTANDARD
+#if false
 							, assembly, searchPath
 #endif
 							);
@@ -71,7 +71,7 @@ namespace UltralightNet
 						if (File.Exists(absoluteAssemblyLocation))
 						{
 							NativeLibrary.Load(absoluteAssemblyLocation
-#if !NETSTANDARD
+#if false
 								, assembly, searchPath
 #endif
 								);
