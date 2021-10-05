@@ -90,8 +90,8 @@ namespace UltralightNet
 #if DEBUG
 								Console.WriteLine($"UltralightNet: failed to load {lib}");
 #endif
-								throw e;
-							} // will cause DllNotFoundException somewhere else
+								throw new Exception("Failed to load Ultralight", e);
+							}
 					}
 				}
 			}
