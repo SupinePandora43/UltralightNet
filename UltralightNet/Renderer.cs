@@ -33,12 +33,14 @@ namespace UltralightNet
 	{
 		public readonly IntPtr Ptr;
 
-		public Renderer(IntPtr ptr, bool dispose = false)
+		private Renderer(IntPtr ptr, bool dispose)
 		{
 			Ptr = ptr;
 			IsDisposed = !dispose;
 		}
-		public Renderer(ULConfig config, bool dispose = true)
+		public static Renderer FromIntPtr(IntPtr ptr, bool dispose = false) => new(ptr, dispose);
+
+		internal Renderer(ULConfig config, bool dispose)
 		{
 			Ptr = Methods.ulCreateRenderer(config.Ptr);
 			IsDisposed = !dispose;

@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Runtime.InteropServices;
 
 namespace UltralightNet
@@ -36,34 +37,16 @@ namespace UltralightNet
 			handles.Clear();
 		}
 
-		private static bool isLoggerSet = false;
-		private static ULLogger _logger;
+		private static bool SetDefaultLogger = true;
+
+		private static ULLogger _logger = default;
 		public static ULLogger Logger
 		{
 			get => _logger;
 			set
 			{
-				unsafe
-				{
-					if (value.__LogMessage is null)
-					{
-						isLoggerSet = false;
-						_logger = value;
-						Methods.ulPlatformSetLogger(value);
-						return;
-					}
-				}
-				if (!isLoggerSet)
-				{
-					isLoggerSet = true;
-					_logger = value;
-					Methods.ulPlatformSetLogger(value);
-				}
-				else
-				{
-					_logger = value;
-					Methods.ulPlatformSetLogger(value);
-				}
+				_logger = value;
+				Methods.ulPlatformSetLogger(value);
 			}
 		}
 
@@ -104,6 +87,25 @@ namespace UltralightNet
 		{
 			Handle(GCHandle.Alloc(clipboard, GCHandleType.Normal));
 			SetClipboard__PInvoke__(clipboard);
+		}
+
+		public static Renderer CreateRenderer(ULConfig config = null, bool dispose = true)
+		{
+#if DEBUG
+			unsafe
+			{
+				if (_logger.__LogMessage is null && SetDefaultLogger)
+				{
+					Console.WriteLine("UltralightNet: no logger set, console logger will be used.");
+
+					Logger = new()
+					{
+						LogMessage = (level, message) => { foreach (string line in message.Split('\n')) { Console.WriteLine($"(UL) {level}: {line}"); } }
+					};
+				}
+			}
+#endif
+			return new Renderer(config ?? new(), dispose);
 		}
 	}
 }

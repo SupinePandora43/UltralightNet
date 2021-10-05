@@ -92,7 +92,7 @@ namespace UltralightNet.Test
 			});
 
 			ULConfig config = new();
-			renderer = new(config);
+			renderer = ULPlatform.CreateRenderer(config);
 
 			SessionTest();
 

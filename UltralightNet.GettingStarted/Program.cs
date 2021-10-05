@@ -29,7 +29,7 @@ namespace UltralightNet.GettingStarted
 			ULConfig config = new();
 
 			// Create Renderer
-			Renderer renderer = new(config);
+			Renderer renderer = ULPlatform.CreateRenderer(config);
 
 			// Create View
 			View view = new(renderer, 512, 512);

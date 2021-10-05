@@ -70,7 +70,7 @@ namespace UltralightNet.AppCore
 
 		public ULMonitor MainMonitor => new(AppCoreMethods.ulAppGetMainMonitor(Ptr));
 
-		public Renderer Renderer => new(AppCoreMethods.ulAppGetRenderer(Ptr));
+		public Renderer Renderer => Renderer.FromIntPtr(AppCoreMethods.ulAppGetRenderer(Ptr));
 
 		public void Run() => AppCoreMethods.ulAppRun(Ptr);
 		public void Quit() => AppCoreMethods.ulAppQuit(Ptr);
