@@ -13,24 +13,6 @@ namespace UltralightNet.Test
 {
 	public class RendererTest
 	{
-		private class TestOutputWriter : TextWriter {
-			public override Encoding Encoding => Encoding.Default;
-
-			private ITestOutputHelper testout;
-
-			public TestOutputWriter(ITestOutputHelper o)
-			{
-				testout = o;
-			}
-			public override void WriteLine(string line) => testout.WriteLine(line);
-		}
-
-		public RendererTest(ITestOutputHelper helper)
-		{
-			Console.SetOut(new TestOutputWriter(helper));
-		}
-
-
 		private Renderer renderer;
 
 		private readonly ULViewConfig viewConfig = new()
