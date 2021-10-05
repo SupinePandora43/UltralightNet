@@ -11,13 +11,13 @@ namespace UltralightNet.GettingStarted
 		static void Main()
 		{
 			// Set Logger
-			ULPlatform.SetLogger(new ULLogger()
+			ULPlatform.Logger = new()
 			{
 				LogMessage = (level, message) =>
 				{
 					Console.WriteLine($"({level}): {message}");
 				}
-			});
+			};
 
 			// Set Font Loader
 			AppCoreMethods.ulEnablePlatformFontLoader();

@@ -1,26 +1,38 @@
+using System;
 using System.Runtime.InteropServices;
 
 namespace UltralightNet
 {
 	[StructLayout(LayoutKind.Sequential)]
-	public struct ULLogger
+	public unsafe struct ULLogger : IDisposable
 	{
 		public ULLoggerLogMessageCallback LogMessage { set { unsafe { _LogMessage = (level, msg) => value(level, ULString.NativeToManaged(msg)); } } }
 
-		public ULLoggerLogMessageCallback__PInvoke__ _LogMessage;
-	}
+		public ULLoggerLogMessageCallback__PInvoke__ _LogMessage
+		{
+			set
+			{
+				unsafe
+				{
+					ULLoggerLogMessageCallback__PInvoke__ logMessage = value;
+					ULPlatform.loggerHandles.Add(this, GCHandle.Alloc(logMessage, GCHandleType.Normal));
+					__LogMessage = (delegate* unmanaged[Cdecl]<ULLogLevel, ULString*, void>)Marshal.GetFunctionPointerForDelegate(logMessage);
+				}
+			}
+		}
 
-	/// <summary>
-	/// <see cref="ULLogger"/> with delegate* types
-	/// </summary>
-	[StructLayout(LayoutKind.Sequential)]
-	public unsafe struct _ULLogger
-	{
-		/// <example>
-		///	ULStringGeneratedDllImportMarshaler marshaler = default;
-		///	marshaler.Value = message;
-		///	string messageString = marshaler.ToManaged();
-		/// </example>
-		public delegate* unmanaged[Cdecl]<ULLogLevel, ULString*, void> LogMessage;
+		public delegate* unmanaged[Cdecl]<ULLogLevel, ULString*, void> __LogMessage;
+
+		public void Dispose()
+		{
+			if (ULPlatform.loggerHandles.ContainsKey(this))
+			{
+				GCHandle handle = ULPlatform.loggerHandles[this];
+				if (handle.IsAllocated)
+				{
+					handle.Free();
+				}
+			}
+		}
 	}
 }

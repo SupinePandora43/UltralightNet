@@ -49,13 +49,13 @@ namespace UltralightNet.Test
 			if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX)) return;
 			AppCoreMethods.ulEnablePlatformFontLoader();
 
-			ULPlatform.SetLogger(new ULLogger()
+			ULPlatform.Logger = new ULLogger()
 			{
 				LogMessage = (level, message) =>
 				{
 					Console.WriteLine(message);
 				}
-			});
+			};
 			AppCoreMethods.ulEnableDefaultLogger("./ullog.txt");
 
 			WebRequest request = WebRequest.CreateHttp("https://raw.githubusercontent.com/SupinePandora43/UltralightNet/gh-pages/index.html");
