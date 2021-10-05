@@ -13,7 +13,7 @@ namespace UltralightNet.Test
 {
 	public class RendererTest
 	{
-		private TestOutputWriter : TextWriter {
+		private class TestOutputWriter : TextWriter {
 			private ITestOutputHelper testout;
 
 			public TestOutputWriter(ITestOutputHelper o)
