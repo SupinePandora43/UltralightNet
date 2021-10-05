@@ -7,11 +7,28 @@ using System.Text;
 using System.Threading;
 using UltralightNet.AppCore;
 using Xunit;
+using Xunit.Abstractions;
 
 namespace UltralightNet.Test
 {
 	public class RendererTest
 	{
+		private TestOutputWriter : TextWriter {
+			private ITestOutputHelper testout;
+
+			public TestOutputWriter(ITestOutputHelper o)
+			{
+				testout = o;
+			}
+			public void WriteLine(string line) => testout.WriteLine(line);
+		}
+
+		public RendererTest(ITestOutputHelper helper)
+		{
+			Console.SetOut(new TestOutputWriter(helper));
+		}
+
+
 		private Renderer renderer;
 
 		private readonly ULViewConfig viewConfig = new()
@@ -49,13 +66,13 @@ namespace UltralightNet.Test
 			if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX)) return;
 			AppCoreMethods.ulEnablePlatformFontLoader();
 			AppCoreMethods.ulEnablePlatformFileSystem("./");
-			/*ULPlatform.Logger = new ULLogger()
+			ULPlatform.Logger = new ULLogger()
 			{
 				LogMessage = (level, message) =>
 				{
 					Console.WriteLine(message);
 				}
-			};
+			};/*
 			AppCoreMethods.ulEnableDefaultLogger("./ullog.txt");
 			*/
 
