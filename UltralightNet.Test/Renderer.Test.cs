@@ -48,7 +48,7 @@ namespace UltralightNet.Test
             //return;
 			if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX)) return;
 			AppCoreMethods.ulEnablePlatformFontLoader();
-
+			AppCoreMethods.ulEnablePlatformFileSystem("./");
 			/*ULPlatform.Logger = new ULLogger()
 			{
 				LogMessage = (level, message) =>
