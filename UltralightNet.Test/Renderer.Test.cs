@@ -14,7 +14,7 @@ namespace UltralightNet.Test
 	public class RendererTest
 	{
 		private class TestOutputWriter : TextWriter {
-			public Encoding Encoding => Encoding.Default;
+			public override Encoding Encoding => Encoding.Default;
 
 			private ITestOutputHelper testout;
 
@@ -22,7 +22,7 @@ namespace UltralightNet.Test
 			{
 				testout = o;
 			}
-			public void WriteLine(string line) => testout.WriteLine(line);
+			public override void WriteLine(string line) => testout.WriteLine(line);
 		}
 
 		public RendererTest(ITestOutputHelper helper)
