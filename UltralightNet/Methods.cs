@@ -65,7 +65,13 @@ namespace UltralightNet
 							{
 								NativeLibrary.Load(lib); // last hope (will not work)
 							}
-							catch (DllNotFoundException) { } // will cause DllNotFoundException somewhere else
+							catch (DllNotFoundException e)
+							{
+#if DEBUG
+								Console.WriteLine($"UltralightNet: failed to load {lib}");
+#endif
+								throw e;
+							} // will cause DllNotFoundException somewhere else
 					}
 				}
 			}
