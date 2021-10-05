@@ -81,7 +81,7 @@ namespace UltralightNet
 			{
 				ptr = new()
 				{
-					data = (ushort*)Marshal.StringToCoTaskMemUni(str),
+					data = (ushort*)Marshal.StringToHGlobalUni(str),
 					length = (nuint)str.Length
 				};
 			}
@@ -115,7 +115,7 @@ namespace UltralightNet
 		{
 			unsafe
 			{
-				Marshal.FreeCoTaskMem((IntPtr)ptr.data);
+				Marshal.FreeHGlobal((IntPtr)ptr.data);
 			}
 		}
 	}
