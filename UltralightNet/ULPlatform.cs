@@ -36,12 +36,12 @@ namespace UltralightNet
 
 		internal static void Handle(ULLogger logger, GCHandle handle)
 		{
-			if (loggerHandles[logger] is null) loggerHandles.Add(logger, new(1));
+			if (!loggerHandles.ContainsKey(logger)) loggerHandles.Add(logger, new(1));
 			loggerHandles[logger].Add(handle);
 		}
 		internal static void Handle(ULFileSystem filesystem, GCHandle handle)
 		{
-			if (filesystemHandles[filesystem] is null) filesystemHandles.Add(filesystem, new(6));
+			if (!filesystemHandles.ContainsKey(filesystem)) filesystemHandles.Add(filesystem, new(6));
 			filesystemHandles[filesystem].Add(handle);
 		}
 
