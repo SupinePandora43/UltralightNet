@@ -15,7 +15,7 @@ namespace UltralightNet
 				unsafe
 				{
 					ULLoggerLogMessageCallback__PInvoke__ logMessage = value;
-					ULPlatform.loggerHandles.Add(this, GCHandle.Alloc(logMessage, GCHandleType.Normal));
+					ULPlatform.Handle(this, GCHandle.Alloc(logMessage, GCHandleType.Normal));
 					__LogMessage = (delegate* unmanaged[Cdecl]<ULLogLevel, ULString*, void>)Marshal.GetFunctionPointerForDelegate(logMessage);
 				}
 			}
@@ -25,14 +25,7 @@ namespace UltralightNet
 
 		public void Dispose()
 		{
-			if (ULPlatform.loggerHandles.ContainsKey(this))
-			{
-				GCHandle handle = ULPlatform.loggerHandles[this];
-				if (handle.IsAllocated)
-				{
-					handle.Free();
-				}
-			}
+			ULPlatform.Free(this);
 		}
 	}
 }
