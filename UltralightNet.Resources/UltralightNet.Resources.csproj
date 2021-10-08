@@ -19,6 +19,24 @@
 			<PackageCopyToOutput>True</PackageCopyToOutput>
 			<CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
 		</Content>
-		<None Update="resources/cacert.pem;resources/icudt67l.dat" Pack="true" PackagePath="/contentFiles" />
+		<Content Include="resources/mediaControls.css">
+			<Pack>True</Pack>
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+			<PackageCopyToOutput>True</PackageCopyToOutput>
+			<CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+		</Content>
+		<Content Include="resources/mediaControls.js">
+			<Pack>True</Pack>
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+			<PackageCopyToOutput>True</PackageCopyToOutput>
+			<CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+		</Content>
+		<Content Include="resources/mediaControlsLocalizedStrings.js">
+			<Pack>True</Pack>
+			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+			<PackageCopyToOutput>True</PackageCopyToOutput>
+			<CopyToPublishDirectory>PreserveNewest</CopyToPublishDirectory>
+		</Content>
+		<None Update="resources/cacert.pem;resources/icudt67l.dat;resources/mediaControls.css;resources/mediaControls.js;resources/mediaControlsLocalizedStrings.js" Pack="true" PackagePath="/contentFiles" />
 	</ItemGroup>
 </Project>
