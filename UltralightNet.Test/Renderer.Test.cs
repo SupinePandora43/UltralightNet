@@ -70,7 +70,7 @@ namespace UltralightNet.Test
 			ULFileSystemGetFileSizeCallback get_file_size = getFileSize;
 			ULFileSystemGetFileMimeTypeCallback get_file_mime_type = getFileMimeType;
 			ULFileSystemReadFromFileCallback read_from_file = readFromFile;
-			ULPlatform.SetFileSystem(new ULFileSystem()
+			/*ULPlatform.FileSystem = new ULFileSystem()
 			{
 				FileExists = (path) =>
 				{
@@ -91,7 +91,7 @@ namespace UltralightNet.Test
 					 Console.WriteLine($"close_file({handle})");
 				 },
 				ReadFromFile = read_from_file
-			});
+			};*/
 
 			ULConfig config = new();
 			renderer = ULPlatform.CreateRenderer(config);
