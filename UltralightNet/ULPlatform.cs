@@ -94,7 +94,7 @@ namespace UltralightNet
 					{
 						for (int i = int.MinValue; i < int.MaxValue; i++)
 						{
-							if (files.ContainsKey(i)) return i;
+							if (!files.ContainsKey(i)) return i;
 						}
 						throw new IndexOutOfRangeException("UltralightNet (Default FileSystem): reached file limit.");
 					}
