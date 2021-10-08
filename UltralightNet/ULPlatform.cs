@@ -71,13 +71,9 @@ namespace UltralightNet
 
 		}
 
-#if DEBUG
 		public static bool SetDefaultLogger = true;
 		public static bool SetDefaultFileSystem = true;
-#else
-		public static bool SetDefaultLogger = false;
-		public static bool SetDefaultFileSystem = false;
-#endif
+
 		private static ULLogger _logger;
 		private static ULFileSystem _filesystem;
 
