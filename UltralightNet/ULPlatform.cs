@@ -137,7 +137,7 @@ namespace UltralightNet
 						ReadFromFile = (handle, data, length) =>
 						{
 							Console.WriteLine($"ReadFromFile({handle})");
-#if NET5_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
+#if NET5_0 || NET5_0_OR_GREATER || NETSTANDARD2_1 || NETSTANDARD2_1_OR_GREATER
 							return files[handle].Read(data);
 #else
 							fixed(byte* dataPtr = data)
