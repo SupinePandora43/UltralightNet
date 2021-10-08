@@ -39,7 +39,7 @@ namespace UltralightNet
 		/// </summary>
 		public static void Free()
 		{
-			
+
 		}
 
 #if DEBUG
@@ -84,7 +84,7 @@ namespace UltralightNet
 						LogMessage = (level, message) => { foreach (string line in message.Split('\n')) { Console.WriteLine($"(UL) {level}: {line}"); } }
 					};
 				}
-				if(SetDefaultFileSystem && _filesystem.__GetFileMimeType is null) // TODO
+				if (SetDefaultFileSystem && _filesystem.__GetFileMimeType is null) // TODO
 				{
 					Console.WriteLine("UltralightNet: no filesystem set, default (with access only to required files) will be used.");
 
@@ -92,7 +92,7 @@ namespace UltralightNet
 
 					int GetFileId()
 					{
-						for(int i = int.MinValue; i<int.MaxValue; i++)
+						for (int i = int.MinValue; i < int.MaxValue; i++)
 						{
 							if (files.ContainsKey(i)) return i;
 						}
@@ -109,7 +109,15 @@ namespace UltralightNet
 						GetFileMimeType = (string file, out string result) =>
 						{
 							Console.WriteLine($"GetFileMimeType({file})");
-							result = "text/html";
+							if (file.EndsWith("html"))
+								result = "text/html";
+							else if (file.EndsWith("js"))
+								result = "application/javascript";
+							else if (file.EndsWith("css"))
+								result = "text/css";
+							else
+								result = "application/octet-stream";
+
 							return true;
 						},
 						OpenFile = (file, _) =>
@@ -140,7 +148,7 @@ namespace UltralightNet
 							return files[handle].Length;
 #endif
 						},
-						CloseFile = (handle)=>
+						CloseFile = (handle) =>
 						{
 							Console.WriteLine($"CloseFile({handle})");
 							files[handle].Close();
