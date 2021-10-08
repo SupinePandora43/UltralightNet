@@ -29,14 +29,43 @@ namespace UltralightNet
 	[System.Diagnostics.CodeAnalysis.SuppressMessage("Interoperability", "CA1401:P/Invokes should not be visible", Justification = "<Pending>")]
 	public static class ULPlatform
 	{
-		internal static readonly Dictionary<ULLogger, GCHandle> loggerHandles = new(1);
-		internal static readonly Dictionary<ULFileSystem, GCHandle> filesystemHandles = new(1);
-		internal static readonly Dictionary<ULGPUDriver, GCHandle> gpudriverHandles = new(1);
-		internal static readonly Dictionary<ULClipboard, GCHandle> clipboardHandles = new(1);
+		private static readonly Dictionary<ULLogger, List<GCHandle>> loggerHandles = new(1);
+		private static readonly Dictionary<ULFileSystem, List<GCHandle>> filesystemHandles = new(1);
+		private static readonly Dictionary<ULGPUDriver, List<GCHandle>> gpudriverHandles = new(1);
+		private static readonly Dictionary<ULClipboard, List<GCHandle>> clipboardHandles = new(1);
+
+		internal static void Handle(ULLogger logger, GCHandle handle)
+		{
+			if (loggerHandles[logger] is null) loggerHandles[logger] = new(1);
+			loggerHandles[logger].Add(handle);
+		}
+		internal static void Handle(ULFileSystem filesystem, GCHandle handle)
+		{
+			if (filesystemHandles[filesystem] is null) filesystemHandles[filesystem] = new(6);
+			filesystemHandles[filesystem].Add(handle);
+		}
+
+		internal static void Free(ULLogger logger)
+		{
+			if (loggerHandles.ContainsKey(logger))
+			{
+				foreach (GCHandle handle in loggerHandles[logger]) if (handle.IsAllocated) handle.Free();
+				loggerHandles.Remove(logger);
+			}
+		}
+		internal static void Free(ULFileSystem filesystem)
+		{
+			if (filesystemHandles.ContainsKey(filesystem))
+			{
+				foreach (GCHandle handle in filesystemHandles[filesystem]) if (handle.IsAllocated) handle.Free();
+				filesystemHandles.Remove(filesystem);
+			}
+		}
 
 		/// <summary>
 		/// Frees structures passed to methods
 		/// </summary>
+		[Obsolete]
 		public static void Free()
 		{
 

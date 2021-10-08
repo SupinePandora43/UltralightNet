@@ -1,4 +1,3 @@
-// TODO: ALLOCATE ME, TEST ME, FREE ME
 using System;
 using System.Runtime.InteropServices;
 
@@ -45,7 +44,7 @@ namespace UltralightNet
 				unsafe
 				{
 					ULFileSystemFileExistsCallback__PInvoke__ callback = value;
-					ULPlatform.filesystemHandles.Add(this, GCHandle.Alloc(callback, GCHandleType.Normal));
+					ULPlatform.Handle(this, GCHandle.Alloc(callback, GCHandleType.Normal));
 					__FileExists = (delegate* unmanaged[Cdecl]<ULString*, bool>)Marshal.GetFunctionPointerForDelegate(callback);
 				}
 			}
@@ -57,7 +56,7 @@ namespace UltralightNet
 				unsafe
 				{
 					ULFileSystemGetFileSizeCallback callback = value;
-					ULPlatform.filesystemHandles.Add(this, GCHandle.Alloc(callback, GCHandleType.Normal));
+					ULPlatform.Handle(this, GCHandle.Alloc(callback, GCHandleType.Normal));
 					__GetFileSize = (delegate* unmanaged[Cdecl]<int, long*, bool>)Marshal.GetFunctionPointerForDelegate(callback);
 				}
 			}
@@ -69,7 +68,7 @@ namespace UltralightNet
 				unsafe
 				{
 					ULFileSystemGetFileMimeTypeCallback__PInvoke__ callback = value;
-					ULPlatform.filesystemHandles.Add(this, GCHandle.Alloc(callback, GCHandleType.Normal));
+					ULPlatform.Handle(this, GCHandle.Alloc(callback, GCHandleType.Normal));
 					__GetFileMimeType = (delegate* unmanaged[Cdecl]<ULString*, ULString*, bool>)Marshal.GetFunctionPointerForDelegate(callback);
 				}
 			}
@@ -81,7 +80,7 @@ namespace UltralightNet
 				unsafe
 				{
 					ULFileSystemOpenFileCallback__PInvoke__ callback = value;
-					ULPlatform.filesystemHandles.Add(this, GCHandle.Alloc(callback, GCHandleType.Normal));
+					ULPlatform.Handle(this, GCHandle.Alloc(callback, GCHandleType.Normal));
 					__OpenFile = (delegate* unmanaged[Cdecl]<ULString*, bool, int>)Marshal.GetFunctionPointerForDelegate(callback);
 				}
 			}
@@ -93,7 +92,7 @@ namespace UltralightNet
 				unsafe
 				{
 					ULFileSystemCloseFileCallback callback = value;
-					ULPlatform.filesystemHandles.Add(this, GCHandle.Alloc(callback, GCHandleType.Normal));
+					ULPlatform.Handle(this, GCHandle.Alloc(callback, GCHandleType.Normal));
 					__CloseFile = (delegate* unmanaged[Cdecl]<int, void>)Marshal.GetFunctionPointerForDelegate(callback);
 				}
 			}
@@ -105,7 +104,7 @@ namespace UltralightNet
 				unsafe
 				{
 					ULFileSystemReadFromFileCallback__PInvoke__ callback = value;
-					ULPlatform.filesystemHandles.Add(this, GCHandle.Alloc(callback, GCHandleType.Normal));
+					ULPlatform.Handle(this, GCHandle.Alloc(callback, GCHandleType.Normal));
 					__ReadFromFile = (delegate* unmanaged[Cdecl]<int, byte*, long, long>)Marshal.GetFunctionPointerForDelegate(callback);
 				}
 			}
@@ -120,7 +119,7 @@ namespace UltralightNet
 
 		public void Dispose()
 		{
-			// TODO
+			ULPlatform.Free(this);
 		}
 	}
 }
