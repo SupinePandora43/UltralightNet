@@ -71,8 +71,8 @@ namespace UltralightNet
 
 		}
 
-		public static bool SetDefaultLogger = true;
-		public static bool SetDefaultFileSystem = true;
+		public static bool SetDefaultLogger { get; set; } = true;
+		public static bool SetDefaultFileSystem { get; set; } = true;
 
 		private static ULLogger _logger;
 		private static ULFileSystem _filesystem;
