@@ -14,4 +14,7 @@ namespace UltralightNet
 		View caller,
 		string title
 	);
+	public delegate void ULChangeTitleCallbackEvent(
+		string title
+	);
 }

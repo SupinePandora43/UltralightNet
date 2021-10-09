@@ -141,11 +141,10 @@ namespace UltralightNet.Test
 
 			view.URL = "https://github.com/";
 
-			view.SetChangeTitleCallback((user_data, caller, title) =>
+			view.OnChangeTitle += (title) =>
 			{
-				Assert.Equal(view.Ptr, caller.Ptr);
 				Assert.Contains("GitHub", title);
-			});
+			};
 
 			view.SetChangeURLCallback((user_data, caller, url) =>
 			{

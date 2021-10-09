@@ -253,6 +253,26 @@ namespace UltralightNet
 		public void FireScrollEvent(ULScrollEvent scrollEvent) => Methods.ulViewFireScrollEvent(Ptr, ref scrollEvent);
 
 		#region Callbacks
+		private event ULChangeTitleCallbackEvent _OnChangeTitle;
+		public event ULChangeTitleCallbackEvent OnChangeTitle
+		{
+			add
+			{
+				if (_OnChangeTitle.GetInvocationList().Length is 0)
+				{
+					SetChangeTitleCallback((user_data, caller, title) => { _OnChangeTitle?.Invoke(title); });
+				}
+				_OnChangeTitle += value;
+			}
+			remove
+			{
+				_OnChangeTitle -= value;
+				if (_OnChangeTitle.GetInvocationList().Length is 0)
+				{
+					SetChangeTitleCallback(null);
+				}
+			}
+		}
 		public void SetChangeTitleCallback(ULChangeTitleCallback callback, IntPtr userData = default)
 		{
 			if (callback is not null)
