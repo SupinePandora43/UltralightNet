@@ -105,6 +105,8 @@ namespace UltralightNet
 		private static ULGPUDriver _gpudriver;
 		private static ULClipboard _clipboard;
 
+		internal static bool gpudriverSet = false;
+
 		public static ULLogger Logger
 		{
 			get => _logger;
@@ -225,6 +227,28 @@ namespace UltralightNet
 							files.Remove(handle);
 						}
 					};
+
+					if (!(File.Exists("resources/cacert.pem") && File.Exists("resources/icudt67l.dat")))
+					{
+						throw new FileNotFoundException($"cacert.pem or icudt67l.dat not found in resources/ folder");
+					}
+				}
+				else
+				{
+					ULStringGeneratedDllImportMarshaler marshaler1 = new("resources/cacert.pem");
+					ULStringGeneratedDllImportMarshaler marshaler2 = new("resources/icudt67l.dat");
+
+					if (!(_filesystem.__FileExists(marshaler1.Value) && _filesystem.__FileExists(marshaler2.Value)))
+					{
+						marshaler1.FreeNative();
+						marshaler2.FreeNative();
+						throw new FileNotFoundException($"{typeof(ULFileSystem)} doesn't provide cacert.pem or icudt67l.dat from resources/ folder");
+					}
+					else
+					{
+						marshaler1.FreeNative();
+						marshaler2.FreeNative();
+					}
 				}
 			}
 			return new Renderer(config ?? new(), dispose);
