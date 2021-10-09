@@ -141,9 +141,12 @@ namespace UltralightNet.Test
 
 			view.URL = "https://github.com/";
 
+			bool ___eventWorks = false;
+
 			view.OnChangeTitle += (title) =>
 			{
 				Assert.Contains("GitHub", title);
+				___eventWorks = true;
 			};
 
 			view.SetChangeURLCallback((user_data, caller, url) =>
@@ -160,11 +163,12 @@ namespace UltralightNet.Test
 
 			renderer.Render();
 
-			view.SetChangeTitleCallback(null);
+			//view.SetChangeTitleCallback(null);
 			view.SetChangeURLCallback(null);
 
 			Assert.Equal("https://github.com/", view.URL);
 			Assert.Contains("GitHub", view.Title);
+			Assert.True(___eventWorks);
 		}
 
 		private void JSTest()
