@@ -46,6 +46,19 @@ namespace UltralightNet
 			IsDisposed = !dispose;
 		}
 
+		public View CreateView(uint width, uint height, ULViewConfig view_config = default, Session session = default, bool dispose = true)
+		{
+#if DEBUG
+			if (view_config.IsAccelerated && !ULPlatform.gpudriverSet)
+			{
+				Console.WriteLine("UltralightNet: no GPUDriver set, but ULViewConfig.IsAccelerated==true.");
+			}
+#endif
+			return new(Methods.ulCreateView(Ptr, width, height, (view_config is default(ULViewConfig)) ? new ULViewConfig().Ptr : view_config.Ptr, (session is default(Session)) ? DefaultSession.Ptr : session.Ptr), dispose);
+		}
+		public Session CreateSession(bool isPersistent, string name) => new(this, isPersistent, name);
+		public Session DefaultSession => new(Methods.ulDefaultSession(Ptr));
+
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public void Update() => Methods.ulUpdate(Ptr);
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]

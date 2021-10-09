@@ -137,7 +137,8 @@ namespace UltralightNet
 		public static ULClipboard Clipboard
 		{
 			get => _clipboard;
-			set {
+			set
+			{
 				_clipboard = value;
 				Methods.ulPlatformSetClipboard(value);
 			}

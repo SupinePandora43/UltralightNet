@@ -184,11 +184,6 @@ namespace UltralightNet
 			Ptr = ptr;
 			IsDisposed = !dispose;
 		}
-		//public View(Renderer renderer, uint width, uint height, ULViewConfig view_config) : this(renderer, width, height, view_config, Session.DefaultSession(renderer)) {}
-		public View(Renderer renderer, uint width, uint height, ULViewConfig view_config = default, Session session = default)
-		{
-			Ptr = Methods.ulCreateView(renderer.Ptr, width, height, (view_config is default(ULViewConfig)) ? new ULViewConfig().Ptr : view_config.Ptr, (session is default(Session)) ? Session.DefaultSession(renderer).Ptr : session.Ptr);
-		}
 
 		private readonly GCHandle[] handles = new GCHandle[12];
 		private void Handle(int key, GCHandle handle)

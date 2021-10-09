@@ -46,7 +46,7 @@ namespace UltralightNet.Test
 		[Fact]
 		public void TestRenderer()
 		{
-            //return;
+			//return;
 			if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX)) return;
 			AppCoreMethods.ulEnablePlatformFontLoader();
 			AppCoreMethods.ulEnablePlatformFileSystem("./");
@@ -120,13 +120,21 @@ namespace UltralightNet.Test
 
 		private void SessionTest()
 		{
-			Session session = Session.DefaultSession(renderer);
+			Session session = renderer.DefaultSession;
 			Assert.Equal("default", session.Name);
+
+			session = renderer.CreateSession(false, "myses1");
+			Assert.Equal("myses1", session.Name);
+			Assert.False(session.IsPersistent);
+
+			session = renderer.CreateSession(true, "myses2");
+			Assert.Equal("myses2", session.Name);
+			Assert.True(session.IsPersistent);
 		}
 
 		private void GenericTest()
 		{
-			View view = new(renderer, 512, 512, viewConfig, Session.DefaultSession(renderer));
+			View view = renderer.CreateView(512, 512, viewConfig);
 
 			Assert.Equal(512u, view.Width);
 			Assert.Equal(512u, view.Height);
@@ -162,7 +170,7 @@ namespace UltralightNet.Test
 
 		private void JSTest()
 		{
-			View view = new(renderer, 2, 2, viewConfig, Session.DefaultSession(renderer));
+			View view = renderer.CreateView(2, 2, viewConfig);
 			Assert.Equal("3", view.EvaluateScript("1+2", out string exception));
 			Assert.True(string.IsNullOrEmpty(exception));
 			view.Dispose();
@@ -170,14 +178,14 @@ namespace UltralightNet.Test
 
 		private void HTMLTest()
 		{
-			View view = new(renderer, 512, 512, viewConfig, Session.DefaultSession(renderer));
+			View view = renderer.CreateView(512, 512, viewConfig);
 			view.HTML = "<html />";
 			view.Dispose();
 		}
 
 		private void FSTest()
 		{
-			View view = new(renderer, 256, 256, viewConfig, Session.DefaultSession(renderer));
+			View view = renderer.CreateView(256, 256, viewConfig);
 			view.URL = "file:///test.html";
 
 			view.SetAddConsoleMessageCallback((user_data, caller, source, level, message, line_number, column_number, source_id) =>
@@ -210,7 +218,7 @@ namespace UltralightNet.Test
 
 		private void EventTest()
 		{
-			View view = new(renderer, 256, 256, viewConfig, Session.DefaultSession(renderer));
+			View view = renderer.CreateView(256, 256, viewConfig);
 			Console.WriteLine("KeyEvent");
 			view.FireKeyEvent(new(ULKeyEventType.Char, ULKeyEventModifiers.ShiftKey, 0, 0, "A", "A", false, false, false));
 			Console.WriteLine("MouseEvent");
