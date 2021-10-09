@@ -44,6 +44,11 @@ namespace UltralightNet
 			if (!filesystemHandles.ContainsKey(filesystem)) filesystemHandles.Add(filesystem, new(6));
 			filesystemHandles[filesystem].Add(handle);
 		}
+		internal static void Handle(ULGPUDriver gpudriver, GCHandle handle)
+		{
+			if (!gpudriverHandles.ContainsKey(gpudriver)) gpudriverHandles.Add(gpudriver, new(14));
+			gpudriverHandles[gpudriver].Add(handle);
+		}
 
 		internal static void Free(ULLogger logger)
 		{
@@ -59,6 +64,14 @@ namespace UltralightNet
 			{
 				foreach (GCHandle handle in filesystemHandles[filesystem]) if (handle.IsAllocated) handle.Free();
 				filesystemHandles.Remove(filesystem);
+			}
+		}
+		internal static void Free(ULGPUDriver gpudriver)
+		{
+			if (gpudriverHandles.ContainsKey(gpudriver))
+			{
+				foreach (GCHandle handle in gpudriverHandles[gpudriver]) if (handle.IsAllocated) handle.Free();
+				gpudriverHandles.Remove(gpudriver);
 			}
 		}
 
