@@ -258,7 +258,7 @@ namespace UltralightNet
 		{
 			add
 			{
-				if (_OnChangeTitle.GetInvocationList().Length is 0)
+				if (_OnChangeTitle?.GetInvocationList().Length is 0)
 				{
 					SetChangeTitleCallback((user_data, caller, title) => { _OnChangeTitle?.Invoke(title); });
 				}
@@ -267,7 +267,7 @@ namespace UltralightNet
 			remove
 			{
 				_OnChangeTitle -= value;
-				if (_OnChangeTitle.GetInvocationList().Length is 0)
+				if (_OnChangeTitle?.GetInvocationList().Length is 0)
 				{
 					SetChangeTitleCallback(null);
 				}
