@@ -102,6 +102,8 @@ namespace UltralightNet
 
 		private static ULLogger _logger;
 		private static ULFileSystem _filesystem;
+		private static ULGPUDriver _gpudriver;
+		private static ULClipboard _clipboard;
 
 		public static ULLogger Logger
 		{
@@ -119,6 +121,23 @@ namespace UltralightNet
 			{
 				_filesystem = value;
 				Methods.ulPlatformSetFileSystem(value);
+			}
+		}
+		public static ULGPUDriver GPUDriver
+		{
+			get => _gpudriver;
+			set
+			{
+				_gpudriver = value;
+				Methods.ulPlatformSetGPUDriver(value);
+			}
+		}
+		public static ULClipboard Clipboard
+		{
+			get => _clipboard;
+			set {
+				_clipboard = value;
+				Methods.ulPlatformSetClipboard(value);
 			}
 		}
 
