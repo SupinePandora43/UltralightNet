@@ -232,8 +232,8 @@ namespace UltralightNet
 
 		public string EvaluateScript(string js_string, out string exception) => Methods.ulViewEvaluateScript(Ptr, js_string, out exception);
 
-		public bool CanGoBack() => Methods.ulViewCanGoBack(Ptr);
-		public bool CanGoForward() => Methods.ulViewCanGoForward(Ptr);
+		public bool CanGoBack => Methods.ulViewCanGoBack(Ptr);
+		public bool CanGoForward => Methods.ulViewCanGoForward(Ptr);
 
 		public void GoBack() => Methods.ulViewGoBack(Ptr);
 		public void GoForward() => Methods.ulViewGoForward(Ptr);
@@ -244,8 +244,8 @@ namespace UltralightNet
 
 		public void Focus() => Methods.ulViewFocus(Ptr);
 		public void Unfocus() => Methods.ulViewUnfocus(Ptr);
-		public bool HasFocus() => Methods.ulViewHasFocus(Ptr);
-		public bool HasInputFocus() => Methods.ulViewHasInputFocus(Ptr);
+		public bool HasFocus => Methods.ulViewHasFocus(Ptr);
+		public bool HasInputFocus => Methods.ulViewHasInputFocus(Ptr);
 
 		public void FireKeyEvent(ULKeyEvent keyEvent) => Methods.ulViewFireKeyEvent(Ptr, keyEvent.Ptr);
 		public void FireMouseEvent(ULMouseEvent mouseEvent) => Methods.ulViewFireMouseEvent(Ptr, mouseEvent.Ptr);
