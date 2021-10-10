@@ -20,4 +20,10 @@ namespace UltralightNet
 		bool is_popup,
 		ULIntRect popup_rect
 	);
+	public delegate View ULCreateChildViewCallbackEvent(
+		string openerUrl,
+		string targetUrl,
+		bool isPopup,
+		ULIntRect popupRect
+	);
 }

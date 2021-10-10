@@ -11,13 +11,13 @@ namespace UltralightNet.GettingStarted
 		static void Main()
 		{
 			// Set Logger
-			ULPlatform.SetLogger(new ULLogger()
+			ULPlatform.Logger = new()
 			{
 				LogMessage = (level, message) =>
 				{
 					Console.WriteLine($"({level}): {message}");
 				}
-			});
+			};
 
 			// Set Font Loader
 			AppCoreMethods.ulEnablePlatformFontLoader();
@@ -29,19 +29,19 @@ namespace UltralightNet.GettingStarted
 			ULConfig config = new();
 
 			// Create Renderer
-			Renderer renderer = new(config);
+			Renderer renderer = ULPlatform.CreateRenderer(config);
 
 			// Create View
-			View view = new(renderer, 512, 512);
+			View view = renderer.CreateView(512, 512);
 
 			// Load URL
 
 			bool loaded = false;
 
-			view.SetFinishLoadingCallback((user_data, caller, frame_id, is_main_frame, url) =>
+			view.OnFinishLoadingCallback += (frameId, isMainFrame, url) =>
 			{
 				loaded = true;
-			});
+			};
 
 			view.URL = "https://github.com"; // Requires "UltralightNet.Resources"
 

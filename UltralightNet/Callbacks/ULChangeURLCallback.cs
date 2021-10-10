@@ -14,4 +14,7 @@ namespace UltralightNet
 		View caller,
 		string url
 	);
+	public delegate void ULChangeURLCallbackEvent(
+		string url
+	);
 }

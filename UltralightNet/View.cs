@@ -184,11 +184,6 @@ namespace UltralightNet
 			Ptr = ptr;
 			IsDisposed = !dispose;
 		}
-		//public View(Renderer renderer, uint width, uint height, ULViewConfig view_config) : this(renderer, width, height, view_config, Session.DefaultSession(renderer)) {}
-		public View(Renderer renderer, uint width, uint height, ULViewConfig view_config = default, Session session = default)
-		{
-			Ptr = Methods.ulCreateView(renderer.Ptr, width, height, (view_config is default(ULViewConfig)) ? new ULViewConfig().Ptr : view_config.Ptr, (session is default(Session)) ? Session.DefaultSession(renderer).Ptr : session.Ptr);
-		}
 
 		private readonly GCHandle[] handles = new GCHandle[12];
 		private void Handle(int key, GCHandle handle)
@@ -237,8 +232,8 @@ namespace UltralightNet
 
 		public string EvaluateScript(string js_string, out string exception) => Methods.ulViewEvaluateScript(Ptr, js_string, out exception);
 
-		public bool CanGoBack() => Methods.ulViewCanGoBack(Ptr);
-		public bool CanGoForward() => Methods.ulViewCanGoForward(Ptr);
+		public bool CanGoBack => Methods.ulViewCanGoBack(Ptr);
+		public bool CanGoForward => Methods.ulViewCanGoForward(Ptr);
 
 		public void GoBack() => Methods.ulViewGoBack(Ptr);
 		public void GoForward() => Methods.ulViewGoForward(Ptr);
@@ -249,8 +244,8 @@ namespace UltralightNet
 
 		public void Focus() => Methods.ulViewFocus(Ptr);
 		public void Unfocus() => Methods.ulViewUnfocus(Ptr);
-		public bool HasFocus() => Methods.ulViewHasFocus(Ptr);
-		public bool HasInputFocus() => Methods.ulViewHasInputFocus(Ptr);
+		public bool HasFocus => Methods.ulViewHasFocus(Ptr);
+		public bool HasInputFocus => Methods.ulViewHasInputFocus(Ptr);
 
 		public void FireKeyEvent(ULKeyEvent keyEvent) => Methods.ulViewFireKeyEvent(Ptr, keyEvent.Ptr);
 		public void FireMouseEvent(ULMouseEvent mouseEvent) => Methods.ulViewFireMouseEvent(Ptr, mouseEvent.Ptr);
@@ -258,7 +253,298 @@ namespace UltralightNet
 		public void FireScrollEvent(ULScrollEvent scrollEvent) => Methods.ulViewFireScrollEvent(Ptr, ref scrollEvent);
 
 		#region Callbacks
-		public void SetChangeTitleCallback(ULChangeTitleCallback callback, IntPtr userData = default)
+
+		private event ULChangeTitleCallbackEvent _OnChangeTitle;
+		private event ULChangeURLCallbackEvent _OnChangeURL;
+		private event ULChangeTooltipCallbackEvent _OnChangeTooltip;
+		private event ULChangeCursorCallbackEvent _OnChangeCursor;
+		private event ULAddConsoleMessageCallbackEvent _OnAddConsoleMessage;
+		private event ULCreateChildViewCallbackEvent _OnCreateChildView;
+		private event ULBeginLoadingCallbackEvent _OnBeginLoading;
+		private event ULFinishLoadingCallbackEvent _OnFinishLoading;
+		private event ULFailLoadingCallbackEvent _OnFailLoading;
+		private event ULWindowObjectReadyCallbackEvent _OnWindowObjectReady;
+		private event ULDOMReadyCallbackEvent _OnDomReady;
+		private event ULUpdateHistoryCallbackEvent _OnUpdateHistory;
+
+		public event ULChangeTitleCallbackEvent OnChangeTitle
+		{
+			add
+			{
+				if (_OnChangeTitle is null)
+				{
+					_OnChangeTitle += value;
+					SetChangeTitleCallback((user_data, caller, title) => _OnChangeTitle?.Invoke(title));
+				}
+				else
+				{
+					_OnChangeTitle += value;
+				}
+			}
+			remove
+			{
+				_OnChangeTitle -= value;
+				if (_OnChangeTitle is null)
+				{
+					SetChangeTitleCallback(null);
+				}
+			}
+		}
+		public event ULChangeURLCallbackEvent OnChangeURL
+		{
+			add
+			{
+				if (_OnChangeURL is null)
+				{
+					_OnChangeURL += value;
+					SetChangeURLCallback((user_data, caller, url) => _OnChangeURL?.Invoke(url));
+				}
+				else
+				{
+					_OnChangeURL += value;
+				}
+			}
+			remove
+			{
+				_OnChangeURL -= value;
+				if (_OnChangeURL is null)
+				{
+					SetChangeURLCallback(null);
+				}
+			}
+		}
+		public event ULChangeTooltipCallbackEvent OnChangeTooltip
+		{
+			add
+			{
+				if (_OnChangeTooltip is null)
+				{
+					_OnChangeTooltip += value;
+					SetChangeTooltipCallback((user_data, caller, tooltip) => _OnChangeTooltip?.Invoke(tooltip));
+				}
+				else
+				{
+					_OnChangeTooltip += value;
+				}
+			}
+			remove
+			{
+				_OnChangeTooltip -= value;
+				if (_OnChangeTooltip is null)
+				{
+					SetChangeTooltipCallback(null);
+				}
+			}
+		}
+		public event ULChangeCursorCallbackEvent OnChangeCursor
+		{
+			add
+			{
+				if (_OnChangeCursor is null)
+				{
+					_OnChangeCursor += value;
+					SetChangeCursorCallback((user_data, caller, cursor) => _OnChangeCursor?.Invoke(cursor));
+				}
+				else
+				{
+					_OnChangeCursor += value;
+				}
+			}
+			remove
+			{
+				_OnChangeCursor -= value;
+				if (_OnChangeCursor is null)
+				{
+					SetChangeCursorCallback(null);
+				}
+			}
+		}
+		public event ULAddConsoleMessageCallbackEvent OnAddConsoleMessage
+		{
+			add
+			{
+				if (_OnAddConsoleMessage is null)
+				{
+					_OnAddConsoleMessage += value;
+					SetAddConsoleMessageCallback((user_data, caller, source, level, message, line_number, column_number, source_id) => _OnAddConsoleMessage?.Invoke(source, level, message, line_number, column_number, source_id));
+				}
+				else
+				{
+					_OnAddConsoleMessage += value;
+				}
+			}
+			remove
+			{
+				_OnAddConsoleMessage -= value;
+				if (_OnAddConsoleMessage is null)
+				{
+					SetAddConsoleMessageCallback(null);
+				}
+			}
+		}
+		public event ULCreateChildViewCallbackEvent OnCreateChildView
+		{
+			add
+			{
+				if (_OnCreateChildView is null)
+				{
+					_OnCreateChildView += value;
+					SetCreateChildViewCallback((user_data, caller, openerUrl, targetUrl, isPopup, popupRect) => _OnCreateChildView?.Invoke(openerUrl, targetUrl, isPopup, popupRect));
+				}
+				else
+				{
+					_OnCreateChildView += value;
+				}
+			}
+			remove
+			{
+				_OnCreateChildView -= value;
+				if (_OnCreateChildView is null)
+				{
+					SetCreateChildViewCallback(null);
+				}
+			}
+		}
+		public event ULBeginLoadingCallbackEvent OnBeginLoading
+		{
+			add
+			{
+				if (_OnBeginLoading is null)
+				{
+					_OnBeginLoading += value;
+					SetBeginLoadingCallback((user_data, caller, frameId, isMainFrame, url) => _OnBeginLoading?.Invoke(frameId, isMainFrame, url));
+				}
+				else
+				{
+					_OnBeginLoading += value;
+				}
+			}
+			remove
+			{
+				_OnBeginLoading -= value;
+				if (_OnBeginLoading is null)
+				{
+					SetBeginLoadingCallback(null);
+				}
+			}
+		}
+		public event ULFinishLoadingCallbackEvent OnFinishLoading
+		{
+			add
+			{
+				if (_OnFinishLoading is null)
+				{
+					_OnFinishLoading += value;
+					SetFinishLoadingCallback((user_data, caller, frameId, isMainFrame, url) => _OnFinishLoading?.Invoke(frameId, isMainFrame, url));
+				}
+				else
+				{
+					_OnFinishLoading += value;
+				}
+			}
+			remove
+			{
+				_OnFinishLoading -= value;
+				if (_OnFinishLoading is null)
+				{
+					SetFinishLoadingCallback(null);
+				}
+			}
+		}
+		public event ULFailLoadingCallbackEvent OnFailLoading
+		{
+			add
+			{
+				if (_OnFailLoading is null)
+				{
+					_OnFailLoading += value;
+					SetFailLoadingCallback((user_data, caller, frameId, isMainFrame, url, description, errorDomain, errorCode) => _OnFailLoading?.Invoke(frameId, isMainFrame, url, description, errorDomain, errorCode));
+				}
+				else
+				{
+					_OnFailLoading += value;
+				}
+			}
+			remove
+			{
+				_OnFailLoading -= value;
+				if (_OnFailLoading is null)
+				{
+					SetFailLoadingCallback(null);
+				}
+			}
+		}
+		public event ULWindowObjectReadyCallbackEvent OnWindowObjectReady
+		{
+			add
+			{
+				if (_OnWindowObjectReady is null)
+				{
+					_OnWindowObjectReady += value;
+					SetWindowObjectReadyCallback((user_data, caller, frameId, isMainFrame, url) => _OnWindowObjectReady?.Invoke(frameId, isMainFrame, url));
+				}
+				else
+				{
+					_OnWindowObjectReady += value;
+				}
+			}
+			remove
+			{
+				_OnWindowObjectReady -= value;
+				if (_OnWindowObjectReady is null)
+				{
+					SetWindowObjectReadyCallback(null);
+				}
+			}
+		}
+		public event ULDOMReadyCallbackEvent OnDomReady
+		{
+			add
+			{
+				if (_OnDomReady is null)
+				{
+					_OnDomReady += value;
+					SetDOMReadyCallback((user_data, caller, frameId, isMainFrame, url) => _OnDomReady?.Invoke(frameId, isMainFrame, url));
+				}
+				else
+				{
+					_OnDomReady += value;
+				}
+			}
+			remove
+			{
+				_OnDomReady -= value;
+				if (_OnDomReady is null)
+				{
+					SetDOMReadyCallback(null);
+				}
+			}
+		}
+		public event ULUpdateHistoryCallbackEvent OnUpdateHistory
+		{
+			add
+			{
+				if (_OnUpdateHistory is null)
+				{
+					_OnUpdateHistory += value;
+					SetUpdateHistoryCallback((user_data, caller) => _OnUpdateHistory?.Invoke());
+				}
+				else
+				{
+					_OnUpdateHistory += value;
+				}
+			}
+			remove
+			{
+				_OnUpdateHistory -= value;
+				if (_OnUpdateHistory is null)
+				{
+					SetUpdateHistoryCallback(null);
+				}
+			}
+		}
+
+		private void SetChangeTitleCallback(ULChangeTitleCallback callback, IntPtr userData = default)
 		{
 			if (callback is not null)
 			{
@@ -272,7 +558,7 @@ namespace UltralightNet
 				Methods.ulViewSetChangeTitleCallback(Ptr, null, userData);
 			}
 		}
-		public void SetChangeURLCallback(ULChangeURLCallback callback, IntPtr userData = default)
+		private void SetChangeURLCallback(ULChangeURLCallback callback, IntPtr userData = default)
 		{
 			if (callback is not null)
 			{
@@ -286,7 +572,7 @@ namespace UltralightNet
 				Methods.ulViewSetChangeURLCallback(Ptr, null, userData);
 			}
 		}
-		public void SetChangeTooltipCallback(ULChangeTooltipCallback callback, IntPtr userData = default)
+		private void SetChangeTooltipCallback(ULChangeTooltipCallback callback, IntPtr userData = default)
 		{
 			if (callback is not null)
 			{
@@ -300,7 +586,7 @@ namespace UltralightNet
 				Methods.ulViewSetChangeTooltipCallback(Ptr, null, userData);
 			}
 		}
-		public void SetChangeCursorCallback(ULChangeCursorCallback callback, IntPtr userData = default)
+		private void SetChangeCursorCallback(ULChangeCursorCallback callback, IntPtr userData = default)
 		{
 			if (callback is not null)
 			{
@@ -314,7 +600,7 @@ namespace UltralightNet
 				Methods.ulViewSetChangeCursorCallback(Ptr, null, userData);
 			}
 		}
-		public void SetAddConsoleMessageCallback(ULAddConsoleMessageCallback callback, IntPtr userData = default)
+		private void SetAddConsoleMessageCallback(ULAddConsoleMessageCallback callback, IntPtr userData = default)
 		{
 			if (callback is not null)
 			{
@@ -328,7 +614,7 @@ namespace UltralightNet
 				Methods.ulViewSetAddConsoleMessageCallback(Ptr, null, userData);
 			}
 		}
-		public void SetCreateChildViewCallback(ULCreateChildViewCallback callback, IntPtr userData = default)
+		private void SetCreateChildViewCallback(ULCreateChildViewCallback callback, IntPtr userData = default)
 		{
 			if (callback is not null)
 			{
@@ -346,7 +632,7 @@ namespace UltralightNet
 				Methods.ulViewSetCreateChildViewCallback(Ptr, null, userData);
 			}
 		}
-		public void SetBeginLoadingCallback(ULBeginLoadingCallback callback, IntPtr userData = default)
+		private void SetBeginLoadingCallback(ULBeginLoadingCallback callback, IntPtr userData = default)
 		{
 			if (callback is not null)
 			{
@@ -360,7 +646,7 @@ namespace UltralightNet
 				Methods.ulViewSetBeginLoadingCallback(Ptr, null, userData);
 			}
 		}
-		public void SetFinishLoadingCallback(ULFinishLoadingCallback callback, IntPtr userData = default)
+		private void SetFinishLoadingCallback(ULFinishLoadingCallback callback, IntPtr userData = default)
 		{
 			if (callback is not null)
 			{
@@ -374,7 +660,7 @@ namespace UltralightNet
 				Methods.ulViewSetFinishLoadingCallback(Ptr, null, userData);
 			}
 		}
-		public void SetFailLoadingCallback(ULFailLoadingCallback callback, IntPtr userData = default)
+		private void SetFailLoadingCallback(ULFailLoadingCallback callback, IntPtr userData = default)
 		{
 			if (callback is not null)
 			{
@@ -388,7 +674,7 @@ namespace UltralightNet
 				Methods.ulViewSetFailLoadingCallback(Ptr, null, userData);
 			}
 		}
-		public void SetWindowObjectReadyCallback(ULWindowObjectReadyCallback callback, IntPtr userData = default)
+		private void SetWindowObjectReadyCallback(ULWindowObjectReadyCallback callback, IntPtr userData = default)
 		{
 			if (callback is not null)
 			{
@@ -402,7 +688,7 @@ namespace UltralightNet
 				Methods.ulViewSetWindowObjectReadyCallback(Ptr, null, userData);
 			}
 		}
-		public void SetDOMReadyCallback(ULDOMReadyCallback callback, IntPtr userData = default)
+		private void SetDOMReadyCallback(ULDOMReadyCallback callback, IntPtr userData = default)
 		{
 			if (callback is not null)
 			{
@@ -416,7 +702,7 @@ namespace UltralightNet
 				Methods.ulViewSetDOMReadyCallback(Ptr, null, userData);
 			}
 		}
-		public void SetUpdateHistoryCallback(ULUpdateHistoryCallback callback, IntPtr userData = default)
+		private void SetUpdateHistoryCallback(ULUpdateHistoryCallback callback, IntPtr userData = default)
 		{
 			if (callback is not null)
 			{

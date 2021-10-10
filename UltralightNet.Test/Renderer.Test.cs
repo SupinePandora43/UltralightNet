@@ -7,6 +7,7 @@ using System.Text;
 using System.Threading;
 using UltralightNet.AppCore;
 using Xunit;
+using Xunit.Abstractions;
 
 namespace UltralightNet.Test
 {
@@ -45,18 +46,19 @@ namespace UltralightNet.Test
 		[Fact]
 		public void TestRenderer()
 		{
-            return;
+			//return;
 			if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX)) return;
 			AppCoreMethods.ulEnablePlatformFontLoader();
-
-			ULPlatform.SetLogger(new ULLogger()
+			AppCoreMethods.ulEnablePlatformFileSystem("./");
+			ULPlatform.Logger = new ULLogger()
 			{
 				LogMessage = (level, message) =>
 				{
 					Console.WriteLine(message);
 				}
-			});
+			};/*
 			AppCoreMethods.ulEnableDefaultLogger("./ullog.txt");
+			*/
 
 			WebRequest request = WebRequest.CreateHttp("https://raw.githubusercontent.com/SupinePandora43/UltralightNet/gh-pages/index.html");
 			WebResponse response = request.GetResponse();
@@ -68,7 +70,7 @@ namespace UltralightNet.Test
 			ULFileSystemGetFileSizeCallback get_file_size = getFileSize;
 			ULFileSystemGetFileMimeTypeCallback get_file_mime_type = getFileMimeType;
 			ULFileSystemReadFromFileCallback read_from_file = readFromFile;
-			ULPlatform.SetFileSystem(new ULFileSystem()
+			/*ULPlatform.FileSystem = new ULFileSystem()
 			{
 				FileExists = (path) =>
 				{
@@ -89,10 +91,10 @@ namespace UltralightNet.Test
 					 Console.WriteLine($"close_file({handle})");
 				 },
 				ReadFromFile = read_from_file
-			});
+			};*/
 
 			ULConfig config = new();
-			renderer = new(config);
+			renderer = ULPlatform.CreateRenderer(config);
 
 			SessionTest();
 
@@ -118,30 +120,41 @@ namespace UltralightNet.Test
 
 		private void SessionTest()
 		{
-			Session session = Session.DefaultSession(renderer);
+			Session session = renderer.DefaultSession;
 			Assert.Equal("default", session.Name);
+
+			session = renderer.CreateSession(false, "myses1");
+			Assert.Equal("myses1", session.Name);
+			Assert.False(session.IsPersistent);
+
+			session = renderer.CreateSession(true, "myses2");
+			Assert.Equal("myses2", session.Name);
+			Assert.True(session.IsPersistent);
 		}
 
 		private void GenericTest()
 		{
-			View view = new(renderer, 512, 512, viewConfig, Session.DefaultSession(renderer));
+			View view = renderer.CreateView(512, 512, viewConfig);
 
 			Assert.Equal(512u, view.Width);
 			Assert.Equal(512u, view.Height);
 
 			view.URL = "https://github.com/";
 
-			view.SetChangeTitleCallback((user_data, caller, title) =>
-			{
-				Assert.Equal(view.Ptr, caller.Ptr);
-				Assert.Contains("GitHub", title);
-			});
+			bool OnChangeTitle = false;
+			bool OnChangeURL = false;
 
-			view.SetChangeURLCallback((user_data, caller, url) =>
+			view.OnChangeTitle += (title) =>
 			{
-				Assert.Equal(view.Ptr, caller.Ptr);
+				Assert.Contains("GitHub", title);
+				OnChangeTitle = true;
+			};
+
+			view.OnChangeURL += (url) =>
+			{
 				Assert.Equal("https://github.com/", url);
-			});
+				OnChangeURL = true;
+			};
 
 			while (view.URL == "")
 			{
@@ -151,16 +164,15 @@ namespace UltralightNet.Test
 
 			renderer.Render();
 
-			view.SetChangeTitleCallback(null);
-			view.SetChangeURLCallback(null);
-
 			Assert.Equal("https://github.com/", view.URL);
 			Assert.Contains("GitHub", view.Title);
+			Assert.True(OnChangeTitle);
+			Assert.True(OnChangeURL);
 		}
 
 		private void JSTest()
 		{
-			View view = new(renderer, 2, 2, viewConfig, Session.DefaultSession(renderer));
+			View view = renderer.CreateView(2, 2, viewConfig);
 			Assert.Equal("3", view.EvaluateScript("1+2", out string exception));
 			Assert.True(string.IsNullOrEmpty(exception));
 			view.Dispose();
@@ -168,27 +180,27 @@ namespace UltralightNet.Test
 
 		private void HTMLTest()
 		{
-			View view = new(renderer, 512, 512, viewConfig, Session.DefaultSession(renderer));
+			View view = renderer.CreateView(512, 512, viewConfig);
 			view.HTML = "<html />";
 			view.Dispose();
 		}
 
 		private void FSTest()
 		{
-			View view = new(renderer, 256, 256, viewConfig, Session.DefaultSession(renderer));
+			View view = renderer.CreateView(256, 256, viewConfig);
 			view.URL = "file:///test.html";
 
-			view.SetAddConsoleMessageCallback((user_data, caller, source, level, message, line_number, column_number, source_id) =>
+			view.OnAddConsoleMessage += (source, level, message, line_number, column_number, source_id) =>
 			{
 				Console.WriteLine($"{source_id} {level}: {line_number}, {column_number} ({source}) - {message}");
-			});
+			};
 
 			bool loaded = false;
 
-			view.SetFinishLoadingCallback((user_data, caller, frame_id, is_main_frame, url) =>
+			view.OnFinishLoading += (frame_id, is_main_frame, url) =>
 			{
 				loaded = true;
-			});
+			};
 
 			while (!loaded)
 			{
@@ -208,7 +220,7 @@ namespace UltralightNet.Test
 
 		private void EventTest()
 		{
-			View view = new(renderer, 256, 256, viewConfig, Session.DefaultSession(renderer));
+			View view = renderer.CreateView(256, 256, viewConfig);
 			Console.WriteLine("KeyEvent");
 			view.FireKeyEvent(new(ULKeyEventType.Char, ULKeyEventModifiers.ShiftKey, 0, 0, "A", "A", false, false, false));
 			Console.WriteLine("MouseEvent");

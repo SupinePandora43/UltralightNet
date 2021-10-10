@@ -12,4 +12,5 @@ namespace UltralightNet
 		IntPtr user_data,
 		View caller
 	);
+	public delegate void ULUpdateHistoryCallbackEvent();
 }

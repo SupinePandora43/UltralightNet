@@ -54,9 +54,7 @@ namespace UltralightNet
 		/// <remarks>A default, persistent Session is already created for you. You only need to call this if you want to create private, in-memory session or use a separate session for each View.</remarks>
 		/// <param name="is_persistent">Whether or not to store the session on disk.<br/>Persistent sessions will be written to the path set in <see cref="ULConfig.CachePath"/></param>
 		/// <param name="name">A unique name for this session, this will be used to generate a unique disk path for persistent sessions.</param>
-		public Session(Renderer renderer, bool is_persistent, string name) => Ptr = Methods.ulCreateSession(renderer.Ptr, is_persistent, name);
-		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		public static Session DefaultSession(Renderer renderer) => new(Methods.ulDefaultSession(renderer.Ptr));
+		internal Session(Renderer renderer, bool is_persistent, string name) => Ptr = Methods.ulCreateSession(renderer.Ptr, is_persistent, name);
 
 		/// <summary>Whether or not this session is written to disk.</summary>
 		public bool IsPersistent => Methods.ulSessionIsPersistent(Ptr);
