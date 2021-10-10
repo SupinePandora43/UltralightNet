@@ -42,7 +42,7 @@ namespace UltralightNet
 		public int y;
 		public Button button;
 	}
-
+	[BlittableType]
 	internal ref struct ULMouseEventNative
 	{
 		public ULMouseEventNative(ULMouseEvent evt)
