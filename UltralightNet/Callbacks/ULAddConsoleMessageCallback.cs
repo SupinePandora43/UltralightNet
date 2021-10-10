@@ -24,4 +24,12 @@ namespace UltralightNet
 		uint column_number,
 		string source_id
 	);
+	public delegate void ULAddConsoleMessageCallbackEvent(
+		ULMessageSource source,
+		ULMessageLevel level,
+		string message,
+		uint line_number,
+		uint column_number,
+		string source_id
+	);
 }

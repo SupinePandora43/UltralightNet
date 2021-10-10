@@ -24,4 +24,12 @@ namespace UltralightNet
 		string error_domain,
 		int error_code
 	);
+	public delegate void ULFailLoadingCallbackEvent(
+		ulong frameId,
+		bool isMainFrame,
+		string url,
+		string description,
+		string errorDomain,
+		int errorCode
+	);
 }

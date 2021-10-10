@@ -38,10 +38,10 @@ namespace UltralightNet.GettingStarted
 
 			bool loaded = false;
 
-			view.SetFinishLoadingCallback((user_data, caller, frame_id, is_main_frame, url) =>
+			view.OnFinishLoadingCallback += (frameId, isMainFrame, url) =>
 			{
 				loaded = true;
-			});
+			};
 
 			view.URL = "https://github.com"; // Requires "UltralightNet.Resources"
 

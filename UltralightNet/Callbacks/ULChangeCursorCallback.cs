@@ -14,4 +14,7 @@ namespace UltralightNet
 		View caller,
 		ULCursor cursor
 	);
+	public delegate void ULChangeCursorCallbackEvent(
+		ULCursor cursor
+	);
 }

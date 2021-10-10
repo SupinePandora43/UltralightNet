@@ -141,19 +141,20 @@ namespace UltralightNet.Test
 
 			view.URL = "https://github.com/";
 
-			bool ___eventWorks = false;
+			bool OnChangeTitle = false;
+			bool OnChangeURL = false;
 
 			view.OnChangeTitle += (title) =>
 			{
 				Assert.Contains("GitHub", title);
-				___eventWorks = true;
+				OnChangeTitle = true;
 			};
 
-			view.SetChangeURLCallback((user_data, caller, url) =>
+			view.OnChangeURL += (url) =>
 			{
-				Assert.Equal(view.Ptr, caller.Ptr);
 				Assert.Equal("https://github.com/", url);
-			});
+				OnChangeURL = true;
+			};
 
 			while (view.URL == "")
 			{
@@ -163,12 +164,10 @@ namespace UltralightNet.Test
 
 			renderer.Render();
 
-			//view.SetChangeTitleCallback(null);
-			view.SetChangeURLCallback(null);
-
 			Assert.Equal("https://github.com/", view.URL);
 			Assert.Contains("GitHub", view.Title);
-			Assert.True(___eventWorks);
+			Assert.True(OnChangeTitle);
+			Assert.True(OnChangeURL);
 		}
 
 		private void JSTest()
@@ -191,17 +190,17 @@ namespace UltralightNet.Test
 			View view = renderer.CreateView(256, 256, viewConfig);
 			view.URL = "file:///test.html";
 
-			view.SetAddConsoleMessageCallback((user_data, caller, source, level, message, line_number, column_number, source_id) =>
+			view.OnAddConsoleMessage += (source, level, message, line_number, column_number, source_id) =>
 			{
 				Console.WriteLine($"{source_id} {level}: {line_number}, {column_number} ({source}) - {message}");
-			});
+			};
 
 			bool loaded = false;
 
-			view.SetFinishLoadingCallback((user_data, caller, frame_id, is_main_frame, url) =>
+			view.OnFinishLoading += (frame_id, is_main_frame, url) =>
 			{
 				loaded = true;
-			});
+			};
 
 			while (!loaded)
 			{

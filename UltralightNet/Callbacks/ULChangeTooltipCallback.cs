@@ -14,4 +14,7 @@ namespace UltralightNet
 		View caller,
 		string tooltip
 	);
+	public delegate void ULChangeTooltipCallbackEvent(
+		string tooltip
+	);
 }

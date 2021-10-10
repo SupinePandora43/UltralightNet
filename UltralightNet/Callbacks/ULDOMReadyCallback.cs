@@ -18,4 +18,9 @@ namespace UltralightNet
 		bool is_main_frame,
 		string url
 	);
+	public delegate void ULDOMReadyCallbackEvent(
+		ulong frameId,
+		bool isMainFrame,
+		string url
+	);
 }
