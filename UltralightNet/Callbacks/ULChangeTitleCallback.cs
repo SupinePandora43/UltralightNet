@@ -4,10 +4,10 @@ using System.Runtime.InteropServices;
 namespace UltralightNet
 {
 	[UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-	public delegate void ULChangeTitleCallback__PInvoke__(
+	public unsafe delegate void ULChangeTitleCallback__PInvoke__(
 		IntPtr user_data,
 		IntPtr caller,
-		IntPtr title
+		ULString* title
 	);
 	public delegate void ULChangeTitleCallback(
 		IntPtr user_data,

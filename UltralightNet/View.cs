@@ -174,7 +174,7 @@ namespace UltralightNet
 		// to be continued https://github.com/ultralight-ux/Ultralight-API/blob/7f9de24ca1c7ec8b385e895c4899b9d96626da58/Ultralight/CAPI.h#L854
 	}
 
-	public class View : IDisposable
+	public unsafe class View : IDisposable
 	{
 		public IntPtr Ptr { get; private set; }
 		public bool IsDisposed { get; private set; }
@@ -549,7 +549,7 @@ namespace UltralightNet
 		{
 			if (callback is not null)
 			{
-				ULChangeTitleCallback__PInvoke__ callback__PInvoke__ = (user_data, caller, title) => callback(user_data, new View(caller), ULStringMarshaler.NativeToManaged(title));
+				ULChangeTitleCallback__PInvoke__ callback__PInvoke__ = (user_data, caller, title) => callback(user_data, new View(caller), ULString.NativeToManaged(title));
 				Handle(0, GCHandle.Alloc(callback__PInvoke__, GCHandleType.Normal));
 				Methods.ulViewSetChangeTitleCallback(Ptr, callback__PInvoke__, userData);
 			}
@@ -563,7 +563,7 @@ namespace UltralightNet
 		{
 			if (callback is not null)
 			{
-				ULChangeURLCallback__PInvoke__ callback__PInvoke__ = (user_data, caller, url) => callback(user_data, new View(caller), ULStringMarshaler.NativeToManaged(url));
+				ULChangeURLCallback__PInvoke__ callback__PInvoke__ = (user_data, caller, url) => callback(user_data, new View(caller), ULString.NativeToManaged(url));
 				Handle(1, GCHandle.Alloc(callback__PInvoke__, GCHandleType.Normal));
 				Methods.ulViewSetChangeURLCallback(Ptr, callback__PInvoke__, userData);
 			}
@@ -577,7 +577,7 @@ namespace UltralightNet
 		{
 			if (callback is not null)
 			{
-				ULChangeTooltipCallback__PInvoke__ callback__PInvoke__ = (user_data, caller, tooltip) => callback(user_data, new View(caller), ULStringMarshaler.NativeToManaged(tooltip));
+				ULChangeTooltipCallback__PInvoke__ callback__PInvoke__ = (user_data, caller, tooltip) => callback(user_data, new View(caller), ULString.NativeToManaged(tooltip));
 				Handle(2, GCHandle.Alloc(callback__PInvoke__, GCHandleType.Normal));
 				Methods.ulViewSetChangeTooltipCallback(Ptr, callback__PInvoke__, userData);
 			}
@@ -605,7 +605,7 @@ namespace UltralightNet
 		{
 			if (callback is not null)
 			{
-				ULAddConsoleMessageCallback__PInvoke__ callback__PInvoke__ = (user_data, caller, source, level, message, line_number, column_number, source_id) => callback(user_data, new View(caller), source, level, ULStringMarshaler.NativeToManaged(message), line_number, column_number, ULStringMarshaler.NativeToManaged(source_id));
+				ULAddConsoleMessageCallback__PInvoke__ callback__PInvoke__ = (user_data, caller, source, level, message, line_number, column_number, source_id) => callback(user_data, new View(caller), source, level, ULString.NativeToManaged(message), line_number, column_number, ULString.NativeToManaged(source_id));
 				Handle(4, GCHandle.Alloc(callback__PInvoke__, GCHandleType.Normal));
 				Methods.ulViewSetAddConsoleMessageCallback(Ptr, callback__PInvoke__, userData);
 			}
@@ -621,7 +621,7 @@ namespace UltralightNet
 			{
 				ULCreateChildViewCallback__PInvoke__ callback__PInvoke__ = (user_data, caller, opener_url, target_url, is_popup, popup_rect) =>
 				{
-					View view = callback(user_data, new View(caller), ULStringMarshaler.NativeToManaged(opener_url), ULStringMarshaler.NativeToManaged(target_url), is_popup != 0, popup_rect);
+					View view = callback(user_data, new View(caller), ULString.NativeToManaged(opener_url), ULString.NativeToManaged(target_url), is_popup != 0, popup_rect);
 					return view is null ? IntPtr.Zero : view.Ptr;
 				};
 				Handle(5, GCHandle.Alloc(callback__PInvoke__, GCHandleType.Normal));
@@ -637,7 +637,7 @@ namespace UltralightNet
 		{
 			if (callback is not null)
 			{
-				ULBeginLoadingCallback__PInvoke__ callback__PInvoke__ = (user_data, caller, frame_id, is_main_frame, url) => callback(user_data, new View(caller), frame_id, is_main_frame != 0, ULStringMarshaler.NativeToManaged(url));
+				ULBeginLoadingCallback__PInvoke__ callback__PInvoke__ = (user_data, caller, frame_id, is_main_frame, url) => callback(user_data, new View(caller), frame_id, is_main_frame != 0, ULString.NativeToManaged(url));
 				Handle(6, GCHandle.Alloc(callback__PInvoke__, GCHandleType.Normal));
 				Methods.ulViewSetBeginLoadingCallback(Ptr, callback__PInvoke__, userData);
 			}
@@ -651,7 +651,7 @@ namespace UltralightNet
 		{
 			if (callback is not null)
 			{
-				ULFinishLoadingCallback__PInvoke__ callback__PInvoke__ = (user_data, caller, frame_id, is_main_frame, url) => callback(user_data, new View(caller), frame_id, is_main_frame != 0, ULStringMarshaler.NativeToManaged(url));
+				ULFinishLoadingCallback__PInvoke__ callback__PInvoke__ = (user_data, caller, frame_id, is_main_frame, url) => callback(user_data, new View(caller), frame_id, is_main_frame != 0, ULString.NativeToManaged(url));
 				Handle(7, GCHandle.Alloc(callback__PInvoke__, GCHandleType.Normal));
 				Methods.ulViewSetFinishLoadingCallback(Ptr, callback__PInvoke__, userData);
 			}
@@ -665,7 +665,7 @@ namespace UltralightNet
 		{
 			if (callback is not null)
 			{
-				ULFailLoadingCallback__PInvoke__ callback__PInvoke__ = (user_data, caller, frame_id, is_main_frame, url, description, error_domain, error_code) => callback(user_data, new View(caller), frame_id, is_main_frame != 0, ULStringMarshaler.NativeToManaged(url), ULStringMarshaler.NativeToManaged(description), ULStringMarshaler.NativeToManaged(error_domain), error_code);
+				ULFailLoadingCallback__PInvoke__ callback__PInvoke__ = (user_data, caller, frame_id, is_main_frame, url, description, error_domain, error_code) => callback(user_data, new View(caller), frame_id, is_main_frame != 0, ULString.NativeToManaged(url), ULString.NativeToManaged(description), ULString.NativeToManaged(error_domain), error_code);
 				Handle(8, GCHandle.Alloc(callback__PInvoke__, GCHandleType.Normal));
 				Methods.ulViewSetFailLoadingCallback(Ptr, callback__PInvoke__, userData);
 			}
@@ -679,7 +679,7 @@ namespace UltralightNet
 		{
 			if (callback is not null)
 			{
-				ULWindowObjectReadyCallback__PInvoke__ callback__PInvoke__ = (user_data, caller, frame_id, is_main_frame, url) => callback(user_data, new View(caller), frame_id, is_main_frame != 0, ULStringMarshaler.NativeToManaged(url));
+				ULWindowObjectReadyCallback__PInvoke__ callback__PInvoke__ = (user_data, caller, frame_id, is_main_frame, url) => callback(user_data, new View(caller), frame_id, is_main_frame != 0, ULString.NativeToManaged(url));
 				Handle(9, GCHandle.Alloc(callback__PInvoke__, GCHandleType.Normal));
 				Methods.ulViewSetWindowObjectReadyCallback(Ptr, callback__PInvoke__, userData);
 			}
@@ -693,7 +693,7 @@ namespace UltralightNet
 		{
 			if (callback is not null)
 			{
-				ULDOMReadyCallback__PInvoke__ callback__PInvoke__ = (user_data, caller, frame_id, is_main_frame, url) => callback(user_data, new View(caller), frame_id, is_main_frame != 0, ULStringMarshaler.NativeToManaged(url));
+				ULDOMReadyCallback__PInvoke__ callback__PInvoke__ = (user_data, caller, frame_id, is_main_frame, url) => callback(user_data, new View(caller), frame_id, is_main_frame != 0, ULString.NativeToManaged(url));
 				Handle(10, GCHandle.Alloc(callback__PInvoke__, GCHandleType.Normal));
 				Methods.ulViewSetDOMReadyCallback(Ptr, callback__PInvoke__, userData);
 			}
