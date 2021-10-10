@@ -32,7 +32,7 @@ namespace UltralightNet.GettingStarted
 			Renderer renderer = ULPlatform.CreateRenderer(config);
 
 			// Create View
-			View view = new(renderer, 512, 512);
+			View view = renderer.CreateView(512, 512);
 
 			// Load URL
 
