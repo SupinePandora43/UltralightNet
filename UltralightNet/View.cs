@@ -119,11 +119,11 @@ namespace UltralightNet
 		[DllImport("Ultralight")]
 		public static extern void ulViewFireKeyEvent(IntPtr view, IntPtr key_event);
 
-		[DllImport("Ultralight")]
-		public static extern void ulViewFireMouseEvent(IntPtr view, IntPtr mouse_event);
+		[GeneratedDllImport("Ultralight")]
+		public static partial void ulViewFireMouseEvent(IntPtr view, ref ULMouseEvent mouseEvent);
 
 		[GeneratedDllImport("Ultralight")]
-		public static partial void ulViewFireScrollEvent(IntPtr view, ref ULScrollEvent scroll_event);
+		public static partial void ulViewFireScrollEvent(IntPtr view, ref ULScrollEvent scrollEvent);
 
 		[DllImport("Ultralight")]
 		public static extern void ulViewSetChangeTitleCallback(IntPtr view, ULChangeTitleCallback__PInvoke__ callback, IntPtr user_data);
@@ -248,7 +248,8 @@ namespace UltralightNet
 		public bool HasInputFocus => Methods.ulViewHasInputFocus(Ptr);
 
 		public void FireKeyEvent(ULKeyEvent keyEvent) => Methods.ulViewFireKeyEvent(Ptr, keyEvent.Ptr);
-		public void FireMouseEvent(ULMouseEvent mouseEvent) => Methods.ulViewFireMouseEvent(Ptr, mouseEvent.Ptr);
+		public void FireMouseEvent(ref ULMouseEvent mouseEvent) => Methods.ulViewFireMouseEvent(Ptr, ref mouseEvent);
+		public void FireMouseEvent(ULMouseEvent mouseEvent) => Methods.ulViewFireMouseEvent(Ptr, ref mouseEvent);
 		public void FireScrollEvent(ref ULScrollEvent scrollEvent) => Methods.ulViewFireScrollEvent(Ptr, ref scrollEvent);
 		public void FireScrollEvent(ULScrollEvent scrollEvent) => Methods.ulViewFireScrollEvent(Ptr, ref scrollEvent);
 
@@ -749,25 +750,5 @@ namespace UltralightNet
 			return a.Ptr == b.Ptr;
 		}
 #nullable restore
-
-		/// <summary>
-		/// literally creates <see cref="View"/> from <see cref="IntPtr"/> and back, pls don't use
-		/// </summary>
-		public class Marshaler : ICustomMarshaler
-		{
-			private static readonly Marshaler instance = new();
-
-			public static ICustomMarshaler GetInstance(string _) => instance;
-
-			public void CleanUpManagedData(object ManagedObj) { }
-
-			public void CleanUpNativeData(IntPtr pNativeData) { }
-
-			public int GetNativeDataSize() => 1;
-
-			public IntPtr MarshalManagedToNative(object ManagedObj) => ((View)ManagedObj).Ptr;
-
-			public object MarshalNativeToManaged(IntPtr pNativeData) => new View(pNativeData);
-		}
 	}
 }

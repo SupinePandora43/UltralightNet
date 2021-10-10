@@ -14,7 +14,8 @@ namespace UltralightNet
 	/// <summary>
 	/// Mouse Event
 	/// </summary>
-	public class ULMouseEvent : IDisposable
+	[NativeMarshalling(typeof(ULMouseEventNative))]
+	public ref struct ULMouseEvent
 	{
 		/// <summary>
 		/// Type of event
@@ -32,30 +33,31 @@ namespace UltralightNet
 		{
 			None,
 			Left,
-			/// <summary>
-			/// Probably a click on mouse wheel
-			/// </summary>
 			Middle,
 			Right
 		}
 
-		public readonly IntPtr Ptr;
-		public bool IsDisposed { get; private set; }
+		public ULMouseEventType type;
+		public int x;
+		public int y;
+		public Button button;
+	}
 
-		public ULMouseEvent(ULMouseEventType type, int x, int y, Button button)
+	internal ref struct ULMouseEventNative
+	{
+		public ULMouseEventNative(ULMouseEvent evt)
 		{
-			Ptr = Methods.ulCreateMouseEvent(type, x, y, button);
+			type = (int)evt.type;
+			x = evt.x;
+			y = evt.y;
+			button = (int)evt.button;
 		}
 
-		~ULMouseEvent() => Dispose();
+		public int type;
+		public int x;
+		public int y;
+		public int button;
 
-		public void Dispose()
-		{
-			if (IsDisposed) return;
-			Methods.ulDestroyMouseEvent(Ptr);
-
-			IsDisposed = true;
-			GC.SuppressFinalize(this);
-		}
+		public ULMouseEvent ToManaged() => new() { type = (ULMouseEvent.ULMouseEventType)type, x = x, y = y, button = (ULMouseEvent.Button)button };
 	}
 }
