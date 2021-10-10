@@ -120,10 +120,10 @@ namespace UltralightNet
 		public static extern void ulViewFireKeyEvent(IntPtr view, IntPtr key_event);
 
 		[GeneratedDllImport("Ultralight")]
-		public static partial void ulViewFireMouseEvent(IntPtr view, ref ULMouseEvent mouseEvent);
+		public static partial void ulViewFireMouseEvent(IntPtr view, in ULMouseEvent mouseEvent);
 
 		[GeneratedDllImport("Ultralight")]
-		public static partial void ulViewFireScrollEvent(IntPtr view, ref ULScrollEvent scrollEvent);
+		public static partial void ulViewFireScrollEvent(IntPtr view, in ULScrollEvent scrollEvent);
 
 		[DllImport("Ultralight")]
 		public static extern void ulViewSetChangeTitleCallback(IntPtr view, ULChangeTitleCallback__PInvoke__ callback, IntPtr user_data);
@@ -248,10 +248,10 @@ namespace UltralightNet
 		public bool HasInputFocus => Methods.ulViewHasInputFocus(Ptr);
 
 		public void FireKeyEvent(ULKeyEvent keyEvent) => Methods.ulViewFireKeyEvent(Ptr, keyEvent.Ptr);
-		public void FireMouseEvent(ref ULMouseEvent mouseEvent) => Methods.ulViewFireMouseEvent(Ptr, ref mouseEvent);
-		public void FireMouseEvent(ULMouseEvent mouseEvent) => Methods.ulViewFireMouseEvent(Ptr, ref mouseEvent);
-		public void FireScrollEvent(ref ULScrollEvent scrollEvent) => Methods.ulViewFireScrollEvent(Ptr, ref scrollEvent);
-		public void FireScrollEvent(ULScrollEvent scrollEvent) => Methods.ulViewFireScrollEvent(Ptr, ref scrollEvent);
+		public void FireMouseEvent(ref ULMouseEvent mouseEvent) => Methods.ulViewFireMouseEvent(Ptr, in mouseEvent);
+		public void FireMouseEvent(ULMouseEvent mouseEvent) => Methods.ulViewFireMouseEvent(Ptr, in mouseEvent);
+		public void FireScrollEvent(ref ULScrollEvent scrollEvent) => Methods.ulViewFireScrollEvent(Ptr, in scrollEvent);
+		public void FireScrollEvent(ULScrollEvent scrollEvent) => Methods.ulViewFireScrollEvent(Ptr, in scrollEvent);
 
 		#region Callbacks
 
