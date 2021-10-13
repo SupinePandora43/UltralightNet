@@ -7,6 +7,17 @@ namespace UltralightNet.Test
 	{
 		private ULConfig config = new();
 
+		public ULConfigTest()
+		{
+			ULStringGeneratedDllImportMarshaler m = new("test");
+			unsafe
+			{
+				ULString* s = m.Value;
+
+				Assert.Equal("test", new((char*)s->data, 0, (int)s->length));
+			}
+		}
+
 		[Fact]
 		public void CachePathTest()
 		{
