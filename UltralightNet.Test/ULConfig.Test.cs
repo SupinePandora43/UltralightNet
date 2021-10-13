@@ -7,29 +7,37 @@ namespace UltralightNet.Test
 	{
 		private ULConfig config = new();
 
-		[Fact]
-		public void STRINGTEST()
+		private static void ulConfigSetCachePath(IntPtr config, in string cache_path)
 		{
-			ULStringGeneratedDllImportMarshaler m = new("test");
 			unsafe
 			{
-				ULString* s = m.Value;
-				Assert.True(s is not null);
-				Assert.NotEqual(IntPtr.Zero, (IntPtr)s);
-				Assert.NotEqual(IntPtr.Zero, (IntPtr)s->data);
-				Assert.Equal('t', ((char*)s->data)[0]);
-				Assert.Equal('e', ((char*)s->data)[1]);
-				Assert.Equal('s', ((char*)s->data)[2]);
-				Assert.Equal('t', ((char*)s->data)[3]);
-				Assert.Equal(4, (int)s->length);
-				Assert.Equal("test", new((char*)s->data, 0, (int)s->length));
+				global::UltralightNet.ULString __cache_path_gen = default;
+				global::UltralightNet.ULString* __cache_path_gen_native = default;
+				//
+				// Pin
+				//
+				fixed(char* __cache_path_gen_native_pinned = cache_path)
+				{
+					__cache_path_gen = new ULString() { data = (ushort*)__cache_path_gen_native_pinned, length = (nuint)cache_path.Length };
+					__cache_path_gen_native = &__cache_path_gen;
+					//
+					// Invoke
+					//
+					ulConfigSetCachePath__PInvoke__(config, __cache_path_gen_native);
+				}
 			}
 		}
+
+		[System.Runtime.InteropServices.DllImportAttribute("Ultralight", EntryPoint = "ulConfigSetCachePath")]
+		extern private static unsafe void ulConfigSetCachePath__PInvoke__(global::System.IntPtr config, global::UltralightNet.ULString* cache_path);
 
 		[Fact]
 		public void CachePathTest()
 		{
 			config.CachePath = "./cache";
+
+			ulConfigSetCachePath(config.Ptr, "./cache");
+
 			Assert.Equal("./cache", config.CachePath);
 		}
 		[Fact]
