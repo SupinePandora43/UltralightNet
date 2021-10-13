@@ -113,42 +113,6 @@ namespace UltralightNet
 
 		}
 	}
-	public struct ULStringGeneratedDllImportMarshaler123
-	{
-		public string managedString;
-
-		public ULStringGeneratedDllImportMarshaler123(string str)
-		{
-			managedString = str;
-		}
-
-		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		public string ToManaged()
-		{
-			return managedString;
-		}
-
-		public unsafe ULString Value
-		{
-			[MethodImpl(MethodImplOptions.AggressiveInlining)]
-			get
-			{
-				fixed (char* fixedStringPtr = managedString)
-				{
-					ULString ulString = new()
-					{
-						data = (ushort*)fixedStringPtr,
-						length = (nuint)managedString.Length
-					};
-					return ulString;
-				}
-
-			}
-
-			[MethodImpl(MethodImplOptions.AggressiveInlining)]
-			set => managedString = new((char*)value.data, 0, (int)value.length);
-		}
-	}
 
 	[BlittableType]
 	[StructLayout(LayoutKind.Sequential)]
