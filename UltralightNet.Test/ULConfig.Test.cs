@@ -7,13 +7,17 @@ namespace UltralightNet.Test
 	{
 		private ULConfig config = new();
 
-		public ULConfigTest()
+		[Fact]
+		public void STRINGTEST()
 		{
 			ULStringGeneratedDllImportMarshaler m = new("test");
 			unsafe
 			{
 				ULString* s = m.Value;
-
+				Assert.True(s is not null);
+				Assert.NotEqual(IntPtr.Zero, (IntPtr)s);
+				Assert.NotEqual(IntPtr.Zero, (IntPtr)s->data);
+				Assert.Equal(4, (int)s->length);
 				Assert.Equal("test", new((char*)s->data, 0, (int)s->length));
 			}
 		}
