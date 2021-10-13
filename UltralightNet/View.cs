@@ -56,6 +56,11 @@ namespace UltralightNet
 		[return: MarshalUsing(typeof(ULStringGeneratedDllImportMarshaler))]
 		public static partial string ulViewEvaluateScript(IntPtr view, [MarshalUsing(typeof(ULStringGeneratedDllImportMarshaler))] string js_string, [MarshalUsing(typeof(ULStringGeneratedDllImportMarshaler))] out string exception);
 
+		[GeneratedDllImport("Ultralight")]
+		[return: MarshalUsing(typeof(ULStringGeneratedDllImportMarshaler123))]
+		public static partial ref string ulViewEvaluateScript123(IntPtr view, [MarshalUsing(typeof(ULStringGeneratedDllImportMarshaler123))] in string js_string, [MarshalUsing(typeof(ULStringGeneratedDllImportMarshaler123))] out string exception);
+
+
 		/// <summary>Check if can navigate backwards in history.</summary>
 		[GeneratedDllImport("Ultralight")]
 		[return: MarshalAs(UnmanagedType.I1)]
