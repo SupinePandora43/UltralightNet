@@ -77,7 +77,7 @@ namespace UltralightNet
 
 		public ULStringGeneratedDllImportMarshaler(string str)
 		{
-			managedString = str ?? string.Empty;
+			managedString = str;
 		}
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
