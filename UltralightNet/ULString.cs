@@ -73,28 +73,17 @@ namespace UltralightNet
 
 	public struct ULStringGeneratedDllImportMarshaler
 	{
-		public ULString ptr;
+		public string managedString;
 
 		public ULStringGeneratedDllImportMarshaler(string str)
 		{
-			unsafe
-			{
-				ptr = new()
-				{
-					data = (ushort*)Marshal.StringToHGlobalUni(str),
-					length = (nuint)str.Length
-				};
-			}
+			managedString = str ?? string.Empty;
 		}
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public string ToManaged()
 		{
-			unsafe
-			{
-				//return Marshal.PtrToStringUni((IntPtr)ptr.data, (int)ptr.length);
-				return new((char*)ptr.data, 0, (int)ptr.length);
-			}
+			return managedString;
 		}
 
 		public unsafe ULString* Value
@@ -102,21 +91,26 @@ namespace UltralightNet
 			[MethodImpl(MethodImplOptions.AggressiveInlining)]
 			get
 			{
-				fixed (ULString* valuePtr = &ptr)
-					return valuePtr;
+				fixed (char* fixedStringPtr = managedString)
+				{
+					ULString ulString = new()
+					{
+						data = (ushort*)fixedStringPtr,
+						length = (nuint)managedString.Length
+					};
+					return &ulString;
+				}
+
 			}
 
 			[MethodImpl(MethodImplOptions.AggressiveInlining)]
-			set => ptr = *value;
+			set => managedString = new((char*)value->data, 0, (int)value->length);
 		}
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public void FreeNative()
 		{
-			unsafe
-			{
-				Marshal.FreeHGlobal((IntPtr)ptr.data);
-			}
+
 		}
 	}
 
