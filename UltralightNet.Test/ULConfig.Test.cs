@@ -17,6 +17,10 @@ namespace UltralightNet.Test
 				Assert.True(s is not null);
 				Assert.NotEqual(IntPtr.Zero, (IntPtr)s);
 				Assert.NotEqual(IntPtr.Zero, (IntPtr)s->data);
+				Assert.Equal('t', ((char*)s->data)[0]);
+				Assert.Equal('e', ((char*)s->data)[1]);
+				Assert.Equal('s', ((char*)s->data)[2]);
+				Assert.Equal('t', ((char*)s->data)[3]);
 				Assert.Equal(4, (int)s->length);
 				Assert.Equal("test", new((char*)s->data, 0, (int)s->length));
 			}
