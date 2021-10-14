@@ -33,9 +33,9 @@ NOTE: At that time, ultralight doesn't support arm. (eg. Android phones or macs 
 
 ## Supported frameworks
 
-.Net >= 5.0
-.Net Framework >= 4.5
-.Net Standard >= 2.0
+* .Net >= `5.0`
+* .Net Framework >= `4.5`
+* .Net Standard >= `2.0`
 
 ## UltralightSharp
 
