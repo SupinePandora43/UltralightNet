@@ -4,25 +4,42 @@ using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Running;
 using System;
 using System.Runtime.InteropServices;
+using System.Threading;
 using UltralightNet;
 
 namespace Benchmarks
 {
-    public class Program
-    {
-        static void Main()
-        {
+	public class Program
+	{
+		static void Main()
+		{
 			BenchmarkRunner.Run<MyBenchmark>();
 			//BenchmarkSwitcher.FromAssembly(typeof(Program).Assembly).Run(null, new DebugInProcessConfig());
 		}
 	}
 	public unsafe class MyBenchmark
 	{
+		Renderer renderer;
 		View view;
 
 		public MyBenchmark()
 		{
-			view = ULPlatform.CreateRenderer().CreateView(512, 512);
+			renderer = ULPlatform.CreateRenderer();
+			view = renderer.CreateView(512, 512);
+
+			bool loaded = false;
+
+			view.OnFinishLoading += (_, _, _) => loaded = true;
+
+			view.URL = "https://github.com";
+
+			while (!loaded)
+			{
+				renderer.Update();
+				Thread.Sleep(100);
+			}
+
+			renderer.Render();
 		}
 
 		[Benchmark]
@@ -37,6 +54,12 @@ namespace Benchmarks
 		{
 			ULScrollEvent @event = new() { type = ULScrollEvent.ScrollType.ByPixel, deltaX = 0, deltaY = 0 };
 			view.FireScrollEventWithoutIn(@event);
+		}
+
+		~MyBenchmark()
+		{
+			view.Dispose();
+			renderer.Dispose();
 		}
 	}
 }
