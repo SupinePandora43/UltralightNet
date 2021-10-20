@@ -12,8 +12,8 @@ namespace Benchmarks
     {
         static void Main()
         {
-			BenchmarkRunner.Run<MyBenchmark>();
-			//BenchmarkSwitcher.FromAssembly(typeof(Program).Assembly).Run(args, new DebugInProcessConfig());
+			//BenchmarkRunner.Run<MyBenchmark>();
+			BenchmarkSwitcher.FromAssembly(typeof(Program).Assembly).Run(null, new DebugInProcessConfig());
 		}
 	}
 	public unsafe class MyBenchmark
