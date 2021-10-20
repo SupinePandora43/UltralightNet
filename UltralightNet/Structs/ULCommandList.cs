@@ -3,7 +3,7 @@ using System.Runtime.CompilerServices;
 
 namespace UltralightNet
 {
-	public unsafe struct ULCommandList
+	public unsafe ref struct ULCommandList
 	{
 		public uint size;
 		public ULCommand* commandsPtr;
