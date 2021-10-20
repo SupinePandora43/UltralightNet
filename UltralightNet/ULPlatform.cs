@@ -163,10 +163,10 @@ namespace UltralightNet
 					Console.WriteLine("UltralightNet: no filesystem set, default (with access only to required files) will be used.");
 
 					var cacertRequest = WebRequest.CreateHttp("https://raw.githubusercontent.com/SupinePandora43/UltralightNet/master/UltralightNet.Resources/resources/cacert.pem");
-					var cacertResponseStream = cacertRequest.GetRequestStreamAsync();
+					var cacertResponse = cacertRequest.GetResponseAsync();
 
 					var icuRequest = WebRequest.CreateHttp("https://raw.githubusercontent.com/SupinePandora43/UltralightNet/master/UltralightNet.Resources/resources/icudt67l.dat");
-					var icuResponseStream = icuRequest.GetRequestStreamAsync();
+					var icuResponse = icuRequest.GetResponseAsync();
 
 					Dictionary<int, Stream> files = new();
 
@@ -206,7 +206,7 @@ namespace UltralightNet
 							//FileStream fs = File.Open(file, FileMode.Open);
 							int id = GetFileId();
 							Console.WriteLine($"OpenFile({file}) = {id}");
-							files[id] = file is "resources/cacert.pem" ? cacertResponseStream.Result : icuResponseStream.Result;
+							files[id] = file is "resources/cacert.pem" ? cacertResponse.Result.GetResponseStream() : icuResponse.Result.GetResponseStream();
 							return id;
 						},
 						GetFileSize = (int handle, out long size) =>
