@@ -7,37 +7,10 @@ namespace UltralightNet.Test
 	{
 		private ULConfig config = new();
 
-		private static void ulConfigSetCachePath(IntPtr config, in string cache_path)
-		{
-			unsafe
-			{
-				global::UltralightNet.ULString __cache_path_gen = default;
-				global::UltralightNet.ULString* __cache_path_gen_native = default;
-				//
-				// Pin
-				//
-				fixed(char* __cache_path_gen_native_pinned = cache_path)
-				{
-					__cache_path_gen = new ULString() { data = (ushort*)__cache_path_gen_native_pinned, length = (nuint)cache_path.Length };
-					__cache_path_gen_native = &__cache_path_gen;
-					//
-					// Invoke
-					//
-					ulConfigSetCachePath__PInvoke__(config, __cache_path_gen_native);
-				}
-			}
-		}
-
-		[System.Runtime.InteropServices.DllImportAttribute("Ultralight", EntryPoint = "ulConfigSetCachePath")]
-		extern private static unsafe void ulConfigSetCachePath__PInvoke__(global::System.IntPtr config, global::UltralightNet.ULString* cache_path);
-
 		[Fact]
 		public void CachePathTest()
 		{
 			config.CachePath = "./cache";
-
-			ulConfigSetCachePath(config.Ptr, "./cache");
-
 			Assert.Equal("./cache", config.CachePath);
 		}
 		[Fact]
