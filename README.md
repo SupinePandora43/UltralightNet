@@ -9,6 +9,7 @@
 - [UltralightNet](#ultralightnet)
 	- [Table of Content](#table-of-content)
 	- [Supported platforms](#supported-platforms)
+	- [Supported frameworks](#supported-frameworks)
 	- [UltralightSharp](#ultralightsharp)
 		- [Differences](#differences)
 			- [Packages](#packages)
@@ -29,6 +30,12 @@ NOTE: At that time, ultralight doesn't support arm. (eg. Android phones or macs 
 - Windows
 - Linux
 - OSX
+
+## Supported frameworks
+
+* .Net >= `5.0`
+* .Net Framework >= `4.5`
+* .Net Standard >= `2.0`
 
 ## UltralightSharp
 
