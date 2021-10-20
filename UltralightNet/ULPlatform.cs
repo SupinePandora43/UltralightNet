@@ -162,10 +162,10 @@ namespace UltralightNet
 				{
 					Console.WriteLine("UltralightNet: no filesystem set, default (with access only to required files) will be used.");
 
-					var cacertRequest = WebRequest.Create("https://raw.githubusercontent.com/SupinePandora43/UltralightNet/master/UltralightNet.Resources/resources/cacert.pem");
+					var cacertRequest = WebRequest.CreateHttp("https://raw.githubusercontent.com/SupinePandora43/UltralightNet/master/UltralightNet.Resources/resources/cacert.pem");
 					var cacertResponseStream = cacertRequest.GetRequestStreamAsync();
 
-					var icuRequest = WebRequest.Create("https://raw.githubusercontent.com/SupinePandora43/UltralightNet/master/UltralightNet.Resources/resources/icudt67l.dat");
+					var icuRequest = WebRequest.CreateHttp("https://raw.githubusercontent.com/SupinePandora43/UltralightNet/master/UltralightNet.Resources/resources/icudt67l.dat");
 					var icuResponseStream = icuRequest.GetRequestStreamAsync();
 
 					Dictionary<int, Stream> files = new();
