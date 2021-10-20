@@ -223,7 +223,7 @@ namespace UltralightNet.Test
 			Console.WriteLine("KeyEvent");
 			view.FireKeyEvent(new(ULKeyEventType.Char, ULKeyEventModifiers.ShiftKey, 0, 0, "A", "A", false, false, false));
 			Console.WriteLine("MouseEvent");
-			view.FireMouseEvent(new() { type = ULMouseEvent.ULMouseEventType.MouseDown, x = 100, y = 100, button = ULMouseEvent.Button.Left });
+			view.FireMouseEvent(new ULMouseEvent() { type = ULMouseEvent.ULMouseEventType.MouseDown, x = 100, y = 100, button = ULMouseEvent.Button.Left });
 			Console.WriteLine("ScrollEvent");
 			view.FireScrollEvent(new() { type = ULScrollEvent.ScrollType.ByPage, deltaX = 23, deltaY = 123 });
 		}

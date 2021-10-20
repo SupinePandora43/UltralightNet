@@ -54,7 +54,9 @@ namespace UltralightNet
 				Console.WriteLine("UltralightNet: no GPUDriver set, but ULViewConfig.IsAccelerated==true.");
 			}
 #endif
-			return new(Methods.ulCreateView(Ptr, width, height, (view_config is default(ULViewConfig)) ? new ULViewConfig().Ptr : view_config.Ptr, (session is default(Session)) ? DefaultSession.Ptr : session.Ptr), dispose);
+			View view = new(Methods.ulCreateView(Ptr, width, height, (view_config is default(ULViewConfig)) ? new ULViewConfig().Ptr : view_config.Ptr, (session is default(Session)) ? DefaultSession.Ptr : session.Ptr), dispose);
+			view.Renderer = this;
+			return view;
 		}
 		public Session CreateSession(bool isPersistent, string name) => new(this, isPersistent, name);
 		public Session DefaultSession => new(Methods.ulDefaultSession(Ptr));

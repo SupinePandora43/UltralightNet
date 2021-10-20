@@ -32,6 +32,8 @@ jobs:
         if: matrix.os=='ubuntu-latest'
       #- name: Test Application
       #  run: dotnet run --project UltralightNet.TestApplication
+      - name: Benchmark
+        run: dotnet run Benchmarks/Benchmarks.csproj
       - name: Test
         run: dotnet test UltralightNet.Test/UltralightNet.Test.csproj --collect:"XPlat Code Coverage" -- DataCollectionRunSettings.DataCollectors.DataCollector.Configuration.Format=cobertura,opencover -- DataCollectionRunSettings.DataCollectors.DataCollector.Configuration.UseSourceLink=true
       - run: |

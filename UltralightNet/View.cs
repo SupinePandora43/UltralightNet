@@ -178,6 +178,7 @@ namespace UltralightNet
 	{
 		public IntPtr Ptr { get; private set; }
 		public bool IsDisposed { get; private set; }
+		public Renderer Renderer { get; internal set; }
 
 		public View(IntPtr ptr, bool dispose = false)
 		{
@@ -225,7 +226,7 @@ namespace UltralightNet
 			}
 		}
 
-		public void Resize(uint width, uint height) => Methods.ulViewResize(Ptr, width, height);
+		public void Resize(in uint width, in uint height) => Methods.ulViewResize(Ptr, width, height);
 
 		public IntPtr LockJSContext() => Methods.ulViewLockJSContext(Ptr);
 		public void UnlockJSContext() => Methods.ulViewUnlockJSContext(Ptr);
@@ -237,7 +238,7 @@ namespace UltralightNet
 
 		public void GoBack() => Methods.ulViewGoBack(Ptr);
 		public void GoForward() => Methods.ulViewGoForward(Ptr);
-		public void GoToHistoryOffset(int offset) => Methods.ulViewGoToHistoryOffset(Ptr, offset);
+		public void GoToHistoryOffset(in int offset) => Methods.ulViewGoToHistoryOffset(Ptr, offset);
 
 		public void Reload() => Methods.ulViewReload(Ptr);
 		public void Stop() => Methods.ulViewStop(Ptr);
@@ -247,11 +248,10 @@ namespace UltralightNet
 		public bool HasFocus => Methods.ulViewHasFocus(Ptr);
 		public bool HasInputFocus => Methods.ulViewHasInputFocus(Ptr);
 
-		public void FireKeyEvent(ULKeyEvent keyEvent) => Methods.ulViewFireKeyEvent(Ptr, keyEvent.Ptr);
-		public void FireMouseEvent(ref ULMouseEvent mouseEvent) => Methods.ulViewFireMouseEvent(Ptr, in mouseEvent);
-		public void FireMouseEvent(ULMouseEvent mouseEvent) => Methods.ulViewFireMouseEvent(Ptr, in mouseEvent);
-		public void FireScrollEvent(ref ULScrollEvent scrollEvent) => Methods.ulViewFireScrollEvent(Ptr, in scrollEvent);
-		public void FireScrollEvent(ULScrollEvent scrollEvent) => Methods.ulViewFireScrollEvent(Ptr, in scrollEvent);
+		public void FireKeyEvent(in ULKeyEvent keyEvent) => Methods.ulViewFireKeyEvent(Ptr, keyEvent.Ptr);
+		public void FireMouseEvent(in ULMouseEvent mouseEvent) => Methods.ulViewFireMouseEvent(Ptr, in mouseEvent);
+		public void FireScrollEventWithoutIn(ULScrollEvent scrollEvent) => Methods.ulViewFireScrollEvent(Ptr, in scrollEvent);
+		public void FireScrollEvent(in ULScrollEvent scrollEvent) => Methods.ulViewFireScrollEvent(Ptr, in scrollEvent);
 
 		#region Callbacks
 
@@ -738,6 +738,7 @@ namespace UltralightNet
 
 			if (IsDisposed) return;
 			Methods.ulDestroyView(Ptr);
+			Renderer = null;
 
 			IsDisposed = true;
 			GC.SuppressFinalize(this);

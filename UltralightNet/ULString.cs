@@ -47,8 +47,8 @@ namespace UltralightNet
 		public static extern IntPtr ulStringGetDataPtr(IntPtr str);
 
 		/// <summary>Get length in UTF-16 characters.</summary>
-		[GeneratedDllImport("Ultralight")]
-		public static partial uint ulStringGetLength(IntPtr str);
+		[DllImport("Ultralight")]
+		public static extern uint ulStringGetLength(IntPtr str);
 
 		/// <summary>Whether this string is empty or not.</summary>
 		[GeneratedDllImport("Ultralight")]

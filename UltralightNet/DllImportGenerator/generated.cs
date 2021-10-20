@@ -875,27 +875,6 @@ namespace UltralightNet
 {
 	public static partial class Methods
 	{
-		public static partial uint ulStringGetLength(global::System.IntPtr str)
-		{
-			unsafe
-			{
-				uint __retVal = default;
-				//
-				// Invoke
-				//
-				__retVal = ulStringGetLength__PInvoke__(str);
-				return __retVal;
-			}
-		}
-
-		[System.Runtime.InteropServices.DllImportAttribute("Ultralight", EntryPoint = "ulStringGetLength")]
-		extern private static unsafe uint ulStringGetLength__PInvoke__(global::System.IntPtr str);
-	}
-}
-namespace UltralightNet
-{
-	public static partial class Methods
-	{
 		public static partial bool ulStringIsEmpty(global::System.IntPtr str)
 		{
 			unsafe

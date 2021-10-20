@@ -36,7 +36,6 @@ namespace UltralightNet
 			Middle,
 			Right
 		}
-
 		public ULMouseEventType type;
 		public int x;
 		public int y;
