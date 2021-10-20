@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Net;
 using System.Runtime.InteropServices;
 
 namespace UltralightNet
@@ -161,7 +162,13 @@ namespace UltralightNet
 				{
 					Console.WriteLine("UltralightNet: no filesystem set, default (with access only to required files) will be used.");
 
-					Dictionary<int, FileStream> files = new();
+					var cacertRequest = WebRequest.Create("https://raw.githubusercontent.com/SupinePandora43/UltralightNet/master/UltralightNet.Resources/resources/cacert.pem");
+					var cacertResponseStream = cacertRequest.GetRequestStreamAsync();
+
+					var icuRequest = WebRequest.Create("https://raw.githubusercontent.com/SupinePandora43/UltralightNet/master/UltralightNet.Resources/resources/icudt67l.dat");
+					var icuResponseStream = icuRequest.GetRequestStreamAsync();
+
+					Dictionary<int, Stream> files = new();
 
 					int GetFileId()
 					{
@@ -177,7 +184,8 @@ namespace UltralightNet
 						FileExists = (path) =>
 						{
 							Console.WriteLine($"FileExists({path}) = {File.Exists(path)}");
-							return File.Exists(path);
+							//return File.Exists(path);
+							return path is "resources/cacert.pem" || path is "resources/icudt67l.dat";
 						},
 						GetFileMimeType = (string file, out string result) =>
 						{
@@ -195,10 +203,10 @@ namespace UltralightNet
 						},
 						OpenFile = (file, _) =>
 						{
-							FileStream fs = File.Open(file, FileMode.Open);
+							//FileStream fs = File.Open(file, FileMode.Open);
 							int id = GetFileId();
 							Console.WriteLine($"OpenFile({file}) = {id}");
-							files[id] = fs;
+							files[id] = file is "resources/cacert.pem" ? cacertResponseStream.Result : icuResponseStream.Result;
 							return id;
 						},
 						GetFileSize = (int handle, out long size) =>
@@ -229,10 +237,10 @@ namespace UltralightNet
 						}
 					};
 
-					if (!(File.Exists("resources/cacert.pem") && File.Exists("resources/icudt67l.dat")))
+					/*if (!(File.Exists("resources/cacert.pem") && File.Exists("resources/icudt67l.dat")))
 					{
 						throw new FileNotFoundException($"cacert.pem or icudt67l.dat not found in resources/ folder");
-					}
+					}*/
 				}
 				else
 				{
