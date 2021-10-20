@@ -6,6 +6,7 @@ using System;
 using System.Runtime.InteropServices;
 using System.Threading;
 using UltralightNet;
+using UltralightNet.AppCore;
 
 namespace Benchmarks
 {
@@ -24,6 +25,7 @@ namespace Benchmarks
 
 		public MyBenchmark()
 		{
+			AppCoreMethods.ulEnablePlatformFileSystem("./");
 			renderer = ULPlatform.CreateRenderer();
 			view = renderer.CreateView(512, 512);
 
