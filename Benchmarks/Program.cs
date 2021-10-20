@@ -26,6 +26,7 @@ namespace Benchmarks
 		public MyBenchmark()
 		{
 			AppCoreMethods.ulEnablePlatformFileSystem("./");
+			AppCoreMethods.ulEnablePlatformFontLoader();
 			renderer = ULPlatform.CreateRenderer();
 			view = renderer.CreateView(512, 512);
 
