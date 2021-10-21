@@ -162,12 +162,6 @@ namespace UltralightNet
 				{
 					Console.WriteLine("UltralightNet: no filesystem set, default (with access only to required files) will be used.");
 
-					var cacertRequest = WebRequest.CreateHttp("https://raw.githubusercontent.com/SupinePandora43/UltralightNet/master/UltralightNet.Resources/resources/cacert.pem");
-					var cacertResponse = cacertRequest.GetResponseAsync();
-
-					var icuRequest = WebRequest.CreateHttp("https://raw.githubusercontent.com/SupinePandora43/UltralightNet/master/UltralightNet.Resources/resources/icudt67l.dat");
-					var icuResponse = icuRequest.GetResponseAsync();
-
 					Dictionary<int, Stream> files = new();
 
 					int GetFileId()
@@ -181,23 +175,30 @@ namespace UltralightNet
 
 					FileSystem = new()
 					{
-						FileExists = (path) =>
+						FileExists = (file) =>
 						{
-							Console.WriteLine($"FileExists({path}) = {File.Exists(path)}");
+							// Console.WriteLine($"FileExists({file}) = {File.Exists(file)}");
 							//return File.Exists(path);
-							return path is "resources/cacert.pem" || path is "resources/icudt67l.dat";
+							return file switch
+							{
+								"resources/cacert.pem" => true,
+								"resources/icudt67l.dat" => true,
+								"resources/mediaControls.css" => true,
+								"resources/mediaControls.js" => true,
+								"resources/mediaControlsLocalizedStrings.js" => true,
+								_ => false
+							};
 						},
 						GetFileMimeType = (string file, out string result) =>
 						{
 							Console.WriteLine($"GetFileMimeType({file})");
-							if (file.EndsWith("html"))
-								result = "text/html";
-							else if (file.EndsWith("js"))
-								result = "application/javascript";
-							else if (file.EndsWith("css"))
-								result = "text/css";
-							else
-								result = "application/octet-stream";
+							result = file switch
+							{
+								"resources/mediaControls.css" => "text/css",
+								"resources/mediaControls.js" => "application/javascript",
+								"resources/mediaControlsLocalizedStrings.js" => "application/javascript",
+								_ => "application/octet-stream"
+							};
 
 							return true;
 						},
@@ -206,7 +207,15 @@ namespace UltralightNet
 							//FileStream fs = File.Open(file, FileMode.Open);
 							int id = GetFileId();
 							Console.WriteLine($"OpenFile({file}) = {id}");
-							files[id] = file is "resources/cacert.pem" ? cacertResponse.Result.GetResponseStream() : icuResponse.Result.GetResponseStream();
+							files[id] = file switch
+							{
+								"resources/cacert.pem" => Resources.Cacertpem,
+								"resources/icudt67l.dat" => Resources.Icudt67ldat,
+								"resources/mediaControls.css" => Resources.MediaControlscss,
+								"resources/mediaControls.js" => Resources.MediaControlsjs,
+								"resources/mediaControlsLocalizedStrings.js" => Resources.MediaControlsLocalizedStringsjs,
+								_ => throw new ArgumentOutOfRangeException(nameof(file), "Tried to open not required file.")
+							};
 							return id;
 						},
 						GetFileSize = (int handle, out long size) =>
@@ -236,11 +245,6 @@ namespace UltralightNet
 							files.Remove(handle);
 						}
 					};
-
-					/*if (!(File.Exists("resources/cacert.pem") && File.Exists("resources/icudt67l.dat")))
-					{
-						throw new FileNotFoundException($"cacert.pem or icudt67l.dat not found in resources/ folder");
-					}*/
 				}
 				else
 				{
