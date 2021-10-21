@@ -224,7 +224,7 @@ namespace UltralightNet
 							Console.WriteLine($"GetFileSize({handle}) = {size}");
 							return true;
 						},
-						ReadFromFile = (handle, data, length) =>
+						ReadFromFile = (handle, data) =>
 						{
 							Console.WriteLine($"ReadFromFile({handle})");
 #if NET5_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
@@ -232,7 +232,7 @@ namespace UltralightNet
 #else
 							fixed(byte* dataPtr = data)
 							{
-								UnmanagedMemoryStream unmanagedMemoryStream = new(dataPtr, length, length, FileAccess.Write);
+								UnmanagedMemoryStream unmanagedMemoryStream = new(dataPtr, data.Length, data.Length, FileAccess.Write);
 								files[handle].CopyTo(unmanagedMemoryStream);
 							}
 							return files[handle].Length;

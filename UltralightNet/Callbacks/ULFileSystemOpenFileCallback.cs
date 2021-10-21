@@ -6,10 +6,10 @@ namespace UltralightNet
 	public unsafe delegate int ULFileSystemOpenFileCallback__PInvoke__(
 		ULString* path,
 		[MarshalAs(UnmanagedType.I1)]
-		bool open_for_writing
+		bool openForWriting
 	);
 	public delegate int ULFileSystemOpenFileCallback(
 		string path,
-		bool open_for_writing
+		bool openForWriting
 	);
 }

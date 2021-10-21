@@ -11,7 +11,6 @@ namespace UltralightNet
 	);
 	public delegate long ULFileSystemReadFromFileCallback(
 		int handle,
-		Span<byte> data,
-		long length
+		Span<byte> data
 	);
 }

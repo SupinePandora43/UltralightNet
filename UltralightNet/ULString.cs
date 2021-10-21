@@ -57,7 +57,7 @@ namespace UltralightNet
 
 		/// <summary>Replaces the contents of 'str' with the contents of 'new_str'</summary>
 		[DllImport("Ultralight")]
-		public static extern void ulStringAssignString(IntPtr str, IntPtr newStr);
+		public static unsafe extern void ulStringAssignString(ULString* str, ULString* newStr);
 
 		[GeneratedDllImport("Ultralight")]
 		public static partial void ulStringAssignCString(
@@ -121,6 +121,7 @@ namespace UltralightNet
 			return new((char*)data, 0, (int)length);
 		}
 
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public static unsafe string NativeToManaged(ULString* ulString)
 		{
 			return new((char*)ulString->data, 0, (int)ulString->length);
