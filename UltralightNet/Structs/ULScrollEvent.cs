@@ -6,7 +6,7 @@ namespace UltralightNet
 	/// Scroll event
 	/// </summary>
 	[NativeMarshalling(typeof(ULScrollEventNative))]
-	public ref struct ULScrollEvent
+	public struct ULScrollEvent
 	{
 		/// <summary>
 		/// Type of event
@@ -33,7 +33,7 @@ namespace UltralightNet
 
 	[BlittableType]
 	[StructLayout(LayoutKind.Sequential)]
-	internal ref struct ULScrollEventNative
+	internal struct ULScrollEventNative
 	{
 		public int type;
 		public int deltaX;
