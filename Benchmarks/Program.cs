@@ -30,6 +30,8 @@ namespace Benchmarks
 			renderer = ULPlatform.CreateRenderer();
 			view = renderer.CreateView(512, 512);
 
+			return;
+
 			bool loaded = false;
 
 			view.OnFinishLoading += (_, _, _) => loaded = true;
