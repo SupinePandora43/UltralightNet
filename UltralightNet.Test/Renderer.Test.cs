@@ -35,9 +35,9 @@ namespace UltralightNet.Test
 			result = "text/html";
 			return true;
 		}
-		private long readFromFile(int handle, Span<byte> data, long length)
+		private long readFromFile(int handle, Span<byte> data)
 		{
-			Console.WriteLine($"readFromFile({handle}, Span<byte> data, {length})");
+			Console.WriteLine($"readFromFile({handle}, Span<byte> data)");
 			//Assert.Equal("<html><body><p>123</p></body></html>".Length, length);
 			//data = "<html><body><p>123</p></body></html>";
 			return handles[handle].Read(data);
