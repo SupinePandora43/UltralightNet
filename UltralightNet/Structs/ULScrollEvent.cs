@@ -33,7 +33,7 @@ namespace UltralightNet
 
 	[BlittableType]
 	[StructLayout(LayoutKind.Sequential)]
-	internal struct ULScrollEventNative
+	internal ref struct ULScrollEventNative
 	{
 		public int type;
 		public int deltaX;
