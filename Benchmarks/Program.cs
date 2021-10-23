@@ -48,31 +48,17 @@ namespace Benchmarks
 		}
 
 		[Benchmark]
-		public void WithIn()
+		public void Manually()
 		{
 			ULScrollEvent @event = new() { type = ULScrollEvent.ScrollType.ByPixel, deltaX = 0, deltaY = 0 };
-			view.FireScrollEvent(in @event);
+			view.FireScrollEvent(@event);
 		}
 
 		[Benchmark]
-		public void WithoutIn()
+		public void Constructor()
 		{
-			ULScrollEvent @event = new() { type = ULScrollEvent.ScrollType.ByPixel, deltaX = 0, deltaY = 0 };
-			view.FireScrollEventWithoutIn(@event);
-		}
-
-		[Benchmark]
-		public void Directly()
-		{
-			ULScrollEvent @event = new() { type = ULScrollEvent.ScrollType.ByPixel, deltaX = 0, deltaY = 0 };
-			view.FireScrollEventDirectly(@event);
-		}
-
-		[Benchmark]
-		public void DirectlyWithIn()
-		{
-			ULScrollEvent @event = new() { type = ULScrollEvent.ScrollType.ByPixel, deltaX = 0, deltaY = 0 };
-			view.FireScrollEventDirectlyWithIn(@event);
+			ULScrollEvent @event = new(ULScrollEvent.ScrollType.ByPixel, 0, 0);
+			view.FireScrollEvent(@event);
 		}
 
 		~MyBenchmark()

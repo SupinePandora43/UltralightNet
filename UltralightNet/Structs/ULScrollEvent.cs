@@ -28,5 +28,12 @@ namespace UltralightNet
 		/// vertical scroll
 		/// </summary>
 		public int deltaY;
+
+		public ULScrollEvent(ScrollType scrollType, int deltaX, int deltaY)
+		{
+			type = scrollType;
+			this.deltaX = deltaX;
+			this.deltaY = deltaY;
+		}
 	}
 }
