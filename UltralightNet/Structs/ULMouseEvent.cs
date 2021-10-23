@@ -14,7 +14,6 @@ namespace UltralightNet
 	/// <summary>
 	/// Mouse Event
 	/// </summary>
-	[NativeMarshalling(typeof(ULMouseEventNative))]
 	public ref struct ULMouseEvent
 	{
 		/// <summary>
@@ -40,23 +39,5 @@ namespace UltralightNet
 		public int x;
 		public int y;
 		public Button button;
-	}
-	[BlittableType]
-	internal ref struct ULMouseEventNative
-	{
-		public ULMouseEventNative(ULMouseEvent evt)
-		{
-			type = (int)evt.type;
-			x = evt.x;
-			y = evt.y;
-			button = (int)evt.button;
-		}
-
-		public int type;
-		public int x;
-		public int y;
-		public int button;
-
-		public ULMouseEvent ToManaged() => new() { type = (ULMouseEvent.ULMouseEventType)type, x = x, y = y, button = (ULMouseEvent.Button)button };
 	}
 }

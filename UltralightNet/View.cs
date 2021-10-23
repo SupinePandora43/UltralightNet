@@ -119,11 +119,11 @@ namespace UltralightNet
 		[DllImport("Ultralight")]
 		public static extern void ulViewFireKeyEvent(IntPtr view, IntPtr key_event);
 
-		[GeneratedDllImport("Ultralight")]
-		public static partial void ulViewFireMouseEvent(IntPtr view, in ULMouseEvent mouseEvent);
+		[DllImport("Ultralight")]
+		public static extern unsafe void ulViewFireMouseEvent(IntPtr view, ULMouseEvent* mouseEvent);
 
-		[GeneratedDllImport("Ultralight")]
-		public static partial void ulViewFireScrollEvent(IntPtr view, in ULScrollEvent scrollEvent);
+		[DllImport("Ultralight")]
+		public static extern unsafe void ulViewFireScrollEvent(IntPtr view, ULScrollEvent* scrollEvent);
 
 		[DllImport("Ultralight")]
 		public static extern void ulViewSetChangeTitleCallback(IntPtr view, ULChangeTitleCallback__PInvoke__ callback, IntPtr user_data);
@@ -249,16 +249,8 @@ namespace UltralightNet
 		public bool HasInputFocus => Methods.ulViewHasInputFocus(Ptr);
 
 		public void FireKeyEvent(in ULKeyEvent keyEvent) => Methods.ulViewFireKeyEvent(Ptr, keyEvent.Ptr);
-		public void FireMouseEvent(in ULMouseEvent mouseEvent) => Methods.ulViewFireMouseEvent(Ptr, in mouseEvent);
-		public void FireScrollEventWithoutIn(ULScrollEvent scrollEvent) => Methods.ulViewFireScrollEvent(Ptr, in scrollEvent);
-		public void FireScrollEvent(in ULScrollEvent scrollEvent) => Methods.ulViewFireScrollEvent(Ptr, in scrollEvent);
-		public void FireScrollEventDirectly(ULScrollEvent scrollEvent) => ulViewFireScrollEvent(Ptr, &scrollEvent);
-		public void FireScrollEventDirectlyWithIn(ULScrollEvent scrollEvent) => ulViewFireScrollEvent(Ptr, scrollEvent);
-
-		[DllImport("Ultralight", ExactSpelling = true)]
-		private static extern void ulViewFireScrollEvent(IntPtr view, ULScrollEvent* scrollEvent);
-		[DllImport("Ultralight", ExactSpelling = true)]
-		private static extern void ulViewFireScrollEvent(IntPtr view, in ULScrollEvent scrollEvent);
+		public void FireMouseEvent(ULMouseEvent mouseEvent) => Methods.ulViewFireMouseEvent(Ptr, &mouseEvent);
+		public void FireScrollEvent(ULScrollEvent scrollEvent) => Methods.ulViewFireScrollEvent(Ptr, &scrollEvent);
 
 		#region Callbacks
 
