@@ -252,6 +252,13 @@ namespace UltralightNet
 		public void FireMouseEvent(in ULMouseEvent mouseEvent) => Methods.ulViewFireMouseEvent(Ptr, in mouseEvent);
 		public void FireScrollEventWithoutIn(ULScrollEvent scrollEvent) => Methods.ulViewFireScrollEvent(Ptr, in scrollEvent);
 		public void FireScrollEvent(in ULScrollEvent scrollEvent) => Methods.ulViewFireScrollEvent(Ptr, in scrollEvent);
+		public void FireScrollEventDirectly(ULScrollEvent scrollEvent) => ulViewFireScrollEvent(Ptr, &scrollEvent);
+		public void FireScrollEventDirectlyWithIn(ULScrollEvent scrollEvent) => ulViewFireScrollEvent(Ptr, scrollEvent);
+
+		[DllImport("Ultralight", ExactSpelling = true)]
+		private static extern void ulViewFireScrollEvent(IntPtr view, ULScrollEvent* scrollEvent);
+		[DllImport("Ultralight", ExactSpelling = true)]
+		private static extern void ulViewFireScrollEvent(IntPtr view, in ULScrollEvent scrollEvent);
 
 		#region Callbacks
 

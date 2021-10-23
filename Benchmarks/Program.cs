@@ -61,6 +61,20 @@ namespace Benchmarks
 			view.FireScrollEventWithoutIn(@event);
 		}
 
+		[Benchmark]
+		public void Directly()
+		{
+			ULScrollEvent @event = new() { type = ULScrollEvent.ScrollType.ByPixel, deltaX = 0, deltaY = 0 };
+			view.FireScrollEventDirectly(@event);
+		}
+
+		[Benchmark]
+		public void DirectlyWithIn()
+		{
+			ULScrollEvent @event = new() { type = ULScrollEvent.ScrollType.ByPixel, deltaX = 0, deltaY = 0 };
+			view.FireScrollEventDirectlyWithIn(@event);
+		}
+
 		~MyBenchmark()
 		{
 			view.Dispose();
