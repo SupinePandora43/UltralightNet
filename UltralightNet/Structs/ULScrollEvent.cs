@@ -6,7 +6,7 @@ namespace UltralightNet
 	/// Scroll event
 	/// </summary>
 	[NativeMarshalling(typeof(ULScrollEventNative))]
-	public struct ULScrollEvent
+	public ref struct ULScrollEvent
 	{
 		/// <summary>
 		/// Type of event
