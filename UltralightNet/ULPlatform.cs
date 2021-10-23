@@ -107,6 +107,7 @@ namespace UltralightNet
 		private static ULClipboard _clipboard;
 
 		internal static bool gpudriverSet = false;
+		internal static bool fileSystemSet = false;
 
 		public static ULLogger Logger
 		{
@@ -124,6 +125,7 @@ namespace UltralightNet
 			{
 				_filesystem = value;
 				Methods.ulPlatformSetFileSystem(value);
+				fileSystemSet = true;
 			}
 		}
 		public static ULGPUDriver GPUDriver
@@ -158,7 +160,7 @@ namespace UltralightNet
 						LogMessage = (level, message) => { foreach (string line in message.Split('\n')) { Console.WriteLine($"(UL) {level}: {line}"); } }
 					};
 				}
-				if (SetDefaultFileSystem && _filesystem.__GetFileMimeType is null) // TODO
+				if (SetDefaultFileSystem && !fileSystemSet) // TODO
 				{
 					Console.WriteLine("UltralightNet: no filesystem set, default (with access only to required files) will be used.");
 
