@@ -1,6 +1,6 @@
 namespace UltralightNet
 {
-	public ref struct ULCommand
+	public struct ULCommand
 	{
 		public ULCommandType command_type;
 		public ULGPUState gpu_state;
