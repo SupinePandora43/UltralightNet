@@ -91,6 +91,9 @@ namespace UltralightNet.Test
 			};
 
 			ULConfig config = new();
+
+                        if(OperatingSystem.IsMacOS()) return;
+
 			renderer = ULPlatform.CreateRenderer(config);
 
 			SessionTest();
