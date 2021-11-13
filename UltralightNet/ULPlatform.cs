@@ -250,19 +250,19 @@ namespace UltralightNet
 				}
 				else
 				{
-					ULStringGeneratedDllImportMarshaler marshaler1 = new("resources/cacert.pem");
-					ULStringGeneratedDllImportMarshaler marshaler2 = new("resources/icudt67l.dat");
-
-					if (!(_filesystem.__FileExists(marshaler1.Value) && _filesystem.__FileExists(marshaler2.Value)))
+					string cacertpem = "resources/cacert.pem";
+					string icudt67ldat = "resources/icudt67l.dat";
+					
+					fixed(char* cacertpemCharacters = cacertpem)
+					fixed(char* icudt67ldatCharacters = icudt67ldat)
 					{
-						marshaler1.FreeNative();
-						marshaler2.FreeNative();
-						throw new FileNotFoundException($"{typeof(ULFileSystem)} doesn't provide cacert.pem or icudt67l.dat from resources/ folder");
-					}
-					else
-					{
-						marshaler1.FreeNative();
-						marshaler2.FreeNative();
+						ULString cacertpemULSTR = new(){ data = (ushort*) cacertpemCharacters, length = (nuint) cacertpem.Length};
+						ULString icudt67ldatULSTR = new(){ data = (ushort*) icudt67ldatCharacters, length = (nuint) icudt67ldat.Length};
+					
+						if (!(_filesystem.__FileExists(&cacertpemULSTR) && _filesystem.__FileExists(&icudt67ldatULSTR)))
+						{
+							throw new FileNotFoundException($"{typeof(ULFileSystem)} doesn't provide cacert.pem or icudt67l.dat from resources/ folder");
+						}
 					}
 				}
 			}
