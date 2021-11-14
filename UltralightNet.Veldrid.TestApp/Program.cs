@@ -19,7 +19,7 @@ namespace UltralightNet.Veldrid.TestApp
 	class Program
 	{
 		private const GraphicsBackend BACKEND = GraphicsBackend.OpenGL;
-		private const bool TRANSPARENT = true;
+		private const bool TRANSPARENT = false;
 
 		private const uint Width = 1024;
 		private const uint Height = 512;
@@ -145,6 +145,7 @@ void main()
 
 			gpuDriver.CommandList = commandList;
 
+			AppCoreMethods.ulEnablePlatformFileSystem("./");
 			ULPlatform.Logger = new ULLogger() { LogMessage = (lvl, msg) => Console.WriteLine(msg) };
 			AppCoreMethods.ulEnablePlatformFontLoader();
 			ULPlatform.GPUDriver = gpuDriver.GetGPUDriver();
@@ -164,7 +165,7 @@ void main()
 			});
 			//View cpuView = new(renderer, Width, Height, TRANSPARENT, Session.DefaultSession(renderer), true);
 
-			const string url = "https://en.key-test.ru/";//"https://github.com/SupinePandora43";
+			const string url = /*"https://en.key-test.ru/";*/"https://github.com/SupinePandora43";
 
 			view.URL = url;
 			//cpuView.URL = url;
