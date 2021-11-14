@@ -11,8 +11,12 @@ namespace UltralightNet
 			set
 			{
 				ULGPUDriverBeginSynchronizeCallback callback = value;
-				ULPlatform.Handle(this, GCHandle.Alloc(callback, GCHandleType.Normal));
-				__BeginSynchronize = (delegate* unmanaged[Cdecl]<void>)Marshal.GetFunctionPointerForDelegate(callback);
+				if (callback is null) __BeginSynchronize = null;
+				else
+				{
+					ULPlatform.Handle(this, GCHandle.Alloc(callback, GCHandleType.Normal));
+					__BeginSynchronize = (delegate* unmanaged[Cdecl]<void>)Marshal.GetFunctionPointerForDelegate(callback);
+				}
 			}
 		}
 		public ULGPUDriverEndSynchronizeCallback EndSynchronize
@@ -20,8 +24,12 @@ namespace UltralightNet
 			set
 			{
 				ULGPUDriverEndSynchronizeCallback callback = value;
-				ULPlatform.Handle(this, GCHandle.Alloc(callback, GCHandleType.Normal));
-				__EndSynchronize = (delegate* unmanaged[Cdecl]<void>)Marshal.GetFunctionPointerForDelegate(callback);
+				if (callback is null) __EndSynchronize = null;
+				else
+				{
+					ULPlatform.Handle(this, GCHandle.Alloc(callback, GCHandleType.Normal));
+					__EndSynchronize = (delegate* unmanaged[Cdecl]<void>)Marshal.GetFunctionPointerForDelegate(callback);
+				}
 			}
 		}
 		public ULGPUDriverNextTextureIdCallback NextTextureId
