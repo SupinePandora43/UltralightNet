@@ -145,9 +145,9 @@ void main()
 
 			gpuDriver.CommandList = commandList;
 
-			ULPlatform.SetLogger(new ULLogger() { LogMessage = (lvl, msg) => Console.WriteLine(msg) }); ;
+			ULPlatform.Logger = new ULLogger() { LogMessage = (lvl, msg) => Console.WriteLine(msg) };
 			AppCoreMethods.ulEnablePlatformFontLoader();
-			ULPlatform.SetGPUDriver(gpuDriver.GetGPUDriver());
+			ULPlatform.GPUDriver = gpuDriver.GetGPUDriver();
 
 			var c = new ULConfig()
 			{
@@ -155,9 +155,9 @@ void main()
 				CachePath = "./cache/"
 			};
 			Console.WriteLine(c.CachePath);
-			Renderer renderer = new(c);
+			Renderer renderer = ULPlatform.CreateRenderer(c);
 
-			View view = new(renderer, Width, Height, new ULViewConfig()
+			View view = renderer.CreateView(Width, Height, new ULViewConfig()
 			{
 				IsAccelerated = true,
 				IsTransparent = true
@@ -200,12 +200,12 @@ void main()
 				x = (int)mm.MousePosition.X;
 				y = (int)mm.MousePosition.Y;
 
-				ULMouseEvent mouseEvent = new(
-					ULMouseEvent.ULMouseEventType.MouseMoved,
-					x,
-					y,
-					ULMouseEvent.Button.None
-				);
+				ULMouseEvent mouseEvent = new(){
+					type = ULMouseEvent.ULMouseEventType.MouseMoved,
+					x = x,
+					y = y,
+					button = ULMouseEvent.Button.None
+				};
 
 				view.FireMouseEvent(mouseEvent);
 				//cpuView.FireMouseEvent(mouseEvent);
@@ -224,36 +224,36 @@ void main()
 					view.GoForward();
 					//cpuView.GoForward();
 				}
-				ULMouseEvent mouseEvent = new(
-					ULMouseEvent.ULMouseEventType.MouseDown,
-					x,
-					y,
-					md.MouseButton switch
+				ULMouseEvent mouseEvent = new(){
+					type = ULMouseEvent.ULMouseEventType.MouseDown,
+					x = x,
+					y = y,
+					button = md.MouseButton switch
 					{
 						MouseButton.Left => ULMouseEvent.Button.Left,
 						MouseButton.Right => ULMouseEvent.Button.Right,
 						MouseButton.Middle => ULMouseEvent.Button.Middle,
 						_ => ULMouseEvent.Button.None
 					}
-				);
+				};
 				view.FireMouseEvent(mouseEvent);
 				//cpuView.FireMouseEvent(mouseEvent);
 			};
 			window.MouseUp += (mu) =>
 			{
 				Console.WriteLine($"Mouse up {mu.Down} {mu.MouseButton}");
-				ULMouseEvent mouseEvent = new(
-					ULMouseEvent.ULMouseEventType.MouseUp,
-					x,
-					y,
-					mu.MouseButton switch
+				ULMouseEvent mouseEvent = new(){
+					type = ULMouseEvent.ULMouseEventType.MouseUp,
+					x = x,
+					y = y,
+					button = mu.MouseButton switch
 					{
 						MouseButton.Left => ULMouseEvent.Button.Left,
 						MouseButton.Right => ULMouseEvent.Button.Right,
 						MouseButton.Middle => ULMouseEvent.Button.Middle,
 						_ => ULMouseEvent.Button.None
 					}
-				);
+				};
 				view.FireMouseEvent(mouseEvent);
 				//cpuView.FireMouseEvent(mouseEvent);
 			};
@@ -307,13 +307,11 @@ void main()
 			stopwatch.Start();
 
 
-			view.SetDOMReadyCallback((user_data, caller, frame_id, is_main_frame, url) =>
+			view.OnDomReady += ((frame_id, is_main_frame, url) =>
 			{
 				Console.WriteLine("Dom is ready");
 
 				// view.EvaluateScript("window.location = \"https://heeeeeeeey.com/\"", out string exception);
-
-				view.SetDOMReadyCallback(null);
 			});
 
 			IntPtr rendererPtr = renderer.Ptr;

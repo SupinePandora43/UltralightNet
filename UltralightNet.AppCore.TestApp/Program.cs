@@ -21,12 +21,9 @@ namespace UltralightNet.AppCore.TestApp
 			View view = overlay.View;
 			//view.URL = "https://github.com/SupinePandora43/UltralightNet";
 
-			view.SetFailLoadingCallback(
-				(user_data, caller, frame_id, is_main_frame, url, description, error_domain, error_code) =>
-					throw new Exception("Failed loading")
-			);
+			view.OnFailLoading += (frame_id, is_main_frame, url, description, error_domain, error_code) => throw new Exception("Failed loading");
 
-			view.SetFinishLoadingCallback((user_data, caller, frame_id, is_main_frame, url) => Console.WriteLine("loaded"));
+			view.OnFinishLoading += (frame_id, is_main_frame, url) => Console.WriteLine("loaded");
 
 			view.HTML = "<html><body><p>123</p></body></html>";
 
