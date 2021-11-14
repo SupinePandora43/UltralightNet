@@ -178,25 +178,5 @@ namespace UltralightNet
 		}
 
 		public object Clone() => new ULBitmap(Methods.ulCreateBitmapFromCopy(Ptr), true);
-
-		/// <summary>
-		/// literally creates <see cref="ULBitmap"/> from <see cref="IntPtr"/> and back, pls don't use
-		/// </summary>
-		public class Marshaler : ICustomMarshaler
-		{
-			private static readonly Marshaler instance = new();
-
-			public static ICustomMarshaler GetInstance(string _) => instance;
-
-			public void CleanUpManagedData(object ManagedObj) { }
-
-			public void CleanUpNativeData(IntPtr pNativeData) { }
-
-			public int GetNativeDataSize() => 1;
-
-			public IntPtr MarshalManagedToNative(object ManagedObj) => ((ULBitmap)ManagedObj).Ptr;
-
-			public object MarshalNativeToManaged(IntPtr pNativeData) => new ULBitmap(pNativeData);
-		}
 	}
 }
