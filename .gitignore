@@ -49,7 +49,6 @@
 **/.idea_modules/
 .sync/
 .vs/
-.vscode/
 /.nuget
 /_ReSharper.Caches/
 /packages/
