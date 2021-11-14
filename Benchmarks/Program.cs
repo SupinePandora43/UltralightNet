@@ -50,14 +50,14 @@ namespace Benchmarks
 		[Benchmark]
 		public void Manually()
 		{
-			ULScrollEvent @event = new() { type = ULScrollEvent.ScrollType.ByPixel, deltaX = 0, deltaY = 0 };
+			ULScrollEvent @event = new() { type = ULScrollEventType.ByPixel, deltaX = 0, deltaY = 0 };
 			view.FireScrollEvent(@event);
 		}
 
 		[Benchmark]
 		public void Constructor()
 		{
-			ULScrollEvent @event = new(ULScrollEvent.ScrollType.ByPixel, 0, 0);
+			ULScrollEvent @event = new(ULScrollEventType.ByPixel, 0, 0);
 			view.FireScrollEvent(@event);
 		}
 
