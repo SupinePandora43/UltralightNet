@@ -152,7 +152,7 @@ void main()
 
 			var c = new ULConfig()
 			{
-				ForceRepaint = false,
+				ForceRepaint = true,
 				CachePath = "./cache/"
 			};
 			Console.WriteLine(c.CachePath);
@@ -170,13 +170,16 @@ void main()
 			view.URL = url;
 			//cpuView.URL = url;
 
-			WebRequest request = WebRequest.CreateHttp("https://raw.githubusercontent.com/SupinePandora43/UltralightNet/ulPath_pipelines/SilkNetSandbox/assets/index.html");
+			try
+			{
+				WebRequest request = WebRequest.CreateHttp("https://raw.githubusercontent.com/SupinePandora43/UltralightNet/ulPath_pipelines/SilkNetSandbox/assets/index.html");
 
-			var response = request.GetResponse();
-			var responseStream = response.GetResponseStream();
-			StreamReader reader = new(responseStream);
-			string htmlText = reader.ReadToEnd();
-
+				var response = request.GetResponse();
+				var responseStream = response.GetResponseStream();
+				StreamReader reader = new(responseStream);
+				string htmlText = reader.ReadToEnd();
+			}
+			finally { }
 			//view.HTML = htmlText;
 			//cpuView.HTML = htmlText;
 
@@ -201,7 +204,8 @@ void main()
 				x = (int)mm.MousePosition.X;
 				y = (int)mm.MousePosition.Y;
 
-				ULMouseEvent mouseEvent = new(){
+				ULMouseEvent mouseEvent = new()
+				{
 					type = ULMouseEvent.ULMouseEventType.MouseMoved,
 					x = x,
 					y = y,
@@ -225,7 +229,8 @@ void main()
 					view.GoForward();
 					//cpuView.GoForward();
 				}
-				ULMouseEvent mouseEvent = new(){
+				ULMouseEvent mouseEvent = new()
+				{
 					type = ULMouseEvent.ULMouseEventType.MouseDown,
 					x = x,
 					y = y,
@@ -243,7 +248,8 @@ void main()
 			window.MouseUp += (mu) =>
 			{
 				Console.WriteLine($"Mouse up {mu.Down} {mu.MouseButton}");
-				ULMouseEvent mouseEvent = new(){
+				ULMouseEvent mouseEvent = new()
+				{
 					type = ULMouseEvent.ULMouseEventType.MouseUp,
 					x = x,
 					y = y,
