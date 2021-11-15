@@ -1,5 +1,3 @@
-using System.Runtime.InteropServices;
-
 namespace UltralightNet
 {
 	/// <summary>
@@ -10,16 +8,7 @@ namespace UltralightNet
 		/// <summary>
 		/// Type of event
 		/// </summary>
-		public enum ScrollType
-		{
-			ByPixel,
-			ByPage
-		}
-
-		/// <summary>
-		/// Type of event
-		/// </summary>
-		public ScrollType type;
+		public ULScrollEventType type;
 		/// <summary>
 		/// horizontal scroll
 		/// </summary>
@@ -28,12 +17,5 @@ namespace UltralightNet
 		/// vertical scroll
 		/// </summary>
 		public int deltaY;
-
-		public ULScrollEvent(ScrollType scrollType, int deltaX, int deltaY)
-		{
-			type = scrollType;
-			this.deltaX = deltaX;
-			this.deltaY = deltaY;
-		}
 	}
 }

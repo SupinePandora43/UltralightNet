@@ -6,7 +6,7 @@ namespace UltralightNet
 	public static partial class Methods
 	{
 		[DllImport("Ultralight")]
-		public static extern IntPtr ulCreateMouseEvent(ULMouseEvent.ULMouseEventType type, int x, int y, ULMouseEvent.Button button);
+		public static extern IntPtr ulCreateMouseEvent(ULMouseEventType type, int x, int y, ULMouseEventButton button);
 
 		[DllImport("Ultralight")]
 		public static extern void ulDestroyMouseEvent(IntPtr evt);
@@ -16,28 +16,9 @@ namespace UltralightNet
 	/// </summary>
 	public ref struct ULMouseEvent
 	{
-		/// <summary>
-		/// Type of event
-		/// </summary>
-		public enum ULMouseEventType
-		{
-			MouseMoved,
-			MouseDown,
-			MouseUp
-		}
-		/// <summary>
-		/// Mouse Button
-		/// </summary>
-		public enum Button
-		{
-			None,
-			Left,
-			Middle,
-			Right
-		}
 		public ULMouseEventType type;
 		public int x;
 		public int y;
-		public Button button;
+		public ULMouseEventButton button;
 	}
 }

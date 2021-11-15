@@ -206,10 +206,10 @@ void main()
 
 				ULMouseEvent mouseEvent = new()
 				{
-					type = ULMouseEvent.ULMouseEventType.MouseMoved,
+					type = ULMouseEventType.MouseMoved,
 					x = x,
 					y = y,
-					button = ULMouseEvent.Button.None
+					button = ULMouseEventButton.None
 				};
 
 				view.FireMouseEvent(mouseEvent);
@@ -231,15 +231,15 @@ void main()
 				}
 				ULMouseEvent mouseEvent = new()
 				{
-					type = ULMouseEvent.ULMouseEventType.MouseDown,
+					type = ULMouseEventType.MouseDown,
 					x = x,
 					y = y,
 					button = md.MouseButton switch
 					{
-						MouseButton.Left => ULMouseEvent.Button.Left,
-						MouseButton.Right => ULMouseEvent.Button.Right,
-						MouseButton.Middle => ULMouseEvent.Button.Middle,
-						_ => ULMouseEvent.Button.None
+						MouseButton.Left => ULMouseEventButton.Left,
+						MouseButton.Right => ULMouseEventButton.Right,
+						MouseButton.Middle => ULMouseEventButton.Middle,
+						_ => ULMouseEventButton.None
 					}
 				};
 				view.FireMouseEvent(mouseEvent);
@@ -250,15 +250,15 @@ void main()
 				Console.WriteLine($"Mouse up {mu.Down} {mu.MouseButton}");
 				ULMouseEvent mouseEvent = new()
 				{
-					type = ULMouseEvent.ULMouseEventType.MouseUp,
+					type = ULMouseEventType.MouseUp,
 					x = x,
 					y = y,
 					button = mu.MouseButton switch
 					{
-						MouseButton.Left => ULMouseEvent.Button.Left,
-						MouseButton.Right => ULMouseEvent.Button.Right,
-						MouseButton.Middle => ULMouseEvent.Button.Middle,
-						_ => ULMouseEvent.Button.None
+						MouseButton.Left => ULMouseEventButton.Left,
+						MouseButton.Right => ULMouseEventButton.Right,
+						MouseButton.Middle => ULMouseEventButton.Middle,
+						_ => ULMouseEventButton.None
 					}
 				};
 				view.FireMouseEvent(mouseEvent);
@@ -268,7 +268,7 @@ void main()
 			{
 				ULScrollEvent scrollEvent = new()
 				{
-					type = ULScrollEvent.ScrollType.ByPixel,
+					type = ULScrollEventType.ByPixel,
 					deltaY = (int)mw.WheelDelta * 100
 				};
 				view.FireScrollEvent(scrollEvent);
