@@ -255,16 +255,27 @@ namespace UltralightNet
 					string cacertpem = "resources/cacert.pem";
 					string icudt67ldat = "resources/icudt67l.dat";
 
+					#if DEBUG
 					fixed(char* cacertpemCharacters = cacertpem)
+					#endif DEBUG
 					fixed(char* icudt67ldatCharacters = icudt67ldat)
 					{
+						#if DEBUG
 						ULString cacertpemULSTR = new(){ data = (ushort*) cacertpemCharacters, length = (nuint) cacertpem.Length};
+						#endif DEBUG
 						ULString icudt67ldatULSTR = new(){ data = (ushort*) icudt67ldatCharacters, length = (nuint) icudt67ldat.Length};
 
-						if (!(_filesystem.__FileExists(&cacertpemULSTR) && _filesystem.__FileExists(&icudt67ldatULSTR)))
+						if (!_filesystem.__FileExists(&icudt67ldatULSTR))
 						{
-							throw new FileNotFoundException($"{typeof(ULFileSystem)} doesn't provide cacert.pem or icudt67l.dat from resources/ folder");
+							throw new FileNotFoundException($"{typeof(ULFileSystem)} doesn't provide icudt67l.dat from resources/ folder.");
 						}
+
+						#if DEBUG
+						if (!_filesystem.__FileExists(&cacertpemULSTR))
+						{
+							Console.WriteLine($"UltralightNet: {typeof(ULFileSystem)} doesn't provide cacert.pem from resources/ folder. All https:// requests will fail.");
+						}
+						#endif DEBUG
 					}
 				}
 			}
