@@ -2,11 +2,6 @@ name: "Issue Labeler"
 on:
   issues:
     types: [opened, edited]
-  push:
-    paths:
-      - .github/workflows/labeler.yml
-    branches:
-      - master
 
 jobs:
   triage:
