@@ -1,0 +1,10 @@
+security:
+    - '(exploit|exploits)'
+enhancement:
+    - '(improve|enhance)'
+performance:
+    - '(speed|bench|benchmark|benchmarks|performance)'
+interop:
+    - '(marshal|native|natively|pointer|pointers)'
+ci:
+    - '(automatize|automate|automatically|automatic|build|deploy)'
