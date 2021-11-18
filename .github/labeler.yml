@@ -8,3 +8,5 @@ interop:
     - '(marshal|native|natively|pointer|pointers)'
 ci:
     - '(automatize|automate|automatically|automatic|build|deploy)'
+gpu:
+    - '(OpenGL|Vulkan|DirectX|GL|Vk|Dx|ULGPUDriver|GPUDriver|shader|shaders|mesh|pipeline|gpu|rt|vertex|vertices|triangle|triangles|polygon|polygons|depth|blend)'
