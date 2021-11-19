@@ -4,14 +4,14 @@ using System.Runtime.InteropServices;
 namespace UltralightNet
 {
 	[UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-	public delegate void ULFailLoadingCallback__PInvoke__(
+	public unsafe delegate void ULFailLoadingCallback__PInvoke__(
 		IntPtr user_data,
 		IntPtr caller,
 		ulong frame_id,
 		byte is_main_frame,
-		IntPtr url,
-		IntPtr description,
-		IntPtr error_domain,
+		ULString* url,
+		ULString* description,
+		ULString* error_domain,
 		int error_code
 	);
 	public delegate void ULFailLoadingCallback(

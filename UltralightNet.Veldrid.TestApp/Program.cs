@@ -19,7 +19,7 @@ namespace UltralightNet.Veldrid.TestApp
 	class Program
 	{
 		private const GraphicsBackend BACKEND = GraphicsBackend.OpenGL;
-		private const bool TRANSPARENT = true;
+		private const bool TRANSPARENT = false;
 
 		private const uint Width = 1024;
 		private const uint Height = 512;
@@ -145,37 +145,41 @@ void main()
 
 			gpuDriver.CommandList = commandList;
 
-			ULPlatform.SetLogger(new ULLogger() { LogMessage = (lvl, msg) => Console.WriteLine(msg) }); ;
+			AppCoreMethods.ulEnablePlatformFileSystem("./");
+			ULPlatform.Logger = new ULLogger() { LogMessage = (lvl, msg) => Console.WriteLine(msg) };
 			AppCoreMethods.ulEnablePlatformFontLoader();
-			ULPlatform.SetGPUDriver(gpuDriver.GetGPUDriver());
+			ULPlatform.GPUDriver = gpuDriver.GetGPUDriver();
 
 			var c = new ULConfig()
 			{
-				ForceRepaint = false,
+				ForceRepaint = true,
 				CachePath = "./cache/"
 			};
 			Console.WriteLine(c.CachePath);
-			Renderer renderer = new(c);
+			Renderer renderer = ULPlatform.CreateRenderer(c);
 
-			View view = new(renderer, Width, Height, new ULViewConfig()
+			View view = renderer.CreateView(Width, Height, new ULViewConfig()
 			{
 				IsAccelerated = true,
 				IsTransparent = true
 			});
 			//View cpuView = new(renderer, Width, Height, TRANSPARENT, Session.DefaultSession(renderer), true);
 
-			const string url = "https://en.key-test.ru/";//"https://github.com/SupinePandora43";
+			const string url = /*"https://en.key-test.ru/";*/"https://github.com/SupinePandora43";
 
 			view.URL = url;
 			//cpuView.URL = url;
 
-			WebRequest request = WebRequest.CreateHttp("https://raw.githubusercontent.com/SupinePandora43/UltralightNet/ulPath_pipelines/SilkNetSandbox/assets/index.html");
+			try
+			{
+				WebRequest request = WebRequest.CreateHttp("https://raw.githubusercontent.com/SupinePandora43/UltralightNet/ulPath_pipelines/SilkNetSandbox/assets/index.html");
 
-			var response = request.GetResponse();
-			var responseStream = response.GetResponseStream();
-			StreamReader reader = new(responseStream);
-			string htmlText = reader.ReadToEnd();
-
+				var response = request.GetResponse();
+				var responseStream = response.GetResponseStream();
+				StreamReader reader = new(responseStream);
+				string htmlText = reader.ReadToEnd();
+			}
+			finally { }
 			//view.HTML = htmlText;
 			//cpuView.HTML = htmlText;
 
@@ -200,12 +204,13 @@ void main()
 				x = (int)mm.MousePosition.X;
 				y = (int)mm.MousePosition.Y;
 
-				ULMouseEvent mouseEvent = new(
-					ULMouseEvent.ULMouseEventType.MouseMoved,
-					x,
-					y,
-					ULMouseEvent.Button.None
-				);
+				ULMouseEvent mouseEvent = new()
+				{
+					type = ULMouseEventType.MouseMoved,
+					x = x,
+					y = y,
+					button = ULMouseEventButton.None
+				};
 
 				view.FireMouseEvent(mouseEvent);
 				//cpuView.FireMouseEvent(mouseEvent);
@@ -224,36 +229,38 @@ void main()
 					view.GoForward();
 					//cpuView.GoForward();
 				}
-				ULMouseEvent mouseEvent = new(
-					ULMouseEvent.ULMouseEventType.MouseDown,
-					x,
-					y,
-					md.MouseButton switch
+				ULMouseEvent mouseEvent = new()
+				{
+					type = ULMouseEventType.MouseDown,
+					x = x,
+					y = y,
+					button = md.MouseButton switch
 					{
-						MouseButton.Left => ULMouseEvent.Button.Left,
-						MouseButton.Right => ULMouseEvent.Button.Right,
-						MouseButton.Middle => ULMouseEvent.Button.Middle,
-						_ => ULMouseEvent.Button.None
+						MouseButton.Left => ULMouseEventButton.Left,
+						MouseButton.Right => ULMouseEventButton.Right,
+						MouseButton.Middle => ULMouseEventButton.Middle,
+						_ => ULMouseEventButton.None
 					}
-				);
+				};
 				view.FireMouseEvent(mouseEvent);
 				//cpuView.FireMouseEvent(mouseEvent);
 			};
 			window.MouseUp += (mu) =>
 			{
 				Console.WriteLine($"Mouse up {mu.Down} {mu.MouseButton}");
-				ULMouseEvent mouseEvent = new(
-					ULMouseEvent.ULMouseEventType.MouseUp,
-					x,
-					y,
-					mu.MouseButton switch
+				ULMouseEvent mouseEvent = new()
+				{
+					type = ULMouseEventType.MouseUp,
+					x = x,
+					y = y,
+					button = mu.MouseButton switch
 					{
-						MouseButton.Left => ULMouseEvent.Button.Left,
-						MouseButton.Right => ULMouseEvent.Button.Right,
-						MouseButton.Middle => ULMouseEvent.Button.Middle,
-						_ => ULMouseEvent.Button.None
+						MouseButton.Left => ULMouseEventButton.Left,
+						MouseButton.Right => ULMouseEventButton.Right,
+						MouseButton.Middle => ULMouseEventButton.Middle,
+						_ => ULMouseEventButton.None
 					}
-				);
+				};
 				view.FireMouseEvent(mouseEvent);
 				//cpuView.FireMouseEvent(mouseEvent);
 			};
@@ -261,7 +268,7 @@ void main()
 			{
 				ULScrollEvent scrollEvent = new()
 				{
-					type = ULScrollEvent.ScrollType.ByPixel,
+					type = ULScrollEventType.ByPixel,
 					deltaY = (int)mw.WheelDelta * 100
 				};
 				view.FireScrollEvent(scrollEvent);
@@ -307,13 +314,11 @@ void main()
 			stopwatch.Start();
 
 
-			view.SetDOMReadyCallback((user_data, caller, frame_id, is_main_frame, url) =>
+			view.OnDomReady += ((frame_id, is_main_frame, url) =>
 			{
 				Console.WriteLine("Dom is ready");
 
 				// view.EvaluateScript("window.location = \"https://heeeeeeeey.com/\"", out string exception);
-
-				view.SetDOMReadyCallback(null);
 			});
 
 			IntPtr rendererPtr = renderer.Ptr;

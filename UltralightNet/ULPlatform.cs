@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Net;
 using System.Runtime.InteropServices;
 
 namespace UltralightNet
@@ -29,6 +30,8 @@ namespace UltralightNet
 	[System.Diagnostics.CodeAnalysis.SuppressMessage("Interoperability", "CA1401:P/Invokes should not be visible", Justification = "<Pending>")]
 	public static class ULPlatform
 	{
+		static void ULPLatform() => Methods.Preload();
+
 		private static readonly Dictionary<ULLogger, List<GCHandle>> loggerHandles = new(1);
 		private static readonly Dictionary<ULFileSystem, List<GCHandle>> filesystemHandles = new(1);
 		private static readonly Dictionary<ULGPUDriver, List<GCHandle>> gpudriverHandles = new(1);
@@ -91,21 +94,29 @@ namespace UltralightNet
 		/// <summary>
 		/// Frees structures passed to methods
 		/// </summary>
-		[Obsolete]
 		public static void Free()
 		{
-
+			foreach(List<GCHandle> handles in loggerHandles.Values) foreach(GCHandle handle in handles) if (handle.IsAllocated) handle.Free();
+			foreach(List<GCHandle> handles in filesystemHandles.Values) foreach(GCHandle handle in handles) if (handle.IsAllocated) handle.Free();
+			foreach(List<GCHandle> handles in gpudriverHandles.Values) foreach(GCHandle handle in handles) if (handle.IsAllocated) handle.Free();
+			foreach(List<GCHandle> handles in clipboardHandles.Values) foreach(GCHandle handle in handles) if (handle.IsAllocated) handle.Free();
 		}
 
 		public static bool SetDefaultLogger { get; set; } = true;
 		public static bool SetDefaultFileSystem { get; set; } = true;
 
+		public static bool DebugWarnCertificate { get; set; } = true;
+		public static bool DebugWarnAcceleration { get; set; } = true;
+
+		public static bool ErrorMissingResources { get; set; } = true;
+
 		private static ULLogger _logger;
-		private static ULFileSystem _filesystem;
+		internal static ULFileSystem _filesystem;
 		private static ULGPUDriver _gpudriver;
 		private static ULClipboard _clipboard;
 
 		internal static bool gpudriverSet = false;
+		internal static bool fileSystemSet = false;
 
 		public static ULLogger Logger
 		{
@@ -123,6 +134,7 @@ namespace UltralightNet
 			{
 				_filesystem = value;
 				Methods.ulPlatformSetFileSystem(value);
+				fileSystemSet = true;
 			}
 		}
 		public static ULGPUDriver GPUDriver
@@ -157,11 +169,11 @@ namespace UltralightNet
 						LogMessage = (level, message) => { foreach (string line in message.Split('\n')) { Console.WriteLine($"(UL) {level}: {line}"); } }
 					};
 				}
-				if (SetDefaultFileSystem && _filesystem.__GetFileMimeType is null) // TODO
+				if (SetDefaultFileSystem && !fileSystemSet) // TODO
 				{
 					Console.WriteLine("UltralightNet: no filesystem set, default (with access only to required files) will be used.");
 
-					Dictionary<int, FileStream> files = new();
+					Dictionary<int, Stream> files = new();
 
 					int GetFileId()
 					{
@@ -174,31 +186,47 @@ namespace UltralightNet
 
 					FileSystem = new()
 					{
-						FileExists = (path) =>
+						FileExists = (file) =>
 						{
-							Console.WriteLine($"FileExists({path}) = {File.Exists(path)}");
-							return File.Exists(path);
+							// Console.WriteLine($"FileExists({file}) = {File.Exists(file)}");
+							//return File.Exists(path);
+							return file switch
+							{
+								"resources/cacert.pem" => true,
+								"resources/icudt67l.dat" => true,
+								"resources/mediaControls.css" => true,
+								"resources/mediaControls.js" => true,
+								"resources/mediaControlsLocalizedStrings.js" => true,
+								_ => false
+							};
 						},
 						GetFileMimeType = (string file, out string result) =>
 						{
 							Console.WriteLine($"GetFileMimeType({file})");
-							if (file.EndsWith("html"))
-								result = "text/html";
-							else if (file.EndsWith("js"))
-								result = "application/javascript";
-							else if (file.EndsWith("css"))
-								result = "text/css";
-							else
-								result = "application/octet-stream";
+							result = file switch
+							{
+								"resources/mediaControls.css" => "text/css",
+								"resources/mediaControls.js" => "application/javascript",
+								"resources/mediaControlsLocalizedStrings.js" => "application/javascript",
+								_ => "application/octet-stream"
+							};
 
 							return true;
 						},
 						OpenFile = (file, _) =>
 						{
-							FileStream fs = File.Open(file, FileMode.Open);
+							//FileStream fs = File.Open(file, FileMode.Open);
 							int id = GetFileId();
 							Console.WriteLine($"OpenFile({file}) = {id}");
-							files[id] = fs;
+							files[id] = file switch
+							{
+								"resources/cacert.pem" => Resources.Cacertpem,
+								"resources/icudt67l.dat" => Resources.Icudt67ldat,
+								"resources/mediaControls.css" => Resources.MediaControlscss,
+								"resources/mediaControls.js" => Resources.MediaControlsjs,
+								"resources/mediaControlsLocalizedStrings.js" => Resources.MediaControlsLocalizedStringsjs,
+								_ => throw new ArgumentOutOfRangeException(nameof(file), "Tried to open not required file.")
+							};
 							return id;
 						},
 						GetFileSize = (int handle, out long size) =>
@@ -207,7 +235,7 @@ namespace UltralightNet
 							Console.WriteLine($"GetFileSize({handle}) = {size}");
 							return true;
 						},
-						ReadFromFile = (handle, data, length) =>
+						ReadFromFile = (handle, data) =>
 						{
 							Console.WriteLine($"ReadFromFile({handle})");
 #if NET5_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
@@ -215,7 +243,7 @@ namespace UltralightNet
 #else
 							fixed(byte* dataPtr = data)
 							{
-								UnmanagedMemoryStream unmanagedMemoryStream = new(dataPtr, length, length, FileAccess.Write);
+								UnmanagedMemoryStream unmanagedMemoryStream = new(dataPtr, data.Length, data.Length, FileAccess.Write);
 								files[handle].CopyTo(unmanagedMemoryStream);
 							}
 							return files[handle].Length;
@@ -228,27 +256,35 @@ namespace UltralightNet
 							files.Remove(handle);
 						}
 					};
-
-					if (!(File.Exists("resources/cacert.pem") && File.Exists("resources/icudt67l.dat")))
-					{
-						throw new FileNotFoundException($"cacert.pem or icudt67l.dat not found in resources/ folder");
-					}
 				}
 				else
 				{
-					ULStringGeneratedDllImportMarshaler marshaler1 = new("resources/cacert.pem");
-					ULStringGeneratedDllImportMarshaler marshaler2 = new("resources/icudt67l.dat");
+					#if DEBUG
+					string cacertpem = "resources/cacert.pem";
+					#endif
+					string icudt67ldat = "resources/icudt67l.dat";
 
-					if (!(_filesystem.__FileExists(marshaler1.Value) && _filesystem.__FileExists(marshaler2.Value)))
+					#if DEBUG
+					fixed(char* cacertpemCharacters = cacertpem)
+					#endif
+					fixed(char* icudt67ldatCharacters = icudt67ldat)
 					{
-						marshaler1.FreeNative();
-						marshaler2.FreeNative();
-						throw new FileNotFoundException($"{typeof(ULFileSystem)} doesn't provide cacert.pem or icudt67l.dat from resources/ folder");
-					}
-					else
-					{
-						marshaler1.FreeNative();
-						marshaler2.FreeNative();
+						#if DEBUG
+						ULString cacertpemULSTR = new(){ data = (ushort*) cacertpemCharacters, length = (nuint) cacertpem.Length};
+						#endif
+						ULString icudt67ldatULSTR = new(){ data = (ushort*) icudt67ldatCharacters, length = (nuint) icudt67ldat.Length};
+
+						if (ErrorMissingResources && (!_filesystem.__FileExists(&icudt67ldatULSTR)))
+						{
+							throw new FileNotFoundException($"{typeof(ULFileSystem)} doesn't provide icudt67l.dat from resources/ folder. (Disable error by setting ULPlatform.ErrorMissingResources to false.)");
+						}
+
+						#if DEBUG
+						if (DebugWarnCertificate && (!_filesystem.__FileExists(&cacertpemULSTR)))
+						{
+							Console.WriteLine($"UltralightNet: {typeof(ULFileSystem)} doesn't provide cacert.pem from resources/ folder. All https:// requests will fail. (Disable warning by setting ULPlatform.DebugWarnCertificate to false)");
+						}
+						#endif
 					}
 				}
 			}

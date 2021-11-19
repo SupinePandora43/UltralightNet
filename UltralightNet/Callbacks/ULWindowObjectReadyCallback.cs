@@ -4,12 +4,12 @@ using System.Runtime.InteropServices;
 namespace UltralightNet
 {
 	[UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-	public delegate void ULWindowObjectReadyCallback__PInvoke__(
+	public unsafe delegate void ULWindowObjectReadyCallback__PInvoke__(
 		IntPtr user_data,
 		IntPtr caller,
 		ulong frame_id,
 		byte is_main_frame,
-		IntPtr url
+		ULString* url
 	);
 	public delegate void ULWindowObjectReadyCallback(
 		IntPtr user_data,

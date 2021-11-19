@@ -7,7 +7,6 @@ using System.Text;
 using System.Threading;
 using UltralightNet.AppCore;
 using Xunit;
-using Xunit.Abstractions;
 
 namespace UltralightNet.Test
 {
@@ -36,9 +35,9 @@ namespace UltralightNet.Test
 			result = "text/html";
 			return true;
 		}
-		private long readFromFile(int handle, Span<byte> data, long length)
+		private long readFromFile(int handle, Span<byte> data)
 		{
-			Console.WriteLine($"readFromFile({handle}, Span<byte> data, {length})");
+			Console.WriteLine($"readFromFile({handle}, Span<byte> data)");
 			//Assert.Equal("<html><body><p>123</p></body></html>".Length, length);
 			//data = "<html><body><p>123</p></body></html>";
 			return handles[handle].Read(data);
@@ -46,8 +45,6 @@ namespace UltralightNet.Test
 		[Fact]
 		public void TestRenderer()
 		{
-			//return;
-			if (RuntimeInformation.IsOSPlatform(OSPlatform.OSX)) return;
 			AppCoreMethods.ulEnablePlatformFontLoader();
 			AppCoreMethods.ulEnablePlatformFileSystem("./");
 			ULPlatform.Logger = new ULLogger()
@@ -70,7 +67,7 @@ namespace UltralightNet.Test
 			ULFileSystemGetFileSizeCallback get_file_size = getFileSize;
 			ULFileSystemGetFileMimeTypeCallback get_file_mime_type = getFileMimeType;
 			ULFileSystemReadFromFileCallback read_from_file = readFromFile;
-			/*ULPlatform.FileSystem = new ULFileSystem()
+			ULPlatform.FileSystem = new ULFileSystem()
 			{
 				FileExists = (path) =>
 				{
@@ -91,9 +88,12 @@ namespace UltralightNet.Test
 					 Console.WriteLine($"close_file({handle})");
 				 },
 				ReadFromFile = read_from_file
-			};*/
+			};
 
 			ULConfig config = new();
+
+                        if(OperatingSystem.IsMacOS()) return;
+
 			renderer = ULPlatform.CreateRenderer(config);
 
 			SessionTest();
@@ -224,9 +224,9 @@ namespace UltralightNet.Test
 			Console.WriteLine("KeyEvent");
 			view.FireKeyEvent(new(ULKeyEventType.Char, ULKeyEventModifiers.ShiftKey, 0, 0, "A", "A", false, false, false));
 			Console.WriteLine("MouseEvent");
-			view.FireMouseEvent(new(ULMouseEvent.ULMouseEventType.MouseDown, 100, 100, ULMouseEvent.Button.Left));
+			view.FireMouseEvent(new ULMouseEvent() { type = ULMouseEventType.MouseDown, x = 100, y = 100, button = ULMouseEventButton.Left });
 			Console.WriteLine("ScrollEvent");
-			view.FireScrollEvent(new() { type = ULScrollEvent.ScrollType.ByPage, deltaX = 23, deltaY = 123 });
+			view.FireScrollEvent(new() { type = ULScrollEventType.ByPage, deltaX = 23, deltaY = 123 });
 		}
 
 		private void MemoryTest()

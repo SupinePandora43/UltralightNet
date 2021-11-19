@@ -875,27 +875,6 @@ namespace UltralightNet
 {
 	public static partial class Methods
 	{
-		public static partial uint ulStringGetLength(global::System.IntPtr str)
-		{
-			unsafe
-			{
-				uint __retVal = default;
-				//
-				// Invoke
-				//
-				__retVal = ulStringGetLength__PInvoke__(str);
-				return __retVal;
-			}
-		}
-
-		[System.Runtime.InteropServices.DllImportAttribute("Ultralight", EntryPoint = "ulStringGetLength")]
-		extern private static unsafe uint ulStringGetLength__PInvoke__(global::System.IntPtr str);
-	}
-}
-namespace UltralightNet
-{
-	public static partial class Methods
-	{
 		public static partial bool ulStringIsEmpty(global::System.IntPtr str)
 		{
 			unsafe
@@ -1344,34 +1323,6 @@ namespace UltralightNet
 		[System.Runtime.InteropServices.DllImportAttribute("Ultralight", EntryPoint = "ulViewHasInputFocus")]
 		extern private static unsafe byte ulViewHasInputFocus__PInvoke__(global::System.IntPtr view);
 	}
-}
-namespace UltralightNet
-{
-    public static partial class Methods
-    {
-        public static partial void ulViewFireScrollEvent(global::System.IntPtr view, ref global::UltralightNet.ULScrollEvent scroll_event)
-        {
-            unsafe
-            {
-                global::UltralightNet.ULScrollEventNative __scroll_event_gen_native = default;
-                //
-                // Marshal
-                //
-                __scroll_event_gen_native = new global::UltralightNet.ULScrollEventNative(scroll_event);
-                //
-                // Invoke
-                //
-                ulViewFireScrollEvent__PInvoke__(view, &__scroll_event_gen_native);
-                //
-                // Unmarshal
-                //
-                scroll_event = __scroll_event_gen_native.ToManaged();
-            }
-        }
-
-        [System.Runtime.InteropServices.DllImportAttribute("Ultralight", EntryPoint = "ulViewFireScrollEvent")]
-        extern private static unsafe void ulViewFireScrollEvent__PInvoke__(global::System.IntPtr view, global::UltralightNet.ULScrollEventNative*scroll_event);
-    }
 }
 namespace UltralightNet
 {

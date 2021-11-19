@@ -1,26 +1,14 @@
-using System.Runtime.InteropServices;
-
 namespace UltralightNet
 {
 	/// <summary>
 	/// Scroll event
 	/// </summary>
-	[NativeMarshalling(typeof(ULScrollEventNative))]
-	public struct ULScrollEvent
+	public ref struct ULScrollEvent
 	{
 		/// <summary>
 		/// Type of event
 		/// </summary>
-		public enum ScrollType
-		{
-			ByPixel,
-			ByPage
-		}
-
-		/// <summary>
-		/// Type of event
-		/// </summary>
-		public ScrollType type;
+		public ULScrollEventType type;
 		/// <summary>
 		/// horizontal scroll
 		/// </summary>
@@ -29,28 +17,5 @@ namespace UltralightNet
 		/// vertical scroll
 		/// </summary>
 		public int deltaY;
-	}
-
-	[BlittableType]
-	[StructLayout(LayoutKind.Sequential)]
-	internal struct ULScrollEventNative
-	{
-		public int type;
-		public int deltaX;
-		public int deltaY;
-
-		public ULScrollEventNative(ULScrollEvent scrollEvent)
-		{
-			type = (int)scrollEvent.type;
-			deltaX = scrollEvent.deltaX;
-			deltaY = scrollEvent.deltaY;
-		}
-
-		public ULScrollEvent ToManaged() => new()
-		{
-			type = (ULScrollEvent.ScrollType)type,
-			deltaX = deltaX,
-			deltaY = deltaY
-		};
 	}
 }

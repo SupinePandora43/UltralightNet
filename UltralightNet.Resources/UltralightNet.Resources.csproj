@@ -1,12 +1,17 @@
 <Project Sdk="Microsoft.NET.Sdk">
 	<PropertyGroup>
-		<TargetFrameworks>net5.0;net451;net45;netstandard2.1;netstandard2;netstandard1</TargetFrameworks>
+		<TargetFrameworks>net5.0;net451;net45;netstandard2.1;netstandard2</TargetFrameworks>
 
 		<Authors>Ultralight, Inc.</Authors>
 		<PackageId>UltralightNet.Resources</PackageId>
 		<Description>Ultralight 'resources' folder</Description>
+
+		<RunAnalyzersDuringBuild>false</RunAnalyzersDuringBuild>
+		<RunAnalyzersDuringLiveAnalysis>false</RunAnalyzersDuringLiveAnalysis>
+		<RunAnalyzers>false</RunAnalyzers>
 	</PropertyGroup>
 	<ItemGroup>
+		<PackageReference Condition="'$(TargetFramework)'!='net5.0'" Include="System.Memory" Version="4.5.4" />
 		<Content Include="resources/cacert.pem">
 			<Pack>True</Pack>
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>

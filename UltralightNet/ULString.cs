@@ -47,8 +47,8 @@ namespace UltralightNet
 		public static extern IntPtr ulStringGetDataPtr(IntPtr str);
 
 		/// <summary>Get length in UTF-16 characters.</summary>
-		[GeneratedDllImport("Ultralight")]
-		public static partial uint ulStringGetLength(IntPtr str);
+		[DllImport("Ultralight")]
+		public static extern uint ulStringGetLength(IntPtr str);
 
 		/// <summary>Whether this string is empty or not.</summary>
 		[GeneratedDllImport("Ultralight")]
@@ -57,7 +57,7 @@ namespace UltralightNet
 
 		/// <summary>Replaces the contents of 'str' with the contents of 'new_str'</summary>
 		[DllImport("Ultralight")]
-		public static extern void ulStringAssignString(IntPtr str, IntPtr newStr);
+		public static unsafe extern void ulStringAssignString(ULString* str, ULString* newStr);
 
 		[GeneratedDllImport("Ultralight")]
 		public static partial void ulStringAssignCString(
@@ -71,30 +71,19 @@ namespace UltralightNet
 			)] string c_str);
 	}
 
-	public struct ULStringGeneratedDllImportMarshaler
+	public unsafe ref struct ULStringGeneratedDllImportMarshaler
 	{
-		public ULString ptr;
+		public ULString ulstring;
 
 		public ULStringGeneratedDllImportMarshaler(string str)
 		{
-			unsafe
-			{
-				ptr = new()
-				{
-					data = (ushort*)Marshal.StringToHGlobalUni(str),
-					length = (nuint)str.Length
-				};
-			}
+			ulstring = new() { data = (ushort*)Marshal.StringToHGlobalUni(str), length = (nuint)str.Length };
 		}
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public string ToManaged()
 		{
-			unsafe
-			{
-				//return Marshal.PtrToStringUni((IntPtr)ptr.data, (int)ptr.length);
-				return new((char*)ptr.data, 0, (int)ptr.length);
-			}
+			return Marshal.PtrToStringUni((IntPtr)ulstring.data, (int)ulstring.length);
 		}
 
 		public unsafe ULString* Value
@@ -102,21 +91,20 @@ namespace UltralightNet
 			[MethodImpl(MethodImplOptions.AggressiveInlining)]
 			get
 			{
-				fixed (ULString* valuePtr = &ptr)
-					return valuePtr;
+				fixed (ULString* ulStringPtr = &ulstring)
+				{
+					return ulStringPtr;
+				}
 			}
 
 			[MethodImpl(MethodImplOptions.AggressiveInlining)]
-			set => ptr = *value;
+			set => ulstring = *value;
 		}
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public void FreeNative()
 		{
-			unsafe
-			{
-				Marshal.FreeHGlobal((IntPtr)ptr.data);
-			}
+			Marshal.FreeHGlobal((IntPtr)ulstring.data);
 		}
 	}
 
@@ -133,132 +121,10 @@ namespace UltralightNet
 			return new((char*)data, 0, (int)length);
 		}
 
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public static unsafe string NativeToManaged(ULString* ulString)
 		{
 			return new((char*)ulString->data, 0, (int)ulString->length);
 		}
-	}
-
-	[Obsolete("Slow")]
-	public class ULStringMarshaler : ICustomMarshaler
-	{
-		#region Structures
-		[StructLayout(LayoutKind.Sequential)]
-		private struct ULStringSTR
-		{
-			[MarshalAs(UnmanagedType.LPWStr)]
-			public string data_;
-			public nuint length_;
-		}
-		[StructLayout(LayoutKind.Sequential)]
-		[BlittableType]
-		public struct ULStringPTR
-		{
-			public IntPtr data_;
-			public nuint length_;
-
-			public static ULStringPTR ManagedToNative(string str)
-			{
-				if (str is null) str = "";
-				IntPtr data = Marshal.StringToHGlobalUni(str);
-				return new() { data_ = data, length_ = (nuint)str.Length };
-			}
-			public string ToManaged()
-			{
-				return Marshal.PtrToStringUni(data_, (int)length_);
-			}
-			public static void CleanUpNative(ULStringPTR ulStringPTR)
-			{
-				Marshal.FreeHGlobal(ulStringPTR.data_);
-			}
-		}
-		#endregion Structures
-
-		private static readonly ULStringMarshaler instance = new();
-
-		public static ICustomMarshaler GetInstance(string _) => instance;
-
-		public int GetNativeDataSize() => 16; // idk what this means
-
-		public void CleanUpManagedData(object ManagedObj) { }
-		public void CleanUpNativeData(IntPtr ptr) => CleanUpNative(ptr);
-
-		public IntPtr MarshalManagedToNative(object ManagedObj) => ManagedToNative(ManagedObj as string);
-		public object MarshalNativeToManaged(IntPtr ptr) => NativeToManaged(ptr);
-
-		#region Code
-
-		/// <summary>
-		/// Creates ULString from <see cref="string"/>
-		/// </summary>
-		/// <param name="managedString">Unicode text</param>
-		/// <returns>ULString pointer</returns>
-		/// <remarks>you <b>MUST</b> call <see cref="CleanUpNativeData(IntPtr)"/> after you done</remarks>
-		public static IntPtr ManagedToNative(string managedString)
-		{
-			if (managedString is null) return IntPtr.Zero;
-
-			IntPtr ptr = Marshal.AllocHGlobal(11);
-			ULStringSTR nativeStruct = new()
-			{
-				data_ = managedString,
-				length_ = (uint)managedString.Length
-			};
-			Marshal.StructureToPtr(
-				nativeStruct,
-				ptr,
-				false
-			);
-			return ptr;
-		}
-
-		public static void ManagedToNative(string managedString, IntPtr ptr)
-		{
-			if (managedString is null || ptr == IntPtr.Zero) return;
-
-			ULStringSTR nativeStruct = new()
-			{
-				data_ = managedString,
-				length_ = (uint)managedString.Length
-			};
-			Marshal.StructureToPtr(
-				nativeStruct,
-				ptr,
-				false
-			);
-		}
-
-		/// <summary>
-		/// Creates <see cref="string"/> from ULString pointer
-		/// </summary>
-		/// <param name="ptr">ULString pointer</param>
-		/// <returns></returns>
-		public static string NativeToManaged(IntPtr ptr)
-		{
-			if (ptr == IntPtr.Zero) return null;
-#if NET5_0_OR_GREATER || NET451 || NETSTANDARD2_0
-			ULStringPTR result = Marshal.PtrToStructure<ULStringPTR>(ptr);
-#else
-			ULStringPTR result = (ULStringPTR)Marshal.PtrToStructure(ptr, typeof(ULStringPTR));
-#endif
-			return Marshal.PtrToStringUni(result.data_, (int)result.length_);
-		}
-
-		/// <summary>
-		/// Frees ULString
-		/// </summary>
-		/// <param name="ptr">ULString pointer</param>
-		public static void CleanUpNative(IntPtr ptr)
-		{
-			if (ptr == IntPtr.Zero) return;
-#if NET5_0_OR_GREATER || NET451 || NETSTANDARD2_0
-			Marshal.DestroyStructure<ULStringSTR>(ptr);
-#else
-			Marshal.DestroyStructure(ptr, typeof(ULStringSTR));
-#endif
-			//Marshal.FreeHGlobal(ptr);
-		}
-
-		#endregion Code
 	}
 }

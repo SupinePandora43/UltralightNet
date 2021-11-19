@@ -524,53 +524,8 @@ namespace UltralightNet.Veldrid
 
 		private void InitShaders()
 		{
-			if (IsDirectX)
-			{
-				ShaderDescription ulVertDesc = new()
-				{
-					Stage = ShaderStages.Vertex,
-					EntryPoint = "main",
-					Debug = Debug,
-					ShaderBytes = HLSL.ulVert
-				};
-				ShaderDescription ulFragDesc = new()
-				{
-					Stage = ShaderStages.Fragment,
-					EntryPoint = "main",
-					Debug = Debug,
-					ShaderBytes = HLSL.ulFill
-				};
-
-				ultralightShaders = new[] {
-					graphicsDevice.ResourceFactory.CreateShader(ref ulVertDesc),
-					graphicsDevice.ResourceFactory.CreateShader(ref ulFragDesc)
-				};
-
-				ShaderDescription ulPathVertDesc = new()
-				{
-					Stage = ShaderStages.Vertex,
-					EntryPoint = "main",
-					Debug = Debug,
-					ShaderBytes = HLSL.ulPathVert
-				};
-				ShaderDescription ulPathFragDesc = new()
-				{
-					Stage = ShaderStages.Fragment,
-					EntryPoint = "main",
-					Debug = Debug,
-					ShaderBytes = HLSL.ulPathFill,
-				};
-
-				ultralightPathShaders = new[] {
-					graphicsDevice.ResourceFactory.CreateShader(ref ulPathVertDesc),
-					graphicsDevice.ResourceFactory.CreateShader(ref ulPathFragDesc)
-				};
-			}
-			else
-			{
-				ultralightShaders = SpirvCross.ul(graphicsDevice);
-				ultralightPathShaders = SpirvCross.ulPath(graphicsDevice);
-			}
+			ultralightShaders = SpirvCross.ul(graphicsDevice);
+			ultralightPathShaders = SpirvCross.ulPath(graphicsDevice);
 		}
 
 		private VertexElementSemantic HLSL_to_any(VertexElementSemantic hlsl_semantic) => IsDirectX ? hlsl_semantic : VertexElementSemantic.TextureCoordinate;
@@ -683,6 +638,12 @@ namespace UltralightNet.Veldrid
 				}
 			);
 		}
+		private static void EnableScissors(ref GraphicsPipelineDescription pipa){
+			pipa.RasterizerState.ScissorTestEnabled = true;
+		}
+		private static void DisableScissors(ref GraphicsPipelineDescription pipa){
+			pipa.RasterizerState.ScissorTestEnabled = false;
+		}
 		private static void DisableBlend(ref GraphicsPipelineDescription pipa)
 		{
 			pipa.BlendState.AttachmentStates = new[]
@@ -737,7 +698,6 @@ namespace UltralightNet.Veldrid
 					},
 					AlphaToCoverageEnabled = false
 				},
-				//BlendState = BlendStateDescription.SingleAlphaBlend,
 				DepthStencilState = new DepthStencilStateDescription()
 				{
 					DepthTestEnabled = false, // glDisable(GL_DEPTH_TEST)
@@ -768,20 +728,20 @@ namespace UltralightNet.Veldrid
 
 			GraphicsPipelineDescription ultralight_pd__SCISSOR_TRUE__ENALBE_BLEND = _ultralightPipelineDescription;
 
-			ultralight_pd__SCISSOR_TRUE__ENALBE_BLEND.RasterizerState.ScissorTestEnabled = true;
+			EnableScissors(ref ultralight_pd__SCISSOR_TRUE__ENALBE_BLEND);
 
 			GraphicsPipelineDescription ultralight_pd__SCISSOR_FALSE__ENALBE_BLEND = _ultralightPipelineDescription;
 
-			ultralight_pd__SCISSOR_FALSE__ENALBE_BLEND.RasterizerState.ScissorTestEnabled = false;
+			DisableScissors(ref ultralight_pd__SCISSOR_FALSE__ENALBE_BLEND);
 
 			GraphicsPipelineDescription ultralight_pd__SCISSOR_TRUE__DISALBE_BLEND = _ultralightPipelineDescription;
 
-			ultralight_pd__SCISSOR_TRUE__DISALBE_BLEND.RasterizerState.ScissorTestEnabled = true;
+			EnableScissors(ref ultralight_pd__SCISSOR_TRUE__DISALBE_BLEND);
 			DisableBlend(ref ultralight_pd__SCISSOR_TRUE__DISALBE_BLEND);
 
 			GraphicsPipelineDescription ultralight_pd__SCISSOR_FALSE__DISALBE_BLEND = _ultralightPipelineDescription;
 
-			ultralight_pd__SCISSOR_FALSE__DISALBE_BLEND.RasterizerState.ScissorTestEnabled = false;
+			DisableScissors(ref ultralight_pd__SCISSOR_FALSE__DISALBE_BLEND);
 			DisableBlend(ref ultralight_pd__SCISSOR_FALSE__DISALBE_BLEND);
 
 
@@ -797,19 +757,20 @@ namespace UltralightNet.Veldrid
 
 			GraphicsPipelineDescription ultralightPath_pd__SCISSOR_TRUE__ENALBE_BLEND = _ultralightPathPipelineDescription;
 
-			ultralightPath_pd__SCISSOR_TRUE__ENALBE_BLEND.RasterizerState.ScissorTestEnabled = true;
+			EnableScissors(ref ultralightPath_pd__SCISSOR_TRUE__ENALBE_BLEND);
 
 			GraphicsPipelineDescription ultralightPath_pd__SCISSOR_FALSE__ENALBE_BLEND = _ultralightPathPipelineDescription;
 
-			ultralightPath_pd__SCISSOR_FALSE__ENALBE_BLEND.RasterizerState.ScissorTestEnabled = false;
+			DisableScissors(ref ultralightPath_pd__SCISSOR_FALSE__ENALBE_BLEND);
 
 			GraphicsPipelineDescription ultralightPath_pd__SCISSOR_TRUE__DISABLE_BLEND = _ultralightPathPipelineDescription;
 
+			EnableScissors(ref ultralightPath_pd__SCISSOR_TRUE__DISABLE_BLEND);
 			DisableBlend(ref ultralightPath_pd__SCISSOR_TRUE__DISABLE_BLEND);
 
 			GraphicsPipelineDescription ultralightPath_pd__SCISSOR_FALSE__DISABLE_BLEND = _ultralightPathPipelineDescription;
 
-			ultralightPath_pd__SCISSOR_FALSE__DISABLE_BLEND.RasterizerState.ScissorTestEnabled = true;
+			DisableScissors(ref ultralightPath_pd__SCISSOR_FALSE__DISABLE_BLEND);
 			DisableBlend(ref ultralightPath_pd__SCISSOR_FALSE__DISABLE_BLEND);
 
 			ulPath_scissor_blend = graphicsDevice.ResourceFactory.CreateGraphicsPipeline(ref ultralightPath_pd__SCISSOR_TRUE__ENALBE_BLEND);
