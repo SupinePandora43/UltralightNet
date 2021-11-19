@@ -1,7 +1,7 @@
 name: Development builds
 on:
   push:
-    branches: [ master ]
+    branches: [ '*' ]
 jobs:
   build-publish:
     name: Build and publish on Github Packages
