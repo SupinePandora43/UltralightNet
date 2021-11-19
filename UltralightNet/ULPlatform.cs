@@ -94,17 +94,24 @@ namespace UltralightNet
 		/// <summary>
 		/// Frees structures passed to methods
 		/// </summary>
-		[Obsolete]
 		public static void Free()
 		{
-
+			foreach(List<GCHandle> handles in loggerHandles.Values) foreach(GCHandle handle in handles) if (handle.IsAllocated) handle.Free();
+			foreach(List<GCHandle> handles in filesystemHandles.Values) foreach(GCHandle handle in handles) if (handle.IsAllocated) handle.Free();
+			foreach(List<GCHandle> handles in gpudriverHandles.Values) foreach(GCHandle handle in handles) if (handle.IsAllocated) handle.Free();
+			foreach(List<GCHandle> handles in clipboardHandles.Values) foreach(GCHandle handle in handles) if (handle.IsAllocated) handle.Free();
 		}
 
 		public static bool SetDefaultLogger { get; set; } = true;
 		public static bool SetDefaultFileSystem { get; set; } = true;
 
+		public static bool DebugWarnCertificate { get; set; } = true;
+		public static bool DebugWarnAcceleration { get; set; } = true;
+
+		public static bool ErrorMissingResources { get; set; } = true;
+
 		private static ULLogger _logger;
-		private static ULFileSystem _filesystem;
+		internal static ULFileSystem _filesystem;
 		private static ULGPUDriver _gpudriver;
 		private static ULClipboard _clipboard;
 
@@ -252,30 +259,32 @@ namespace UltralightNet
 				}
 				else
 				{
+					#if DEBUG
 					string cacertpem = "resources/cacert.pem";
+					#endif
 					string icudt67ldat = "resources/icudt67l.dat";
 
 					#if DEBUG
 					fixed(char* cacertpemCharacters = cacertpem)
-					#endif DEBUG
+					#endif
 					fixed(char* icudt67ldatCharacters = icudt67ldat)
 					{
 						#if DEBUG
 						ULString cacertpemULSTR = new(){ data = (ushort*) cacertpemCharacters, length = (nuint) cacertpem.Length};
-						#endif DEBUG
+						#endif
 						ULString icudt67ldatULSTR = new(){ data = (ushort*) icudt67ldatCharacters, length = (nuint) icudt67ldat.Length};
 
-						if (!_filesystem.__FileExists(&icudt67ldatULSTR))
+						if (ErrorMissingResources && (!_filesystem.__FileExists(&icudt67ldatULSTR)))
 						{
-							throw new FileNotFoundException($"{typeof(ULFileSystem)} doesn't provide icudt67l.dat from resources/ folder.");
+							throw new FileNotFoundException($"{typeof(ULFileSystem)} doesn't provide icudt67l.dat from resources/ folder. (Disable error by setting ULPlatform.ErrorMissingResources to false.)");
 						}
 
 						#if DEBUG
-						if (!_filesystem.__FileExists(&cacertpemULSTR))
+						if (DebugWarnCertificate && (!_filesystem.__FileExists(&cacertpemULSTR)))
 						{
-							Console.WriteLine($"UltralightNet: {typeof(ULFileSystem)} doesn't provide cacert.pem from resources/ folder. All https:// requests will fail.");
+							Console.WriteLine($"UltralightNet: {typeof(ULFileSystem)} doesn't provide cacert.pem from resources/ folder. All https:// requests will fail. (Disable warning by setting ULPlatform.DebugWarnCertificate to false)");
 						}
-						#endif DEBUG
+						#endif
 					}
 				}
 			}

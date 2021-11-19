@@ -196,7 +196,27 @@ namespace UltralightNet
 			handles[key] = handle;
 		}
 
-		public string URL { get => Methods.ulViewGetURL(Ptr); set => Methods.ulViewLoadURL(Ptr, value); }
+		public string URL
+		{
+			get => Methods.ulViewGetURL(Ptr);
+			#if DEBUG
+			set {
+				if(ULPlatform.DebugWarnCertificate && value.ToLower().StartsWith("https://")){
+					string cacertpem = "resources/cacert.pem";
+					fixed(char* cacertpemCharacters = cacertpem){
+						ULString cacertpemULSTR = new(){ data = (ushort*) cacertpemCharacters, length = (nuint) cacertpem.Length};
+						if (!ULPlatform._filesystem.__FileExists(&cacertpemULSTR))
+						{
+							Console.WriteLine($"UltralightNet: {typeof(ULFileSystem)} doesn't provide cacert.pem from resources/ folder. All https:// requests will fail. (Disable warning by setting ULPlatform.DebugWarnCertificate to false)");
+						}
+					}
+				}
+				Methods.ulViewLoadURL(Ptr, value);
+			}
+			#else
+			set => Methods.ulViewLoadURL(Ptr, value);
+			#endif
+		}
 		public string HTML { set => Methods.ulViewLoadHTML(Ptr, value); }
 		public string Title { get => Methods.ulViewGetTitle(Ptr); }
 
