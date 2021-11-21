@@ -14,10 +14,6 @@ public class UltralightNetOpenGLGpuDriver {
 	private readonly Dictionary<uint, GeometryEntry> geometries = new();
 	private readonly Dictionary<uint, RenderBufferEntry> renderBuffers = new();
 
-	private uint nextTextureId = 0;
-	private uint nextGeometryId = 0;
-	private uint nextRenderBufferId = 0;
-
 	public UltralightNetOpenGLGpuDriver(GL glapi){
 		gl = glapi;
 
@@ -116,19 +112,31 @@ public class UltralightNetOpenGLGpuDriver {
 		BeginSynchronize = null,
 		EndSynchronize = null,
 		NextTextureId = () => {
-			uint id = ++nextTextureId;
-			textures.Add(id, new());
-			return id;
+			for (uint i = 0; ; i++)
+			{
+				if (!textures.ContainsKey(i)){
+					textures.Add(i, new());
+					return i;
+				}
+			}
 		},
 		NextGeometryId = () => {
-			uint id = ++nextGeometryId;
-			geometries.Add(id, new());
-			return id;
+			for (uint i = 0; ; i++)
+			{
+				if (!geometries.ContainsKey(i)){
+					geometries.Add(i, new());
+					return i;
+				}
+			}
 		},
 		NextRenderBufferId = () => {
-			uint id = ++nextRenderBufferId;
-			renderBuffers.Add(id, new());
-			return id;
+			for (uint i = 0; ; i++)
+			{
+				if (!renderBuffers.ContainsKey(i)){
+					renderBuffers.Add(i, new());
+					return i;
+				}
+			}
 		},
 	};
 
