@@ -29,15 +29,15 @@ public unsafe class UltralightNetOpenGLGpuDriver {
 			gl.CompileShader(frag);
 
 			string vertLog = gl.GetShaderInfoLog(vert);
-            if (!string.IsNullOrWhiteSpace(vertLog))
-            {
-                throw new Exception($"Error compiling shader of type, failed with error {vertLog}");
-            }
+			if (!string.IsNullOrWhiteSpace(vertLog))
+			{
+				throw new Exception($"Error compiling shader of type, failed with error {vertLog}");
+			}
 			string fragLog = gl.GetShaderInfoLog(frag);
-            if (!string.IsNullOrWhiteSpace(fragLog))
-            {
-                throw new Exception($"Error compiling shader of type, failed with error {fragLog}");
-            }
+			if (!string.IsNullOrWhiteSpace(fragLog))
+			{
+				throw new Exception($"Error compiling shader of type, failed with error {fragLog}");
+			}
 
 			pathProgram = gl.CreateProgram();
 
@@ -46,15 +46,15 @@ public unsafe class UltralightNetOpenGLGpuDriver {
 
 			gl.LinkProgram(pathProgram);
 			gl.GetProgram(pathProgram, GLEnum.LinkStatus, out var status);
-            if (status == 0)
-            {
-                throw new Exception($"Program failed to link with error: {gl.GetProgramInfoLog(pathProgram)}");
-            }
+			if (status == 0)
+			{
+				throw new Exception($"Program failed to link with error: {gl.GetProgramInfoLog(pathProgram)}");
+			}
 
 			gl.DetachShader(pathProgram, vert);
-            gl.DetachShader(pathProgram, frag);
-            gl.DeleteShader(vert);
-            gl.DeleteShader(frag);
+			gl.DetachShader(pathProgram, frag);
+			gl.DeleteShader(vert);
+			gl.DeleteShader(frag);
 		}
 		#endregion
 		#region fillProgram
@@ -69,15 +69,15 @@ public unsafe class UltralightNetOpenGLGpuDriver {
 			gl.CompileShader(frag);
 
 			string vertLog = gl.GetShaderInfoLog(vert);
-            if (!string.IsNullOrWhiteSpace(vertLog))
-            {
-                throw new Exception($"Error compiling shader of type, failed with error {vertLog}");
-            }
+			if (!string.IsNullOrWhiteSpace(vertLog))
+			{
+				throw new Exception($"Error compiling shader of type, failed with error {vertLog}");
+			}
 			string fragLog = gl.GetShaderInfoLog(frag);
-            if (!string.IsNullOrWhiteSpace(fragLog))
-            {
-                throw new Exception($"Error compiling shader of type, failed with error {fragLog}");
-            }
+			if (!string.IsNullOrWhiteSpace(fragLog))
+			{
+				throw new Exception($"Error compiling shader of type, failed with error {fragLog}");
+			}
 
 			fillProgram = gl.CreateProgram();
 
@@ -86,20 +86,20 @@ public unsafe class UltralightNetOpenGLGpuDriver {
 
 			gl.LinkProgram(fillProgram);
 			gl.GetProgram(fillProgram, GLEnum.LinkStatus, out var status);
-            if (status == 0)
-            {
-                throw new Exception($"Program failed to link with error: {gl.GetProgramInfoLog(fillProgram)}");
-            }
+			if (status == 0)
+			{
+				throw new Exception($"Program failed to link with error: {gl.GetProgramInfoLog(fillProgram)}");
+			}
 
 			gl.DetachShader(fillProgram, vert);
-            gl.DetachShader(fillProgram, frag);
-            gl.DeleteShader(vert);
-            gl.DeleteShader(frag);
+			gl.DetachShader(fillProgram, frag);
+			gl.DeleteShader(vert);
+			gl.DeleteShader(frag);
 		}
 		#endregion
 	}
 
-    private static string GetShader(string name)
+	private static string GetShader(string name)
 	{
 		Assembly assembly = typeof(SpirvCross).Assembly;
 		Stream stream = assembly.GetManifestResourceStream("UltralightNet.OpenGL.shaders." + name);
@@ -143,7 +143,7 @@ public unsafe class UltralightNetOpenGLGpuDriver {
 			textures[entryId].textureId = textureId;
 
 			gl.ActiveTexture(TextureUnit.Texture0);
-    		gl.BindTexture(TextureTarget.Texture2D, textureId);
+			gl.BindTexture(TextureTarget.Texture2D, textureId);
 
 			var linear = (int) GLEnum.Linear;
 			gl.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, ref linear);
@@ -152,7 +152,7 @@ public unsafe class UltralightNetOpenGLGpuDriver {
 			var clampToEdge = (int) GLEnum.ClampToEdge;
 			gl.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapS, ref clampToEdge);
 			gl.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapT, ref clampToEdge);
-    
+	
 			if(bitmap.IsEmpty){
 				// FIXME: rgba
 				gl.TexImage2D(TextureTarget.Texture2D, 0, (int) InternalFormat.Rgba8, bitmap.Width, bitmap.Height, 0, PixelFormat.Rgba, PixelType.UnsignedByte, default);
@@ -179,7 +179,7 @@ public unsafe class UltralightNetOpenGLGpuDriver {
 			uint textureId = textures[entryId].textureId;
 
 			gl.ActiveTexture(TextureUnit.Texture0);
-    		gl.BindTexture(TextureTarget.Texture2D, textureId);
+			gl.BindTexture(TextureTarget.Texture2D, textureId);
 
 			gl.PixelStore(PixelStoreParameter.UnpackAlignment, 1);
 			gl.PixelStore(PixelStoreParameter.UnpackRowLength, (int) (bitmap.RowBytes / bitmap.Bpp));
@@ -192,7 +192,7 @@ public unsafe class UltralightNetOpenGLGpuDriver {
 			}else{
 				gl.TexImage2D(TextureTarget.Texture2D, 0, (int) InternalFormat.R8, texWidth, texHeight, 0, PixelFormat.Red, PixelType.UnsignedByte, pixels);
 			}
-			
+
 			bitmap.UnlockPixels();
 
 			//FIXME: mipmap
