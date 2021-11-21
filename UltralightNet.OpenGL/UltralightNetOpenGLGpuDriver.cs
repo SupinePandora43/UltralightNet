@@ -4,7 +4,7 @@ using System;
 using System.IO;
 using Silk.NET.OpenGL;
 
-public class UltralightNetOpenGLGpuDriver {
+public unsafe class UltralightNetOpenGLGpuDriver {
 	private GL gl;
 
 	private uint pathProgram;
@@ -138,8 +138,69 @@ public class UltralightNetOpenGLGpuDriver {
 				}
 			}
 		},
+		CreateTexture = (entryId, bitmap) => {
+			uint textureId = gl.GenTexture();
+			textures[entryId].textureId = textureId;
+
+			gl.ActiveTexture(TextureUnit.Texture0);
+    		gl.BindTexture(TextureTarget.Texture2D, textureId);
+
+			var linear = (int) GLEnum.Linear;
+			gl.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, ref linear);
+			gl.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, ref linear);
+		
+			var clampToEdge = (int) GLEnum.ClampToEdge;
+			gl.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapS, ref clampToEdge);
+			gl.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapT, ref clampToEdge);
+    
+			if(bitmap.IsEmpty){
+				// FIXME: rgba
+				gl.TexImage2D(TextureTarget.Texture2D, 0, (int) InternalFormat.Rgba8, bitmap.Width, bitmap.Height, 0, PixelFormat.Rgba, PixelType.UnsignedByte, default);
+			} else {
+				gl.PixelStore(PixelStoreParameter.UnpackAlignment, 1);
+				gl.PixelStore(PixelStoreParameter.UnpackRowLength, (int) (bitmap.RowBytes / bitmap.Bpp));
+			
+				void* pixels = (void*) bitmap.LockPixels();
+				
+				if(bitmap.Format is ULBitmapFormat.BGRA8_UNORM_SRGB){
+					// FIXME: rgba
+					gl.TexImage2D(TextureTarget.Texture2D, 0, (int) InternalFormat.Srgb8Alpha8, bitmap.Width, bitmap.Height, 0, PixelFormat.Rgba, PixelType.UnsignedByte, pixels);
+				}else{
+					gl.TexImage2D(TextureTarget.Texture2D, 0, (int) InternalFormat.R8, texWidth, texHeight, 0, PixelFormat.Red, PixelType.UnsignedByte, pixels);
+				}
+
+				bitmap.UnlockPixels();
+			}
+
+			//FIXME: mipmap
+			gl.GenerateMipmap(TextureTarget.Texture2D);
+		},
+		UpdateTexture = (entryId, bitmap) => {
+			uint textureId = textures[entryId].textureId;
+
+			gl.ActiveTexture(TextureUnit.Texture0);
+    		gl.BindTexture(TextureTarget.Texture2D, textureId);
+
+			gl.PixelStore(PixelStoreParameter.UnpackAlignment, 1);
+			gl.PixelStore(PixelStoreParameter.UnpackRowLength, (int) (bitmap.RowBytes / bitmap.Bpp));
+		
+			void* pixels = (void*) bitmap.LockPixels();
+			
+			if(bitmap.Format is ULBitmapFormat.BGRA8_UNORM_SRGB){
+				// FIXME: rgba
+				gl.TexImage2D(TextureTarget.Texture2D, 0, (int) InternalFormat.Srgb8Alpha8, bitmap.Width, bitmap.Height, 0, PixelFormat.Rgba, PixelType.UnsignedByte, pixels);
+			}else{
+				gl.TexImage2D(TextureTarget.Texture2D, 0, (int) InternalFormat.R8, texWidth, texHeight, 0, PixelFormat.Red, PixelType.UnsignedByte, pixels);
+			}
+			
+			bitmap.UnlockPixels();
+
+			//FIXME: mipmap
+			gl.GenerateMipmap(TextureTarget.Texture2D);
+		}
 	};
 
+	// TODO: delete if useless
 	private class TextureEntry
 	{
 		public uint textureId;
