@@ -5,11 +5,18 @@ using System.IO;
 using Silk.NET.OpenGL;
 
 public class UltralightNetOpenGLGpuDriver {
-
 	private GL gl;
 
 	private uint pathProgram;
 	private uint fillProgram;
+
+	private readonly Dictionary<uint, TextureEntry> textures = new();
+	private readonly Dictionary<uint, GeometryEntry> geometries = new();
+	private readonly Dictionary<uint, RenderBufferEntry> renderBuffers = new();
+
+	private uint nextTextureId = 0;
+	private uint nextGeometryId = 0;
+	private uint nextRenderBufferId = 0;
 
 	public UltralightNetOpenGLGpuDriver(GL glapi){
 		gl = glapi;
@@ -106,6 +113,37 @@ public class UltralightNetOpenGLGpuDriver {
 
 
 	public ULGpuDriver GetGPUDriver() => new(){
-
+		BeginSynchronize = null,
+		EndSynchronize = null,
+		NextTextureId = () => {
+			uint id = ++nextTextureId;
+			textures.Add(id, new());
+			return id;
+		},
+		NextGeometryId = () => {
+			uint id = ++nextGeometryId;
+			geometries.Add(id, new());
+			return id;
+		},
+		NextRenderBufferId = () => {
+			uint id = ++nextRenderBufferId;
+			renderBuffers.Add(id, new());
+			return id;
+		},
 	};
+
+	private class TextureEntry
+	{
+		public uint textureId;
+	}
+	private class GeometryEntry
+	{
+		public uint vertices;
+		public uint indicies;
+	}
+	private class RenderBufferEntry
+	{
+		public uint framebuffer;
+		public TextureEntry textureEntry;
+	}
 }
