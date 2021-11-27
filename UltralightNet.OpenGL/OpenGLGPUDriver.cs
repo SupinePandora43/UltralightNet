@@ -1,8 +1,9 @@
 namespace UltralightNet.OpenGL;
 
 using System;
-using System.Collections.Generic;
 using System.IO;
+using System.Reflection;
+using System.Collections.Generic;
 using Silk.NET.OpenGL;
 using UltralightNet;
 
@@ -103,7 +104,7 @@ public unsafe class OpenGLGPUDriver {
 
 	private static string GetShader(string name)
 	{
-		Assembly assembly = typeof(SpirvCross).Assembly;
+		Assembly assembly = typeof(OpenGLGPUDriver).Assembly;
 		Stream stream = assembly.GetManifestResourceStream("UltralightNet.OpenGL.shaders." + name);
 		StreamReader resourceStreamReader = new(stream, Encoding.UTF8, false, 16, true);
 		return resourceStreamReader.ReadToEnd();
