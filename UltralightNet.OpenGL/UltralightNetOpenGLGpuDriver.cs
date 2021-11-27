@@ -1,8 +1,10 @@
 namespace UltralightNet.OpenGL;
 
 using System;
+using System.Collections.Generic;
 using System.IO;
 using Silk.NET.OpenGL;
+using UltralightNet;
 
 public unsafe class UltralightNetOpenGLGpuDriver {
 	private GL gl;
