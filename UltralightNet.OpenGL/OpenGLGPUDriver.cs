@@ -6,7 +6,7 @@ using System.IO;
 using Silk.NET.OpenGL;
 using UltralightNet;
 
-public unsafe class UltralightNetOpenGLGpuDriver {
+public unsafe class OpenGLGPUDriver {
 	private GL gl;
 
 	private uint pathProgram;
@@ -16,7 +16,7 @@ public unsafe class UltralightNetOpenGLGpuDriver {
 	private readonly Dictionary<uint, GeometryEntry> geometries = new();
 	private readonly Dictionary<uint, RenderBufferEntry> renderBuffers = new();
 
-	public UltralightNetOpenGLGpuDriver(GL glapi){
+	public OpenGLGPUDriver(GL glapi){
 		gl = glapi;
 
 		#region pathProgram
@@ -110,7 +110,7 @@ public unsafe class UltralightNetOpenGLGpuDriver {
 	}
 
 
-	public ULGpuDriver GetGPUDriver() => new(){
+	public ULGPUDriver GetGPUDriver() => new(){
 		BeginSynchronize = null,
 		EndSynchronize = null,
 		NextTextureId = () => {
