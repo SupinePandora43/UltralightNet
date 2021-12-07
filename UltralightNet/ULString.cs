@@ -117,7 +117,7 @@ namespace UltralightNet
 			str = managed;
 		}
 
-		public readonly ref char GetPinnableReference() => str.GetPinnableReference();
+		public readonly ref char GetPinnableReference() => ref str.GetPinnableReference();
 
 		public ULString Value
 		{
