@@ -108,6 +108,24 @@ namespace UltralightNet
 		}
 	}
 
+	public unsafe struct NoAllocULStringMarshaller
+	{
+		private string str;
+
+		public NoAllocULStringMarshaller(string managed)
+		{
+			_str = managed;
+		}
+
+		public ref char GetPinnableReference() => str.GetPinnableReference();
+
+		public ULString Value
+		{
+			get => new ULString() { data = (ushort*)Unsafe.AsPointer(GetPinnableReference()), length = (nuint)str.Length };
+		}
+	}
+
+
 	[BlittableType]
 	[StructLayout(LayoutKind.Sequential)]
 	public unsafe struct ULString
