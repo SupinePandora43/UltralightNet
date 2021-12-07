@@ -121,7 +121,7 @@ namespace UltralightNet
 
 		public ULString Value
 		{
-			get => new ULString() { data = (ushort*)Unsafe.AsPointer(ref GetPinnableReference()), length = (nuint)str.Length };
+			get => new ULString() { data = (ushort*)Unsafe.AsPointer(ref Unsafe.AsRef(GetPinnableReference())), length = (nuint)str.Length };
 		}
 	}
 
