@@ -114,7 +114,7 @@ namespace UltralightNet
 
 		public NoAllocULStringMarshaller(string managed)
 		{
-			_str = managed;
+			str = managed;
 		}
 
 		public ref char GetPinnableReference() => str.GetPinnableReference();
