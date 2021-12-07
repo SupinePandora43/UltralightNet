@@ -107,7 +107,7 @@ namespace UltralightNet
 			Marshal.FreeHGlobal((IntPtr)ulstring.data);
 		}
 	}
-
+#if NET5_0_OR_GREATER
 	public unsafe struct NoAllocULStringMarshaller
 	{
 		private string str;
@@ -124,7 +124,7 @@ namespace UltralightNet
 			get => new ULString() { data = (ushort*)Unsafe.AsPointer(ref Unsafe.AsRef(GetPinnableReference())), length = (nuint)str.Length };
 		}
 	}
-
+#endif
 
 	[BlittableType]
 	[StructLayout(LayoutKind.Sequential)]
