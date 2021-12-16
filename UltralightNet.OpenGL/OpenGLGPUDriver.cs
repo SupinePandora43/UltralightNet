@@ -2,6 +2,7 @@ namespace UltralightNet.OpenGL;
 
 using System;
 using System.IO;
+using System.Text;
 using System.Reflection;
 using System.Collections.Generic;
 using Silk.NET.OpenGL;
@@ -146,15 +147,13 @@ public unsafe class OpenGLGPUDriver {
 			textures[entryId].textureId = textureId;
 
 			gl.ActiveTexture(TextureUnit.Texture0);
-			gl.BindTexture(TextureTarget.Texture2D, textureId);
+			gl.BindTexture(GLEnum.Texture2D, textureId);
 
-			var linear = (int) GLEnum.Linear;
-			gl.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, ref linear);
-			gl.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, ref linear);
+			gl.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int) GLEnum.Linear);
+			gl.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter,(int) GLEnum.Linear);
 		
-			var clampToEdge = (int) GLEnum.ClampToEdge;
-			gl.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapS, ref clampToEdge);
-			gl.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapT, ref clampToEdge);
+			gl.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapS, (int) GLEnum.ClampToEdge);
+			gl.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapT, (int) GLEnum.ClampToEdge);
 	
 			if(bitmap.IsEmpty){
 				// FIXME: rgba
@@ -169,7 +168,7 @@ public unsafe class OpenGLGPUDriver {
 					// FIXME: rgba
 					gl.TexImage2D(TextureTarget.Texture2D, 0, (int) InternalFormat.Srgb8Alpha8, bitmap.Width, bitmap.Height, 0, PixelFormat.Rgba, PixelType.UnsignedByte, pixels);
 				}else{
-					gl.TexImage2D(TextureTarget.Texture2D, 0, (int) InternalFormat.R8, texWidth, texHeight, 0, PixelFormat.Red, PixelType.UnsignedByte, pixels);
+					gl.TexImage2D(TextureTarget.Texture2D, 0, (int) InternalFormat.R8, bitmap.Width, bitmap.Height, 0, PixelFormat.Red, PixelType.UnsignedByte, pixels);
 				}
 
 				bitmap.UnlockPixels();
@@ -193,7 +192,7 @@ public unsafe class OpenGLGPUDriver {
 				// FIXME: rgba
 				gl.TexImage2D(TextureTarget.Texture2D, 0, (int) InternalFormat.Srgb8Alpha8, bitmap.Width, bitmap.Height, 0, PixelFormat.Rgba, PixelType.UnsignedByte, pixels);
 			}else{
-				gl.TexImage2D(TextureTarget.Texture2D, 0, (int) InternalFormat.R8, texWidth, texHeight, 0, PixelFormat.Red, PixelType.UnsignedByte, pixels);
+				gl.TexImage2D(TextureTarget.Texture2D, 0, (int) InternalFormat.R8, bitmap.Width, bitmap.Height, 0, PixelFormat.Red, PixelType.UnsignedByte, pixels);
 			}
 
 			bitmap.UnlockPixels();
