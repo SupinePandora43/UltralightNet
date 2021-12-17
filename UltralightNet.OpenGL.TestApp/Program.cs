@@ -4,147 +4,163 @@ using Silk.NET.Input;
 using Silk.NET.OpenGL;
 using Silk.NET.Windowing;
 
-Window.PrioritizeSdl();
+namespace UltralightNet.OpenGL.TestApp;
 
-IWindow window = Window.Create(WindowOptions.Default with
+public static class Program
 {
-	Size = new Vector2D<int>(800, 600)
-});
-
-string VertexShaderSource = @"
+	static readonly string VertexShaderSource = @"
 #version 330 core //Using version GLSL version 3.3
 layout (location = 0) in vec4 vPos;
-
+layout (location = 0) out vec2 uv;
 void main()
 {
+	uv = vec2(vPos.z, vPos.w);
     gl_Position = vec4(vPos.x, vPos.y, vPos.z, 1.0);
 }
 ";
 
-string FragmentShaderSource = @"
+	static readonly string FragmentShaderSource = @"
 #version 330 core
+layout (location = 0) in vec2 uv;
 out vec4 FragColor;
 void main()
 {
-    FragColor = vec4(1.0f, 0.5f, 0.2f, 1.0f);
+    FragColor = vec4(uv.x, uv.y, 0.0f, 1.0f);
+    //FragColor = vec4(1.0f,1.0f,0.0f,1.0f);
 }
 ";
 
-//Vertex data, uploaded to the VBO.
-float[] Vertices =
-{
-    //X    Y      Z
-    0.5f,  0.5f, 0.0f,
-	0.5f, -0.5f, 0.0f,
-	-0.5f, -0.5f, 0.0f,
-	-0.5f,  0.5f, 0.5f
-};
+	static float[] VertexBuffer = new float[]{
+		-1f, 1f, 0f, 1f,
+		1f, 1f, 1f, 1f,
+		1f,-1f, 1f, 0f,
+		-1f,-1f, 0f, 0f
+	};
 
-//Index data, uploaded to the EBO.
-uint[] Indices =
-{
-	0, 1, 3,
-	1, 2, 3
-};
-
-GL gl = null;
-
-uint vao = 0, vbo = 0, ebo = 0;
-uint Shader = 0;
-
-unsafe void OnLoad()
-{
-	IInputContext input = window.CreateInput();
-	for (int i = 0; i < input.Keyboards.Count; i++)
+	static uint[] IndexBuffer = new uint[]
 	{
-		//input.Keyboards[i].KeyDown += KeyDown;
+		0,1,2,
+		2,3,0
+	};
+
+	static IWindow window;
+	static GL gl = null;
+
+	static uint vao = 0, vbo = 0, ebo = 0;
+	static uint quadProgram = 0;
+
+	public static void Main()
+	{
+		Window.PrioritizeSdl();
+
+		window = Window.Create(WindowOptions.Default with
+		{
+			Size = new Vector2D<int>(800, 600),
+			API = new GraphicsAPI(ContextAPI.OpenGL, ContextProfile.Core, ContextFlags.ForwardCompatible, new APIVersion(4, 5))
+		});
+
+		window.Load += OnLoad;
+		window.Update += OnUpdate;
+		window.Render += OnRender;
+		window.FramebufferResize += s => gl.Viewport(s);
+
+		window.Run();
 	}
 
-	//Getting the opengl api for drawing to the screen.
-	gl = GL.GetApi(window);
-
-	//Creating a vertex array.
-	vao = gl.GenVertexArray();
-	gl.BindVertexArray(vao);
-
-	//Initializing a vertex buffer that holds the vertex data.
-	vbo = gl.GenBuffer(); //Creating the buffer.
-	gl.BindBuffer(BufferTargetARB.ArrayBuffer, vbo); //Binding the buffer.
-	fixed (void* v = &Vertices[0])
+	static unsafe void OnLoad()
 	{
-		gl.BufferData(BufferTargetARB.ArrayBuffer, (nuint)(Vertices.Length * sizeof(uint)), v, BufferUsageARB.StaticDraw); //Setting buffer data.
+		IInputContext input = window.CreateInput();
+		for (int i = 0; i < input.Keyboards.Count; i++)
+		{
+			//input.Keyboards[i].KeyDown += KeyDown;
+		}
+
+		//Getting the opengl api for drawing to the screen.
+		gl = GL.GetApi(window);
+
+		gl.Enable(GLEnum.CullFace);
+		gl.CullFace(GLEnum.Back);
+		gl.FrontFace(GLEnum.CW);
+
+		//Creating a vertex array.
+		vao = gl.GenVertexArray();
+		gl.BindVertexArray(vao);
+
+		//Initializing a vertex buffer that holds the vertex data.
+		vbo = gl.GenBuffer(); //Creating the buffer.
+		gl.BindBuffer(BufferTargetARB.ArrayBuffer, vbo); //Binding the buffer.
+		fixed (void* v = &VertexBuffer[0])
+		{
+			gl.BufferData(BufferTargetARB.ArrayBuffer, (nuint)(VertexBuffer.Length * sizeof(float)), v, BufferUsageARB.StaticDraw); //Setting buffer data.
+		}
+
+		//Initializing a element buffer that holds the index data.
+		ebo = gl.GenBuffer(); //Creating the buffer.
+		gl.BindBuffer(BufferTargetARB.ElementArrayBuffer, ebo); //Binding the buffer.
+		fixed (void* i = &IndexBuffer[0])
+		{
+			gl.BufferData(BufferTargetARB.ElementArrayBuffer, (nuint)(IndexBuffer.Length * sizeof(uint)), i, BufferUsageARB.StaticDraw); //Setting buffer data.
+		}
+
+		//Creating a vertex shader.
+		uint vertexShader = gl.CreateShader(ShaderType.VertexShader);
+		gl.ShaderSource(vertexShader, VertexShaderSource);
+		gl.CompileShader(vertexShader);
+
+		//Checking the shader for compilation errors.
+		string infoLog = gl.GetShaderInfoLog(vertexShader);
+		if (!string.IsNullOrWhiteSpace(infoLog))
+		{
+			Console.WriteLine($"Error compiling vertex shader {infoLog}");
+		}
+
+		//Creating a fragment shader.
+		uint fragmentShader = gl.CreateShader(ShaderType.FragmentShader);
+		gl.ShaderSource(fragmentShader, FragmentShaderSource);
+		gl.CompileShader(fragmentShader);
+
+		//Checking the shader for compilation errors.
+		infoLog = gl.GetShaderInfoLog(fragmentShader);
+		if (!string.IsNullOrWhiteSpace(infoLog))
+		{
+			Console.WriteLine($"Error compiling fragment shader {infoLog}");
+		}
+
+		//Combining the shaders under one shader program.
+		quadProgram = gl.CreateProgram();
+		gl.AttachShader(quadProgram, vertexShader);
+		gl.AttachShader(quadProgram, fragmentShader);
+		gl.LinkProgram(quadProgram);
+
+		//Checking the linking for errors.
+		gl.GetProgram(quadProgram, GLEnum.LinkStatus, out var status);
+		if (status == 0)
+		{
+			Console.WriteLine($"Error linking shader {gl.GetProgramInfoLog(quadProgram)}");
+		}
+
+		//Delete the no longer useful individual shaders;
+		gl.DetachShader(quadProgram, vertexShader);
+		gl.DetachShader(quadProgram, fragmentShader);
+		gl.DeleteShader(vertexShader);
+		gl.DeleteShader(fragmentShader);
+
+		//Tell opengl how to give the data to the shaders.
+
+		gl.VertexAttribPointer(0, 4, VertexAttribPointerType.Float, false, 4 * sizeof(float), null);
+		gl.EnableVertexAttribArray(0);
 	}
 
-	//Initializing a element buffer that holds the index data.
-	ebo = gl.GenBuffer(); //Creating the buffer.
-	gl.BindBuffer(BufferTargetARB.ElementArrayBuffer, ebo); //Binding the buffer.
-	fixed (void* i = &Indices[0])
+	static unsafe void OnRender(double obj)
 	{
-		gl.BufferData(BufferTargetARB.ElementArrayBuffer, (nuint)(Indices.Length * sizeof(uint)), i, BufferUsageARB.StaticDraw); //Setting buffer data.
+		gl.Clear((uint)ClearBufferMask.ColorBufferBit);
+		gl.BindVertexArray(vao);
+		gl.UseProgram(quadProgram);
+		gl.DrawElements(PrimitiveType.Triangles, (uint)IndexBuffer.Length, DrawElementsType.UnsignedInt, null);
 	}
 
-	//Creating a vertex shader.
-	uint vertexShader = gl.CreateShader(ShaderType.VertexShader);
-	gl.ShaderSource(vertexShader, VertexShaderSource);
-	gl.CompileShader(vertexShader);
-
-	//Checking the shader for compilation errors.
-	string infoLog = gl.GetShaderInfoLog(vertexShader);
-	if (!string.IsNullOrWhiteSpace(infoLog))
+	static void OnUpdate(double obj)
 	{
-		Console.WriteLine($"Error compiling vertex shader {infoLog}");
+		
 	}
-
-	//Creating a fragment shader.
-	uint fragmentShader = gl.CreateShader(ShaderType.FragmentShader);
-	gl.ShaderSource(fragmentShader, FragmentShaderSource);
-	gl.CompileShader(fragmentShader);
-
-	//Checking the shader for compilation errors.
-	infoLog = gl.GetShaderInfoLog(fragmentShader);
-	if (!string.IsNullOrWhiteSpace(infoLog))
-	{
-		Console.WriteLine($"Error compiling fragment shader {infoLog}");
-	}
-
-	//Combining the shaders under one shader program.
-	Shader = gl.CreateProgram();
-	gl.AttachShader(Shader, vertexShader);
-	gl.AttachShader(Shader, fragmentShader);
-	gl.LinkProgram(Shader);
-
-	//Checking the linking for errors.
-	gl.GetProgram(Shader, GLEnum.LinkStatus, out var status);
-	if (status == 0)
-	{
-		Console.WriteLine($"Error linking shader {gl.GetProgramInfoLog(Shader)}");
-	}
-
-	//Delete the no longer useful individual shaders;
-	gl.DetachShader(Shader, vertexShader);
-	gl.DetachShader(Shader, fragmentShader);
-	gl.DeleteShader(vertexShader);
-	gl.DeleteShader(fragmentShader);
-
-	//Tell opengl how to give the data to the shaders.
-	gl.VertexAttribPointer(0, 3, VertexAttribPointerType.Float, false, 3 * sizeof(float), null);
-	gl.EnableVertexAttribArray(0);
 }
-
-unsafe void OnRender(double obj)
-{
-	gl.Clear((uint)ClearBufferMask.ColorBufferBit);
-	gl.BindVertexArray(vao);
-	gl.UseProgram(Shader);
-	gl.DrawElements(PrimitiveType.Triangles, (uint)Indices.Length, DrawElementsType.UnsignedInt, null);
-}
-
-void OnUpdate(double obj)
-{
-	//Here all updates to the program should be done.
-}
-
-window.Load += OnLoad;
-window.Render += OnRender;
-
-window.Run();
