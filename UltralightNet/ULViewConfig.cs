@@ -100,11 +100,7 @@ namespace UltralightNet
 		public bool IsAccelerated
 		{
 			get => ULViewConfig_C.is_accelerated;
-			#if DEBUG
-			set { if(ULPlatform.DebugWarnAcceleration && (!ULPlatform.gpudriverSet) && value) Console.WriteLine($"{typeof(ULViewConfig)}.IsAccelerated set to true, but {typeof(ULPlatform)}.GPUDriver is not set. (Disable warning by setting ULPlatform.DebugWarnAcceleration to false.)"); Methods.ulViewConfigSetIsAccelerated(Ptr, value); }
-			#else
 			set => Methods.ulViewConfigSetIsAccelerated(Ptr, value);
-			#endif
 		}
 		public bool IsTransparent
 		{

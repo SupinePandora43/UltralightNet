@@ -106,9 +106,9 @@ namespace UltralightNet
 		public static bool SetDefaultFileSystem { get; set; } = true;
 
 		public static bool DebugWarnCertificate { get; set; } = true;
-		public static bool DebugWarnAcceleration { get; set; } = true;
 
 		public static bool ErrorMissingResources { get; set; } = true;
+		public static bool ErrorGPUDriverNotSet { get; set; } = true;
 
 		private static ULLogger _logger;
 		internal static ULFileSystem _filesystem;

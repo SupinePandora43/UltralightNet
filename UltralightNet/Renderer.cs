@@ -46,15 +46,17 @@ namespace UltralightNet
 			IsDisposed = !dispose;
 		}
 
-		public View CreateView(uint width, uint height, ULViewConfig view_config = default, Session session = default, bool dispose = true)
+		public View CreateView(uint width, uint height) => CreateView(width, height, new ULViewConfig());
+		public View CreateView(uint width, uint height, ULViewConfig viewConfig) => CreateView(width, height, viewConfig, DefaultSession);
+		public View CreateView(uint width, uint height, ULViewConfig viewConfig, Session session) => CreateView(width, height, viewConfig, session, true);
+
+		public View CreateView(uint width, uint height, ULViewConfig viewConfig, Session session, bool dispose)
 		{
-#if DEBUG
-			if (view_config.IsAccelerated && !ULPlatform.gpudriverSet)
+			if (ULPlatform.ErrorGPUDriverNotSet && viewConfig.IsAccelerated && !ULPlatform.gpudriverSet)
 			{
-				Console.WriteLine("UltralightNet: no GPUDriver set, but ULViewConfig.IsAccelerated==true.");
+				throw new Exception("No ULPlatform.GPUDriver set, but ULViewConfig.IsAccelerated==true. (Disable error by setting ULPlatform.ErrorGPUDriverNotSet to false.)");
 			}
-#endif
-			View view = new(Methods.ulCreateView(Ptr, width, height, (view_config is default(ULViewConfig)) ? new ULViewConfig().Ptr : view_config.Ptr, (session is default(Session)) ? DefaultSession.Ptr : session.Ptr), dispose);
+			View view = new(Methods.ulCreateView(Ptr, width, height, viewConfig.Ptr, session.Ptr), dispose);
 			view.Renderer = this;
 			return view;
 		}
