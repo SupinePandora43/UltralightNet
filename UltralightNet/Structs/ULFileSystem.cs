@@ -49,7 +49,8 @@ namespace UltralightNet
 			}
 			get
 			{
-				var c = _GetFileMimeType;
+				throw new NotImplementedException();
+				/*var c = _GetFileMimeType;
 				return (string path, out string result) =>
 				{
 					fixed (char* pathPtr = path)
@@ -60,7 +61,7 @@ namespace UltralightNet
 
 						return c(&pathUlStr, &resultUlStr);
 					}
-				};
+				};*/
 			}
 		}
 		public ULFileSystemOpenFileCallback OpenFile
