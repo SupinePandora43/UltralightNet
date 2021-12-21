@@ -49,6 +49,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Benchmarks", "Benchmarks\Be
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UltralightNet.OpenGL.TestApp", "UltralightNet.OpenGL.TestApp\UltralightNet.OpenGL.TestApp.csproj", "{12E884F6-0828-4451-9B17-97A3E945D6D8}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UltralightNet.OpenGL", "UltralightNet.OpenGL\UltralightNet.OpenGL.csproj", "{1CD5E12E-E31F-444F-8287-23CDA55A4D10}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -111,6 +113,10 @@ Global
 		{12E884F6-0828-4451-9B17-97A3E945D6D8}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{12E884F6-0828-4451-9B17-97A3E945D6D8}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{12E884F6-0828-4451-9B17-97A3E945D6D8}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1CD5E12E-E31F-444F-8287-23CDA55A4D10}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1CD5E12E-E31F-444F-8287-23CDA55A4D10}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1CD5E12E-E31F-444F-8287-23CDA55A4D10}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1CD5E12E-E31F-444F-8287-23CDA55A4D10}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
