@@ -53,7 +53,6 @@ void main()
 	static Renderer renderer;
 	static View view;
 
-	static ULGPUDriver driver;
 	static OpenGLGPUDriver gpuDriver;
 
 	public static void Main()
@@ -165,9 +164,7 @@ void main()
 
 		gpuDriver = new(gl);
 
-		driver = gpuDriver.GetGPUDriver();
-
-		ULPlatform.GPUDriver = driver;
+		ULPlatform.GPUDriver = gpuDriver.GetGPUDriver();
 
 		renderer = ULPlatform.CreateRenderer();
 
