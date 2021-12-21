@@ -144,6 +144,7 @@ namespace UltralightNet
 			{
 				_gpudriver = value;
 				Methods.ulPlatformSetGPUDriver(value);
+				gpudriverSet = true;
 			}
 		}
 		public static ULClipboard Clipboard
