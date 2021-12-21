@@ -38,7 +38,7 @@ namespace UltralightNet.GettingStarted
 
 			bool loaded = false;
 
-			view.OnFinishLoadingCallback += (frameId, isMainFrame, url) =>
+			view.OnFinishLoading += (frameId, isMainFrame, url) =>
 			{
 				loaded = true;
 			};
