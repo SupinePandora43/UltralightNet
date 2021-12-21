@@ -7,7 +7,7 @@
             "type": "process",
             "args": [
                 "build",
-                "${workspaceFolder}/UltralightNet.Veldrid.TestApp/UltralightNet.Veldrid.TestApp.csproj",
+                "${workspaceFolder}/UltralightNet.OpenGL.TestApp/UltralightNet.OpenGL.TestApp.csproj",
                 "/property:GenerateFullPaths=true",
                 "/consoleloggerparameters:NoSummary"
             ],

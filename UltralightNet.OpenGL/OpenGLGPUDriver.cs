@@ -9,11 +9,12 @@ using Silk.NET.OpenGL;
 using UltralightNet;
 
 public unsafe class OpenGLGPUDriver {
-	private GL gl;
+	private readonly GL gl;
 
-	private uint pathProgram;
-	private uint fillProgram;
+	private readonly uint pathProgram;
+	private readonly uint fillProgram;
 
+	// TODO: use Lists
 	private readonly Dictionary<uint, TextureEntry> textures = new();
 	private readonly Dictionary<uint, GeometryEntry> geometries = new();
 	private readonly Dictionary<uint, RenderBufferEntry> renderBuffers = new();
@@ -40,13 +41,17 @@ public unsafe class OpenGLGPUDriver {
 			string fragLog = gl.GetShaderInfoLog(frag);
 			if (!string.IsNullOrWhiteSpace(fragLog))
 			{
-				throw new Exception($"Error compiling shader of type, failed with error {fragLog}");
+				//throw new Exception($"Error compiling shader of type, failed with error {fragLog}");
 			}
 
 			pathProgram = gl.CreateProgram();
 
 			gl.AttachShader(pathProgram, vert);
 			gl.AttachShader(pathProgram, frag);
+
+			gl.BindAttribLocation(pathProgram, 0, "in_Position");
+      		gl.BindAttribLocation(pathProgram, 1, "in_Color");
+      		gl.BindAttribLocation(pathProgram, 2, "in_TexCoord");
 
 			gl.LinkProgram(pathProgram);
 			gl.GetProgram(pathProgram, GLEnum.LinkStatus, out var status);
@@ -87,6 +92,18 @@ public unsafe class OpenGLGPUDriver {
 
 			gl.AttachShader(fillProgram, vert);
 			gl.AttachShader(fillProgram, frag);
+
+			gl.BindAttribLocation(fillProgram, 0, "in_Position");
+      		gl.BindAttribLocation(fillProgram, 1, "in_Color");
+      		gl.BindAttribLocation(fillProgram, 2, "in_TexCoord");
+      		gl.BindAttribLocation(fillProgram, 3, "in_ObjCoord");
+      		gl.BindAttribLocation(fillProgram, 4, "in_Data0");
+      		gl.BindAttribLocation(fillProgram, 5, "in_Data1");
+      		gl.BindAttribLocation(fillProgram, 6, "in_Data2");
+      		gl.BindAttribLocation(fillProgram, 7, "in_Data3");
+      		gl.BindAttribLocation(fillProgram, 8, "in_Data4");
+      		gl.BindAttribLocation(fillProgram, 9, "in_Data5");
+      		gl.BindAttribLocation(fillProgram, 10, "in_Data6");
 
 			gl.LinkProgram(fillProgram);
 			gl.GetProgram(fillProgram, GLEnum.LinkStatus, out var status);
@@ -143,6 +160,7 @@ public unsafe class OpenGLGPUDriver {
 			}
 		},
 		CreateTexture = (entryId, bitmap) => {
+			Console.WriteLine("CreateTexture");
 			uint textureId = gl.GenTexture();
 			textures[entryId].textureId = textureId;
 
@@ -151,19 +169,20 @@ public unsafe class OpenGLGPUDriver {
 
 			gl.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int) GLEnum.Linear);
 			gl.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter,(int) GLEnum.Linear);
-		
+
 			gl.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapS, (int) GLEnum.ClampToEdge);
 			gl.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapT, (int) GLEnum.ClampToEdge);
-	
+
 			if(bitmap.IsEmpty){
+				Console.WriteLine("RT");
 				// FIXME: rgba
 				gl.TexImage2D(TextureTarget.Texture2D, 0, (int) InternalFormat.Rgba8, bitmap.Width, bitmap.Height, 0, PixelFormat.Rgba, PixelType.UnsignedByte, default);
 			} else {
 				gl.PixelStore(PixelStoreParameter.UnpackAlignment, 1);
 				gl.PixelStore(PixelStoreParameter.UnpackRowLength, (int) (bitmap.RowBytes / bitmap.Bpp));
-			
+
 				void* pixels = (void*) bitmap.LockPixels();
-				
+
 				if(bitmap.Format is ULBitmapFormat.BGRA8_UNORM_SRGB){
 					// FIXME: rgba
 					gl.TexImage2D(TextureTarget.Texture2D, 0, (int) InternalFormat.Srgb8Alpha8, bitmap.Width, bitmap.Height, 0, PixelFormat.Rgba, PixelType.UnsignedByte, pixels);
@@ -185,9 +204,9 @@ public unsafe class OpenGLGPUDriver {
 
 			gl.PixelStore(PixelStoreParameter.UnpackAlignment, 1);
 			gl.PixelStore(PixelStoreParameter.UnpackRowLength, (int) (bitmap.RowBytes / bitmap.Bpp));
-		
+
 			void* pixels = (void*) bitmap.LockPixels();
-			
+
 			if(bitmap.Format is ULBitmapFormat.BGRA8_UNORM_SRGB){
 				// FIXME: rgba
 				gl.TexImage2D(TextureTarget.Texture2D, 0, (int) InternalFormat.Srgb8Alpha8, bitmap.Width, bitmap.Height, 0, PixelFormat.Rgba, PixelType.UnsignedByte, pixels);

@@ -3,13 +3,14 @@ using Silk.NET.Maths;
 using Silk.NET.Input;
 using Silk.NET.OpenGL;
 using Silk.NET.Windowing;
+using UltralightNet.AppCore;
 
 namespace UltralightNet.OpenGL.TestApp;
 
 public static class Program
 {
-	static readonly string VertexShaderSource = @"
-#version 330 core //Using version GLSL version 3.3
+	const string VertexShaderSource = @"
+#version 420 core //Using version GLSL version 3.3
 layout (location = 0) in vec4 vPos;
 layout (location = 0) out vec2 uv;
 void main()
@@ -19,8 +20,8 @@ void main()
 }
 ";
 
-	static readonly string FragmentShaderSource = @"
-#version 330 core
+	const string FragmentShaderSource = @"
+#version 420 core
 layout (location = 0) in vec2 uv;
 out vec4 FragColor;
 void main()
@@ -49,14 +50,23 @@ void main()
 	static uint vao = 0, vbo = 0, ebo = 0;
 	static uint quadProgram = 0;
 
+	static Renderer renderer;
+	static View view;
+
+	static ULGPUDriver driver;
+	static OpenGLGPUDriver gpuDriver;
+
 	public static void Main()
 	{
+		AppCoreMethods.ulEnablePlatformFontLoader();
+		AppCoreMethods.ulEnablePlatformFileSystem("./");
+
 		Window.PrioritizeSdl();
 
 		window = Window.Create(WindowOptions.Default with
 		{
 			Size = new Vector2D<int>(800, 600),
-			API = new GraphicsAPI(ContextAPI.OpenGL, ContextProfile.Core, ContextFlags.ForwardCompatible, new APIVersion(4, 5))
+			API = new GraphicsAPI(ContextAPI.OpenGL, ContextProfile.Core, ContextFlags.ForwardCompatible, new APIVersion(3, 3))
 		});
 
 		window.Load += OnLoad;
@@ -78,9 +88,12 @@ void main()
 		//Getting the opengl api for drawing to the screen.
 		gl = GL.GetApi(window);
 
+		gl.Enable(GLEnum.FramebufferSrgb);
+
 		gl.Enable(GLEnum.CullFace);
 		gl.CullFace(GLEnum.Back);
 		gl.FrontFace(GLEnum.CW);
+		gl.Disable(GLEnum.Depth);
 
 		//Creating a vertex array.
 		vao = gl.GenVertexArray();
@@ -149,10 +162,35 @@ void main()
 
 		gl.VertexAttribPointer(0, 4, VertexAttribPointerType.Float, false, 4 * sizeof(float), null);
 		gl.EnableVertexAttribArray(0);
+
+		gpuDriver = new(gl);
+
+		driver = gpuDriver.GetGPUDriver();
+
+		ULPlatform.GPUDriver = driver;
+
+		renderer = ULPlatform.CreateRenderer();
+
+		view = renderer.CreateView(800, 600, new ULViewConfig { IsAccelerated = true });
+		view.URL = "https://github.com";
+
+		bool loaded = false;
+
+		view.OnFinishLoading += (_, _, _) => loaded = true;
+
+		while (!loaded)
+		{
+			renderer.Update();
+			System.Threading.Thread.Sleep(10);
+		}
+
+		window.SwapBuffers();
 	}
 
 	static unsafe void OnRender(double obj)
 	{
+		renderer.Render();
+
 		gl.Clear((uint)ClearBufferMask.ColorBufferBit);
 		gl.BindVertexArray(vao);
 		gl.UseProgram(quadProgram);
@@ -161,6 +199,6 @@ void main()
 
 	static void OnUpdate(double obj)
 	{
-		
+		renderer.Update();
 	}
 }

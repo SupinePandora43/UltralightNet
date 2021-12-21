@@ -1,15 +1,13 @@
-#version 450
+#version 150
 precision highp float;
 
 // Program Uniforms
-layout(set=0, binding=0) uniform Uniforms {
-	uniform vec4 State;
-	uniform mat4 Transform;
-	uniform vec4 Scalar4[2];
-	uniform vec4 Vector[8];
-	uniform uint fClipSize;
-	uniform mat4 Clip[8];
-};
+uniform vec4 State;
+uniform mat4 Transform;
+uniform vec4 Scalar4[2];
+uniform vec4 Vector[8];
+uniform uint fClipSize;
+uniform mat4 Clip[8];
 
 // Uniform Accessor Functions
 float Time() { return State[0]; }
@@ -19,12 +17,12 @@ float ScreenScale() { return State[3]; }
 float Scalar(uint i) { if (i < 4u) return Scalar4[0][i]; else return Scalar4[1][i - 4u]; }
 
 // Vertex Attributes
-layout(location = 0) in vec4 ex_Color;
-layout(location = 1) in vec2 ex_ObjectCoord;
+in vec4 ex_Color;
+in vec2 ex_ObjectCoord;
 //layout(location = 2) in vec2 ex_ScreenCoord;
 
 // Out Params
-layout(location = 0) out vec4 out_Color;
+out vec4 out_Color;
 
 float sdRect(vec2 p, vec2 size) {
     vec2 d = abs(p) - size;
@@ -34,7 +32,7 @@ float sdRect(vec2 p, vec2 size) {
 //
 // The MIT License
 // Copyright 2013 Inigo Quilez
-// Permission is hereby granted, free of charge, to any person obtaining a 
+// Permission is hereby granted, free of charge, to any person obtaining a
 // copy of this software and associated documentation files (the "Software"),
 // to deal in the Software without restriction, including without limitation
 // the rights to use, copy, modify, merge, publish, distribute, sublicense,
@@ -52,15 +50,15 @@ float sdEllipse( vec2 p, in vec2 ab ) {
   if (abs(ab.x - ab.y) < 0.1)
     return length(p) - ab.x;
     p = abs(p); if (p.x > p.y) { p=p.yx; ab=ab.yx; }
-    
+
     float l = ab.y*ab.y - ab.x*ab.x;
-    
-  float m = ab.x*p.x/l; 
-    float n = ab.y*p.y/l; 
+
+  float m = ab.x*p.x/l;
+    float n = ab.y*p.y/l;
     float m2 = m*m;
     float n2 = n*n;
-    
-  float c = (m2 + n2 - 1.0)/3.0; 
+
+  float c = (m2 + n2 - 1.0)/3.0;
     float c3 = c*c*c;
   float q = c3 + m2*n2*2.0;
   float d = c3 + m2*n2;
@@ -85,9 +83,9 @@ float sdEllipse( vec2 p, in vec2 ab ) {
     co = (p + 2.0*g/rm - m)/2.0;
   }
   float si = sqrt(1.0 - co*co);
- 
+
   vec2 r = vec2(ab.x*co, ab.y*si);
-    
+
   return length(r - p) * sign(p.y-r.y);
 }
 float sdRoundRect(vec2 p, vec2 size, vec4 rx, vec4 ry) {
@@ -107,7 +105,7 @@ float sdRoundRect(vec2 p, vec2 size, vec4 rx, vec4 ry) {
     return sdEllipse(local, vec2(rx.z, ry.z));
   corner = vec2(-size.x+rx.w, size.y-ry.w); // Bottom-Left
   local = p - corner;
-  if (dot(rx.w, ry.w) > 0.0 && p.x < corner.x && p.y > corner.y) 
+  if (dot(rx.w, ry.w) > 0.0 && p.x < corner.x && p.y > corner.y)
     return sdEllipse(local, vec2(rx.w, ry.w));
   return sdRect(p, size);
 }
@@ -131,15 +129,15 @@ void applyClip() {
     vec4 radii_x, radii_y;
     Unpack(data[1], radii_x, radii_y);
     bool inverse = bool(data[3].z);
-    
+
     vec2 p = ex_ObjectCoord;
     p = transformAffine(p, data[2].xy, data[2].zw, data[3].xy);
     p -= origin;
-        
+
     float d_clip = sdRoundRect(p, size, radii_x, radii_y) * (inverse? -1.0 : 1.0);
     float alpha = antialias(-d_clip, AA_WIDTH, -AA_WIDTH);
     out_Color = vec4(out_Color.rgb * alpha, out_Color.a * alpha);
-    
+
     //if (abs(d_clip) < 2.0)
     // out_Color = vec4(0.9, 1.0, 0.0, 1.0);
   }

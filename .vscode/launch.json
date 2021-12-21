@@ -13,9 +13,9 @@
             "request": "launch",
             "preLaunchTask": "build",
             // If you have changed target frameworks, make sure to update the program path.
-            "program": "${workspaceFolder}/UltralightNet.Veldrid.TestApp/bin/Debug/net6.0/UltralightNet.Veldrid.TestApp.dll",
+            "program": "${workspaceFolder}/UltralightNet.OpenGL.TestApp/bin/Debug/net6.0/UltralightNet.OpenGL.TestApp.dll",
             "args": [],
-            "cwd": "${workspaceFolder}/UltralightNet.Veldrid.TestApp",
+            "cwd": "${workspaceFolder}/UltralightNet.OpenGL.TestApp/bin/Debug/net6.0",
             // For more information about the 'console' field, see https://aka.ms/VSCode-CS-LaunchJson-Console
             "console": "internalConsole",
             "stopAtEntry": false
