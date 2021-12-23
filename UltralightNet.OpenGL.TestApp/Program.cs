@@ -16,17 +16,19 @@ layout (location = 0) out vec2 uv;
 void main()
 {
 	uv = vec2(vPos.z, vPos.w);
-    gl_Position = vec4(vPos.x, vPos.y, vPos.z, 1.0);
+    gl_Position = vec4(vPos.x, vPos.y, 0, 1.0);
 }
 ";
 
 	const string FragmentShaderSource = @"
 #version 420 core
 layout (location = 0) in vec2 uv;
+uniform sampler2D rt;
 out vec4 FragColor;
 void main()
 {
-    FragColor = vec4(uv.x, uv.y, 0.0f, 1.0f);
+	FragColor = texture(rt, uv);
+    //FragColor = vec4(uv.x, uv.y, 0.0f, 1.0f);
     //FragColor = vec4(1.0f,1.0f,0.0f,1.0f);
 }
 ";
@@ -45,7 +47,7 @@ void main()
 	};
 
 	static IWindow window;
-	static GL gl = null;
+	static GL gl;
 
 	static uint vao = 0, vbo = 0, ebo = 0;
 	static uint quadProgram = 0;
@@ -83,6 +85,7 @@ void main()
 		{
 			//input.Keyboards[i].KeyDown += KeyDown;
 		}
+		input.Mice[0].Scroll += OnScroll;
 
 		//Getting the opengl api for drawing to the screen.
 		gl = GL.GetApi(window);
@@ -92,7 +95,10 @@ void main()
 		gl.Enable(GLEnum.CullFace);
 		gl.CullFace(GLEnum.Back);
 		gl.FrontFace(GLEnum.CW);
-		gl.Disable(GLEnum.Depth);
+		//gl.Disable(GLEnum.Depth);
+		gl.DepthFunc(DepthFunction.Never);
+		gl.Disable(EnableCap.DepthTest);
+		gl.Disable(GLEnum.StencilTest);
 
 		//Creating a vertex array.
 		vao = gl.GenVertexArray();
@@ -162,14 +168,18 @@ void main()
 		gl.VertexAttribPointer(0, 4, VertexAttribPointerType.Float, false, 4 * sizeof(float), null);
 		gl.EnableVertexAttribArray(0);
 
+		window.SwapBuffers();
+
 		gpuDriver = new(gl);
+
+		window.SwapBuffers();
 
 		ULPlatform.GPUDriver = gpuDriver.GetGPUDriver();
 
-		renderer = ULPlatform.CreateRenderer();
+		renderer = ULPlatform.CreateRenderer(new ULConfig { FaceWinding = ULFaceWinding.Clockwise, ForceRepaint = true });
 
-		view = renderer.CreateView(800, 600, new ULViewConfig { IsAccelerated = true });
-		view.URL = "https://github.com";
+		view = renderer.CreateView(800, 600, new ULViewConfig { IsAccelerated = true, IsTransparent = false });
+		view.URL = "https://youtube.com";
 
 		bool loaded = false;
 
@@ -182,13 +192,25 @@ void main()
 		}
 
 		window.SwapBuffers();
+
+		renderer.Render();
+
+		window.SwapBuffers();
 	}
 
 	static unsafe void OnRender(double obj)
 	{
+		renderer.Update();
 		renderer.Render();
 
+		uint rtId = gpuDriver.textures[view.RenderTarget.texture_id].textureId;
+		//window.ClearContext();
 		gl.Clear((uint)ClearBufferMask.ColorBufferBit);
+
+		gl.ActiveTexture(GLEnum.Texture0);
+		gl.BindTexture(GLEnum.Texture2D, rtId);
+		gl.Uniform1(gl.GetUniformLocation(quadProgram, "rt"), 0);
+
 		gl.BindVertexArray(vao);
 		gl.UseProgram(quadProgram);
 		gl.DrawElements(PrimitiveType.Triangles, (uint)IndexBuffer.Length, DrawElementsType.UnsignedInt, null);
@@ -196,6 +218,11 @@ void main()
 
 	static void OnUpdate(double obj)
 	{
-		renderer.Update();
+		//renderer.Update();
+	}
+
+	static void OnScroll(IMouse _, ScrollWheel scroll)
+	{
+		view.FireScrollEvent(new ULScrollEvent { type = ULScrollEventType.ByPage, deltaX = (int)scroll.X, deltaY = (int)scroll.Y });
 	}
 }
