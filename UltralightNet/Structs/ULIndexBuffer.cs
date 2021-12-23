@@ -4,9 +4,9 @@ using System.Runtime.InteropServices;
 namespace UltralightNet
 {
 	[BlittableType]
-	public struct ULIndexBuffer
+	public unsafe struct ULIndexBuffer
 	{
 		public uint size;
-		public IntPtr data;
+		public void* data;
 	}
 }

@@ -1,11 +1,13 @@
 using System;
+using System.Runtime.InteropServices;
 
 namespace UltralightNet
 {
-	public struct ULVertexBuffer
+	[BlittableType]
+	public unsafe struct ULVertexBuffer
 	{
 		public ULVertexBufferFormat format;
 		public uint size;
-		public IntPtr data;
+		public void* data;
 	}
 }
