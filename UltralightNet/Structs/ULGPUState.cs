@@ -18,6 +18,7 @@ namespace UltralightNet
 		[MarshalAs(UnmanagedType.I1)]
 		public bool enable_blend;
 
+		[MarshalAs(UnmanagedType.U1)]
 		public ULShaderType shader_type;
 
 		public uint render_buffer_id;
