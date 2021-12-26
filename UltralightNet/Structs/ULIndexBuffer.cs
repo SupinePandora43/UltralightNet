@@ -3,7 +3,7 @@ using System.Runtime.InteropServices;
 
 namespace UltralightNet
 {
-	[BlittableType]
+	//[BlittableType]
 	public unsafe struct ULIndexBuffer
 	{
 		public uint size;
