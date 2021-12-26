@@ -61,6 +61,7 @@ void main()
 	{
 		AppCoreMethods.ulEnablePlatformFontLoader();
 		AppCoreMethods.ulEnablePlatformFileSystem("./");
+		AppCoreMethods.ulEnableDefaultLogger("./log123as.txt");
 
 		Window.PrioritizeSdl();
 
@@ -90,15 +91,14 @@ void main()
 		//Getting the opengl api for drawing to the screen.
 		gl = GL.GetApi(window);
 
-		gl.Enable(GLEnum.FramebufferSrgb);
+		//gl.Enable(GLEnum.FramebufferSrgb);
 
 		gl.Enable(GLEnum.CullFace);
 		gl.CullFace(GLEnum.Back);
 		gl.FrontFace(GLEnum.CW);
-		//gl.Disable(GLEnum.Depth);
-		gl.DepthFunc(DepthFunction.Never);
 		gl.Disable(EnableCap.DepthTest);
-		gl.Disable(GLEnum.StencilTest);
+		gl.DepthFunc(DepthFunction.Never);
+		//gl.Disable(GLEnum.StencilTest);
 
 		//Creating a vertex array.
 		vao = gl.GenVertexArray();
@@ -148,6 +148,7 @@ void main()
 		quadProgram = gl.CreateProgram();
 		gl.AttachShader(quadProgram, vertexShader);
 		gl.AttachShader(quadProgram, fragmentShader);
+		gl.BindAttribLocation(quadProgram, 0, "vPos");
 		gl.LinkProgram(quadProgram);
 
 		//Checking the linking for errors.
@@ -165,6 +166,9 @@ void main()
 
 		//Tell opengl how to give the data to the shaders.
 
+		gl.UseProgram(quadProgram);
+		gl.Uniform1(gl.GetUniformLocation(quadProgram, "rt"), 0);
+
 		gl.VertexAttribPointer(0, 4, VertexAttribPointerType.Float, false, 4 * sizeof(float), null);
 		gl.EnableVertexAttribArray(0);
 
@@ -179,9 +183,9 @@ void main()
 		renderer = ULPlatform.CreateRenderer(new ULConfig { FaceWinding = ULFaceWinding.Clockwise, ForceRepaint = true });
 
 		view = renderer.CreateView(800, 600, new ULViewConfig { IsAccelerated = true, IsTransparent = false });
-		view.URL = "https://youtube.com";
-
-		bool loaded = false;
+		//view.URL = "https://youtube.com";
+		view.HTML = "<html><body><p>123</p></body></html>";
+		/*bool loaded = false;
 
 		view.OnFinishLoading += (_, _, _) => loaded = true;
 
@@ -189,7 +193,7 @@ void main()
 		{
 			renderer.Update();
 			System.Threading.Thread.Sleep(10);
-		}
+		}*/
 
 		window.SwapBuffers();
 
@@ -200,20 +204,27 @@ void main()
 
 	static unsafe void OnRender(double obj)
 	{
+		gpuDriver.Check();
 		renderer.Update();
 		renderer.Render();
+		gpuDriver.Check();
 
 		uint rtId = gpuDriver.textures[view.RenderTarget.texture_id].textureId;
 		//window.ClearContext();
 		gl.Clear((uint)ClearBufferMask.ColorBufferBit);
+		gpuDriver.Check();
 
 		gl.ActiveTexture(GLEnum.Texture0);
+		gpuDriver.Check();
 		gl.BindTexture(GLEnum.Texture2D, rtId);
-		gl.Uniform1(gl.GetUniformLocation(quadProgram, "rt"), 0);
+		gpuDriver.Check();
 
 		gl.BindVertexArray(vao);
+		gpuDriver.Check();
 		gl.UseProgram(quadProgram);
+		gpuDriver.Check();
 		gl.DrawElements(PrimitiveType.Triangles, (uint)IndexBuffer.Length, DrawElementsType.UnsignedInt, null);
+		gpuDriver.Check();
 	}
 
 	static void OnUpdate(double obj)

@@ -161,7 +161,7 @@ void main()
 			View view = renderer.CreateView(Width, Height, new ULViewConfig()
 			{
 				IsAccelerated = true,
-				IsTransparent = true
+				IsTransparent = true,
 			});
 			//View cpuView = new(renderer, Width, Height, TRANSPARENT, Session.DefaultSession(renderer), true);
 
@@ -170,7 +170,7 @@ void main()
 			view.URL = url;
 			//cpuView.URL = url;
 
-			try
+			/*try
 			{
 				WebRequest request = WebRequest.CreateHttp("https://raw.githubusercontent.com/SupinePandora43/UltralightNet/ulPath_pipelines/SilkNetSandbox/assets/index.html");
 
@@ -179,7 +179,10 @@ void main()
 				StreamReader reader = new(responseStream);
 				string htmlText = reader.ReadToEnd();
 			}
-			finally { }
+			finally { }*/
+
+			view.HTML = "<html><body><p>123</p></body></html>";
+
 			//view.HTML = htmlText;
 			//cpuView.HTML = htmlText;
 

@@ -22,9 +22,18 @@ public unsafe class OpenGLGPUDriver
 	private readonly Dictionary<uint, GeometryEntry> geometries = new();
 	private readonly Dictionary<uint, RenderBufferEntry> renderBuffers = new();
 
+	public void Check([CallerLineNumber] int line = default){
+#if DEBUG
+		var error = gl.GetError();
+		if(error is not 0) Console.WriteLine($"{line}: {error}");
+#endif
+	}
+
 	public OpenGLGPUDriver(GL glapi)
 	{
 		gl = glapi;
+
+		Check();
 
 		#region pathProgram
 		{
@@ -126,6 +135,8 @@ public unsafe class OpenGLGPUDriver
 			gl.Uniform1(gl.GetUniformLocation(fillProgram, "Texture2"), 1);
 		}
 		#endregion
+
+		Check();
 	}
 
 	private static string GetShader(string name)
@@ -177,7 +188,7 @@ public unsafe class OpenGLGPUDriver
 		CreateTexture = (entryId, bitmap) =>
 		{
 			Console.WriteLine("CreateTexture");
-
+			Check();
 			var isRT = bitmap.IsEmpty;
 
 			if (!isRT)
@@ -220,12 +231,14 @@ public unsafe class OpenGLGPUDriver
 
 				bitmap.UnlockPixels();
 			}
-
+			Check();
 			//FIXME: mipmap
 			gl.GenerateMipmap(TextureTarget.Texture2D);
+			Check();
 		},
 		UpdateTexture = (entryId, bitmap) =>
 		{
+			Check();
 			uint textureId = textures[entryId].textureId;
 
 			gl.ActiveTexture(TextureUnit.Texture0);
@@ -250,6 +263,8 @@ public unsafe class OpenGLGPUDriver
 
 			//FIXME: mipmap
 			gl.GenerateMipmap(TextureTarget.Texture2D);
+
+			Check();
 		},
 		DestroyTexture = (id) =>
 		{
@@ -293,6 +308,7 @@ public unsafe class OpenGLGPUDriver
 		},
 		CreateGeometry = (id, vb, ib) =>
 		{
+			Check();
 			var entry = geometries[id];
 
 			entry.vao = gl.GenVertexArray();
@@ -305,7 +321,7 @@ public unsafe class OpenGLGPUDriver
 
 			gl.BufferData(BufferTargetARB.ArrayBuffer, vb.size, vb.data, BufferUsageARB.DynamicDraw);
 
-			if (vb.format is ULVertexBufferFormat.VBF_2f_4ub_2f_2f_28f)
+			if (vb.Format is ULVertexBufferFormat.VBF_2f_4ub_2f_2f_28f)
 			{
 				const uint stride = 140;
 
@@ -351,10 +367,14 @@ public unsafe class OpenGLGPUDriver
 			gl.BindBuffer(BufferTargetARB.ElementArrayBuffer, entry.ebo);
 
 			gl.BufferData(BufferTargetARB.ElementArrayBuffer, ib.size, ib.data, BufferUsageARB.DynamicDraw);
+
+			Check();
 		},
 		UpdateGeometry = (id, vb, ib) =>
 		{
 			var entry = geometries[id];
+
+			gl.BindVertexArray(entry.vao);
 
 			gl.BindBuffer(BufferTargetARB.ArrayBuffer, entry.vbo);
 
@@ -376,82 +396,69 @@ public unsafe class OpenGLGPUDriver
 		},
 		UpdateCommandList = (commandList) =>
 		{
+			Check();
 			var commandSpan = commandList.ToSpan();
-
-			gl.BindFramebuffer(FramebufferTarget.Framebuffer, 0);
-
+			Check();
 			gl.Enable(EnableCap.Blend);
-			//_gl.Enable(EnableCap.FramebufferSrgb);
 			gl.Disable(EnableCap.ScissorTest);
 			gl.Disable(EnableCap.DepthTest);
 			gl.DepthFunc(DepthFunction.Never);
 			gl.BlendFunc(BlendingFactor.One, BlendingFactor.OneMinusSrcAlpha);
-
+			Check();
 			foreach (var command in commandSpan)
 			{
+				Check();
 				var gpuState = command.gpu_state;
 				var renderBufferEntry = renderBuffers[gpuState.render_buffer_id];
 
 				gl.BindFramebuffer(FramebufferTarget.Framebuffer, renderBufferEntry.framebuffer);
-
+				Check();
 				if (command.command_type is ULCommandType.DrawGeometry)
 				{
 					gl.Viewport(0, 0, gpuState.viewport_width, gpuState.viewport_height);
-
+					Check();
 					uint program;
 
 					if (gpuState.shader_type is ULShaderType.FillPath) program = pathProgram; //gl.UseProgram(pathProgram);
 					else program = fillProgram; //gl.UseProgram(fillProgram);
 
-					gl.UseProgram(program);
-
 					var geometryEntry = geometries[command.geometry_id];
-
-					gl.Uniform4(
-						gl.GetUniformLocation(program, "State"),
-						0,
-						gpuState.viewport_width,
-						gpuState.viewport_height,
-						1
-		  			);
-
-					var txf = gpuState.transform.ApplyProjection(gpuState.viewport_width, gpuState.viewport_height, false);
-					gl.UniformMatrix4(
-					  gl.GetUniformLocation(program, "Transform"), 1, false, &txf.M11
-					);
-					gl.Uniform4(
-					  gl.GetUniformLocation(program, "Scalar4"), 2,
-					  &gpuState.scalar_0
-					);
+					gl.UseProgram(program);
+					Check();
+					gl.Uniform4(gl.GetUniformLocation(program, "State"), 0, gpuState.viewport_width, gpuState.viewport_height, 1);
+					Check();
+					Matrix4x4 transform = gpuState.transform.ApplyProjection(gpuState.viewport_width, gpuState.viewport_height, false);
+					gl.UniformMatrix4(gl.GetUniformLocation(program, "Transform"), 1, false, &transform.M11);
+					Check();
+					gl.Uniform4(gl.GetUniformLocation(program, "Scalar4"), 2, &gpuState.scalar_0);
+					Check();
 					gl.Uniform4(gl.GetUniformLocation(program, "Vector"), 8, &gpuState.vector_0.X);
-					gl.Uniform1(
-					  gl.GetUniformLocation(program, "fClipSize"),
-					  (float)gpuState.clip_size
-					);
-					gl.UniformMatrix4(
-					  gl.GetUniformLocation(program, "Clip"), 8, false,
-					  &gpuState.clip_0.M11
-					);
-
+					Check();
+					gl.Uniform1(gl.GetUniformLocation(program, "fClipSize"), (uint)gpuState.clip_size);
+					Check();
+					gl.UniformMatrix4(gl.GetUniformLocation(program, "Clip"), 8, false, &gpuState.clip_0.M11);
+					Check();
 					gl.BindVertexArray(geometryEntry.vao);
-
+					Check();
 					if (program == fillProgram)
 					{
 						gl.ActiveTexture(GLEnum.Texture0);
 						gl.BindTexture(GLEnum.Texture2D, textures[gpuState.texture_1_id].textureId);
 						//gl.Uniform1(gl.GetUniformLocation(fillProgram, "Texture1"), 0);
-
+						Check();
 						gl.ActiveTexture(GLEnum.Texture1);
 						gl.BindTexture(GLEnum.Texture2D, textures[gpuState.texture_2_id].textureId);
 						//gl.Uniform1(gl.GetUniformLocation(fillProgram, "Texture2"), 0);
+						Check();
 					}
 					else
 					{
 						gl.ActiveTexture(GLEnum.Texture0);
 						gl.BindTexture(GLEnum.Texture2D, 0);
-
+						Check();
 						gl.ActiveTexture(GLEnum.Texture1);
 						gl.BindTexture(GLEnum.Texture2D, 0);
+						Check();
 					}
 
 					if (gpuState.enable_scissor)
@@ -461,22 +468,28 @@ public unsafe class OpenGLGPUDriver
 					}
 					else gl.Disable(EnableCap.ScissorTest);
 
+					Check();
+
 					if (gpuState.enable_blend) gl.Enable(EnableCap.Blend);
 					else gl.Disable(EnableCap.Blend);
-
-					gl.DrawElements(PrimitiveType.Triangles, command.indices_count, DrawElementsType.UnsignedInt, (void*)(command.indices_offset * sizeof(uint)));
-					gl.BindVertexArray(0);
+					Check();
+					gl.DrawElements(PrimitiveType.Triangles, command.indices_count, DrawElementsType.UnsignedInt, (void*)(command.indices_offset /** sizeof(uint)*/));
+					Check();
 				}
 				else if (command.command_type is ULCommandType.ClearRenderBuffer)
 				{
+					Check();
 					gl.Disable(GLEnum.ScissorTest);
 					gl.ClearColor(0, 0, 0, 0);
 					gl.Clear((uint)GLEnum.ColorBufferBit);
+					Check();
 				}
 				else throw new Exception();
 			}
 
+			gl.BindVertexArray(0);
 			gl.BindFramebuffer(FramebufferTarget.Framebuffer, 0);
+			Check();
 		}
 	};
 
