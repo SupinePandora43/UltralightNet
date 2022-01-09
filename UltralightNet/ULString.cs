@@ -111,13 +111,13 @@ namespace UltralightNet
 		/// <summary>Do not use on pointers</summary>
 		public string ToManaged()
 		{
-			return new((char*)data, 0, (int)length);
+			return Marshal.PtrToStringUTF8((IntPtr)data, (int)length);
 		}
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public static unsafe string NativeToManaged(ULString* ulString)
 		{
-			return new((char*)ulString->data, 0, (int)ulString->length);
+			return Marshal.PtrToStringUTF8((IntPtr)ulString->data, (int)ulString->length);
 		}
 	}
 }
