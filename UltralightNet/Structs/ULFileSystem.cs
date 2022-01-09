@@ -15,18 +15,6 @@ namespace UltralightNet
 					_FileExists = (path) => value(ULString.NativeToManaged(path));
 				}
 			}
-			get
-			{
-				var c = __FileExists;
-				return (path) =>
-				{
-					fixed (char* pathPtr = path)
-					{
-						ULString pathUlStr = new() { data = (ushort*)pathPtr, length = (nuint)path.Length };
-						return c(&pathUlStr);
-					}
-				};
-			}
 		}
 		public ULFileSystemGetFileMimeTypeCallback GetFileMimeType
 		{
@@ -38,30 +26,13 @@ namespace UltralightNet
 					{
 						bool ret = value(ULString.NativeToManaged(path), out string result);
 
-						fixed (char* resultStrPtr = result)
-						{
-							ULString resultUlStr = new() { data = (ushort*)resultStrPtr, length = (nuint)result.Length };
-							Methods.ulStringAssignString(resultUlStrPtr, &resultUlStr);
-						}
+						ULStringGeneratedDllImportMarshaler m = new(result);
+						Methods.ulStringAssignString(resultUlStrPtr, m.Value);
+						m.FreeNative();
+
 						return ret;
 					};
 				}
-			}
-			get
-			{
-				throw new NotImplementedException();
-				/*var c = _GetFileMimeType;
-				return (string path, out string result) =>
-				{
-					fixed (char* pathPtr = path)
-					fixed (char* resultPtr = result)
-					{
-						ULString pathUlStr = new() { data = (ushort*)pathPtr, length = (nuint)path.Length };
-						ULString resultUlStr = new() { data = (ushort*)resultPtr, length = (nuint)result.Length };
-
-						return c(&pathUlStr, &resultUlStr);
-					}
-				};*/
 			}
 		}
 		public ULFileSystemOpenFileCallback OpenFile
@@ -72,18 +43,6 @@ namespace UltralightNet
 				{
 					_OpenFile = (path, open_for_writing) => value(ULString.NativeToManaged(path), open_for_writing);
 				}
-			}
-			get
-			{
-				var c = _OpenFile;
-				return (path, openForWriting) =>
-				{
-					fixed (char* pathPtr = path)
-					{
-						ULString pathUlStr = new() { data = (ushort*)pathPtr, length = (nuint)path.Length };
-						return c(&pathUlStr, openForWriting);
-					}
-				};
 			}
 		}
 		public ULFileSystemReadFromFileCallback ReadFromFile

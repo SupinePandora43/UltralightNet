@@ -203,13 +203,12 @@ namespace UltralightNet
 			set {
 				if(ULPlatform.DebugWarnCertificate && value.ToLower().StartsWith("https://")){
 					string cacertpem = "resources/cacert.pem";
-					fixed(char* cacertpemCharacters = cacertpem){
-						ULString cacertpemULSTR = new(){ data = (ushort*) cacertpemCharacters, length = (nuint) cacertpem.Length};
-						if (!ULPlatform._filesystem.__FileExists(&cacertpemULSTR))
-						{
-							Console.WriteLine($"UltralightNet: {typeof(ULFileSystem)} doesn't provide cacert.pem from resources/ folder. All https:// requests will fail. (Disable warning by setting ULPlatform.DebugWarnCertificate to false)");
-						}
+					ULStringGeneratedDllImportMarshaler m = new(cacertpem);
+					if (!ULPlatform._filesystem.__FileExists(m.Value))
+					{
+						Console.WriteLine($"UltralightNet: {typeof(ULFileSystem)} doesn't provide cacert.pem from resources/ folder. All https:// requests will fail. (Disable warning by setting ULPlatform.DebugWarnCertificate to false)");
 					}
+					m.FreeNative();
 				}
 				Methods.ulViewLoadURL(Ptr, value);
 			}

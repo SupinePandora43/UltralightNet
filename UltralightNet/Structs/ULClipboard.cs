@@ -25,8 +25,9 @@ namespace UltralightNet
 					{
 						value(out string managedResult);
 
-						result->data = (ushort*)Marshal.StringToHGlobalUni(managedResult);
-						result->length = (nuint)managedResult.Length;
+						ULStringGeneratedDllImportMarshaler m = new(managedResult);
+						Methods.ulStringAssignString(result, m.Value);
+						m.FreeNative();
 					};
 				}
 			}

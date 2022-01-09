@@ -260,33 +260,14 @@ namespace UltralightNet
 				}
 				else
 				{
-					#if DEBUG
-					string cacertpem = "resources/cacert.pem";
-					#endif
-					string icudt67ldat = "resources/icudt67l.dat";
+					ULStringGeneratedDllImportMarshaler m = new("resources/icudt67l.dat");
 
-					#if DEBUG
-					fixed(char* cacertpemCharacters = cacertpem)
-					#endif
-					fixed(char* icudt67ldatCharacters = icudt67ldat)
+					if (ErrorMissingResources && (!_filesystem.__FileExists(m.Value)))
 					{
-						#if DEBUG
-						ULString cacertpemULSTR = new(){ data = (ushort*) cacertpemCharacters, length = (nuint) cacertpem.Length};
-						#endif
-						ULString icudt67ldatULSTR = new(){ data = (ushort*) icudt67ldatCharacters, length = (nuint) icudt67ldat.Length};
-
-						if (ErrorMissingResources && (!_filesystem.__FileExists(&icudt67ldatULSTR)))
-						{
-							throw new FileNotFoundException($"{typeof(ULFileSystem)} doesn't provide icudt67l.dat from resources/ folder. (Disable error by setting ULPlatform.ErrorMissingResources to false.)");
-						}
-
-						#if DEBUG
-						if (DebugWarnCertificate && (!_filesystem.__FileExists(&cacertpemULSTR)))
-						{
-							Console.WriteLine($"UltralightNet: {typeof(ULFileSystem)} doesn't provide cacert.pem from resources/ folder. All https:// requests will fail. (Disable warning by setting ULPlatform.DebugWarnCertificate to false)");
-						}
-						#endif
+						throw new FileNotFoundException($"{typeof(ULFileSystem)} doesn't provide icudt67l.dat from resources/ folder. (Disable error by setting ULPlatform.ErrorMissingResources to false.)");
 					}
+
+					m.FreeNative();
 				}
 			}
 			return new Renderer(config ?? new(), dispose);

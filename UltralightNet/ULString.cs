@@ -7,53 +7,47 @@ namespace UltralightNet
 	public static partial class Methods
 	{
 		/// <summary>Create string from null-terminated ASCII C-string.</summary>
-		[GeneratedDllImport("Ultralight", CharSet = CharSet.Ansi)]
-		public static partial IntPtr ulCreateString([MarshalAs(UnmanagedType.LPStr)] string str);
+		[GeneratedDllImport("Ultralight")]
+		public unsafe static partial ULString* ulCreateString([MarshalAs(UnmanagedType.LPStr)] string str);
 
 		/// <summary>Create string from UTF-8 buffer.</summary>
 		[GeneratedDllImport("Ultralight")]
 		[Obsolete("Unexpected behaviour")]
-		public static partial IntPtr ulCreateStringUTF8(
+		public static unsafe partial ULString* ulCreateStringUTF8(
 #if NET5_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
 			[MarshalAs(UnmanagedType.LPUTF8Str)]
 #else
 			[MarshalAs(UnmanagedType.LPStr)]
 #endif
 			string str,
-			uint len
+			nuint len
 		);
 
 		/// <summary>Create string from UTF-16 buffer.</summary>
-		[GeneratedDllImport("Ultralight", CharSet = CharSet.Unicode)]
-		public static partial IntPtr ulCreateStringUTF16([MarshalAs(UnmanagedType.LPWStr)] string str, uint len);
+		[GeneratedDllImport("Ultralight")]
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		public static unsafe partial ULString* ulCreateStringUTF16([MarshalAs(UnmanagedType.LPWStr)] string str, nuint len);
 
 		// <summary>Create string from copy of existing string.</summary>
-		// [DllImport("Ultralight")]
-		// [Obsolete("missing")]
-		// public static extern IntPtr ulCreateStringFromCopy(IntPtr str);
-		public static IntPtr ulCreateStringFromCopy() => throw new EntryPointNotFoundException();
+		[DllImport("Ultralight")]
+		public static unsafe extern ULString* ulCreateStringFromCopy(ULString* str);
 
 		/// <summary>Destroy string (you should destroy any strings you explicitly Create).</summary>
 		[DllImport("Ultralight")]
-		public static extern void ulDestroyString(IntPtr str);
+		public static unsafe extern void ulDestroyString(ULString* str);
 
-		/// <summary>Get internal UTF-16 buffer data.</summary>
-		[GeneratedDllImport("Ultralight", CharSet = CharSet.Unicode)]
-		[return: MarshalAs(UnmanagedType.LPWStr)]
-		public static partial string ulStringGetData(IntPtr str);
-
-		/// <summary>Get internal UTF-16 buffer data.</summary>
+		/// <summary>Get internal UTF-8 buffer data.</summary>
 		[DllImport("Ultralight", EntryPoint = "ulStringGetData")]
-		public static extern IntPtr ulStringGetDataPtr(IntPtr str);
+		public static unsafe extern byte* ulStringGetDataPtr(ULString* str);
 
-		/// <summary>Get length in UTF-16 characters.</summary>
+		/// <summary>Get length in UTF-8 characters.</summary>
 		[DllImport("Ultralight")]
-		public static extern uint ulStringGetLength(IntPtr str);
+		public static unsafe extern nuint ulStringGetLength(ULString* str);
 
 		/// <summary>Whether this string is empty or not.</summary>
 		[GeneratedDllImport("Ultralight")]
 		[return: MarshalAs(UnmanagedType.I1)]
-		public static partial bool ulStringIsEmpty(IntPtr str);
+		public static unsafe partial bool ulStringIsEmpty(ULString* str);
 
 		/// <summary>Replaces the contents of 'str' with the contents of 'new_str'</summary>
 		[DllImport("Ultralight")]
@@ -73,64 +67,45 @@ namespace UltralightNet
 
 	public unsafe ref struct ULStringGeneratedDllImportMarshaler
 	{
-		public ULString ulstring;
+		public ULString* ulstringPtr;
 
+		[SkipLocalsInit]
 		public ULStringGeneratedDllImportMarshaler(string str)
 		{
-			ulstring = new() { data = (ushort*)Marshal.StringToHGlobalUni(str), length = (nuint)str.Length };
+			ulstringPtr = Methods.ulCreateStringUTF16(str, (nuint) str.Length);
 		}
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		[SkipLocalsInit]
 		public string ToManaged()
 		{
-			return Marshal.PtrToStringUni((IntPtr)ulstring.data, (int)ulstring.length);
+			return Marshal.PtrToStringUTF8((IntPtr)ulstringPtr->data, (int)ulstringPtr->length);
 		}
 
 		public unsafe ULString* Value
 		{
 			[MethodImpl(MethodImplOptions.AggressiveInlining)]
-			get
-			{
-				fixed (ULString* ulStringPtr = &ulstring)
-				{
-					return ulStringPtr;
-				}
-			}
+			[SkipLocalsInit]
+			get => ulstringPtr;
 
 			[MethodImpl(MethodImplOptions.AggressiveInlining)]
-			set => ulstring = *value;
+			[SkipLocalsInit]
+			set => ulstringPtr = value;
 		}
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		[SkipLocalsInit]
 		public void FreeNative()
 		{
-			Marshal.FreeHGlobal((IntPtr)ulstring.data);
+			Methods.ulDestroyString(ulstringPtr);
 		}
 	}
-#if NET5_0_OR_GREATER
-	public unsafe struct NoAllocULStringMarshaller
-	{
-		private string str;
-
-		public NoAllocULStringMarshaller(string managed)
-		{
-			str = managed;
-		}
-
-		public ref readonly char GetPinnableReference() => ref str.GetPinnableReference();
-
-		public ULString Value
-		{
-			get => new ULString() { data = (ushort*)Unsafe.AsPointer(ref Unsafe.AsRef(GetPinnableReference())), length = (nuint)str.Length };
-		}
-	}
-#endif
 
 	[BlittableType]
 	[StructLayout(LayoutKind.Sequential)]
 	public unsafe struct ULString
 	{
-		public ushort* data;
+		public byte* data;
 		public nuint length;
 
 		/// <summary>Do not use on pointers</summary>
