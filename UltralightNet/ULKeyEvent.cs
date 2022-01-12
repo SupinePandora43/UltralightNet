@@ -30,7 +30,7 @@ namespace UltralightNet
 			IntPtr ulCreateKeyEventWindows__C = NativeLibrary.GetExport(ul, "ulCreateKeyEventWindows");
 
 			IntPtr retVal;
-			
+
 			unsafe
 			{
 				delegate* unmanaged[Cdecl]<ULKeyEventType, UIntPtr, IntPtr, IntPtr> @delegate = (delegate* unmanaged[Cdecl]<ULKeyEventType, UIntPtr, IntPtr, IntPtr>)ulCreateKeyEventWindows__C;
@@ -111,7 +111,7 @@ namespace UltralightNet
 #endif
 			Ptr = Methods.ulCreateKeyEventWindows(type, wparam, lparam);
 		}
-		
+
 		/// <summary>
 		/// Create a key event from native macOS event.
 		/// </summary>
@@ -179,6 +179,9 @@ namespace UltralightNet
 		// GK_HANGUL (15) IME Hangul mode
 		public const int GK_HANGUL = 0x15;
 
+		// GK_IME_ON (16) IME On
+		public const int GK_IME_ON = 0x16;
+
 		// GK_JUNJA (17) IME Junja mode
 		public const int GK_JUNJA = 0x17;
 
@@ -190,6 +193,9 @@ namespace UltralightNet
 
 		// GK_KANJI (19) IME Kanji mode
 		public const int GK_KANJI = 0x19;
+
+		// GK_IME_OFF (1A) IME Off
+		public const int GK_IME_OFF = 0x1A;
 
 		// GK_ESCAPE (1B) ESC key
 		public const int GK_ESCAPE = 0x1B;
@@ -616,6 +622,8 @@ namespace UltralightNet
 
 		// GK_PACKET (E7) Windows 2000/XP: Used to pass Unicode characters as if they were keystrokes. The GK_PACKET key is the low word of a 32-bit Virtual Key value used for non-keyboard input methods. For more information, see Remark in KEYBDINPUT,SendInput, WM_KEYDOWN, and WM_KEYUP
 		public const int GK_PACKET = 0xE7;
+
+		public const int GK_OEM_ATTN = 0xF0;
 
 		// GK_ATTN (F6) Attn key
 		public const int GK_ATTN = 0xF6;
