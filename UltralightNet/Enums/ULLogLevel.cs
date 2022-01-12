@@ -1,6 +1,6 @@
 namespace UltralightNet
 {
-	public enum ULLogLevel
+	public enum ULLogLevel: byte
 	{
 		Error,
 		Warning,

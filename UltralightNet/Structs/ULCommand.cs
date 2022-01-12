@@ -5,7 +5,6 @@ namespace UltralightNet
 	[StructLayout(LayoutKind.Sequential)]
 	public struct ULCommand
 	{
-		[MarshalAs(UnmanagedType.U1)]
 		public ULCommandType command_type;
 		public ULGPUState gpu_state;
 

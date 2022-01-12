@@ -1,6 +1,6 @@
 namespace UltralightNet
 {
-	public enum ULFaceWinding
+	public enum ULFaceWinding: byte
 	{
 		/// <summary>Clockwise Winding (Direct3D, etc.)</summary>
 		Clockwise,

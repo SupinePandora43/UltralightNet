@@ -1,7 +1,7 @@
 namespace UltralightNet
 {
 	/// <summary>The various Bitmap formats.</summary>
-	public enum ULBitmapFormat
+	public enum ULBitmapFormat: byte
 	{
 		/// <summary>
 		/// Alpha channel only, 8-bits per pixel.

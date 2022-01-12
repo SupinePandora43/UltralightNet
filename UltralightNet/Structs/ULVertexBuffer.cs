@@ -6,14 +6,14 @@ namespace UltralightNet
 	//[BlittableType]
 	public unsafe struct ULVertexBuffer
 	{
-		private int format;
+		private byte format;
 		public uint size;
 		public void* data;
 
 		public ULVertexBufferFormat Format
 		{
 			get => (ULVertexBufferFormat)format;
-			set => format = (int)value;
+			set => format = (byte)value;
 		}
 	}
 }

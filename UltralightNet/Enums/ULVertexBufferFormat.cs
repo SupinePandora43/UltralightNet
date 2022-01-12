@@ -1,6 +1,6 @@
 namespace UltralightNet
 {
-	public enum ULVertexBufferFormat: int
+	public enum ULVertexBufferFormat: byte
 	{
 		/// <summary>
 		/// <see cref="float"/>[2] <br/>

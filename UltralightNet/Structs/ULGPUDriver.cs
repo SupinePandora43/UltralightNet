@@ -3,6 +3,9 @@ using System.Runtime.InteropServices;
 
 namespace UltralightNet
 {
+	/// <summary>
+	/// Custom rendering backend
+	/// </summary>
 	[StructLayout(LayoutKind.Sequential)]
 	public unsafe struct ULGPUDriver : IDisposable
 	{
