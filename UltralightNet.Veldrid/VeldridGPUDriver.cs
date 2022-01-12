@@ -287,7 +287,7 @@ namespace UltralightNet.Veldrid
 		}
 		#endregion Texture
 		#region Geometry
-		private void CreateGeometry(uint geometry_id, ULVertexBuffer vertices, ULIndexBuffer indices)
+		private unsafe void CreateGeometry(uint geometry_id, ULVertexBuffer vertices, ULIndexBuffer indices)
 		{
 #if DEBUG
 			Console.WriteLine($"CreateGeometry({geometry_id})");
@@ -299,16 +299,16 @@ namespace UltralightNet.Veldrid
 			BufferDescription indexDescription = new(indices.size, BufferUsage.IndexBuffer);
 			entry.indicies = graphicsDevice.ResourceFactory.CreateBuffer(ref indexDescription);
 
-			graphicsDevice.UpdateBuffer(entry.vertices, 0, vertices.data, vertices.size);
-			graphicsDevice.UpdateBuffer(entry.indicies, 0, indices.data, indices.size);
+			graphicsDevice.UpdateBuffer(entry.vertices, 0, (IntPtr)vertices.data, vertices.size);
+			graphicsDevice.UpdateBuffer(entry.indicies, 0, (IntPtr)indices.data, indices.size);
 		}
-		private void UpdateGeometry(uint geometry_id, ULVertexBuffer vertices, ULIndexBuffer indices)
+		private unsafe void UpdateGeometry(uint geometry_id, ULVertexBuffer vertices, ULIndexBuffer indices)
 		{
 			//Console.WriteLine($"UpdateGeometry({geometry_id})");
 			GeometryEntry entry = GeometryEntries[geometry_id];
 
-			graphicsDevice.UpdateBuffer(entry.vertices, 0, vertices.data, vertices.size);
-			graphicsDevice.UpdateBuffer(entry.indicies, 0, indices.data, indices.size);
+			graphicsDevice.UpdateBuffer(entry.vertices, 0, (IntPtr)vertices.data, vertices.size);
+			graphicsDevice.UpdateBuffer(entry.indicies, 0, (IntPtr)indices.data, indices.size);
 		}
 		private void DestroyGeometry(uint geometry_id)
 		{
