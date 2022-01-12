@@ -154,7 +154,7 @@ public unsafe class OpenGLGPUDriver
 		EndSynchronize = null,
 		NextTextureId = () =>
 		{
-			for (uint i = 0; ; i++)
+			for (uint i = 1; ; i++)
 			{
 				if (!textures.ContainsKey(i))
 				{
@@ -165,7 +165,7 @@ public unsafe class OpenGLGPUDriver
 		},
 		NextGeometryId = () =>
 		{
-			for (uint i = 0; ; i++)
+			for (uint i = 1; ; i++)
 			{
 				if (!geometries.ContainsKey(i))
 				{
@@ -176,7 +176,7 @@ public unsafe class OpenGLGPUDriver
 		},
 		NextRenderBufferId = () =>
 		{
-			for (uint i = 0; ; i++)
+			for (uint i = 1; ; i++)
 			{
 				if (!renderBuffers.ContainsKey(i))
 				{
@@ -447,7 +447,7 @@ public unsafe class OpenGLGPUDriver
 						//gl.Uniform1(gl.GetUniformLocation(fillProgram, "Texture1"), 0);
 						Check();
 						gl.ActiveTexture(GLEnum.Texture1);
-						gl.BindTexture(GLEnum.Texture2D, textures[gpuState.texture_2_id].textureId);
+						gl.BindTexture(GLEnum.Texture2D, textures.ContainsKey(gpuState.texture_2_id) ? textures[gpuState.texture_2_id].textureId : 0);
 						//gl.Uniform1(gl.GetUniformLocation(fillProgram, "Texture2"), 0);
 						Check();
 					}
