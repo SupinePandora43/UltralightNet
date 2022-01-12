@@ -32,6 +32,7 @@ jobs:
           sudo apt install libpng12-0
           find /usr/lib -name "libffi.so*"
           sudo ln -s  /usr/lib/x86_64-linux-gnu/libffi.so.7.1.0  /usr/lib/x86_64-linux-gnu/libffi.so.6
+          sudo apt-get install libpulse0
         if: matrix.os=='ubuntu-latest'
       #- name: Test Application
       #  run: dotnet run --project UltralightNet.TestApplication
