@@ -1,4 +1,5 @@
 using System;
+using System.Numerics;
 using Silk.NET.Maths;
 using Silk.NET.Input;
 using Silk.NET.OpenGL;
@@ -87,6 +88,9 @@ void main()
 			//input.Keyboards[i].KeyDown += KeyDown;
 		}
 		input.Mice[0].Scroll += OnScroll;
+		input.Mice[0].MouseDown += OnMouseDown;
+		input.Mice[0].MouseUp += OnMouseUp;
+		input.Mice[0].MouseMove += OnMouseMove;
 
 		//Getting the opengl api for drawing to the screen.
 		gl = GL.GetApi(window);
@@ -182,7 +186,7 @@ void main()
 
 		renderer = ULPlatform.CreateRenderer(new ULConfig { FaceWinding = ULFaceWinding.Clockwise, ForceRepaint = true });
 
-		view = renderer.CreateView(800, 600, new ULViewConfig { IsAccelerated = true, IsTransparent = false });
+		view = renderer.CreateView(800, 600, new ULViewConfig { IsAccelerated = true, IsTransparent = true });
 		//view.URL = "https://youtube.com";
 		view.HTML = "<html><body><p>123</p></body></html>";
 		/*bool loaded = false;
@@ -235,5 +239,17 @@ void main()
 	static void OnScroll(IMouse _, ScrollWheel scroll)
 	{
 		view.FireScrollEvent(new ULScrollEvent { type = ULScrollEventType.ByPage, deltaX = (int)scroll.X, deltaY = (int)scroll.Y });
+	}
+
+	static void OnMouseDown(IMouse mouse, MouseButton button){
+		view.FireMouseEvent(new(){type = ULMouseEventType.MouseDown, button = button is MouseButton.Left ? ULMouseEventButton.Left : (button is MouseButton.Right ? ULMouseEventButton.Right : ULMouseEventButton.Middle), x = (int) mouse.Position.X, y = (int) mouse.Position.Y });
+	}
+
+	static void OnMouseUp(IMouse mouse, MouseButton button){
+		view.FireMouseEvent(new(){type = ULMouseEventType.MouseUp, button = button is MouseButton.Left ? ULMouseEventButton.Left : (button is MouseButton.Right ? ULMouseEventButton.Right : ULMouseEventButton.Middle), x = (int) mouse.Position.X, y = (int) mouse.Position.Y });
+	}
+
+	static void OnMouseMove(IMouse mouse, Vector2 position){
+		view.FireMouseEvent(new(){type = ULMouseEventType.MouseMoved, x = (int) position.X, y = (int) position.Y });
 	}
 }
