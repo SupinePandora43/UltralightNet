@@ -87,6 +87,8 @@ namespace UltralightNet
 	{
 		/// <summary>The file path to a writable directory that will be used to store cookies, cached resources, and other persistent data.</summary>
 		public ULString cache_path;
+		
+		public ULString ResourcePathPrefix;
 
 		public ULFaceWinding face_winding;
 
@@ -111,9 +113,13 @@ namespace UltralightNet
 		public uint override_ram_size;
 		public uint min_large_heap_size;
 		public uint min_small_heap_size;
+		
+		public uint NumRendererThreads;
+
+		public double MaxUpdateTime;
 	}
 	/// <summary>Configuration settings for Ultralight.</summary>
-	public class ULConfig : IDisposable
+	public unsafe class ULConfig : IDisposable
 	{
 		public IntPtr Ptr
 		{
@@ -122,11 +128,7 @@ namespace UltralightNet
 		}
 		public ULConfig_C ULConfig_C
 		{
-#if NET5_0_OR_GREATER || NET451 || NETSTANDARD2_0
-			get => Marshal.PtrToStructure<ULConfig_C>(Ptr);
-#else
-			get => (ULConfig_C)Marshal.PtrToStructure(Ptr, typeof(ULConfig_C));
-#endif
+			get => *((ULConfig_C*) Ptr)
 		}
 
 		public ULConfig(bool dispose = true)
