@@ -161,7 +161,7 @@ void main()
 			View view = renderer.CreateView(Width, Height, new ULViewConfig()
 			{
 				IsAccelerated = true,
-				IsTransparent = true,
+				IsTransparent = false,
 			});
 			//View cpuView = new(renderer, Width, Height, TRANSPARENT, Session.DefaultSession(renderer), true);
 
