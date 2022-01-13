@@ -198,6 +198,7 @@ public unsafe class OpenGLGPUDriver
 
 				gl.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapS, (int)GLEnum.ClampToEdge);
 				gl.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapT, (int)GLEnum.ClampToEdge);
+				gl.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapR, (int)GLEnum.Repeat);
 			}
 
 			uint textureId = gl.GenTexture();
@@ -473,7 +474,7 @@ public unsafe class OpenGLGPUDriver
 					if (gpuState.enable_blend) gl.Enable(EnableCap.Blend);
 					else gl.Disable(EnableCap.Blend);
 					Check();
-					gl.DrawElements(PrimitiveType.Triangles, command.indices_count, DrawElementsType.UnsignedInt, (void*)(command.indices_offset /** sizeof(uint)*/));
+					gl.DrawElements(PrimitiveType.Triangles, command.indices_count, DrawElementsType.UnsignedInt, (void*)(command.indices_offset * sizeof(uint)));
 					Check();
 				}
 				else if (command.command_type is ULCommandType.ClearRenderBuffer)
