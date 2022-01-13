@@ -11,7 +11,7 @@ namespace UltralightNet.AppCore.TestApp
 			AppCoreMethods.ulEnableDefaultLogger("./log.txt");
 			AppCoreMethods.ulEnablePlatformFileSystem(Path.GetDirectoryName(typeof(Program).Assembly.Location));
 
-			ULApp app = new(new ULSettings(), new ULConfig());
+			ULApp app = new(new ULSettings(), new ULConfig(){ForceRepaint = true});
 			ULWindow window = new(app.MainMonitor, 512, 512, false, ULWindowFlags.Titled | ULWindowFlags.Resizable);
 
 			window.Title = "test title";
@@ -23,9 +23,13 @@ namespace UltralightNet.AppCore.TestApp
 
 			view.OnFailLoading += (frame_id, is_main_frame, url, description, error_domain, error_code) => throw new Exception("Failed loading");
 
-			view.OnFinishLoading += (frame_id, is_main_frame, url) => Console.WriteLine("loaded");
+			bool l = false;
+
+			view.OnFinishLoading += (frame_id, is_main_frame, url) => l = true;
 
 			view.HTML = "<html><body><p>123</p></body></html>";
+
+			while(!l) {app.Renderer.Update();Thread.Sleep(20);}
 
 			app.Run();
 		}
