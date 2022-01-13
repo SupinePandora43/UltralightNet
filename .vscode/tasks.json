@@ -25,6 +25,18 @@
             ],
             "problemMatcher": "$msCompile"
         },
+		{
+            "label": "buildTestApp",
+            "command": "dotnet",
+            "type": "process",
+            "args": [
+                "build",
+                "${workspaceFolder}/UltralightNet.TestApp/UltralightNet.TestApp.csproj",
+                "/property:GenerateFullPaths=true",
+                "/consoleloggerparameters:NoSummary"
+            ],
+            "problemMatcher": "$msCompile"
+        },
         {
             "label": "publish",
             "command": "dotnet",

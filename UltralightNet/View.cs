@@ -47,7 +47,7 @@ namespace UltralightNet
 
 		//todo: JavaScriptCore bindings
 		[DllImport("Ultralight")]
-		public static extern IntPtr ulViewLockJSContext(IntPtr view);
+		public static extern unsafe void* ulViewLockJSContext(IntPtr view);
 
 		[DllImport("Ultralight")]
 		public static extern void ulViewUnlockJSContext(IntPtr view);
@@ -180,10 +180,13 @@ namespace UltralightNet
 		public bool IsDisposed { get; private set; }
 		public Renderer Renderer { get; internal set; }
 
+		private JSContext Context { get; set; }
+
 		public View(IntPtr ptr, bool dispose = false)
 		{
 			Ptr = ptr;
 			IsDisposed = !dispose;
+			Context = new();
 		}
 
 		private readonly GCHandle[] handles = new GCHandle[12];
@@ -247,7 +250,11 @@ namespace UltralightNet
 
 		public void Resize(in uint width, in uint height) => Methods.ulViewResize(Ptr, width, height);
 
-		public IntPtr LockJSContext() => Methods.ulViewLockJSContext(Ptr);
+		public JSContext LockJSContext(){
+			void* contextHandle = Methods.ulViewLockJSContext(Ptr);
+			Context.OnLocked(contextHandle);
+			return Context;
+		}
 		public void UnlockJSContext() => Methods.ulViewUnlockJSContext(Ptr);
 
 		public string EvaluateScript(string js_string, out string exception) => Methods.ulViewEvaluateScript(Ptr, js_string, out exception);

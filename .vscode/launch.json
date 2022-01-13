@@ -36,6 +36,17 @@
             "console": "internalConsole",
             "stopAtEntry": false
         },
+		{
+            "name": "TestApp",
+            "type": "coreclr",
+            "request": "launch",
+            "preLaunchTask": "buildTestApp",
+            "program": "${workspaceFolder}/UltralightNet.TestApp/bin/Debug/net6.0/UltralightNet.TestApp.dll",
+            "args": [],
+            "cwd": "${workspaceFolder}/UltralightNet.TestApp/bin/Debug/net6.0",
+            "console": "internalConsole",
+            "stopAtEntry": false
+        },
         {
             "name": ".NET Core Attach",
             "type": "coreclr",
