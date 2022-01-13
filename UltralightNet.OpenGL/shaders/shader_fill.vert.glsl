@@ -1,5 +1,4 @@
 #version 150
-precision highp float;
 
 // Program Uniforms
 uniform vec4 State;
@@ -33,6 +32,7 @@ in vec4 in_Data6;
 // Out Params
 out vec4 ex_Color;
 out vec2 ex_TexCoord;
+out vec2 ex_ObjectCoord;
 out vec4 ex_Data0;
 out vec4 ex_Data1;
 out vec4 ex_Data2;
@@ -40,8 +40,6 @@ out vec4 ex_Data3;
 out vec4 ex_Data4;
 out vec4 ex_Data5;
 out vec4 ex_Data6;
-out vec2 ex_ObjectCoord;
-//layout(location = 10)out vec2 ex_ScreenCoord;
 
 void main(void)
 {
