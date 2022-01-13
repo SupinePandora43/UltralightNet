@@ -97,9 +97,9 @@ void main()
 
 		//gl.Enable(GLEnum.FramebufferSrgb);
 
-		gl.Enable(GLEnum.CullFace);
-		gl.CullFace(GLEnum.Back);
-		gl.FrontFace(GLEnum.CW);
+		gl.CullFace(GLEnum.None);
+		gl.Disable(GLEnum.CullFace);
+		gl.FrontFace(GLEnum.Ccw);
 		gl.Disable(EnableCap.DepthTest);
 		gl.DepthFunc(DepthFunction.Never);
 		//gl.Disable(GLEnum.StencilTest);
@@ -184,9 +184,9 @@ void main()
 
 		ULPlatform.GPUDriver = gpuDriver.GetGPUDriver();
 
-		renderer = ULPlatform.CreateRenderer(new ULConfig { FaceWinding = ULFaceWinding.Clockwise, ForceRepaint = true });
+		renderer = ULPlatform.CreateRenderer(new ULConfig { FaceWinding = ULFaceWinding.CounterClockwise, ForceRepaint = true });
 
-		view = renderer.CreateView(800, 600, new ULViewConfig { IsAccelerated = true, IsTransparent = true });
+		view = renderer.CreateView(800, 600, new ULViewConfig { IsAccelerated = true, IsTransparent = false });
 		//view.URL = "https://youtube.com";
 		view.HTML = "<html><body><p>123</p></body></html>";
 		/*bool loaded = false;
