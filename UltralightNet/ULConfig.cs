@@ -128,7 +128,7 @@ namespace UltralightNet
 		}
 		public ULConfig_C ULConfig_C
 		{
-			get => *((ULConfig_C*) Ptr)
+			get => *((ULConfig_C*) Ptr);
 		}
 
 		public ULConfig(bool dispose = true)
