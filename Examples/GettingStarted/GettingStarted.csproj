@@ -3,15 +3,15 @@
 		<OutputType>Exe</OutputType>
 		<TargetFramework>net6.0</TargetFramework>
 	</PropertyGroup>
-	
+
 	<ItemGroup>
 		<!-- Ultralight Binaries -->
 		<PackageReference Include="UltralightNet.Binaries" Version="$(Version)" />
-		<!-- AppCore bindings, in this project used only for font loader -->
+		<!-- AppCore bindings -->
 		<PackageReference Include="UltralightNet.AppCore" Version="$(Version)" />
-		<!-- "resources" folder, used for URL loading -->
+		<!-- "resources" folder -->
 		<PackageReference Include="UltralightNet.Resources" Version="$(Version)" />
-		<!-- Ultralight bindings itself -->
+		<!-- UltralightNet bindings itself -->
 		<PackageReference Include="UltralightNet" Version="$(Version)" />
 	</ItemGroup>
 

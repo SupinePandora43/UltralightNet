@@ -47,6 +47,17 @@
             "console": "internalConsole",
             "stopAtEntry": false
         },
+		{
+            "name": "Examples/GettingStarted",
+            "type": "coreclr",
+            "request": "launch",
+            "preLaunchTask": "build_Examples_GettingStarted",
+            "program": "${workspaceFolder}/Examples/GettingStarted/bin/Debug/net6.0/GettingStarted.dll",
+            "args": [],
+            "cwd": "${workspaceFolder}/Examples/GettingStarted/bin/Debug/net6.0",
+            "console": "internalConsole",
+            "stopAtEntry": false
+        },
         {
             "name": ".NET Core Attach",
             "type": "coreclr",

@@ -37,6 +37,18 @@
             ],
             "problemMatcher": "$msCompile"
         },
+		{
+            "label": "build_Examples_GettingStarted",
+            "command": "dotnet",
+            "type": "process",
+            "args": [
+                "build",
+                "${workspaceFolder}/Examples/GettingStarted/GettingStarted.csproj",
+                "/property:GenerateFullPaths=true",
+                "/consoleloggerparameters:NoSummary"
+            ],
+            "problemMatcher": "$msCompile"
+        },
         {
             "label": "publish",
             "command": "dotnet",

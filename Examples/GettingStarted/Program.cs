@@ -4,35 +4,23 @@ using System.Threading;
 using UltralightNet;
 using UltralightNet.AppCore;
 
-namespace UltralightNet.GettingStarted
+namespace GettingStarted
 {
 	class Program
 	{
 		static void Main()
 		{
-			// Set Logger
-			ULPlatform.Logger = new()
-			{
-				LogMessage = (level, message) =>
-				{
-					Console.WriteLine($"({level}): {message}");
-				}
-			};
-
 			// Set Font Loader
 			AppCoreMethods.ulEnablePlatformFontLoader();
 
-			// Set filesystem (Ultralight requires "resources/icudt67l.dat", and probably cacert.pem too)
+			// Set filesystem (Ultralight requires "resources/icudt67l.dat")
 			AppCoreMethods.ulEnablePlatformFileSystem(Path.GetDirectoryName(typeof(Program).Assembly.Location));
 
-			// Create config, used for specifying resources folder (used for URL loading)
-			ULConfig config = new();
-
 			// Create Renderer
-			Renderer renderer = ULPlatform.CreateRenderer(config);
+			Renderer renderer = ULPlatform.CreateRenderer();
 
 			// Create View
-			View view = renderer.CreateView(512, 512);
+			View view = renderer.CreateView(1980, 1024);
 
 			// Load URL
 
@@ -43,13 +31,13 @@ namespace UltralightNet.GettingStarted
 				loaded = true;
 			};
 
-			view.URL = "https://github.com"; // Requires "UltralightNet.Resources"
+			view.URL = "https://ultralig.ht";
 
 			// Update Renderer until page is loaded
 			while (!loaded)
 			{
 				renderer.Update();
-				// sleep | give ultralight time to process network etc.
+				// give time to process network etc.
 				Thread.Sleep(10);
 			}
 
@@ -65,8 +53,8 @@ namespace UltralightNet.GettingStarted
 			// Swap Red and Blue channels
 			bitmap.SwapRedBlueChannels();
 
-			// save bitmap to png file
-			bitmap.WritePng("./github.png");
+			// Save bitmap to png file
+			bitmap.WritePng("./ultralight.png");
 		}
 	}
 }

@@ -37,7 +37,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UltralightNet.Veldrid", "Ul
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UltralightNet.Veldrid.TestApp", "UltralightNet.Veldrid.TestApp\UltralightNet.Veldrid.TestApp.csproj", "{F6F0F247-9E1D-469C-81D1-4FAAD701933C}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UltralightNet.GettingStarted", "UltralightNet.GettingStarted\UltralightNet.GettingStarted.csproj", "{483B033B-63EF-4AB1-A27E-2AAD4C2D2FF3}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Examples.GettingStarted", "Examples\GettingStarted\GettingStarted.csproj", "{483B033B-63EF-4AB1-A27E-2AAD4C2D2FF3}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UltralightNet.AppCore.TestApp", "UltralightNet.AppCore.TestApp\UltralightNet.AppCore.TestApp.csproj", "{6066A6F2-EE9A-4F71-9CC0-8D6D068ED97F}"
 EndProject
