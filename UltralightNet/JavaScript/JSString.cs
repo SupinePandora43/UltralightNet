@@ -29,9 +29,11 @@ namespace UltralightNet {
 		public static extern nuint JSStringGetUTF8CString(void* @string, byte* buffer, nuint bufferSize);
 
 		[GeneratedDllImport("WebCore")]
+		[return: MarshalAs(UnmanagedType.I1)]
 		public static partial bool JSStringIsEqual(void* a, void* b);
 
 		[GeneratedDllImport("WebCore")]
+		[return: MarshalAs(UnmanagedType.I1)]
 		public static partial bool JSStringIsEqualToUTF8CString(void* str, byte* characters);
 	}
 

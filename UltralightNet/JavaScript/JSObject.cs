@@ -6,6 +6,22 @@ namespace UltralightNet
 
 	unsafe partial class JavaScriptMethods
 	{
+		// [DllImport("WebCore")]
+		// public static extern void* JSClassCreate(JSClassDefinition* jsClassDefinition);
+
+		[DllImport("WebCore")]
+		public static extern void* JSClassRetain(void* jsClass);
+		
+		[DllImport("WebCore")]
+		public static extern void JSClassRelease(void* jsClass);
+
+		[DllImport("WebCore")]
+		public static extern void* JSClassGetPrivate(void* jsClass);
+
+		[GeneratedDllImport("WebCore")]
+		[return: MarshalAs(UnmanagedType.I1)]
+		public static extern bool JSClassSetPrivate(void* jsClass, void* data);
+
 		[DllImport("WebCore")]
 		public static extern void* JSObjectMakeFunctionWithCallback(void* context, void* name, delegate* unmanaged[Cdecl]<void*, void*, void*, nuint, void**, void**, void*> func);
 
