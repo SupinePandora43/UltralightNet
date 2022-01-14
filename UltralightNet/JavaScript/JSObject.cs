@@ -6,6 +6,7 @@ namespace UltralightNet
 
 	unsafe partial class JavaScriptMethods
 	{
+		// TODO:
 		// [DllImport("WebCore")]
 		// public static extern void* JSClassCreate(JSClassDefinition* jsClassDefinition);
 
@@ -131,16 +132,46 @@ namespace UltralightNet
 
 	public unsafe class JSObject
 	{
-		public JSObject(void* context, void* ptr)
+		private void* handle = null;
+		private void* context = null;
+		private bool isContextSet = false;
+		private bool isManaged = false;
+
+		public JSObject(void* context, void* handle)
 		{
-			contextPtr = context;
-			handle = ptr;
+			this.context = context;
+			this.handle = handle;
 		}
 
-		private void* handle;
-		public void* Handle => handle;
+		private JSObject() { }
 
-		private void* contextPtr;
+		public void* Context
+		{
+			get => context;
+			set
+			{
+				isContextSet = true;
+				context = value;
+			}
+		}
+
+		public void* Handle
+		{
+			get
+			{
+				if (handle is null && isManaged)
+				{
+					if (!isContextSet) throw new Exception("JSObject.Context is not set.");
+					ConvertToNativeJSObject();
+				}
+				return handle;
+			}
+		}
+
+		private void ConvertToNativeJSObject()
+		{
+
+		}
 
 		public JSObject this[string key]
 		{
@@ -152,7 +183,7 @@ namespace UltralightNet
 
 		public void SetProperty(JSString name, JSObject obj)
 		{
-			JavaScriptMethods.JSObjectSetProperty(contextPtr, handle, name.Handle, obj.Handle);
+			JavaScriptMethods.JSObjectSetProperty(Context, handle, name.Handle, obj.Handle);
 		}
 
 		public void SetProperty(string name, JSObject obj)
