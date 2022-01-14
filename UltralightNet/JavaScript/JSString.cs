@@ -1,3 +1,5 @@
+// JSStringRef.h
+
 using System;
 using System.Runtime.InteropServices;
 
