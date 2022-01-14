@@ -11,7 +11,7 @@ namespace UltralightNet
 
 		[DllImport("WebCore")]
 		public static extern void* JSClassRetain(void* jsClass);
-		
+
 		[DllImport("WebCore")]
 		public static extern void JSClassRelease(void* jsClass);
 
@@ -20,7 +20,7 @@ namespace UltralightNet
 
 		[GeneratedDllImport("WebCore")]
 		[return: MarshalAs(UnmanagedType.I1)]
-		public static extern bool JSClassSetPrivate(void* jsClass, void* data);
+		public static partial bool JSClassSetPrivate(void* jsClass, void* data);
 
 		[DllImport("WebCore")]
 		public static extern void* JSObjectMake(void* context, void* jsClass, void* data);
@@ -57,13 +57,76 @@ namespace UltralightNet
 
 		[GeneratedDllImport("WebCore")]
 		[return: MarshalAs(UnmanagedType.I1)]
-		public static extern bool JSObjectHasProperty(void* jsClass, void* jsObject, void* propertyName);
+		public static partial bool JSObjectHasProperty(void* jsClass, void* jsObject, void* propertyName);
 
 		[DllImport("WebCore")]
 		public static extern void* JSObjectGetProperty(void* context, void* jsObject, void* propertyName, void** exception);
 
 		[DllImport("WebCore")]
 		public static extern void JSObjectSetProperty(void* context, void* jsObject, void* propertyName, void* value, JSPropertyAttributes attributes = JSPropertyAttributes.None, void** exception = null);
+
+		[GeneratedDllImport("WebCore")]
+		[return: MarshalAs(UnmanagedType.I1)]
+		public static partial bool JSObjectDeleteProperty(void* context, void* jsObject, void* propertyName, void** exception);
+
+		[GeneratedDllImport("WebCore")]
+		[return: MarshalAs(UnmanagedType.I1)]
+		public static partial bool JSObjectHasPropertyForKey(void* context, void* jsObject, void* propertyKey, void** exception);
+
+		[DllImport("WebCore")]
+		public static extern void* JSObjectGetPropertyForKey(void* context, void* jsObject, void* propertyKey, void** exception);
+
+		[DllImport("WebCore")]
+		public static extern void JSObjectSetPropertyForKey(void* context, void* jsObject, void* propertyKey, void* value, JSPropertyAttributes attributes = JSPropertyAttributes.None, void** exception = null);
+
+		[GeneratedDllImport("WebCore")]
+		[return: MarshalAs(UnmanagedType.I1)]
+		public static partial bool JSObjectDeletePropertyForKey(void* context, void* jsObject, void* propertyKey, void** exception);
+
+		[DllImport("WebCore")]
+		public static extern void* JSObjectGetPropertyAtIndex(void* context, void* jsObject, uint propertyIndex, void** exception);
+
+		[DllImport("WebCore")]
+		public static extern void JSObjectSetPropertyAtIndex(void* context, void* jsObject, uint propertyIndex, void* value, void** exception = null);
+
+		[DllImport("WebCore")]
+		public static extern void* JSObjectGetPrivate(void* jsObject);
+
+		[GeneratedDllImport("WebCore")]
+		[return: MarshalAs(UnmanagedType.I1)]
+		public static partial bool JSObjectSetPrivate(void* jsObject, void* data);
+
+		[GeneratedDllImport("WebCore")]
+		[return: MarshalAs(UnmanagedType.I1)]
+		public static partial bool JSObjectIsFunction(void* context, void* jsObject);
+
+		[DllImport("WebCore")]
+		public static extern void* JSObjectCallAsFunction(void* context, void* jsObject, void* thisObject, nuint argumentCount, void** arguments, void** exception);
+
+		[GeneratedDllImport("WebCore")]
+		[return: MarshalAs(UnmanagedType.I1)]
+		public static partial bool JSObjectIsConstructor(void* context, void* jsObject);
+
+		[DllImport("WebCore")]
+		public static extern void* JSObjectCallAsConstructor(void* context, void* jsObject, nuint argumentCount, void** arguments, void** exception);
+
+		[DllImport("WebCore")]
+		public static extern void* JSObjectCopyPropertyNames(void* context, void* jsObject);
+
+		[DllImport("WebCore")]
+		public static extern void* JSPropertyNameArrayRetain(void* array);
+
+		[DllImport("WebCore")]
+		public static extern void JSPropertyNameArrayRelease(void* array);
+
+		[DllImport("WebCore")]
+		public static extern nuint JSPropertyNameArrayGetCount(void* array);
+
+		[DllImport("WebCore")]
+		public static extern void* JSPropertyNameArrayGetNameAtIndex(void* array, nuint index);
+
+		[DllImport("WebCore")]
+		public static extern void JSPropertyNameAccumulatorAddName(void* array, void* propertyName);
 	}
 
 	public unsafe class JSObject
