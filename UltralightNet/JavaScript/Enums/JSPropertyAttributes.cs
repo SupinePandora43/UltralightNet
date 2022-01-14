@@ -1,5 +1,8 @@
+using System;
+
 namespace UltralightNet
 {
+	[Flags]
 	public enum JSPropertyAttributes : uint
 	{
 		None = 0,
