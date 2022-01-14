@@ -23,7 +23,7 @@ namespace UltralightNetTestApplication
 			// context.GlobalObject["GetMessage"] = (JSObject) (arguments) => (JSValue) "Hello from C#!";
 			// context.GlobalObject["GetMessage"] = (JSObject) &GetMessage;
 
-			void* funcObject = JavaScriptMethods.JSObjectMakeFunctionWithCallback(context.Handle, new JSString("GetMessage").Handle, (delegate* unmanaged[Cdecl]<void*, void*, void*, nuint, void**, void**, void*>) &GetMessage);
+			void* funcObject = JavaScriptMethods.JSObjectMakeFunctionWithCallback(context.Handle, new JSString("GetMessage").Handle, &GetMessage);
 
 			context.GlobalObject["GetMessage"] = new JSObject(context.Handle, funcObject);
 
