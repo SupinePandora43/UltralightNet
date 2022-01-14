@@ -110,7 +110,7 @@ namespace UltralightNet
 	public unsafe class JSValue
 	{
 		private void* handle = null;
-		private void* context;
+		private void* context = null;
 		private object managed;
 		private bool isManaged = false;
 		private bool isContextSet = false;
@@ -123,9 +123,11 @@ namespace UltralightNet
 
 		private JSValue() { }
 
-		public void* Context {
+		public void* Context
+		{
 			get => context;
-			set {
+			set
+			{
 				isContextSet = true;
 				context = value;
 			}
@@ -135,16 +137,19 @@ namespace UltralightNet
 		{
 			get
 			{
-				if(isManaged){
-					if(!isContextSet) throw new Exception("JSValue.Context is not set.");
-					if(handle is null) ConvertToNativeJSValue();
+				if (handle is null && isManaged)
+				{
+					if (!isContextSet) throw new Exception("JSValue.Context is not set.");
+					ConvertToNativeJSValue();
 				}
 				return handle;
 			}
 		}
 
-		private void ConvertToNativeJSValue(){
-			if(managed is string str){
+		private void ConvertToNativeJSValue()
+		{
+			if (managed is string str)
+			{
 				handle = JavaScriptMethods.JSValueMakeString(Context, new JSString(str).Handle);
 			}
 		}
