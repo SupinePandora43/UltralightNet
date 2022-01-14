@@ -1,9 +1,10 @@
 using System;
 using System.Runtime.InteropServices;
 
-namespace UltralightNet {
-
-	unsafe partial class JavaScriptMethods {
+namespace UltralightNet
+{
+	unsafe partial class JavaScriptMethods
+	{
 		[DllImport("WebCore")]
 		public static extern JSValue JSValueGetType(void* context, void* jsValue);
 
@@ -106,14 +107,17 @@ namespace UltralightNet {
 		public static extern void JSValueUnprotect(void* context, void* jsValue);
 	}
 
-	public unsafe class JSValue {
+	public unsafe class JSValue
+	{
 		private void* handle;
 		private void* context;
 		private bool isManaged;
 		private object managed;
 
-		public JSValue(){
-
+		public JSValue(void* context, void* jsValue)
+		{
+			this.context = context;
+			handle = jsValue;
 		}
 	}
 
