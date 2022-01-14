@@ -35,11 +35,9 @@ namespace UltralightNetTestApplication
 		[UnmanagedCallersOnly(CallConvs = new Type[] { typeof(CallConvCdecl) })]
 		static unsafe void* GetMessage(void* context, void* function, void* thisObject, nuint argumentCount, void** arguments, void** exception)
 		{
-			JSString str = new("Hello from C#!");
-
-			void* value = JavaScriptMethods.JSValueMakeString(context, str.Handle);
-
-			return value;
+			JSValue value = "Hello from C#!";
+			value.Context = context;
+			return value.Handle;
 		}
 	}
 }
