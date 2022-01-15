@@ -3,12 +3,10 @@ using System.Runtime.InteropServices;
 
 namespace UltralightNet
 {
-
 	unsafe partial class JavaScriptMethods
 	{
-		// TODO:
-		// [DllImport("WebCore")]
-		// public static extern void* JSClassCreate(JSClassDefinition* jsClassDefinition);
+		[DllImport("WebCore")]
+		public static extern void* JSClassCreate(JSClassDefinition* jsClassDefinition);
 
 		[DllImport("WebCore")]
 		public static extern void* JSClassRetain(void* jsClass);
