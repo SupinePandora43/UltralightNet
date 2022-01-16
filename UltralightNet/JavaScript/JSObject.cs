@@ -128,45 +128,11 @@ namespace UltralightNet
 		public static extern void JSPropertyNameAccumulatorAddName(void* array, void* propertyName);
 	}
 
-	public unsafe class JSObject
+	public unsafe class JSObject : JSValue
 	{
-		private void* handle = null;
-		private void* context = null;
-		private bool isContextSet = false;
-		private bool isManaged = false;
+		public JSObject(void* context, void* handle) : base(context, handle) {}
 
-		public JSObject(void* context, void* handle)
-		{
-			this.context = context;
-			this.handle = handle;
-		}
-
-		private JSObject() { }
-
-		public void* Context
-		{
-			get => context;
-			set
-			{
-				isContextSet = true;
-				context = value;
-			}
-		}
-
-		public void* Handle
-		{
-			get
-			{
-				if (handle is null && isManaged)
-				{
-					if (!isContextSet) throw new Exception("JSObject.Context is not set.");
-					ConvertToNativeJSObject();
-				}
-				return handle;
-			}
-		}
-
-		private void ConvertToNativeJSObject()
+		override protected void ConvertToNativeJSThing()
 		{
 
 		}
@@ -181,13 +147,14 @@ namespace UltralightNet
 
 		public void SetProperty(JSString name, JSObject obj)
 		{
-			JavaScriptMethods.JSObjectSetProperty(Context, handle, name.Handle, obj.Handle);
+			JavaScriptMethods.JSObjectSetProperty(Context, Handle, name.Handle, obj.Handle);
 		}
 
 		public void SetProperty(string name, JSObject obj)
 		{
 			SetProperty(new JSString(name), obj);
 		}
+
 	}
 
 }
