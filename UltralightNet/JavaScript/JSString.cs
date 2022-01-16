@@ -3,9 +3,11 @@
 using System;
 using System.Runtime.InteropServices;
 
-namespace UltralightNet {
+namespace UltralightNet
+{
 
-	unsafe partial class JavaScriptMethods {
+	unsafe partial class JavaScriptMethods
+	{
 		[DllImport("WebCore")]
 		public static extern void* JSStringCreateWithCharacters(ushort* characters, nuint length);
 
@@ -39,25 +41,67 @@ namespace UltralightNet {
 		public static partial bool JSStringIsEqualToUTF8CString(void* str, byte* characters);
 	}
 
-	public unsafe class JSString: IDisposable {
-		private void* handle;
+	public unsafe class JSString : IDisposable, IEquatable<JSString>
+	{
+		private readonly void* handle;
+		private readonly bool dispose = true;
 		private bool isDisposed = false;
 
-		public JSString(string str){
-			fixed(char* characters = str){
-				handle = JavaScriptMethods.JSStringCreateWithCharacters((ushort*) characters, (nuint) str.Length);
+		public JSString(void* handle, bool dispose = false)
+		{
+			this.handle = handle;
+			this.dispose = dispose;
+		}
+		public JSString(string str)
+		{
+			fixed (char* characters = str)
+			{
+				handle = JavaScriptMethods.JSStringCreateWithCharacters((ushort*)characters, (nuint)str.Length);
 			}
 		}
 
 		public void* Handle => handle;
 
+		public JSString Retain() => new(JavaScriptMethods.JSStringRetain(Handle), true);
+
+		public nuint Length => JavaScriptMethods.JSStringGetLength(Handle);
+
+		public ReadOnlySpan<ushort> UTF16Data => new(JavaScriptMethods.JSStringGetCharactersPtr(Handle), (int)Length);
+		public ushort* UTF16DataRaw => JavaScriptMethods.JSStringGetCharactersPtr(Handle);
+
+		public nuint MaximumUTF8CStringSize => JavaScriptMethods.JSStringGetMaximumUTF8CStringSize(Handle);
+
+		public nuint GetUTF8(byte* buffer, nuint bufferSize) => JavaScriptMethods.JSStringGetUTF8CString(Handle, buffer, bufferSize);
+		public nuint GetUTF8(Span<byte> buffer) { fixed (byte* bufferPtr = buffer) { return JavaScriptMethods.JSStringGetUTF8CString(Handle, bufferPtr, (nuint)buffer.Length); } }
+
+#nullable enable
+
+		public override string? ToString() => new((char*)UTF16DataRaw, 0, (int)Length);
+
+		public override bool Equals(object? other) => Equals(other as JSString);
+		public bool Equals(JSString? other)
+		{
+			if (other is null) return false;
+			return JavaScriptMethods.JSStringIsEqual(Handle, other.Handle);
+		}
+
+#nullable disable
+
+		public bool Equals(byte* other) => JavaScriptMethods.JSStringIsEqualToUTF8CString(Handle, other);
+		public bool Equals(ReadOnlySpan<byte> other) { fixed (byte* bytes = other) { return Equals(bytes); } }
+
+		public static implicit operator JSString(string obj) => new(obj);
+
 		~JSString() => Dispose();
 
 		public void Dispose()
 		{
-			if(isDisposed) return;
+			if (isDisposed) return;
 
-			JavaScriptMethods.JSStringRelease(handle);
+			if (dispose)
+			{
+				JavaScriptMethods.JSStringRelease(handle);
+			}
 
 			isDisposed = true;
 			GC.SuppressFinalize(this);
