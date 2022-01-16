@@ -5,7 +5,7 @@ uniform vec4 State;
 uniform mat4 Transform;
 uniform vec4 Scalar4[2];
 uniform vec4 Vector[8];
-uniform uint fClipSize;
+uniform uint ClipSize;
 uniform mat4 Clip[8];
 
 // Uniform Accessor Functions
@@ -138,7 +138,7 @@ float antialias(in float d, in float width, in float median) {
 }
 
 void applyClip() {
-  for (uint i = 0u; i < fClipSize; i++) {
+  for (uint i = 0u; i < ClipSize; i++) {
     mat4 data = Clip[i];
     vec2 origin = data[0].xy;
     vec2 size = data[0].zw;

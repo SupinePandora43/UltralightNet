@@ -5,7 +5,7 @@ uniform vec4 State;
 uniform mat4 Transform;
 uniform vec4 Scalar4[2];
 uniform vec4 Vector[8];
-uniform uint fClipSize;
+uniform uint ClipSize;
 uniform mat4 Clip[8];
 
 // Uniform Accessor Functions
