@@ -22,10 +22,11 @@ public unsafe class OpenGLGPUDriver
 	private readonly Dictionary<uint, GeometryEntry> geometries = new();
 	private readonly Dictionary<uint, RenderBufferEntry> renderBuffers = new();
 
-	public void Check([CallerLineNumber] int line = default){
+	public void Check([CallerLineNumber] int line = default)
+	{
 #if DEBUG
 		var error = gl.GetError();
-		if(error is not 0) Console.WriteLine($"{line}: {error}");
+		if (error is not 0) Console.WriteLine($"{line}: {error}");
 #endif
 	}
 
@@ -426,16 +427,16 @@ public unsafe class OpenGLGPUDriver
 					var geometryEntry = geometries[command.geometry_id];
 					gl.UseProgram(program);
 					Check();
-					gl.Uniform4(gl.GetUniformLocation(program, "State"), 0, gpuState.viewport_width, gpuState.viewport_height, 1);
+					gl.Uniform4(gl.GetUniformLocation(program, "State"), 0f, (float)gpuState.viewport_width, (float)gpuState.viewport_height, 1f);
 					Check();
-					Matrix4x4 transform = gpuState.transform.ApplyProjection(gpuState.viewport_width, gpuState.viewport_height, false);
+					Matrix4x4 transform = gpuState.transform.ApplyProjection(gpuState.viewport_width, gpuState.viewport_height, gpuState.render_buffer_id is not 1);
 					gl.UniformMatrix4(gl.GetUniformLocation(program, "Transform"), 1, false, &transform.M11);
 					Check();
 					gl.Uniform4(gl.GetUniformLocation(program, "Scalar4"), 2, &gpuState.scalar_0);
 					Check();
 					gl.Uniform4(gl.GetUniformLocation(program, "Vector"), 8, &gpuState.vector_0.X);
 					Check();
-					gl.Uniform1(gl.GetUniformLocation(program, "fClipSize"), (uint)gpuState.clip_size);
+					gl.Uniform1(gl.GetUniformLocation(program, "ClipSize"), (uint)gpuState.clip_size);
 					Check();
 					gl.UniformMatrix4(gl.GetUniformLocation(program, "Clip"), 8, false, &gpuState.clip_0.M11);
 					Check();
@@ -445,22 +446,30 @@ public unsafe class OpenGLGPUDriver
 					{
 						gl.ActiveTexture(GLEnum.Texture0);
 						gl.BindTexture(GLEnum.Texture2D, textures[gpuState.texture_1_id].textureId);
-						//gl.Uniform1(gl.GetUniformLocation(fillProgram, "Texture1"), 0);
-						Check();
+
+						gl.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)GLEnum.Linear);
+						gl.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)GLEnum.Linear);
+						gl.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapS, (int)GLEnum.ClampToEdge);
+						gl.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapT, (int)GLEnum.ClampToEdge);
+
+
 						gl.ActiveTexture(GLEnum.Texture1);
 						gl.BindTexture(GLEnum.Texture2D, textures.ContainsKey(gpuState.texture_2_id) ? textures[gpuState.texture_2_id].textureId : 0);
-						//gl.Uniform1(gl.GetUniformLocation(fillProgram, "Texture2"), 0);
-						Check();
+
+						gl.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)GLEnum.Linear);
+						gl.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)GLEnum.Linear);
+
+						gl.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapS, (int)GLEnum.ClampToEdge);
+						gl.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapT, (int)GLEnum.ClampToEdge);
 					}
 					else
 					{
 						gl.ActiveTexture(GLEnum.Texture0);
 						gl.BindTexture(GLEnum.Texture2D, 0);
-						Check();
 						gl.ActiveTexture(GLEnum.Texture1);
 						gl.BindTexture(GLEnum.Texture2D, 0);
-						Check();
 					}
+					Check();
 
 					if (gpuState.enable_scissor)
 					{
