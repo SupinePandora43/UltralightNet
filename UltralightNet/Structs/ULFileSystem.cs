@@ -89,13 +89,13 @@ namespace UltralightNet
 				{
 					ULFileSystemGetFileSizeCallback callback = value;
 					ULPlatform.Handle(this, GCHandle.Alloc(callback, GCHandleType.Normal));
-					__GetFileSize = (delegate* unmanaged[Cdecl]<int, long*, bool>)Marshal.GetFunctionPointerForDelegate(callback);
+					__GetFileSize = (delegate* unmanaged[Cdecl]<nuint, long*, bool>)Marshal.GetFunctionPointerForDelegate(callback);
 				}
 			}
 			get
 			{
 				var p = __GetFileSize;
-				return (int handle, out long result) =>
+				return (nuint handle, out long result) =>
 				{
 					fixed (long* resultPtr = &result)
 						return p(handle, resultPtr);
@@ -127,7 +127,7 @@ namespace UltralightNet
 				{
 					ULFileSystemOpenFileCallback__PInvoke__ callback = value;
 					ULPlatform.Handle(this, GCHandle.Alloc(callback, GCHandleType.Normal));
-					__OpenFile = (delegate* unmanaged[Cdecl]<ULString*, bool, int>)Marshal.GetFunctionPointerForDelegate(callback);
+					__OpenFile = (delegate* unmanaged[Cdecl]<ULString*, bool, nuint>)Marshal.GetFunctionPointerForDelegate(callback);
 				}
 			}
 			get
@@ -144,7 +144,7 @@ namespace UltralightNet
 				{
 					ULFileSystemCloseFileCallback callback = value;
 					ULPlatform.Handle(this, GCHandle.Alloc(callback, GCHandleType.Normal));
-					__CloseFile = (delegate* unmanaged[Cdecl]<int, void>)Marshal.GetFunctionPointerForDelegate(callback);
+					__CloseFile = (delegate* unmanaged[Cdecl]<nuint, void>)Marshal.GetFunctionPointerForDelegate(callback);
 				}
 			}
 			get
@@ -161,7 +161,7 @@ namespace UltralightNet
 				{
 					ULFileSystemReadFromFileCallback__PInvoke__ callback = value;
 					ULPlatform.Handle(this, GCHandle.Alloc(callback, GCHandleType.Normal));
-					__ReadFromFile = (delegate* unmanaged[Cdecl]<int, byte*, long, long>)Marshal.GetFunctionPointerForDelegate(callback);
+					__ReadFromFile = (delegate* unmanaged[Cdecl]<nuint, byte*, long, long>)Marshal.GetFunctionPointerForDelegate(callback);
 				}
 			}
 			get
@@ -172,11 +172,11 @@ namespace UltralightNet
 		}
 
 		public delegate* unmanaged[Cdecl]<ULString*, bool> __FileExists;
-		public delegate* unmanaged[Cdecl]<int, long*, bool> __GetFileSize;
+		public delegate* unmanaged[Cdecl]<nuint, long*, bool> __GetFileSize;
 		public delegate* unmanaged[Cdecl]<ULString*, ULString*, bool> __GetFileMimeType;
-		public delegate* unmanaged[Cdecl]<ULString*, bool, int> __OpenFile;
-		public delegate* unmanaged[Cdecl]<int, void> __CloseFile;
-		public delegate* unmanaged[Cdecl]<int, byte*, long, long> __ReadFromFile;
+		public delegate* unmanaged[Cdecl]<ULString*, bool, nuint> __OpenFile;
+		public delegate* unmanaged[Cdecl]<nuint, void> __CloseFile;
+		public delegate* unmanaged[Cdecl]<nuint, byte*, long, long> __ReadFromFile;
 
 		public void Dispose()
 		{

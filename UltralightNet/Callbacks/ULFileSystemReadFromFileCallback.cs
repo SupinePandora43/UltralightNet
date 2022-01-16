@@ -5,12 +5,12 @@ namespace UltralightNet
 {
 	[UnmanagedFunctionPointer(CallingConvention.Cdecl)]
 	public unsafe delegate long ULFileSystemReadFromFileCallback__PInvoke__(
-		int handle,
+		nuint handle,
 		byte* data,
 		long length
 	);
 	public delegate long ULFileSystemReadFromFileCallback(
-		int handle,
+		nuint handle,
 		Span<byte> data
 	);
 }

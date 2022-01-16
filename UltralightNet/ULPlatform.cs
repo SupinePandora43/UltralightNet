@@ -174,15 +174,11 @@ namespace UltralightNet
 				{
 					Console.WriteLine("UltralightNet: no filesystem set, default (with access only to required files) will be used.");
 
-					Dictionary<int, Stream> files = new();
+					List<Stream> files = new();
 
-					int GetFileId()
+					nuint GetFileId()
 					{
-						for (int i = int.MinValue; i < int.MaxValue; i++)
-						{
-							if (!files.ContainsKey(i)) return i;
-						}
-						throw new IndexOutOfRangeException("UltralightNet (Default FileSystem): reached file limit.");
+						return (nuint) files.Count;
 					}
 
 					FileSystem = new()
@@ -217,9 +213,9 @@ namespace UltralightNet
 						OpenFile = (file, _) =>
 						{
 							//FileStream fs = File.Open(file, FileMode.Open);
-							int id = GetFileId();
+							nuint id = GetFileId();
 							Console.WriteLine($"OpenFile({file}) = {id}");
-							files[id] = file switch
+							files[(int)id] = file switch
 							{
 								"resources/cacert.pem" => Resources.Cacertpem,
 								"resources/icudt67l.dat" => Resources.Icudt67ldat,
@@ -230,9 +226,9 @@ namespace UltralightNet
 							};
 							return id;
 						},
-						GetFileSize = (int handle, out long size) =>
+						GetFileSize = (nuint handle, out long size) =>
 						{
-							size = files[handle].Length;
+							size = files[(int)handle].Length;
 							Console.WriteLine($"GetFileSize({handle}) = {size}");
 							return true;
 						},
@@ -240,7 +236,7 @@ namespace UltralightNet
 						{
 							Console.WriteLine($"ReadFromFile({handle})");
 #if NET5_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
-							return files[handle].Read(data);
+							return files[(int)handle].Read(data);
 #else
 							fixed(byte* dataPtr = data)
 							{
@@ -253,8 +249,8 @@ namespace UltralightNet
 						CloseFile = (handle) =>
 						{
 							Console.WriteLine($"CloseFile({handle})");
-							files[handle].Close();
-							files.Remove(handle);
+							files[(int)handle].Close();
+							files.RemoveAt((int)handle);
 						}
 					};
 				}
