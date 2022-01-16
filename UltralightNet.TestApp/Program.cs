@@ -27,6 +27,8 @@ namespace UltralightNetTestApplication
 
 			context.GlobalObject["GetMessage"] = new JSObject(context.Handle, funcObject);
 
+			Console.WriteLine(context.EvaluateScript("GetMessage()"));
+
 			view.UnlockJSContext();
 
 			Console.WriteLine(view.EvaluateScript("GetMessage()", out _));
@@ -38,6 +40,10 @@ namespace UltralightNetTestApplication
 			JSValue value = "Hello from C#!";
 			value.Context = context;
 			return value.Handle;
+		}
+		static JSValue GetMessageManaged(JSContext context, JSObject function, JSObject thisObject, ReadOnlySpan<JSValue> arguments, out JSValue exception){
+			exception = null;
+			return context.MakeString("Hello from C#!");
 		}
 	}
 }
