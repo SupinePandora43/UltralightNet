@@ -1,10 +1,13 @@
+using System;
 using System.Runtime.InteropServices;
 
-namespace UltralightNet {
+namespace UltralightNet
+{
 
 	[System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE1006:Naming Styles", Justification = "<Pending>")]
 	[System.Diagnostics.CodeAnalysis.SuppressMessage("Interoperability", "CA1401:P/Invokes should not be visible", Justification = "<Pending>")]
-	public static unsafe partial class JavaScriptMethods {
+	public static unsafe partial class JavaScriptMethods
+	{
 		static JavaScriptMethods() => Methods.Preload();
 
 		[DllImport("WebCore")]
@@ -44,25 +47,89 @@ namespace UltralightNet {
 		public static extern void JSGlobalContextSetName(void* globalContext, void* name);
 	}
 
-	public unsafe class JSContext {
-		public JSContext(void* ptr){
-			handle = ptr;
-			dispose = false;
-		}
-		public JSContext(){
-			dispose = true;
-		}
+	public unsafe class JSContext : IDisposable
+	{
+		public JSContext() { }
 
 		private void* handle;
+		private bool isGlobalContext = false;
 		private bool isDisposed = false;
 		private bool dispose = true;
 
 		public void* Handle => handle;
 
-		public JSObject GlobalObject => new(Handle, JavaScriptMethods.JSContextGetGlobalObject(handle));
 
-		internal void OnLocked(void* actualHandle){
+		internal void OnLocked(void* actualHandle)
+		{
 			handle = actualHandle;
+		}
+
+		public JSObject GlobalObject => new(Handle, JavaScriptMethods.JSContextGetGlobalObject(Handle));
+		public JSContextGroup Group => new(JavaScriptMethods.JSContextGetGroup(Handle));
+		public JSContext GlobalContext => new() { isGlobalContext = true, handle = JavaScriptMethods.JSContextGetGlobalContext(Handle) };
+
+		public JSString Name
+		{
+			get
+			{
+				if (!isGlobalContext) throw new Exception("context isn't GlobalContext");
+				return new(JavaScriptMethods.JSGlobalContextCopyName(Handle), true);
+			}
+			set
+			{
+				if (!isGlobalContext) throw new Exception("context isn't GlobalContext");
+				JavaScriptMethods.JSGlobalContextSetName(Handle, value.Handle);
+			}
+		}
+
+		public JSValue EvaluateScript(JSString script, JSObject thisObject, JSString sourceURL, int startingLineNumber, out JSValue exception)
+		{
+			void* exceptionPointer;
+			var resultNative = JavaScriptMethods.JSEvaluateScript(Handle, script.Handle, thisObject is null ? null : thisObject.Handle, sourceURL is null ? null : sourceURL.Handle, startingLineNumber, &exceptionPointer);
+			exception = new JSValue(Handle, exceptionPointer);
+			return new(Handle, resultNative);
+		}
+		public JSValue EvaluateScript(JSString script, JSObject thisObject = null, JSString sourceURL = null, int startingLineNumber = 0) => EvaluateScript(script, thisObject, sourceURL, startingLineNumber, out _);
+		public bool CheckScriptSyntax(JSString script, JSString sourceURL, int startingLineNumber, out JSValue exception)
+		{
+			void* exceptionPointer;
+			var result = JavaScriptMethods.JSCheckScriptSyntax(Handle, script.Handle, sourceURL is null ? null : sourceURL.Handle, startingLineNumber, &exceptionPointer);
+			exception = new(Handle, exceptionPointer);
+			return result;
+		}
+		public bool CheckScriptSyntax(JSString script, JSString sourceURL = null, int startingLineNumber = 0) => CheckScriptSyntax(script, sourceURL, startingLineNumber, out _);
+		public void GarbageCollect() => JavaScriptMethods.JSGarbageCollect(Handle);
+
+		public static JSContext CreateGlobalContext(void* jsClass) => new() { isGlobalContext = true, handle = JavaScriptMethods.JSGlobalContextCreate(jsClass) };
+		public static JSContext CreateGlobalContextInGroup(JSContextGroup group, void* jsClass) => new() { isGlobalContext = true, handle = JavaScriptMethods.JSGlobalContextCreateInGroup(group.Handle, jsClass) };
+
+		public static JSContext Retain(JSContext context)
+		{
+			if (!context.isGlobalContext) throw new ArgumentException("context isn't a GlobalContext", nameof(context));
+			return new() { isGlobalContext = true, handle = JavaScriptMethods.JSGlobalContextRetain(context.Handle) };
+		}
+
+		public JSValue MakeUndefined() => new(Handle, JavaScriptMethods.JSValueMakeUndefined(Handle));
+		public JSValue MakeNull() => new(Handle, JavaScriptMethods.JSValueMakeNull(Handle));
+		public JSValue MakeBoolean(bool boolean) => new(Handle, JavaScriptMethods.JSValueMakeBoolean(Handle, boolean));
+		public JSValue MakeNumber(double number) => new(Handle, JavaScriptMethods.JSValueMakeNumber(Handle, number));
+		public JSValue MakeString(string str) => new(Handle, JavaScriptMethods.JSValueMakeString(Handle, new JSString(str).Handle));
+		public JSValue MakeSymbol(char chr) => new(Handle, JavaScriptMethods.JSValueMakeSymbol(Handle, new JSString(chr.ToString()).Handle));
+		public JSValue MakeFromJSON(string json) => new(Handle, JavaScriptMethods.JSValueMakeFromJSONString(Handle, new JSString(json).Handle));
+
+		~JSContext() => Dispose();
+
+		public void Dispose()
+		{
+			if (!isDisposed)
+			{
+				if (isGlobalContext && dispose)
+				{
+					JavaScriptMethods.JSGlobalContextRelease(handle);
+				}
+				isDisposed = true;
+				GC.SuppressFinalize(this);
+			}
 		}
 	}
 
