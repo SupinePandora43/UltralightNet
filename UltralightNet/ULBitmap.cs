@@ -16,7 +16,7 @@ namespace UltralightNet
 
 		/// <summary>Create bitmap from existing pixel buffer. @see Bitmap for help using this function.</summary>
 		[GeneratedDllImport("Ultralight")]
-		public static partial IntPtr ulCreateBitmapFromPixels(uint width, uint height, ULBitmapFormat format, uint row_bytes, IntPtr pixels, uint size, [MarshalAs(UnmanagedType.I1)] bool should_copy);
+		public static unsafe partial IntPtr ulCreateBitmapFromPixels(uint width, uint height, ULBitmapFormat format, uint row_bytes, void* pixels, nuint size, [MarshalAs(UnmanagedType.I1)] bool should_copy);
 
 		/// <summary>Create bitmap from copy.</summary>
 		[DllImport("Ultralight")]
@@ -97,7 +97,7 @@ namespace UltralightNet
 		[DllImport("Ultralight")]
 		public static extern void ulBitmapSwapRedBlueChannels(IntPtr bitmap);
 	}
-	public class ULBitmap : IDisposable, ICloneable
+	public unsafe class ULBitmap : IDisposable, ICloneable
 	{
 		public readonly IntPtr Ptr;
 		public bool IsDisposed { get; private set; }
@@ -109,7 +109,7 @@ namespace UltralightNet
 		}
 
 		public ULBitmap(uint width, uint height, ULBitmapFormat format) => Ptr = Methods.ulCreateBitmap(width, height, format);
-		public ULBitmap(uint width, uint height, ULBitmapFormat format, uint row_bytes, IntPtr pixels, uint size, bool should_copy) => Ptr = Methods.ulCreateBitmapFromPixels(width, height, format, row_bytes, pixels, size, should_copy);
+		public ULBitmap(uint width, uint height, ULBitmapFormat format, uint row_bytes, void* pixels, uint size, bool should_copy) => Ptr = Methods.ulCreateBitmapFromPixels(width, height, format, row_bytes, pixels, size, should_copy);
 
 		public uint Width
 		{
