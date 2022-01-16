@@ -6,7 +6,7 @@ namespace UltralightNet
 	unsafe partial class JavaScriptMethods
 	{
 		[DllImport("WebCore")]
-		public static extern JSValue JSValueGetType(void* context, void* jsValue);
+		public static extern JSType JSValueGetType(void* context, void* jsValue);
 
 		[GeneratedDllImport("WebCore")]
 		[return: MarshalAs(UnmanagedType.I1)]
@@ -49,7 +49,7 @@ namespace UltralightNet
 		public static partial bool JSValueIsDate(void* context, void* jsValue);
 
 		[DllImport("WebCore")]
-		public static extern void* JSValueGetTypedArrayType(void* context, void* jsValue, void** exception);
+		public static extern JSTypedArrayType JSValueGetTypedArrayType(void* context, void* jsValue, void** exception);
 
 		[GeneratedDllImport("WebCore")]
 		[return: MarshalAs(UnmanagedType.I1)]
@@ -115,13 +115,13 @@ namespace UltralightNet
 		private bool isManaged = false;
 		private bool isContextSet = false;
 
-		public JSValue(void* context, void* jsValue)
+		public JSValue(void* context, void* handle)
 		{
 			this.context = context;
-			handle = jsValue;
+			this.handle = handle;
 		}
 
-		private JSValue() { }
+		protected JSValue() { }
 
 		public void* Context
 		{
@@ -140,19 +140,124 @@ namespace UltralightNet
 				if (handle is null && isManaged)
 				{
 					if (!isContextSet) throw new Exception("JSValue.Context is not set.");
-					ConvertToNativeJSValue();
+					ConvertToNativeJSThing();
 				}
 				return handle;
 			}
 		}
 
-		private void ConvertToNativeJSValue()
+		virtual protected void ConvertToNativeJSThing()
 		{
 			if (managed is string str)
 			{
 				handle = JavaScriptMethods.JSValueMakeString(Context, new JSString(str).Handle);
 			}
 		}
+
+		public JSType Type => JavaScriptMethods.JSValueGetType(Context, Handle);
+		public bool IsUndefined => JavaScriptMethods.JSValueIsUndefined(Context, Handle);
+		public bool IsNull => JavaScriptMethods.JSValueIsNull(Context, Handle);
+		public bool IsBoolean => JavaScriptMethods.JSValueIsBoolean(Context, Handle);
+		public bool IsNumber => JavaScriptMethods.JSValueIsNumber(Context, Handle);
+		public bool IsString => JavaScriptMethods.JSValueIsString(Context, Handle);
+		public bool IsSymbol => JavaScriptMethods.JSValueIsSymbol(Context, Handle);
+		public bool IsObject => JavaScriptMethods.JSValueIsObject(Context, Handle);
+		public bool IsObjectOfClass(void* jsClass) => JavaScriptMethods.JSValueIsObjectOfClass(Context, Handle, jsClass);
+		public bool IsArray => JavaScriptMethods.JSValueIsArray(Context, Handle);
+		public bool IsDate => JavaScriptMethods.JSValueIsDate(Context, Handle);
+		public JSTypedArrayType TypedArrayType
+		{
+			get
+			{
+				void* exception;
+				var result = JavaScriptMethods.JSValueGetTypedArrayType(Context, Handle, &exception);
+				var exceptionOOP = new JSValue(Context, exception);
+				if (exceptionOOP.IsString)
+				{
+					throw new Exception((string)exceptionOOP);
+				}
+				return result;
+			}
+		}
+		public bool IsEqual(JSValue other)
+		{
+			void* exception;
+			var result = JavaScriptMethods.JSValueIsEqual(Context, Handle, other.Handle, &exception);
+			var exceptionOOP = new JSValue(Context, exception);
+			if (exceptionOOP.IsString)
+			{
+				throw new Exception((string)exceptionOOP);
+			}
+			return result;
+		}
+		public bool IsStrictEqual(JSValue other) => JavaScriptMethods.JSValueIsStrictEqual(Context, Handle, other.Handle);
+		public bool IsInstanceOfConstructor(JSObject constructor)
+		{
+			void* exception;
+			var result = JavaScriptMethods.JSValueIsInstanceOfConstructor(Context, Handle, constructor.Handle, &exception);
+			var exceptionOOP = new JSValue(Context, exception);
+			if (exceptionOOP.IsString)
+			{
+				throw new Exception((string)exceptionOOP);
+			}
+			return result;
+		}
+
+		public static explicit operator bool(JSValue jsValue) => JavaScriptMethods.JSValueToBoolean(jsValue.Context, jsValue.Handle);
+		public static explicit operator double(JSValue jsValue)
+		{
+			void* exception;
+			var result = JavaScriptMethods.JSValueToNumber(jsValue.Context, jsValue.Handle, &exception);
+			var exceptionOOP = new JSValue(jsValue.Context, exception);
+			if (exceptionOOP.IsString)
+			{
+				throw new Exception((string)exceptionOOP);
+			}
+			return result;
+		}
+		public static explicit operator string(JSValue jsValue)
+		{
+			void* exception;
+			var result = JavaScriptMethods.JSValueToStringCopy(jsValue.Context, jsValue.Handle, &exception);
+			var exceptionOOP = new JSValue(jsValue.Context, exception);
+			if (exceptionOOP.IsString)
+			{
+				throw new Exception((string)exceptionOOP);
+			}
+			JSString jsString = new(result, true);
+			string resultActual = jsString.ToString();
+			jsString.Dispose();
+			return resultActual;
+		}
+		public JSObject ToJSObject()
+		{
+			void* exception;
+			var result = JavaScriptMethods.JSValueToObject(Context, Handle, &exception);
+			var exceptionOOP = new JSValue(Context, exception);
+			if (exceptionOOP.IsString)
+			{
+				throw new Exception((string)exceptionOOP);
+			}
+			return new JSObject(Context, result);
+		}
+		public string ToJSON(uint indent = 4)
+		{
+			void* exception;
+			var result = JavaScriptMethods.JSValueCreateJSONString(Context, Handle, indent, &exception);
+			var exceptionOOP = new JSValue(Context, exception);
+			if (exceptionOOP.IsString)
+			{
+				throw new Exception((string)exceptionOOP);
+			}
+			JSString jsString = new(result, true);
+			string finalResult = jsString.ToString();
+			jsString.Dispose();
+			return finalResult;
+		}
+		public void Protect() => JavaScriptMethods.JSValueProtect(Context, Handle);
+		public void Unprotect() => JavaScriptMethods.JSValueUnprotect(Context, Handle);
+
+		public override string ToString() => (string) this;
 
 		public static implicit operator JSValue(string obj)
 		{
