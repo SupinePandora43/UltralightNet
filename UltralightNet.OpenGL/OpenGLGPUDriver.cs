@@ -30,6 +30,8 @@ public unsafe class OpenGLGPUDriver
 #endif
 	}
 
+	private readonly bool DSA = true;
+
 	public OpenGLGPUDriver(GL glapi)
 	{
 		gl = glapi;
@@ -192,30 +194,99 @@ public unsafe class OpenGLGPUDriver
 			Check();
 			var isRT = bitmap.IsEmpty;
 
-			if (!isRT)
+			uint textureId;
+
+			uint width = bitmap.Width;
+			uint height = bitmap.Height;
+
+			if (DSA)
 			{
-				gl.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)GLEnum.Linear);
-				gl.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)GLEnum.Linear);
+				gl.CreateTextures(TextureTarget.Texture2D, 1, &textureId);
 
-				gl.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapS, (int)GLEnum.ClampToEdge);
-				gl.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapT, (int)GLEnum.ClampToEdge);
-				gl.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapR, (int)GLEnum.Repeat);
-			}
+				if (isRT)
+				{
+					gl.TextureStorage2D(textureId, 1, SizedInternalFormat.Rgba8, width, height);
+				}
+				else
+				{
+					gl.PixelStore(PixelStoreParameter.UnpackAlignment, 1);
+					gl.PixelStore(PixelStoreParameter.UnpackRowLength, (int)(bitmap.RowBytes / bitmap.Bpp));
 
-			uint textureId = gl.GenTexture();
-			textures[entryId].textureId = textureId;
+					void* pixels = (void*)bitmap.LockPixels();
 
-			gl.ActiveTexture(TextureUnit.Texture0);
-			gl.BindTexture(TextureTarget.Texture2D, textureId);
+					if (bitmap.Format is ULBitmapFormat.BGRA8_UNORM_SRGB)
+					{
+						gl.TextureStorage2D(textureId, 1, SizedInternalFormat.Rgba8, width, height);
+						gl.TextureSubImage2D(textureId, 0, 0, 0, width, height, PixelFormat.Bgra, PixelType.UnsignedByte, pixels);
+					}
+					else
+					{
+						gl.TextureStorage2D(textureId, 1, SizedInternalFormat.R8, width, height);
+						gl.TextureSubImage2D(textureId, 0, 0, 0, width, height, PixelFormat.Red, PixelType.UnsignedByte, pixels);
+					}
 
-			if (isRT)
-			{
-				Console.WriteLine("RT");
-				// FIXME: rgba
-				gl.TexImage2D(TextureTarget.Texture2D, 0, (int)InternalFormat.Rgba8, bitmap.Width, bitmap.Height, 0, PixelFormat.Bgra, PixelType.UnsignedByte, null);
+					bitmap.UnlockPixels();
+				}
+
+				gl.TextureParameterI(textureId, TextureParameterName.TextureMinFilter, (int)GLEnum.Linear);
+				gl.TextureParameterI(textureId, TextureParameterName.TextureMagFilter, (int)GLEnum.Linear);
+
+				gl.TextureParameterI(textureId, TextureParameterName.TextureWrapS, (int)GLEnum.ClampToEdge);
+				gl.TextureParameterI(textureId, TextureParameterName.TextureWrapT, (int)GLEnum.ClampToEdge);
+				gl.TextureParameterI(textureId, TextureParameterName.TextureWrapR, (int)GLEnum.Repeat);
+
+				gl.GenerateTextureMipmap(textureId);
 			}
 			else
 			{
+				textureId = gl.GenTexture();
+
+				gl.ActiveTexture(TextureUnit.Texture0);
+				gl.BindTexture(TextureTarget.Texture2D, textureId);
+
+				gl.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)GLEnum.Linear);
+				gl.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)GLEnum.Linear);
+				gl.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapS, (int)GLEnum.ClampToEdge);
+				gl.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapT, (int)GLEnum.ClampToEdge);
+
+				if (isRT)
+				{
+					Console.WriteLine("RT");
+					gl.TexImage2D(TextureTarget.Texture2D, 0, (int)InternalFormat.Rgba8, width, height, 0, PixelFormat.Bgra, PixelType.UnsignedByte, null);
+				}
+				else
+				{
+					gl.PixelStore(PixelStoreParameter.UnpackAlignment, 1);
+					gl.PixelStore(PixelStoreParameter.UnpackRowLength, (int)(bitmap.RowBytes / bitmap.Bpp));
+
+					void* pixels = (void*)bitmap.LockPixels();
+
+					if (bitmap.Format is ULBitmapFormat.BGRA8_UNORM_SRGB)
+					{
+						gl.TexImage2D(TextureTarget.Texture2D, 0, (int)InternalFormat.Rgba8, width, height, 0, PixelFormat.Bgra, PixelType.UnsignedByte, pixels);
+					}
+					else
+					{
+						gl.TexImage2D(TextureTarget.Texture2D, 0, (int)InternalFormat.R8, width, height, 0, PixelFormat.Red, PixelType.UnsignedByte, pixels);
+					}
+
+					bitmap.UnlockPixels();
+				}
+				gl.GenerateMipmap(TextureTarget.Texture2D);
+			}
+
+			Check();
+			textures[entryId].textureId = textureId;
+		},
+		UpdateTexture = (entryId, bitmap) =>
+		{
+			Check();
+			uint textureId = textures[entryId].textureId;
+
+			if (DSA)
+			{
+				uint width = bitmap.Width;
+				uint height = bitmap.Height;
 				gl.PixelStore(PixelStoreParameter.UnpackAlignment, 1);
 				gl.PixelStore(PixelStoreParameter.UnpackRowLength, (int)(bitmap.RowBytes / bitmap.Bpp));
 
@@ -223,8 +294,30 @@ public unsafe class OpenGLGPUDriver
 
 				if (bitmap.Format is ULBitmapFormat.BGRA8_UNORM_SRGB)
 				{
-					// FIXME: rgba
-					gl.TexImage2D(TextureTarget.Texture2D, 0, (int)InternalFormat.Rgba8, bitmap.Width, bitmap.Height, 0, PixelFormat.Bgra, PixelType.UnsignedByte, pixels);
+					gl.TextureSubImage2D(textureId, 0, 0, 0, width, height, PixelFormat.Bgra, PixelType.UnsignedByte, pixels);
+				}
+				else
+				{
+					gl.TextureSubImage2D(textureId, 0, 0, 0, width, height, PixelFormat.Red, PixelType.UnsignedByte, pixels);
+				}
+
+				bitmap.UnlockPixels();
+
+				gl.GenerateTextureMipmap(textureId);
+			}
+			else
+			{
+				gl.ActiveTexture(TextureUnit.Texture0);
+				gl.BindTexture(TextureTarget.Texture2D, textureId);
+
+				gl.PixelStore(PixelStoreParameter.UnpackAlignment, 1);
+				gl.PixelStore(PixelStoreParameter.UnpackRowLength, (int)(bitmap.RowBytes / bitmap.Bpp));
+
+				void* pixels = (void*)bitmap.LockPixels();
+
+				if (bitmap.Format is ULBitmapFormat.BGRA8_UNORM_SRGB)
+				{
+					gl.TexImage2D(TextureTarget.Texture2D, 0, (int)InternalFormat.Rgb8, bitmap.Width, bitmap.Height, 0, PixelFormat.Bgra, PixelType.UnsignedByte, pixels);
 				}
 				else
 				{
@@ -232,39 +325,9 @@ public unsafe class OpenGLGPUDriver
 				}
 
 				bitmap.UnlockPixels();
+
+				gl.GenerateMipmap(TextureTarget.Texture2D);
 			}
-			Check();
-			//FIXME: mipmap
-			gl.GenerateMipmap(TextureTarget.Texture2D);
-			Check();
-		},
-		UpdateTexture = (entryId, bitmap) =>
-		{
-			Check();
-			uint textureId = textures[entryId].textureId;
-
-			gl.ActiveTexture(TextureUnit.Texture0);
-			gl.BindTexture(TextureTarget.Texture2D, textureId);
-
-			gl.PixelStore(PixelStoreParameter.UnpackAlignment, 1);
-			gl.PixelStore(PixelStoreParameter.UnpackRowLength, (int)(bitmap.RowBytes / bitmap.Bpp));
-
-			void* pixels = (void*)bitmap.LockPixels();
-
-			if (bitmap.Format is ULBitmapFormat.BGRA8_UNORM_SRGB)
-			{
-				// FIXME: rgba
-				gl.TexImage2D(TextureTarget.Texture2D, 0, (int)InternalFormat.Rgb8, bitmap.Width, bitmap.Height, 0, PixelFormat.Bgra, PixelType.UnsignedByte, pixels);
-			}
-			else
-			{
-				gl.TexImage2D(TextureTarget.Texture2D, 0, (int)InternalFormat.R8, bitmap.Width, bitmap.Height, 0, PixelFormat.Red, PixelType.UnsignedByte, pixels);
-			}
-
-			bitmap.UnlockPixels();
-
-			//FIXME: mipmap
-			gl.GenerateMipmap(TextureTarget.Texture2D);
 
 			Check();
 		},
@@ -313,78 +376,158 @@ public unsafe class OpenGLGPUDriver
 			Check();
 			var entry = geometries[id];
 
-			entry.vao = gl.GenVertexArray();
+			uint vao, vbo, ebo;
 
-			gl.BindVertexArray(entry.vao);
-
-			entry.vbo = gl.GenBuffer();
-
-			gl.BindBuffer(BufferTargetARB.ArrayBuffer, entry.vbo);
-
-			gl.BufferData(BufferTargetARB.ArrayBuffer, vb.size, vb.data, BufferUsageARB.DynamicDraw);
-
-			if (vb.Format is ULVertexBufferFormat.VBF_2f_4ub_2f_2f_28f)
+			if (DSA)
 			{
-				const uint stride = 140;
+				vao = gl.CreateVertexArray();
+				vbo = gl.CreateBuffer();
+				ebo = gl.CreateBuffer();
 
-				gl.VertexAttribPointer(0, 2, VertexAttribPointerType.Float, false, stride, (void*)0);
-				gl.VertexAttribPointer(1, 4, VertexAttribPointerType.UnsignedByte, true, stride, (void*)8);
-				gl.VertexAttribPointer(2, 2, VertexAttribPointerType.Float, false, stride, (void*)12);
-				gl.VertexAttribPointer(3, 2, VertexAttribPointerType.Float, false, stride, (void*)20);
-				gl.VertexAttribPointer(4, 4, VertexAttribPointerType.Float, false, stride, (void*)28);
-				gl.VertexAttribPointer(5, 4, VertexAttribPointerType.Float, false, stride, (void*)44);
-				gl.VertexAttribPointer(6, 4, VertexAttribPointerType.Float, false, stride, (void*)60);
-				gl.VertexAttribPointer(7, 4, VertexAttribPointerType.Float, false, stride, (void*)76);
-				gl.VertexAttribPointer(8, 4, VertexAttribPointerType.Float, false, stride, (void*)92);
-				gl.VertexAttribPointer(9, 4, VertexAttribPointerType.Float, false, stride, (void*)108);
-				gl.VertexAttribPointer(10, 4, VertexAttribPointerType.Float, false, stride, (void*)124);
+				gl.NamedBufferData(vbo, vb.size, vb.data, GLEnum.DynamicDraw);
+				gl.NamedBufferData(ebo, ib.size, ib.data, GLEnum.DynamicDraw);
 
-				gl.EnableVertexAttribArray(0);
-				gl.EnableVertexAttribArray(1);
-				gl.EnableVertexAttribArray(2);
-				gl.EnableVertexAttribArray(3);
-				gl.EnableVertexAttribArray(4);
-				gl.EnableVertexAttribArray(5);
-				gl.EnableVertexAttribArray(6);
-				gl.EnableVertexAttribArray(7);
-				gl.EnableVertexAttribArray(8);
-				gl.EnableVertexAttribArray(9);
-				gl.EnableVertexAttribArray(10);
+				if (vb.Format is ULVertexBufferFormat.VBF_2f_4ub_2f_2f_28f)
+				{
+					gl.EnableVertexArrayAttrib(vao, 0);
+					gl.VertexArrayAttribBinding(vao, 0, 0);
+					gl.VertexArrayAttribFormat(vao, 0, 2, GLEnum.Float, false, 0);
+					gl.EnableVertexArrayAttrib(vao, 1);
+					gl.VertexArrayAttribBinding(vao, 1, 0);
+					gl.VertexArrayAttribFormat(vao, 1, 4, GLEnum.UnsignedByte, true, 8);
+					gl.EnableVertexArrayAttrib(vao, 2);
+					gl.VertexArrayAttribBinding(vao, 2, 0);
+					gl.VertexArrayAttribFormat(vao, 2, 2, GLEnum.Float, false, 12);
+					gl.EnableVertexArrayAttrib(vao, 3);
+					gl.VertexArrayAttribBinding(vao, 3, 0);
+					gl.VertexArrayAttribFormat(vao, 3, 2, GLEnum.Float, false, 20);
+					gl.EnableVertexArrayAttrib(vao, 4);
+					gl.VertexArrayAttribBinding(vao, 4, 0);
+					gl.VertexArrayAttribFormat(vao, 4, 4, GLEnum.Float, false, 28);
+					gl.EnableVertexArrayAttrib(vao, 5);
+					gl.VertexArrayAttribBinding(vao, 5, 0);
+					gl.VertexArrayAttribFormat(vao, 5, 4, GLEnum.Float, false, 44);
+					gl.EnableVertexArrayAttrib(vao, 6);
+					gl.VertexArrayAttribBinding(vao, 6, 0);
+					gl.VertexArrayAttribFormat(vao, 6, 4, GLEnum.Float, false, 60);
+					gl.EnableVertexArrayAttrib(vao, 7);
+					gl.VertexArrayAttribBinding(vao, 7, 0);
+					gl.VertexArrayAttribFormat(vao, 7, 4, GLEnum.Float, false, 76);
+					gl.EnableVertexArrayAttrib(vao, 8);
+					gl.VertexArrayAttribBinding(vao, 8, 0);
+					gl.VertexArrayAttribFormat(vao, 8, 4, GLEnum.Float, false, 92);
+					gl.EnableVertexArrayAttrib(vao, 9);
+					gl.VertexArrayAttribBinding(vao, 9, 0);
+					gl.VertexArrayAttribFormat(vao, 9, 4, GLEnum.Float, false, 108);
+					gl.EnableVertexArrayAttrib(vao, 10);
+					gl.VertexArrayAttribBinding(vao, 10, 0);
+					gl.VertexArrayAttribFormat(vao, 10, 4, GLEnum.Float, false, 124);
+
+					gl.VertexArrayVertexBuffer(vao, 0, vbo, 0, 140);
+				}
+				else
+				{
+					gl.EnableVertexArrayAttrib(vao, 0);
+					gl.VertexArrayAttribBinding(vao, 0, 0);
+					gl.VertexArrayAttribFormat(vao, 0, 2, GLEnum.Float, false, 0);
+					gl.EnableVertexArrayAttrib(vao, 1);
+					gl.VertexArrayAttribBinding(vao, 1, 0);
+					gl.VertexArrayAttribFormat(vao, 1, 4, GLEnum.UnsignedByte, true, 8);
+					gl.EnableVertexArrayAttrib(vao, 2);
+					gl.VertexArrayAttribBinding(vao, 2, 0);
+					gl.VertexArrayAttribFormat(vao, 2, 2, GLEnum.Float, false, 12);
+
+					gl.VertexArrayVertexBuffer(vao, 0, vbo, 0, 20);
+				}
+
+				gl.VertexArrayElementBuffer(vao, ebo);
 			}
 			else
 			{
-				const uint stride = 20;
+				vao = gl.GenVertexArray();
 
-				gl.VertexAttribPointer(0, 2, VertexAttribPointerType.Float, false, stride, (void*)0);
-				gl.VertexAttribPointer(1, 4, VertexAttribPointerType.UnsignedByte, true, stride, (void*)8);
-				gl.VertexAttribPointer(2, 2, VertexAttribPointerType.Float, false, stride, (void*)12);
+				gl.BindVertexArray(vao);
 
-				gl.EnableVertexAttribArray(0);
-				gl.EnableVertexAttribArray(1);
-				gl.EnableVertexAttribArray(2);
+				vbo = gl.GenBuffer();
+
+				gl.BindBuffer(BufferTargetARB.ArrayBuffer, vbo);
+				gl.BufferData(BufferTargetARB.ArrayBuffer, vb.size, vb.data, BufferUsageARB.DynamicDraw);
+
+				if (vb.Format is ULVertexBufferFormat.VBF_2f_4ub_2f_2f_28f)
+				{
+					const uint stride = 140;
+
+					gl.VertexAttribPointer(0, 2, VertexAttribPointerType.Float, false, stride, (void*)0);
+					gl.VertexAttribPointer(1, 4, VertexAttribPointerType.UnsignedByte, true, stride, (void*)8);
+					gl.VertexAttribPointer(2, 2, VertexAttribPointerType.Float, false, stride, (void*)12);
+					gl.VertexAttribPointer(3, 2, VertexAttribPointerType.Float, false, stride, (void*)20);
+					gl.VertexAttribPointer(4, 4, VertexAttribPointerType.Float, false, stride, (void*)28);
+					gl.VertexAttribPointer(5, 4, VertexAttribPointerType.Float, false, stride, (void*)44);
+					gl.VertexAttribPointer(6, 4, VertexAttribPointerType.Float, false, stride, (void*)60);
+					gl.VertexAttribPointer(7, 4, VertexAttribPointerType.Float, false, stride, (void*)76);
+					gl.VertexAttribPointer(8, 4, VertexAttribPointerType.Float, false, stride, (void*)92);
+					gl.VertexAttribPointer(9, 4, VertexAttribPointerType.Float, false, stride, (void*)108);
+					gl.VertexAttribPointer(10, 4, VertexAttribPointerType.Float, false, stride, (void*)124);
+
+					gl.EnableVertexAttribArray(0);
+					gl.EnableVertexAttribArray(1);
+					gl.EnableVertexAttribArray(2);
+					gl.EnableVertexAttribArray(3);
+					gl.EnableVertexAttribArray(4);
+					gl.EnableVertexAttribArray(5);
+					gl.EnableVertexAttribArray(6);
+					gl.EnableVertexAttribArray(7);
+					gl.EnableVertexAttribArray(8);
+					gl.EnableVertexAttribArray(9);
+					gl.EnableVertexAttribArray(10);
+				}
+				else
+				{
+					const uint stride = 20;
+
+					gl.VertexAttribPointer(0, 2, VertexAttribPointerType.Float, false, stride, (void*)0);
+					gl.VertexAttribPointer(1, 4, VertexAttribPointerType.UnsignedByte, true, stride, (void*)8);
+					gl.VertexAttribPointer(2, 2, VertexAttribPointerType.Float, false, stride, (void*)12);
+
+					gl.EnableVertexAttribArray(0);
+					gl.EnableVertexAttribArray(1);
+					gl.EnableVertexAttribArray(2);
+				}
+
+				ebo = gl.GenBuffer();
+
+				gl.BindBuffer(BufferTargetARB.ElementArrayBuffer, ebo);
+				gl.BufferData(BufferTargetARB.ElementArrayBuffer, ib.size, ib.data, BufferUsageARB.DynamicDraw);
+
+				Check();
+
+				gl.BindVertexArray(0);
 			}
 
-			entry.ebo = gl.GenBuffer();
-
-			gl.BindBuffer(BufferTargetARB.ElementArrayBuffer, entry.ebo);
-
-			gl.BufferData(BufferTargetARB.ElementArrayBuffer, ib.size, ib.data, BufferUsageARB.DynamicDraw);
-
 			Check();
+			entry.vao = vao;
+			entry.vbo = vbo;
+			entry.ebo = ebo;
 		},
 		UpdateGeometry = (id, vb, ib) =>
 		{
 			var entry = geometries[id];
 
-			gl.BindVertexArray(entry.vao);
-
-			gl.BindBuffer(BufferTargetARB.ArrayBuffer, entry.vbo);
-
-			gl.BufferData(BufferTargetARB.ArrayBuffer, (nuint)vb.size, vb.data, BufferUsageARB.DynamicDraw);
-
-			gl.BindBuffer(BufferTargetARB.ElementArrayBuffer, entry.ebo);
-
-			gl.BufferData(BufferTargetARB.ElementArrayBuffer, ib.size, ib.data, BufferUsageARB.DynamicDraw);
+			if (DSA)
+			{
+				gl.NamedBufferData(entry.vbo, vb.size, vb.data, GLEnum.DynamicDraw);
+				gl.NamedBufferData(entry.ebo, ib.size, ib.data, GLEnum.DynamicDraw);
+			}
+			else
+			{
+				gl.BindVertexArray(entry.vao);
+				gl.BindBuffer(BufferTargetARB.ArrayBuffer, entry.vbo);
+				gl.BufferData(BufferTargetARB.ArrayBuffer, (nuint)vb.size, vb.data, BufferUsageARB.DynamicDraw);
+				gl.BindBuffer(BufferTargetARB.ElementArrayBuffer, entry.ebo);
+				gl.BufferData(BufferTargetARB.ElementArrayBuffer, ib.size, ib.data, BufferUsageARB.DynamicDraw);
+				gl.BindVertexArray(0);
+			}
+			Check();
 		},
 		DestroyGeometry = (id) =>
 		{
@@ -429,7 +572,7 @@ public unsafe class OpenGLGPUDriver
 					Check();
 					gl.Uniform4(gl.GetUniformLocation(program, "State"), 0f, (float)gpuState.viewport_width, (float)gpuState.viewport_height, 1f);
 					Check();
-					Matrix4x4 transform = gpuState.transform.ApplyProjection(gpuState.viewport_width, gpuState.viewport_height, gpuState.render_buffer_id is not 1);
+					Matrix4x4 transform = gpuState.transform.ApplyProjection(gpuState.viewport_width, gpuState.viewport_height, false);
 					gl.UniformMatrix4(gl.GetUniformLocation(program, "Transform"), 1, false, &transform.M11);
 					Check();
 					gl.Uniform4(gl.GetUniformLocation(program, "Scalar4"), 2, &gpuState.scalar_0);
@@ -442,32 +585,16 @@ public unsafe class OpenGLGPUDriver
 					Check();
 					gl.BindVertexArray(geometryEntry.vao);
 					Check();
-					if (program == fillProgram)
+
+					if (DSA)
 					{
+						gl.BindTextureUnit(0, textures.ContainsKey(gpuState.texture_1_id) ? textures[gpuState.texture_1_id].textureId : 0);
+						gl.BindTextureUnit(1, textures.ContainsKey(gpuState.texture_2_id) ? textures[gpuState.texture_2_id].textureId : 0);
+					}else{
 						gl.ActiveTexture(GLEnum.Texture0);
-						gl.BindTexture(GLEnum.Texture2D, textures[gpuState.texture_1_id].textureId);
-
-						gl.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)GLEnum.Linear);
-						gl.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)GLEnum.Linear);
-						gl.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapS, (int)GLEnum.ClampToEdge);
-						gl.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapT, (int)GLEnum.ClampToEdge);
-
-
+						gl.BindTexture(GLEnum.Texture2D, textures.ContainsKey(gpuState.texture_1_id) ? textures[gpuState.texture_1_id].textureId : 0);
 						gl.ActiveTexture(GLEnum.Texture1);
 						gl.BindTexture(GLEnum.Texture2D, textures.ContainsKey(gpuState.texture_2_id) ? textures[gpuState.texture_2_id].textureId : 0);
-
-						gl.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)GLEnum.Linear);
-						gl.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)GLEnum.Linear);
-
-						gl.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapS, (int)GLEnum.ClampToEdge);
-						gl.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapT, (int)GLEnum.ClampToEdge);
-					}
-					else
-					{
-						gl.ActiveTexture(GLEnum.Texture0);
-						gl.BindTexture(GLEnum.Texture2D, 0);
-						gl.ActiveTexture(GLEnum.Texture1);
-						gl.BindTexture(GLEnum.Texture2D, 0);
 					}
 					Check();
 
