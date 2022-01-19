@@ -75,7 +75,11 @@ void main()
 		window.Load += OnLoad;
 		window.Update += OnUpdate;
 		window.Render += OnRender;
-		window.FramebufferResize += s => gl.Viewport(s);
+		window.FramebufferResize += s =>
+		{
+			gl.Viewport(s);
+			view.Resize((uint)s.X, (uint)s.Y);
+		};
 
 		window.Run();
 	}
@@ -184,11 +188,11 @@ void main()
 
 		ULPlatform.GPUDriver = gpuDriver.GetGPUDriver();
 
-		renderer = ULPlatform.CreateRenderer(new ULConfig { FaceWinding = ULFaceWinding.CounterClockwise, ForceRepaint = true });
+		renderer = ULPlatform.CreateRenderer(new ULConfig { FaceWinding = ULFaceWinding.Clockwise, ForceRepaint = true });
 
 		view = renderer.CreateView(800, 600, new ULViewConfig { IsAccelerated = true, IsTransparent = false });
-		//view.URL = "https://youtube.com";
-		view.HTML = "<html><body><p>123</p></body></html>";
+		view.URL = "https://youtube.com";
+		//view.HTML = "<html><body><p>123</p></body></html>";
 		/*bool loaded = false;
 
 		view.OnFinishLoading += (_, _, _) => loaded = true;
@@ -241,15 +245,18 @@ void main()
 		view.FireScrollEvent(new ULScrollEvent { type = ULScrollEventType.ByPage, deltaX = (int)scroll.X, deltaY = (int)scroll.Y });
 	}
 
-	static void OnMouseDown(IMouse mouse, MouseButton button){
-		view.FireMouseEvent(new(){type = ULMouseEventType.MouseDown, button = button is MouseButton.Left ? ULMouseEventButton.Left : (button is MouseButton.Right ? ULMouseEventButton.Right : ULMouseEventButton.Middle), x = (int) mouse.Position.X, y = (int) mouse.Position.Y });
+	static void OnMouseDown(IMouse mouse, MouseButton button)
+	{
+		view.FireMouseEvent(new() { type = ULMouseEventType.MouseDown, button = button is MouseButton.Left ? ULMouseEventButton.Left : (button is MouseButton.Right ? ULMouseEventButton.Right : ULMouseEventButton.Middle), x = (int)mouse.Position.X, y = (int)mouse.Position.Y });
 	}
 
-	static void OnMouseUp(IMouse mouse, MouseButton button){
-		view.FireMouseEvent(new(){type = ULMouseEventType.MouseUp, button = button is MouseButton.Left ? ULMouseEventButton.Left : (button is MouseButton.Right ? ULMouseEventButton.Right : ULMouseEventButton.Middle), x = (int) mouse.Position.X, y = (int) mouse.Position.Y });
+	static void OnMouseUp(IMouse mouse, MouseButton button)
+	{
+		view.FireMouseEvent(new() { type = ULMouseEventType.MouseUp, button = button is MouseButton.Left ? ULMouseEventButton.Left : (button is MouseButton.Right ? ULMouseEventButton.Right : ULMouseEventButton.Middle), x = (int)mouse.Position.X, y = (int)mouse.Position.Y });
 	}
 
-	static void OnMouseMove(IMouse mouse, Vector2 position){
-		view.FireMouseEvent(new(){type = ULMouseEventType.MouseMoved, x = (int) position.X, y = (int) position.Y });
+	static void OnMouseMove(IMouse mouse, Vector2 position)
+	{
+		view.FireMouseEvent(new() { type = ULMouseEventType.MouseMoved, x = (int)position.X, y = (int)position.Y });
 	}
 }
