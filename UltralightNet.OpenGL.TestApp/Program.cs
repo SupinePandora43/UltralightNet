@@ -69,7 +69,7 @@ void main()
 		window = Window.Create(WindowOptions.Default with
 		{
 			Size = new Vector2D<int>(800, 600),
-			API = new GraphicsAPI(ContextAPI.OpenGL, ContextProfile.Core, ContextFlags.ForwardCompatible, new APIVersion(3, 3))
+			API = new GraphicsAPI(ContextAPI.OpenGL, ContextProfile.Core, ContextFlags.ForwardCompatible, new APIVersion(4, 6))
 		});
 
 		window.Load += OnLoad;
@@ -191,8 +191,8 @@ void main()
 		renderer = ULPlatform.CreateRenderer(new ULConfig { FaceWinding = ULFaceWinding.Clockwise, ForceRepaint = true });
 
 		view = renderer.CreateView(800, 600, new ULViewConfig { IsAccelerated = true, IsTransparent = false });
-		view.URL = "https://youtube.com";
-		//view.HTML = "<html><body><p>123</p></body></html>";
+		//view.URL = "https://youtube.com";
+		view.HTML = "<html><body><p>123</p></body></html>";
 		/*bool loaded = false;
 
 		view.OnFinishLoading += (_, _, _) => loaded = true;
