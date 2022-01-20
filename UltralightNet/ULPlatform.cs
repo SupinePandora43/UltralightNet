@@ -105,8 +105,6 @@ namespace UltralightNet
 		public static bool SetDefaultLogger { get; set; } = true;
 		public static bool SetDefaultFileSystem { get; set; } = true;
 
-		public static bool DebugWarnCertificate { get; set; } = true;
-
 		public static bool ErrorMissingResources { get; set; } = true;
 		public static bool ErrorGPUDriverNotSet { get; set; } = true;
 
@@ -185,8 +183,6 @@ namespace UltralightNet
 					{
 						FileExists = (file) =>
 						{
-							// Console.WriteLine($"FileExists({file}) = {File.Exists(file)}");
-							//return File.Exists(path);
 							return file switch
 							{
 								"resources/cacert.pem" => true,
@@ -199,7 +195,6 @@ namespace UltralightNet
 						},
 						GetFileMimeType = (string file, out string result) =>
 						{
-							Console.WriteLine($"GetFileMimeType({file})");
 							result = file switch
 							{
 								"resources/mediaControls.css" => "text/css",
@@ -212,10 +207,7 @@ namespace UltralightNet
 						},
 						OpenFile = (file, _) =>
 						{
-							//FileStream fs = File.Open(file, FileMode.Open);
-							nuint id = GetFileId();
-							Console.WriteLine($"OpenFile({file}) = {id}");
-							files[(int)id] = file switch
+							files.Add(file switch
 							{
 								"resources/cacert.pem" => Resources.Cacertpem,
 								"resources/icudt67l.dat" => Resources.Icudt67ldat,
@@ -223,18 +215,16 @@ namespace UltralightNet
 								"resources/mediaControls.js" => Resources.MediaControlsjs,
 								"resources/mediaControlsLocalizedStrings.js" => Resources.MediaControlsLocalizedStringsjs,
 								_ => throw new ArgumentOutOfRangeException(nameof(file), "Tried to open not required file.")
-							};
-							return id;
+							});
+							return (nuint)files.Count - 1;
 						},
 						GetFileSize = (nuint handle, out long size) =>
 						{
 							size = files[(int)handle].Length;
-							Console.WriteLine($"GetFileSize({handle}) = {size}");
 							return true;
 						},
 						ReadFromFile = (handle, data) =>
 						{
-							Console.WriteLine($"ReadFromFile({handle})");
 #if NET5_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
 							return files[(int)handle].Read(data);
 #else

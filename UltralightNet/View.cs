@@ -202,22 +202,7 @@ namespace UltralightNet
 		public string URL
 		{
 			get => Methods.ulViewGetURL(Ptr);
-			#if DEBUG
-			set {
-				if(ULPlatform.DebugWarnCertificate && value.ToLower().StartsWith("https://")){
-					string cacertpem = "resources/cacert.pem";
-					ULStringGeneratedDllImportMarshaler m = new(cacertpem);
-					if (!ULPlatform._filesystem.__FileExists(m.Value))
-					{
-						Console.WriteLine($"UltralightNet: {typeof(ULFileSystem)} doesn't provide cacert.pem from resources/ folder. All https:// requests will fail. (Disable warning by setting ULPlatform.DebugWarnCertificate to false)");
-					}
-					m.FreeNative();
-				}
-				Methods.ulViewLoadURL(Ptr, value);
-			}
-			#else
 			set => Methods.ulViewLoadURL(Ptr, value);
-			#endif
 		}
 		public string HTML { set => Methods.ulViewLoadHTML(Ptr, value); }
 		public string Title { get => Methods.ulViewGetTitle(Ptr); }
