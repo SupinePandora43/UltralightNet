@@ -345,25 +345,41 @@ public unsafe class OpenGLGPUDriver
 
 			entry.textureEntry = textures[renderBuffer.texture_id];
 
-			entry.framebuffer = gl.GenFramebuffer();
+			uint framebuffer;
+			uint textureGLId = entry.textureEntry.textureId;
 
-			gl.BindFramebuffer(FramebufferTarget.Framebuffer, entry.framebuffer);
-
-			gl.BindTexture(TextureTarget.Texture2D, entry.textureEntry.textureId);
-
-			gl.FramebufferTexture2D(FramebufferTarget.Framebuffer, FramebufferAttachment.ColorAttachment0, TextureTarget.Texture2D, entry.textureEntry.textureId, 0);
-
-			gl.DrawBuffers(1, stackalloc[] { DrawBufferMode.ColorAttachment0 });
+			if (DSA)
+			{
+				framebuffer = gl.CreateFramebuffer();
+				gl.NamedFramebufferTexture(framebuffer, FramebufferAttachment.ColorAttachment0, textureGLId, 0);
+				gl.NamedFramebufferDrawBuffer(framebuffer, ColorBuffer.ColorAttachment0);
 
 #if DEBUG
-			var status = gl.CheckFramebufferStatus(FramebufferTarget.Framebuffer);
-			if (status is not GLEnum.FramebufferComplete)
-			{
-				throw new Exception(status.ToString());
-			}
+				var status = gl.CheckNamedFramebufferStatus(framebuffer, FramebufferTarget.Framebuffer);
+				if (status is not GLEnum.FramebufferComplete)
+				{
+					throw new Exception(status.ToString());
+				}
 #endif
+			}
+			else
+			{
+				framebuffer = gl.GenFramebuffer();
+				gl.BindFramebuffer(FramebufferTarget.Framebuffer, framebuffer);
+				gl.BindTexture(TextureTarget.Texture2D, textureGLId);
+				gl.FramebufferTexture2D(FramebufferTarget.Framebuffer, FramebufferAttachment.ColorAttachment0, TextureTarget.Texture2D, textureGLId, 0);
+				gl.DrawBuffer(DrawBufferMode.ColorAttachment0);
 
-			gl.BindFramebuffer(FramebufferTarget.Framebuffer, 0);
+#if DEBUG
+				var status = gl.CheckFramebufferStatus(FramebufferTarget.Framebuffer);
+				if (status is not GLEnum.FramebufferComplete)
+				{
+					throw new Exception(status.ToString());
+				}
+#endif
+				gl.BindFramebuffer(FramebufferTarget.Framebuffer, 0);
+			}
+			entry.framebuffer = framebuffer;
 		},
 		DestroyRenderBuffer = (id) =>
 		{
@@ -590,7 +606,9 @@ public unsafe class OpenGLGPUDriver
 					{
 						gl.BindTextureUnit(0, textures.ContainsKey(gpuState.texture_1_id) ? textures[gpuState.texture_1_id].textureId : 0);
 						gl.BindTextureUnit(1, textures.ContainsKey(gpuState.texture_2_id) ? textures[gpuState.texture_2_id].textureId : 0);
-					}else{
+					}
+					else
+					{
 						gl.ActiveTexture(GLEnum.Texture0);
 						gl.BindTexture(GLEnum.Texture2D, textures.ContainsKey(gpuState.texture_1_id) ? textures[gpuState.texture_1_id].textureId : 0);
 						gl.ActiveTexture(GLEnum.Texture1);
