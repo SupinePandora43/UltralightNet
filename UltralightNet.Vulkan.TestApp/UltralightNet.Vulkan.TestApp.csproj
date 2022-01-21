@@ -1,0 +1,40 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<OutputType>Exe</OutputType>
+		<TargetFramework>net6.0</TargetFramework>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Nullable>enable</Nullable>
+		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<!-- <PackageReference Include="Silk.NET" Version="2.11.0" /> -->
+		<PackageReference Include="Silk.NET.Core" Version="2.11.0" />
+		<PackageReference Include="Silk.NET.Input" Version="2.11.0" />
+		<PackageReference Include="Silk.NET.Windowing.GLFW" Version="2.11.0" />
+		<PackageReference Include="Silk.NET.Windowing" Version="2.11.0" />
+		<!-- <PackageReference Include="Silk.NET.Assimp" Version="2.11.0" /> -->
+		<PackageReference Include="Silk.NET.Vulkan.Extensions.EXT" Version="2.11.0" />
+		<PackageReference Include="Silk.NET.Vulkan.Extensions.KHR" Version="2.11.0" />
+		<!-- <PackageReference Include="SixLabors.ImageSharp" Version="1.0.4" /> -->
+	</ItemGroup>
+
+	<ItemGroup>
+        <EmbeddedResource Include="shaders/spirv/*" />
+    </ItemGroup>
+    <ItemGroup Label="Shaders">
+        <VertexShader Include="shaders/**/*.vert" />
+        <FragmentShader Include="shaders/**/*.frag" />
+    </ItemGroup>
+    <Target Name="CompileVertexShaders" Inputs="@(VertexShader)" Outputs="@(VertexShader -> '%(RelativeDir)vertex/%(filename).spv')" BeforeTargets="ResolveReferences">
+        <MakeDir Directories="@(VertexShader -> '%(RelativeDir)spirv')" />
+        <Exec Command="glslc -O -o @(VertexShader -> '%(RelativeDir)spirv/%(filename).vert.spv') %(VertexShader.Identity)" EchoOff="false" />
+        <Exec Command="echo $(BuildDir)" />
+    </Target>
+    <Target Name="CompileFragmentShaders" Inputs="@(FragmentShader)" Outputs="@(FragmentShader -> '%(RelativeDir)fragment/%(filename).spv')" BeforeTargets="ResolveReferences">
+        <MakeDir Directories="@(FragmentShader -> '%(RelativeDir)spirv')" />
+        <Exec Command="glslc -O -o @(FragmentShader -> '%(RelativeDir)spirv/%(filename).frag.spv') %(FragmentShader.Identity)" EchoOff="false" />
+    </Target>
+
+</Project>

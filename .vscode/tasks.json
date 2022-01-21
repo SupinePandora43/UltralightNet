@@ -14,6 +14,18 @@
             "problemMatcher": "$msCompile"
         },
 		{
+            "label": "buildVulkan",
+            "command": "dotnet",
+            "type": "process",
+            "args": [
+                "build",
+                "${workspaceFolder}/UltralightNet.Vulkan.TestApp/UltralightNet.Vulkan.TestApp.csproj",
+                "/property:GenerateFullPaths=true",
+                "/consoleloggerparameters:NoSummary"
+            ],
+            "problemMatcher": "$msCompile"
+        },
+		{
             "label": "buildVeldrid",
             "command": "dotnet",
             "type": "process",

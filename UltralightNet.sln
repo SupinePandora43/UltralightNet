@@ -51,6 +51,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UltralightNet.OpenGL.TestAp
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UltralightNet.OpenGL", "UltralightNet.OpenGL\UltralightNet.OpenGL.csproj", "{1CD5E12E-E31F-444F-8287-23CDA55A4D10}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UltralightNet.Vulkan.TestApp", "UltralightNet.Vulkan.TestApp\UltralightNet.Vulkan.TestApp.csproj", "{9EEB642C-B091-4E80-AED1-B24C06F2C820}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UltralightNet.Vulkan", "UltralightNet.Vulkan\UltralightNet.Vulkan.csproj", "{5533F4FD-2126-4506-80EA-20CF5F533DDD}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -117,6 +121,14 @@ Global
 		{1CD5E12E-E31F-444F-8287-23CDA55A4D10}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1CD5E12E-E31F-444F-8287-23CDA55A4D10}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1CD5E12E-E31F-444F-8287-23CDA55A4D10}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9EEB642C-B091-4E80-AED1-B24C06F2C820}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9EEB642C-B091-4E80-AED1-B24C06F2C820}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9EEB642C-B091-4E80-AED1-B24C06F2C820}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9EEB642C-B091-4E80-AED1-B24C06F2C820}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5533F4FD-2126-4506-80EA-20CF5F533DDD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5533F4FD-2126-4506-80EA-20CF5F533DDD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5533F4FD-2126-4506-80EA-20CF5F533DDD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5533F4FD-2126-4506-80EA-20CF5F533DDD}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

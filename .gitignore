@@ -64,3 +64,4 @@ TestResult.xml
 !.keep
 *.log
 /publish
+*.spv
