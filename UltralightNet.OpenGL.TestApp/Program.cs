@@ -19,7 +19,7 @@ layout (location = 0) out vec2 uv;
 void main()
 {
 	uv = vec2(vPos.z, vPos.w);
-    gl_Position = vec4(vPos.x, vPos.y, 0, 1.0);
+    gl_Position = vec4(vPos.x, -vPos.y, 0, 1.0);
 }
 ";
 
@@ -96,7 +96,6 @@ void main()
 			System.Threading.Thread.Sleep(1000/240);
 			gl.Viewport(s);
 			view.Resize((uint)s.X, (uint)s.Y);
-			gpuDriver.viewRenderBuffers.Add(view.RenderTarget.render_buffer_id);
 		};
 
 		new System.Threading.Thread(TimeoutThread).Start();
@@ -234,7 +233,7 @@ void main()
 
 		view = renderer.CreateView(800, 600, new ULViewConfig { IsAccelerated = true, IsTransparent = false });
 		view.URL = "https://youtube.com";
-		view.URL = "https://twitter.com/@supinepandora43";
+		//view.URL = "https://twitter.com/@supinepandora43";
 		//view.HTML = "<html><body><p>123</p></body></html>";
 		/*bool loaded = false;
 
@@ -249,8 +248,6 @@ void main()
 		window.SwapBuffers();
 
 		renderer.Render();
-
-		gpuDriver.viewRenderBuffers.Add(view.RenderTarget.render_buffer_id);
 
 		window.SwapBuffers();
 	}

@@ -23,8 +23,6 @@ public unsafe class OpenGLGPUDriver
 	private readonly Dictionary<uint, GeometryEntry> geometries = new();
 	public readonly Dictionary<uint, RenderBufferEntry> renderBuffers = new();
 
-	public readonly List<uint> viewRenderBuffers = new();
-
 	public void Check([CallerLineNumber] int line = default)
 	{
 #if DEBUG
@@ -424,7 +422,6 @@ public unsafe class OpenGLGPUDriver
 			var entry = renderBuffers[id];
 			gl.DeleteFramebuffer(entry.framebuffer);
 			renderBuffers.Remove(id);
-			viewRenderBuffers.Remove(id);
 		},
 		CreateGeometry = (id, vb, ib) =>
 		{
@@ -632,7 +629,7 @@ public unsafe class OpenGLGPUDriver
 					Uniforms uniforms = new();
 					uniforms.State.X = gpuState.viewport_width;
 					uniforms.State.Y = gpuState.viewport_height;
-					uniforms.Transform = gpuState.transform.ApplyProjection(gpuState.viewport_width, gpuState.viewport_height, !viewRenderBuffers.Contains(gpuState.render_buffer_id));
+					uniforms.Transform = gpuState.transform.ApplyProjection(gpuState.viewport_width, gpuState.viewport_height, true);
 					new ReadOnlySpan<Vector4>(&gpuState.scalar_0, 2).CopyTo(new Span<Vector4>(&uniforms.Scalar4_0.W, 2));
 					new ReadOnlySpan<Vector4>(&gpuState.vector_0.W, 8).CopyTo(new Span<Vector4>(&uniforms.Vector_0.W, 8));
 					uniforms.ClipSize = (uint)gpuState.clip_size;
