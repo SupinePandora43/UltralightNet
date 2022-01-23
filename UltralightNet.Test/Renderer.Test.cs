@@ -22,11 +22,11 @@ namespace UltralightNet.Test
 
 		private readonly Dictionary<int, FileStream> handles = new();
 
-		private bool getFileSize(int handle, out long size)
+		private bool getFileSize(nuint handle, out long size)
 		{
 			Console.WriteLine($"get_file_size({handle})");
 			//size = "<html><body><p>123</p></body></html>".Length;
-			size = handles[handle].Length;
+			size = handles[(int)handle].Length;
 			return true;
 		}
 		private bool getFileMimeType(string path, out string result)
@@ -35,12 +35,12 @@ namespace UltralightNet.Test
 			result = "text/html";
 			return true;
 		}
-		private long readFromFile(int handle, Span<byte> data)
+		private long readFromFile(nuint handle, Span<byte> data)
 		{
 			Console.WriteLine($"readFromFile({handle}, Span<byte> data)");
 			//Assert.Equal("<html><body><p>123</p></body></html>".Length, length);
 			//data = "<html><body><p>123</p></body></html>";
-			return handles[handle].Read(data);
+			return handles[(int)handle].Read(data);
 		}
 		[Fact]
 		public void TestRenderer()
@@ -81,7 +81,7 @@ namespace UltralightNet.Test
 					 Console.WriteLine($"open_file({path}, {open_for_writing})");
 					 int handle = new Random().Next(0, 100);
 					 handles[handle] = File.OpenRead(path);
-					 return handle;
+					 return (nuint)handle;
 				 },
 				CloseFile = (handle) =>
 				 {
@@ -92,7 +92,7 @@ namespace UltralightNet.Test
 
 			ULConfig config = new();
 
-                        if(OperatingSystem.IsMacOS()) return;
+			if (OperatingSystem.IsMacOS()) return;
 
 			renderer = ULPlatform.CreateRenderer(config);
 
