@@ -613,10 +613,10 @@ public unsafe class OpenGLGPUDriver
 					uniforms.State.X = gpuState.viewport_width;
 					uniforms.State.Y = gpuState.viewport_height;
 					uniforms.Transform = gpuState.transform.ApplyProjection(gpuState.viewport_width, gpuState.viewport_height, false);
-					new ReadOnlySpan<Vector4>(&gpuState.scalar_0, 2).CopyTo(new Span<Vector4>(&uniforms.Scalar4_0, 2));
-					new ReadOnlySpan<Vector4>(&gpuState.vector_0, 8).CopyTo(new Span<Vector4>(&uniforms.Vector_0, 8));
+					new ReadOnlySpan<Vector4>(&gpuState.scalar_0, 2).CopyTo(new Span<Vector4>(&uniforms.Scalar4_0.W, 2));
+					new ReadOnlySpan<Vector4>(&gpuState.vector_0.W, 8).CopyTo(new Span<Vector4>(&uniforms.Vector_0.W, 8));
 					uniforms.ClipSize = (uint)gpuState.clip_size;
-					new ReadOnlySpan<Matrix4x4>(&gpuState.clip_0, 8).CopyTo(new Span<Matrix4x4>(&uniforms.Clip_0, 8));
+					new ReadOnlySpan<Matrix4x4>(&gpuState.clip_0.M11, 8).CopyTo(new Span<Matrix4x4>(&uniforms.Clip_0.M11, 8));
 
 					if (DSA)
 						gl.NamedBufferData(UBO, 768, &uniforms, GLEnum.DynamicDraw);
