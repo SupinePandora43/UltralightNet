@@ -13,6 +13,11 @@ using Silk.NET.Vulkan.Extensions.KHR;
 using UltralightNet;
 using Buffer = Silk.NET.Vulkan.Buffer;
 
+internal class RenderBufferEntry
+{
+
+}
+
 internal class TextureEntry
 {
 
@@ -29,8 +34,6 @@ internal class GeometryEntry
 	public DeviceMemory vertexMemory;
 	public DeviceMemory indexStagingMemory;
 	public DeviceMemory indexMemory;
-
-	public CommandBuffer stageCopy;
 }
 
 public unsafe partial class VulkanGPUDriver
@@ -48,8 +51,11 @@ public unsafe partial class VulkanGPUDriver
 	private const SampleCountFlags msaaSamples = SampleCountFlags.SampleCount4Bit;
 
 	private readonly List<TextureEntry> textures = new();
+	private readonly Queue<uint> texturesFreeIds = new();
 	private readonly List<GeometryEntry> geometries = new();
 	private readonly Queue<uint> geometriesFreeIds = new();
+	private readonly List<RenderBufferEntry> renderBuffers = new();
+	private readonly Queue<uint> renderBuffersFreeIds = new();
 
 	public VulkanGPUDriver(Vk vk, Device device)
 	{
@@ -57,22 +63,52 @@ public unsafe partial class VulkanGPUDriver
 		this.device = device;
 
 		geometries.Add(new()); // id => 1 workaround
+
+		_gpuDriver = new()
+		{
+			NextTextureId = NextTextureId,
+			CreateTexture = CreateTexture,
+			UpdateTexture = UpdateTexture,
+			DestroyTexture = DestroyTexture,
+			NextRenderBufferId = NextRenderBufferId
+		};
 	}
 
+	private ULGPUDriver _gpuDriver;
+	public ULGPUDriver GPUDriver => _gpuDriver;
+
+	#region ID
 	private uint NextGeometryId()
 	{
 		if (geometriesFreeIds.Count is not 0) return geometriesFreeIds.Dequeue();
 		else
 		{
 			geometries.Add(new());
-			return (uint)geometries.Count;
+			return (uint)geometries.Count - 1;
 		}
 	}
-
-	private void CreateTexture(uint id, void* bitmapPtr)
+	private uint NextTextureId()
 	{
-		ULBitmap bitmap = new((IntPtr)bitmapPtr);
+		if (texturesFreeIds.Count is not 0) return texturesFreeIds.Dequeue();
+		else
+		{
+			textures.Add(new());
+			return (uint)textures.Count - 1;
+		}
+	}
+	private uint NextRenderBufferId()
+	{
+		if (renderBuffersFreeIds.Count is not 0) return renderBuffersFreeIds.Dequeue();
+		else
+		{
+			renderBuffers.Add(new());
+			return (uint)renderBuffers.Count - 1;
+		}
+	}
+	#endregion ID
 
+	private void CreateTexture(uint id, ULBitmap bitmap)
+	{
 		uint width = bitmap.Width;
 		uint height = bitmap.Height;
 
@@ -112,6 +148,9 @@ public unsafe partial class VulkanGPUDriver
 		else
 		{
 			nuint bitmapSize = bitmap.Size;
+
+			// TODO: nuint.MaxValue > int.MaxValue
+			if (bitmapSize >= int.MaxValue) throw error;
 
 			CreateBuffer(bitmapSize, BufferUsageFlags.BufferUsageTransferSrcBit, MemoryPropertyFlags.MemoryPropertyHostVisibleBit | MemoryPropertyFlags.MemoryPropertyHostCoherentBit, out Buffer stagingBuffer, out DeviceMemory stagingBufferMemory);
 
@@ -169,6 +208,15 @@ public unsafe partial class VulkanGPUDriver
 		}
 	}
 
+	private void UpdateTexture(uint id, ULBitmap bitmap)
+	{
+		// TODO
+	}
+	private void DestroyTexture(uint id)
+	{
+		// TODO
+	}
+
 	private void CreateGeometry(uint id, ULVertexBuffer vb, ULIndexBuffer ib)
 	{
 		Buffer vertexStagingBuffer;
@@ -181,13 +229,14 @@ public unsafe partial class VulkanGPUDriver
 		DeviceMemory indexStagingMemory;
 		DeviceMemory indexMemory;
 
-		CommandBuffer stageCopy;
-
 		CreateBuffer(vb.size, BufferUsageFlags.BufferUsageTransferSrcBit, MemoryPropertyFlags.MemoryPropertyHostVisibleBit | MemoryPropertyFlags.MemoryPropertyHostCoherentBit, out vertexStagingBuffer, out vertexStagingMemory);
 		CreateBuffer(vb.size, BufferUsageFlags.BufferUsageTransferDstBit | BufferUsageFlags.BufferUsageVertexBufferBit, MemoryPropertyFlags.MemoryPropertyDeviceLocalBit, out vertexBuffer, out vertexMemory);
 
 		CreateBuffer(ib.size, BufferUsageFlags.BufferUsageTransferSrcBit, MemoryPropertyFlags.MemoryPropertyHostVisibleBit | MemoryPropertyFlags.MemoryPropertyHostCoherentBit, out indexStagingBuffer, out indexStagingMemory);
 		CreateBuffer(ib.size, BufferUsageFlags.BufferUsageTransferDstBit | BufferUsageFlags.BufferUsageIndexBufferBit, MemoryPropertyFlags.MemoryPropertyDeviceLocalBit, out indexBuffer, out indexMemory);
+
+		// TODO: nuint.MaxValue > int.MaxValue
+		if (Math.Max(vb.size, ib.size) >= int.MaxValue) throw error;
 
 		void* vertexStaging;
 		vk.MapMemory(device, vertexStagingMemory, 0, vb.size, 0, &vertexStaging);
@@ -199,12 +248,11 @@ public unsafe partial class VulkanGPUDriver
 		new ReadOnlySpan<byte>(ib.data, (int)ib.size).CopyTo(new Span<byte>(indexStaging, (int)ib.size));
 		vk.UnmapMemory(device, indexStagingMemory);
 
-		stageCopy = CreateCommandBuffer(CommandBufferLevel.Secondary);
+		CommandBuffer stageCopy = BeginSingleTimeCommands();
 
-		BeginCommandBuffer(stageCopy);
 		CopyBuffer(stageCopy, vertexStagingBuffer, vertexBuffer, vb.size);
 		CopyBuffer(stageCopy, indexStagingBuffer, indexBuffer, ib.size);
-		EndCommandBuffer(stageCopy);
+		EndSingleTimeCommands(stageCopy);
 
 		geometries[(int)id] = new GeometryEntry()
 		{
@@ -217,6 +265,28 @@ public unsafe partial class VulkanGPUDriver
 			indexStagingMemory = indexStagingMemory,
 			indexMemory = indexMemory
 		};
+	}
+	private void UpdateGeometry(uint id, ULVertexBuffer vb, ULIndexBuffer ib)
+	{
+		GeometryEntry geometryEntry = geometries[(int)id];
+
+		// TODO: nuint.MaxValue > int.MaxValue
+		if (Math.Max(vb.size, ib.size) >= int.MaxValue) throw error;
+
+		void* vertexStaging;
+		vk.MapMemory(device, geometryEntry.vertexStagingMemory, 0, vb.size, 0, &vertexStaging);
+		new ReadOnlySpan<byte>(vb.data, (int)vb.size).CopyTo(new Span<byte>(vertexStaging, (int)vb.size));
+		vk.UnmapMemory(device, geometryEntry.vertexStagingMemory);
+
+		void* indexStaging;
+		vk.MapMemory(device, geometryEntry.indexStagingMemory, 0, ib.size, 0, &indexStaging);
+		new ReadOnlySpan<byte>(ib.data, (int)ib.size).CopyTo(new Span<byte>(indexStaging, (int)ib.size));
+		vk.UnmapMemory(device, geometryEntry.indexStagingMemory);
+
+		CommandBuffer stageCopy = BeginSingleTimeCommands();
+		CopyBuffer(stageCopy, geometryEntry.vertexStagingBuffer, geometryEntry.vertexBuffer, vb.size);
+		CopyBuffer(stageCopy, geometryEntry.indexStagingBuffer, geometryEntry.indexBuffer, ib.size);
+		EndSingleTimeCommands(stageCopy);
 	}
 	private void DestroyGeometry(uint id)
 	{
@@ -232,8 +302,6 @@ public unsafe partial class VulkanGPUDriver
 		vk.FreeMemory(device, geometryEntry.indexStagingMemory, null);
 		vk.FreeMemory(device, geometryEntry.indexMemory, null);
 
-		fixed (CommandBuffer* stageCopy = &geometryEntry.stageCopy)
-			vk.FreeCommandBuffers(device, commandPool, 1, stageCopy);
 		geometriesFreeIds.Enqueue(id);
 
 		geometries[(int)id] = null;

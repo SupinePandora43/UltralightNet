@@ -10,22 +10,17 @@
 		<SymbolPackageFormat>snupkg</SymbolPackageFormat>
 	</PropertyGroup>
 
+	<Import Project="../CompileShaders.targets" />
+
 	<ItemGroup>
-	  <None Remove="shaders\shader_fill.frag.glsl" />
-	  <None Remove="shaderss\shader_fill.vert.glsl" />
-	  <None Remove="shaderss\shader_fill_path.frag.glsl" />
-	  <None Remove="shaderss\shader_fill_path.vert.glsl" />
+	  <EmbeddedResource Include="../../shaders/compiled/glsl/shader_fill.vert" />
+	  <EmbeddedResource Include="../../shaders/compiled/glsl/shader_fill.frag" />
+	  <EmbeddedResource Include="../../shaders/compiled/glsl/shader_fill_path.vert" />
+	  <EmbeddedResource Include="../../shaders/compiled/glsl/shader_fill_path.frag" />
 	</ItemGroup>
 
 	<ItemGroup>
-	  <EmbeddedResource Include="shaders\shader_fill.frag.glsl" />
-	  <EmbeddedResource Include="shaders\shader_fill_path.frag.glsl" />
-	  <EmbeddedResource Include="shaders\shader_fill_path.vert.glsl" />
-	  <EmbeddedResource Include="shaders\shader_fill.vert.glsl" />
-	</ItemGroup>
-
-	<ItemGroup>
-		<ProjectReference Include="..\UltralightNet\UltralightNet.csproj" />
+		<ProjectReference Include="../../../UltralightNet/UltralightNet.csproj" />
 
 		<PackageReference Include="Silk.NET.OpenGL" Version="2.11.0"/>
 		<PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0" PrivateAssets="All" />

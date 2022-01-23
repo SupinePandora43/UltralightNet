@@ -16,6 +16,7 @@ public unsafe class OpenGLGPUDriver
 
 	private readonly uint pathProgram;
 	private readonly uint fillProgram;
+	private readonly uint UBO;
 
 	// TODO: use Lists
 	public readonly Dictionary<uint, TextureEntry> textures = new();
@@ -43,8 +44,8 @@ public unsafe class OpenGLGPUDriver
 			uint vert = gl.CreateShader(ShaderType.VertexShader);
 			uint frag = gl.CreateShader(ShaderType.FragmentShader);
 
-			gl.ShaderSource(vert, GetShader("shader_fill_path.vert.glsl"));
-			gl.ShaderSource(frag, GetShader("shader_fill_path.frag.glsl"));
+			gl.ShaderSource(vert, GetShader("shader_fill_path.vert"));
+			gl.ShaderSource(frag, GetShader("shader_fill_path.frag"));
 
 			gl.CompileShader(vert);
 			gl.CompileShader(frag);
@@ -80,6 +81,8 @@ public unsafe class OpenGLGPUDriver
 			gl.DetachShader(pathProgram, frag);
 			gl.DeleteShader(vert);
 			gl.DeleteShader(frag);
+
+			gl.UniformBlockBinding(pathProgram, gl.GetUniformBlockIndex(pathProgram, "Uniforms"), 0);
 		}
 		#endregion
 		#region fillProgram
@@ -87,8 +90,8 @@ public unsafe class OpenGLGPUDriver
 			uint vert = gl.CreateShader(ShaderType.VertexShader);
 			uint frag = gl.CreateShader(ShaderType.FragmentShader);
 
-			gl.ShaderSource(vert, GetShader("shader_fill.vert.glsl"));
-			gl.ShaderSource(frag, GetShader("shader_fill.frag.glsl"));
+			gl.ShaderSource(vert, GetShader("shader_fill.vert"));
+			gl.ShaderSource(frag, GetShader("shader_fill.frag"));
 
 			gl.CompileShader(vert);
 			gl.CompileShader(frag);
@@ -136,16 +139,32 @@ public unsafe class OpenGLGPUDriver
 			gl.UseProgram(fillProgram);
 			gl.Uniform1(gl.GetUniformLocation(fillProgram, "Texture1"), 0);
 			gl.Uniform1(gl.GetUniformLocation(fillProgram, "Texture2"), 1);
+			gl.UniformBlockBinding(fillProgram, gl.GetUniformBlockIndex(fillProgram, "Uniforms"), 0);
+			gl.UseProgram(0);
 		}
 		#endregion
 
 		Check();
+
+		if (DSA)
+		{
+			UBO = gl.CreateBuffer();
+			gl.NamedBufferData(UBO, 768, null, VertexBufferObjectUsage.DynamicDraw);
+		}
+		else
+		{
+			UBO = gl.GenBuffer();
+			gl.BindBuffer(GLEnum.UniformBuffer, UBO);
+			gl.BufferData(GLEnum.UniformBuffer, 768, null, GLEnum.DynamicDraw);
+			gl.BindBuffer(GLEnum.UniformBuffer, 0);
+		}
+		gl.BindBufferRange(GLEnum.UniformBuffer, 0, UBO, 0, 768);
 	}
 
 	private static string GetShader(string name)
 	{
 		Assembly assembly = typeof(OpenGLGPUDriver).Assembly;
-		Stream stream = assembly.GetManifestResourceStream("UltralightNet.OpenGL.shaders." + name);
+		Stream stream = assembly.GetManifestResourceStream("UltralightNet.OpenGL." + name);
 		StreamReader resourceStreamReader = new(stream, Encoding.UTF8, false, 16, true);
 		return resourceStreamReader.ReadToEnd();
 	}
@@ -566,6 +585,9 @@ public unsafe class OpenGLGPUDriver
 			gl.DepthFunc(DepthFunction.Never);
 			gl.BlendFunc(BlendingFactor.One, BlendingFactor.OneMinusSrcAlpha);
 			Check();
+
+			if (!DSA) gl.BindBuffer(BufferTargetARB.UniformBuffer, UBO);
+
 			foreach (var command in commandSpan)
 			{
 				Check();
@@ -586,21 +608,24 @@ public unsafe class OpenGLGPUDriver
 					var geometryEntry = geometries[command.geometry_id];
 					gl.UseProgram(program);
 					Check();
-					gl.Uniform4(gl.GetUniformLocation(program, "State"), 0f, (float)gpuState.viewport_width, (float)gpuState.viewport_height, 1f);
-					Check();
-					Matrix4x4 transform = gpuState.transform.ApplyProjection(gpuState.viewport_width, gpuState.viewport_height, false);
-					gl.UniformMatrix4(gl.GetUniformLocation(program, "Transform"), 1, false, &transform.M11);
-					Check();
-					gl.Uniform4(gl.GetUniformLocation(program, "Scalar4"), 2, &gpuState.scalar_0);
-					Check();
-					gl.Uniform4(gl.GetUniformLocation(program, "Vector"), 8, &gpuState.vector_0.X);
-					Check();
-					gl.Uniform1(gl.GetUniformLocation(program, "ClipSize"), (uint)gpuState.clip_size);
-					Check();
-					gl.UniformMatrix4(gl.GetUniformLocation(program, "Clip"), 8, false, &gpuState.clip_0.M11);
-					Check();
+
+					Uniforms uniforms = new();
+					uniforms.State.X = gpuState.viewport_width;
+					uniforms.State.Y = gpuState.viewport_height;
+					uniforms.Transform = gpuState.transform.ApplyProjection(gpuState.viewport_width, gpuState.viewport_height, false);
+					new ReadOnlySpan<Vector4>(&gpuState.scalar_0, 2).CopyTo(new Span<Vector4>(&uniforms.Scalar4_0, 2));
+					new ReadOnlySpan<Vector4>(&gpuState.vector_0, 8).CopyTo(new Span<Vector4>(&uniforms.Vector_0, 8));
+					uniforms.ClipSize = (uint)gpuState.clip_size;
+					new ReadOnlySpan<Matrix4x4>(&gpuState.clip_0, 8).CopyTo(new Span<Matrix4x4>(&uniforms.Clip_0, 8));
+
+					if (DSA)
+						gl.NamedBufferData(UBO, 768, &uniforms, GLEnum.DynamicDraw);
+					else
+					{
+						gl.BufferData(BufferTargetARB.UniformBuffer, 768, &uniforms, BufferUsageARB.DynamicDraw);
+					}
+
 					gl.BindVertexArray(geometryEntry.vao);
-					Check();
 
 					if (DSA)
 					{

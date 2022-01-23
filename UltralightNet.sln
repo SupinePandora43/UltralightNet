@@ -49,7 +49,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Benchmarks", "Benchmarks\Be
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UltralightNet.OpenGL.TestApp", "UltralightNet.OpenGL.TestApp\UltralightNet.OpenGL.TestApp.csproj", "{12E884F6-0828-4451-9B17-97A3E945D6D8}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UltralightNet.OpenGL", "UltralightNet.OpenGL\UltralightNet.OpenGL.csproj", "{1CD5E12E-E31F-444F-8287-23CDA55A4D10}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UltralightNet.OpenGL", "gpu/libs/UltralightNet.OpenGL/UltralightNet.OpenGL.csproj", "{1CD5E12E-E31F-444F-8287-23CDA55A4D10}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UltralightNet.Vulkan.TestApp", "UltralightNet.Vulkan.TestApp\UltralightNet.Vulkan.TestApp.csproj", "{9EEB642C-B091-4E80-AED1-B24C06F2C820}"
 EndProject

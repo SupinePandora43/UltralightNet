@@ -1,12 +1,14 @@
-#version 150
+#version 420
 
 // Program Uniforms
-uniform vec4 State;
-uniform mat4 Transform;
-uniform vec4 Scalar4[2];
-uniform vec4 Vector[8];
-uniform uint ClipSize;
-uniform mat4 Clip[8];
+layout(set=0, binding=0) uniform Uniforms {
+	uniform vec4 State;
+	uniform mat4 Transform;
+	uniform vec4 Scalar4[2];
+	uniform vec4 Vector[8];
+	uniform uint ClipSize;
+	uniform mat4 Clip[8];
+};
 
 // Uniform Accessor Functions
 float Time() { return State[0]; }
@@ -16,11 +18,11 @@ float ScreenScale() { return State[3]; }
 float Scalar(uint i) { if (i < 4u) return Scalar4[0][i]; else return Scalar4[1][i - 4u]; }
 
 // Vertex Attributes
-in vec4 ex_Color;
-in vec2 ex_ObjectCoord;
+layout(location = 0)in vec4 ex_Color;
+layout(location = 1)in vec2 ex_ObjectCoord;
 
 // Out Params
-out vec4 out_Color;
+layout(location = 0)out vec4 out_Color;
 
 float sdRect(vec2 p, vec2 size) {
     vec2 d = abs(p) - size;

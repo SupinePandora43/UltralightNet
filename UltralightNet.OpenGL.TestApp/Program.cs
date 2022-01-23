@@ -184,6 +184,8 @@ void main()
 
 		gpuDriver = new(gl);
 
+		gpuDriver.Check();
+
 		window.SwapBuffers();
 
 		ULPlatform.GPUDriver = gpuDriver.GetGPUDriver();
