@@ -21,7 +21,9 @@ public unsafe class OpenGLGPUDriver
 	// TODO: use Lists
 	public readonly Dictionary<uint, TextureEntry> textures = new();
 	private readonly Dictionary<uint, GeometryEntry> geometries = new();
-	private readonly Dictionary<uint, RenderBufferEntry> renderBuffers = new();
+	public readonly Dictionary<uint, RenderBufferEntry> renderBuffers = new();
+
+	public readonly List<uint> viewRenderBuffers = new();
 
 	public void Check([CallerLineNumber] int line = default)
 	{
@@ -32,10 +34,13 @@ public unsafe class OpenGLGPUDriver
 	}
 
 	private readonly bool DSA = true;
+	private readonly uint samples = 4;
 
-	public OpenGLGPUDriver(GL glapi)
+	public OpenGLGPUDriver(GL glapi, bool DSA, uint samples)
 	{
 		gl = glapi;
+		this.DSA = DSA;
+		this.samples = samples;
 
 		Check();
 
@@ -220,14 +225,22 @@ public unsafe class OpenGLGPUDriver
 
 			if (DSA)
 			{
-				gl.CreateTextures(TextureTarget.Texture2D, 1, &textureId);
-
 				if (isRT)
 				{
-					gl.TextureStorage2D(textureId, 1, SizedInternalFormat.Rgba8, width, height);
+					if (samples is 1)
+					{
+						gl.CreateTextures(TextureTarget.Texture2D, 1, &textureId);
+						gl.TextureStorage2D(textureId, 1, SizedInternalFormat.Rgba8, width, height);
+					}
+					else
+					{
+						gl.CreateTextures(TextureTarget.Texture2DMultisample, 1, &textureId);
+						gl.TextureStorage2DMultisample(textureId, samples, SizedInternalFormat.Rgba8, width, height, false);
+					}
 				}
 				else
 				{
+					gl.CreateTextures(TextureTarget.Texture2D, 1, &textureId);
 					gl.PixelStore(PixelStoreParameter.UnpackAlignment, 1);
 					gl.PixelStore(PixelStoreParameter.UnpackRowLength, (int)(bitmap.RowBytes / bitmap.Bpp));
 
@@ -245,16 +258,19 @@ public unsafe class OpenGLGPUDriver
 					}
 
 					bitmap.UnlockPixels();
+
+					Check();
+					gl.TextureParameterI(textureId, TextureParameterName.TextureMinFilter, (int)GLEnum.Linear);
+					gl.TextureParameterI(textureId, TextureParameterName.TextureMagFilter, (int)GLEnum.Linear);
+
+					Check();
+					gl.TextureParameterI(textureId, TextureParameterName.TextureWrapS, (int)GLEnum.ClampToEdge);
+					gl.TextureParameterI(textureId, TextureParameterName.TextureWrapT, (int)GLEnum.ClampToEdge);
+					gl.TextureParameterI(textureId, TextureParameterName.TextureWrapR, (int)GLEnum.Repeat);
+
+					gl.GenerateTextureMipmap(textureId);
 				}
-
-				gl.TextureParameterI(textureId, TextureParameterName.TextureMinFilter, (int)GLEnum.Linear);
-				gl.TextureParameterI(textureId, TextureParameterName.TextureMagFilter, (int)GLEnum.Linear);
-
-				gl.TextureParameterI(textureId, TextureParameterName.TextureWrapS, (int)GLEnum.ClampToEdge);
-				gl.TextureParameterI(textureId, TextureParameterName.TextureWrapT, (int)GLEnum.ClampToEdge);
-				gl.TextureParameterI(textureId, TextureParameterName.TextureWrapR, (int)GLEnum.Repeat);
-
-				gl.GenerateTextureMipmap(textureId);
+				Check();
 			}
 			else
 			{
@@ -362,6 +378,8 @@ public unsafe class OpenGLGPUDriver
 		{
 			var entry = renderBuffers[id];
 
+			Console.WriteLine("CreateRenderBuffer");
+
 			entry.textureEntry = textures[renderBuffer.texture_id];
 
 			uint framebuffer;
@@ -402,9 +420,11 @@ public unsafe class OpenGLGPUDriver
 		},
 		DestroyRenderBuffer = (id) =>
 		{
+			Console.WriteLine("DestroyRenderBuffer");
 			var entry = renderBuffers[id];
 			gl.DeleteFramebuffer(entry.framebuffer);
 			renderBuffers.Remove(id);
+			viewRenderBuffers.Remove(id);
 		},
 		CreateGeometry = (id, vb, ib) =>
 		{
@@ -612,7 +632,7 @@ public unsafe class OpenGLGPUDriver
 					Uniforms uniforms = new();
 					uniforms.State.X = gpuState.viewport_width;
 					uniforms.State.Y = gpuState.viewport_height;
-					uniforms.Transform = gpuState.transform.ApplyProjection(gpuState.viewport_width, gpuState.viewport_height, false);
+					uniforms.Transform = gpuState.transform.ApplyProjection(gpuState.viewport_width, gpuState.viewport_height, !viewRenderBuffers.Contains(gpuState.render_buffer_id));
 					new ReadOnlySpan<Vector4>(&gpuState.scalar_0, 2).CopyTo(new Span<Vector4>(&uniforms.Scalar4_0.W, 2));
 					new ReadOnlySpan<Vector4>(&gpuState.vector_0.W, 8).CopyTo(new Span<Vector4>(&uniforms.Vector_0.W, 8));
 					uniforms.ClipSize = (uint)gpuState.clip_size;
@@ -627,18 +647,19 @@ public unsafe class OpenGLGPUDriver
 
 					gl.BindVertexArray(geometryEntry.vao);
 
-					if (DSA)
-					{
-						gl.BindTextureUnit(0, textures.ContainsKey(gpuState.texture_1_id) ? textures[gpuState.texture_1_id].textureId : 0);
-						gl.BindTextureUnit(1, textures.ContainsKey(gpuState.texture_2_id) ? textures[gpuState.texture_2_id].textureId : 0);
-					}
-					else
-					{
-						gl.ActiveTexture(GLEnum.Texture0);
-						gl.BindTexture(GLEnum.Texture2D, textures.ContainsKey(gpuState.texture_1_id) ? textures[gpuState.texture_1_id].textureId : 0);
-						gl.ActiveTexture(GLEnum.Texture1);
-						gl.BindTexture(GLEnum.Texture2D, textures.ContainsKey(gpuState.texture_2_id) ? textures[gpuState.texture_2_id].textureId : 0);
-					}
+					if (gpuState.shader_type is ULShaderType.Fill)
+						if (DSA)
+						{
+							gl.BindTextureUnit(0, textures.ContainsKey(gpuState.texture_1_id) ? textures[gpuState.texture_1_id].textureId : 0);
+							gl.BindTextureUnit(1, textures.ContainsKey(gpuState.texture_2_id) ? textures[gpuState.texture_2_id].textureId : 0);
+						}
+						else
+						{
+							gl.ActiveTexture(GLEnum.Texture0);
+							gl.BindTexture(GLEnum.Texture2D, textures.ContainsKey(gpuState.texture_1_id) ? textures[gpuState.texture_1_id].textureId : 0);
+							gl.ActiveTexture(GLEnum.Texture1);
+							gl.BindTexture(GLEnum.Texture2D, textures.ContainsKey(gpuState.texture_2_id) ? textures[gpuState.texture_2_id].textureId : 0);
+						}
 					Check();
 
 					if (gpuState.enable_scissor)
@@ -684,7 +705,7 @@ public unsafe class OpenGLGPUDriver
 		public uint vbo;
 		public uint ebo;
 	}
-	private class RenderBufferEntry
+	public class RenderBufferEntry
 	{
 		public uint framebuffer;
 		public TextureEntry textureEntry;

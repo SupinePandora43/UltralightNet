@@ -5,6 +5,8 @@ using Silk.NET.Input;
 using Silk.NET.OpenGL;
 using Silk.NET.Windowing;
 using UltralightNet.AppCore;
+using System.Runtime.CompilerServices;
+using System.Diagnostics;
 
 namespace UltralightNet.OpenGL.TestApp;
 
@@ -24,11 +26,23 @@ void main()
 	const string FragmentShaderSource = @"
 #version 420 core
 layout (location = 0) in vec2 uv;
+//uniform sampler2DMS rt;
 uniform sampler2D rt;
+uniform vec2 resolution;
 out vec4 FragColor;
+vec4 ms(sampler2DMS sampler, ivec2 coord){
+	vec4 color = vec4(0.0);
+	for(int i = 0; i < 4; i++){
+		color += texelFetch(sampler, coord, i);
+	}
+	color /= float(4);
+	return color;
+}
 void main()
 {
+	ivec2 texCoord = ivec2(uv*resolution);
 	FragColor = texture(rt, uv);
+	//FragColor = ms(rt, texCoord);
     //FragColor = vec4(uv.x, uv.y, 0.0f, 1.0f);
     //FragColor = vec4(1.0f,1.0f,0.0f,1.0f);
 }
@@ -60,6 +74,7 @@ void main()
 
 	public static void Main()
 	{
+		AppContext.SetSwitch("Switch.System.Reflection.Assembly.SimulatedLocationInBaseDirectory", true);
 		AppCoreMethods.ulEnablePlatformFontLoader();
 		AppCoreMethods.ulEnablePlatformFileSystem("./");
 		AppCoreMethods.ulEnableDefaultLogger("./log123as.txt");
@@ -69,7 +84,8 @@ void main()
 		window = Window.Create(WindowOptions.Default with
 		{
 			Size = new Vector2D<int>(800, 600),
-			API = new GraphicsAPI(ContextAPI.OpenGL, ContextProfile.Core, ContextFlags.ForwardCompatible, new APIVersion(4, 6))
+			API = new GraphicsAPI(ContextAPI.OpenGL, ContextProfile.Core, ContextFlags.ForwardCompatible, new APIVersion(4, 6)),
+			Samples = 4
 		});
 
 		window.Load += OnLoad;
@@ -77,11 +93,34 @@ void main()
 		window.Render += OnRender;
 		window.FramebufferResize += s =>
 		{
+			System.Threading.Thread.Sleep(1000/240);
 			gl.Viewport(s);
 			view.Resize((uint)s.X, (uint)s.Y);
+			gpuDriver.viewRenderBuffers.Add(view.RenderTarget.render_buffer_id);
 		};
 
+		new System.Threading.Thread(TimeoutThread).Start();
+
 		window.Run();
+	}
+
+	static Stopwatch stopwatch = Stopwatch.StartNew();
+
+	static string state = "none";
+
+	static void TimeoutThread(){
+		while(true){
+			//if(stopwatch.ElapsedMilliseconds>1000) Console.WriteLine($"High delay {stopwatch.ElapsedMilliseconds} {state}");
+			System.Threading.Thread.Sleep(1000);
+		}
+	}
+
+	private static void Check([CallerLineNumber] int line = default)
+	{
+#if DEBUG
+		var error = gl.GetError();
+		if (error is not 0) Console.WriteLine($"{line}: {error}");
+#endif
 	}
 
 	static unsafe void OnLoad()
@@ -98,14 +137,15 @@ void main()
 
 		//Getting the opengl api for drawing to the screen.
 		gl = GL.GetApi(window);
-
+		Check();
 		//gl.Enable(GLEnum.FramebufferSrgb);
 
-		gl.CullFace(GLEnum.None);
+		gl.CullFace(GLEnum.Back);
 		gl.Disable(GLEnum.CullFace);
 		gl.FrontFace(GLEnum.Ccw);
 		gl.Disable(EnableCap.DepthTest);
 		gl.DepthFunc(DepthFunction.Never);
+		gl.Enable(GLEnum.Multisample);
 		//gl.Disable(GLEnum.StencilTest);
 
 		//Creating a vertex array.
@@ -182,7 +222,7 @@ void main()
 
 		window.SwapBuffers();
 
-		gpuDriver = new(gl);
+		gpuDriver = new(gl, true, 1);
 
 		gpuDriver.Check();
 
@@ -190,11 +230,12 @@ void main()
 
 		ULPlatform.GPUDriver = gpuDriver.GetGPUDriver();
 
-		renderer = ULPlatform.CreateRenderer(new ULConfig { FaceWinding = ULFaceWinding.Clockwise, ForceRepaint = true });
+		renderer = ULPlatform.CreateRenderer(new ULConfig { FaceWinding = ULFaceWinding.Clockwise, ForceRepaint = false });
 
 		view = renderer.CreateView(800, 600, new ULViewConfig { IsAccelerated = true, IsTransparent = false });
-		//view.URL = "https://youtube.com";
-		view.HTML = "<html><body><p>123</p></body></html>";
+		view.URL = "https://youtube.com";
+		view.URL = "https://twitter.com/@supinepandora43";
+		//view.HTML = "<html><body><p>123</p></body></html>";
 		/*bool loaded = false;
 
 		view.OnFinishLoading += (_, _, _) => loaded = true;
@@ -209,17 +250,27 @@ void main()
 
 		renderer.Render();
 
+		gpuDriver.viewRenderBuffers.Add(view.RenderTarget.render_buffer_id);
+
 		window.SwapBuffers();
 	}
 
 	static unsafe void OnRender(double obj)
 	{
+		state = "begin";
+		stopwatch.Restart();
 		gpuDriver.Check();
+		state = "Update";
+		stopwatch.Restart();
 		renderer.Update();
+		state = "Update";
+		stopwatch.Restart();
 		renderer.Render();
 		gpuDriver.Check();
 
-		uint rtId = gpuDriver.textures[view.RenderTarget.texture_id].textureId;
+		state = "Draw";
+		stopwatch.Restart();
+		uint rtId = gpuDriver.renderBuffers[view.RenderTarget.render_buffer_id].textureEntry.textureId;
 		//window.ClearContext();
 		gl.Clear((uint)ClearBufferMask.ColorBufferBit);
 		gpuDriver.Check();
@@ -233,8 +284,11 @@ void main()
 		gpuDriver.Check();
 		gl.UseProgram(quadProgram);
 		gpuDriver.Check();
+		gl.Uniform2(gl.GetUniformLocation(quadProgram, "resolution"), new Vector2(window.Size.X, window.Size.Y));
 		gl.DrawElements(PrimitiveType.Triangles, (uint)IndexBuffer.Length, DrawElementsType.UnsignedInt, null);
 		gpuDriver.Check();
+		state = "done";
+		stopwatch.Restart();
 	}
 
 	static void OnUpdate(double obj)
