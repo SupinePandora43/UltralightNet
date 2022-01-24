@@ -85,7 +85,9 @@ void main()
 		{
 			Size = new Vector2D<int>(800, 600),
 			API = new GraphicsAPI(ContextAPI.OpenGL, ContextProfile.Core, ContextFlags.ForwardCompatible, new APIVersion(4, 6)),
-			Samples = 4
+			Samples = 1,
+			FramesPerSecond = 1000,
+			VSync = false
 		});
 
 		window.Load += OnLoad;
@@ -221,7 +223,7 @@ void main()
 
 		window.SwapBuffers();
 
-		gpuDriver = new(gl, true, 1);
+		gpuDriver = new(gl);
 
 		gpuDriver.Check();
 
@@ -267,14 +269,15 @@ void main()
 
 		state = "Draw";
 		stopwatch.Restart();
-		uint rtId = gpuDriver.renderBuffers[view.RenderTarget.render_buffer_id].textureEntry.textureId;
+		var textureEntry = gpuDriver.renderBuffers[view.RenderTarget.render_buffer_id].textureEntry;
+		gl.BlitNamedFramebuffer(textureEntry.multisampledFramebuffer, textureEntry.framebuffer, 0, 0, (int) textureEntry.width, (int) textureEntry.height, 0, 0, (int) textureEntry.width, (int) textureEntry.height,ClearBufferMask.ColorBufferBit,BlitFramebufferFilter.Nearest);
 		//window.ClearContext();
 		gl.Clear((uint)ClearBufferMask.ColorBufferBit);
 		gpuDriver.Check();
 
 		gl.ActiveTexture(GLEnum.Texture0);
 		gpuDriver.Check();
-		gl.BindTexture(GLEnum.Texture2D, rtId);
+		gl.BindTexture(GLEnum.Texture2D, textureEntry.textureId);
 		gpuDriver.Check();
 
 		gl.BindVertexArray(vao);
