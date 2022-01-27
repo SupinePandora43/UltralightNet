@@ -65,3 +65,4 @@ TestResult.xml
 *.log
 /publish
 *.spv
+gpu/shaders/compiled
