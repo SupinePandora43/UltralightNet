@@ -1,19 +1,18 @@
 using System;
 using System.Numerics;
-using Silk.NET.Maths;
+using System.Runtime.CompilerServices;
 using Silk.NET.Input;
+using Silk.NET.Maths;
 using Silk.NET.OpenGL;
 using Silk.NET.Windowing;
 using UltralightNet.AppCore;
-using System.Runtime.CompilerServices;
-using System.Diagnostics;
 
 namespace UltralightNet.OpenGL.TestApp;
 
 public static class Program
 {
 	const string VertexShaderSource = @"
-#version 420 core //Using version GLSL version 3.3
+#version 420 core
 layout (location = 0) in vec4 vPos;
 layout (location = 0) out vec2 uv;
 void main()
@@ -26,25 +25,12 @@ void main()
 	const string FragmentShaderSource = @"
 #version 420 core
 layout (location = 0) in vec2 uv;
-//uniform sampler2DMS rt;
 uniform sampler2D rt;
-uniform vec2 resolution;
 out vec4 FragColor;
-vec4 ms(sampler2DMS sampler, ivec2 coord){
-	vec4 color = vec4(0.0);
-	for(int i = 0; i < 4; i++){
-		color += texelFetch(sampler, coord, i);
-	}
-	color /= float(4);
-	return color;
-}
+
 void main()
 {
-	ivec2 texCoord = ivec2(uv*resolution);
 	FragColor = texture(rt, uv);
-	//FragColor = ms(rt, texCoord);
-    //FragColor = vec4(uv.x, uv.y, 0.0f, 1.0f);
-    //FragColor = vec4(1.0f,1.0f,0.0f,1.0f);
 }
 ";
 
@@ -79,14 +65,13 @@ void main()
 		AppCoreMethods.ulEnablePlatformFileSystem("./");
 		AppCoreMethods.ulEnableDefaultLogger("./log123as.txt");
 
-		Window.PrioritizeSdl();
-
 		window = Window.Create(WindowOptions.Default with
 		{
-			Size = new Vector2D<int>(800, 600),
-			API = new GraphicsAPI(ContextAPI.OpenGL, ContextProfile.Core, ContextFlags.ForwardCompatible, new APIVersion(4, 6)),
+			Size = new Vector2D<int>(512, 512),
+			API = new GraphicsAPI(ContextAPI.OpenGL, ContextProfile.Core, ContextFlags.ForwardCompatible, new APIVersion(4, 5)),
 			Samples = 1,
-			FramesPerSecond = 1000,
+			FramesPerSecond = 0,
+			UpdatesPerSecond = 0,
 			VSync = false
 		});
 
@@ -95,25 +80,12 @@ void main()
 		window.Render += OnRender;
 		window.FramebufferResize += s =>
 		{
-			System.Threading.Thread.Sleep(1000/240);
 			gl.Viewport(s);
 			view.Resize((uint)s.X, (uint)s.Y);
+			System.Threading.Thread.Sleep(1000 / 240);
 		};
 
-		new System.Threading.Thread(TimeoutThread).Start();
-
 		window.Run();
-	}
-
-	static Stopwatch stopwatch = Stopwatch.StartNew();
-
-	static string state = "none";
-
-	static void TimeoutThread(){
-		while(true){
-			//if(stopwatch.ElapsedMilliseconds>1000) Console.WriteLine($"High delay {stopwatch.ElapsedMilliseconds} {state}");
-			System.Threading.Thread.Sleep(1000);
-		}
 	}
 
 	private static void Check([CallerLineNumber] int line = default)
@@ -223,7 +195,7 @@ void main()
 
 		window.SwapBuffers();
 
-		gpuDriver = new(gl);
+		gpuDriver = new(gl, true, 4);
 
 		gpuDriver.Check();
 
@@ -233,11 +205,12 @@ void main()
 
 		renderer = ULPlatform.CreateRenderer(new ULConfig { FaceWinding = ULFaceWinding.Clockwise, ForceRepaint = false });
 
-		view = renderer.CreateView(800, 600, new ULViewConfig { IsAccelerated = true, IsTransparent = false });
+		view = renderer.CreateView(512, 512, new ULViewConfig { IsAccelerated = true, IsTransparent = false });
+		view.URL = "https://vk.com/supinepandora43";
+		view.URL = "https://twitter.com/@supinepandora43";
 		view.URL = "https://youtube.com";
-		//view.URL = "https://twitter.com/@supinepandora43";
 		//view.HTML = "<html><body><p>123</p></body></html>";
-		/*bool loaded = false;
+		bool loaded = false;
 
 		view.OnFinishLoading += (_, _, _) => loaded = true;
 
@@ -245,7 +218,7 @@ void main()
 		{
 			renderer.Update();
 			System.Threading.Thread.Sleep(10);
-		}*/
+		}
 
 		window.SwapBuffers();
 
@@ -256,39 +229,19 @@ void main()
 
 	static unsafe void OnRender(double obj)
 	{
-		state = "begin";
-		stopwatch.Restart();
-		gpuDriver.Check();
-		state = "Update";
-		stopwatch.Restart();
 		renderer.Update();
-		state = "Update";
-		stopwatch.Restart();
 		renderer.Render();
-		gpuDriver.Check();
 
-		state = "Draw";
-		stopwatch.Restart();
 		var textureEntry = gpuDriver.renderBuffers[view.RenderTarget.render_buffer_id].textureEntry;
-		gl.BlitNamedFramebuffer(textureEntry.multisampledFramebuffer, textureEntry.framebuffer, 0, 0, (int) textureEntry.width, (int) textureEntry.height, 0, 0, (int) textureEntry.width, (int) textureEntry.height,ClearBufferMask.ColorBufferBit,BlitFramebufferFilter.Nearest);
+		gl.BlitNamedFramebuffer(textureEntry.multisampledFramebuffer, textureEntry.framebuffer, 0, 0, (int)textureEntry.width, (int)textureEntry.height, 0, 0, (int)textureEntry.width, (int)textureEntry.height, ClearBufferMask.ColorBufferBit, BlitFramebufferFilter.Nearest);
 		//window.ClearContext();
 		gl.Clear((uint)ClearBufferMask.ColorBufferBit);
-		gpuDriver.Check();
 
-		gl.ActiveTexture(GLEnum.Texture0);
-		gpuDriver.Check();
-		gl.BindTexture(GLEnum.Texture2D, textureEntry.textureId);
-		gpuDriver.Check();
+		gl.BindTextureUnit(0, textureEntry.textureId);
 
 		gl.BindVertexArray(vao);
-		gpuDriver.Check();
 		gl.UseProgram(quadProgram);
-		gpuDriver.Check();
-		gl.Uniform2(gl.GetUniformLocation(quadProgram, "resolution"), new Vector2(window.Size.X, window.Size.Y));
 		gl.DrawElements(PrimitiveType.Triangles, (uint)IndexBuffer.Length, DrawElementsType.UnsignedInt, null);
-		gpuDriver.Check();
-		state = "done";
-		stopwatch.Restart();
 	}
 
 	static void OnUpdate(double obj)
@@ -298,7 +251,7 @@ void main()
 
 	static void OnScroll(IMouse _, ScrollWheel scroll)
 	{
-		view.FireScrollEvent(new ULScrollEvent { type = ULScrollEventType.ByPage, deltaX = (int)scroll.X, deltaY = (int)scroll.Y });
+		view.FireScrollEvent(new ULScrollEvent { type = ULScrollEventType.ByPixel, deltaX = (int)scroll.X * 100, deltaY = (int)scroll.Y * 100 });
 	}
 
 	static void OnMouseDown(IMouse mouse, MouseButton button)
@@ -310,7 +263,6 @@ void main()
 	{
 		view.FireMouseEvent(new() { type = ULMouseEventType.MouseUp, button = button is MouseButton.Left ? ULMouseEventButton.Left : (button is MouseButton.Right ? ULMouseEventButton.Right : ULMouseEventButton.Middle), x = (int)mouse.Position.X, y = (int)mouse.Position.Y });
 	}
-
 	static void OnMouseMove(IMouse mouse, Vector2 position)
 	{
 		view.FireMouseEvent(new() { type = ULMouseEventType.MouseMoved, x = (int)position.X, y = (int)position.Y });
