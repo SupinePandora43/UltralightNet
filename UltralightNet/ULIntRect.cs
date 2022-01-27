@@ -10,7 +10,6 @@ namespace UltralightNet
 		public int right;
 		public int bottom;
 
-
 		public bool IsEmpty => (left == right) && (top == bottom);
 	}
 }

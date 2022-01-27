@@ -1,5 +1,5 @@
-using System.Runtime.InteropServices;
 using System.Numerics;
+using System.Runtime.InteropServices;
 
 namespace UltralightNet
 {
@@ -62,6 +62,5 @@ namespace UltralightNet
 		public bool enable_scissor;
 
 		public ULIntRect scissor_rect;
-
 	}
 }
