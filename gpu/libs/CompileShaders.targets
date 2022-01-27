@@ -3,8 +3,8 @@
 		<Shaders Include="../../shaders/*.*"/>
 	</ItemGroup>
 	<Target Name="CompileShaders" Inputs="@(Shaders)" Outputs="../../shaders/compiled/**" BeforeTargets="ResolveReferences">
-        <MakeDir Directories="../../shaders/compiled/spirv;../../shaders/compiled/glsl" />
+        <MakeDir Directories="../../shaders/compiled;../../shaders/compiled/spirv;../../shaders/compiled/glsl" />
         <Exec Command="glslc -O -g -o ../../shaders/compiled/spirv/%(Shaders.Filename)%(Shaders.Extension).spv %(Shaders.Identity)" EchoOff="false" />
-        <Exec Command="spirv-cross --version 330 ../../shaders/compiled/spirv/%(Shaders.Filename)%(Shaders.Extension).spv --output ../../shaders/compiled/glsl/%(Shaders.Filename)%(Shaders.Extension)" EchoOff="false" />
+        <Exec Command="spirv-cross --version 420 ../../shaders/compiled/spirv/%(Shaders.Filename)%(Shaders.Extension).spv --output ../../shaders/compiled/glsl/%(Shaders.Filename)%(Shaders.Extension)" EchoOff="false" />
     </Target>
 </Project>
