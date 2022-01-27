@@ -10,7 +10,7 @@ using System.Runtime.CompilerServices;
 using Silk.NET.OpenGL;
 using UltralightNet;
 
-public unsafe class OpenGLGPUDriver
+public unsafe partial class OpenGLGPUDriver
 {
 	private readonly GL gl;
 
@@ -37,8 +37,12 @@ public unsafe class OpenGLGPUDriver
 	public OpenGLGPUDriver(GL glapi, bool DSA = true, uint samples = 0)
 	{
 		gl = glapi;
-		this.DSA = DSA;
-		this.samples = samples is 0 ? (uint)gl.GetInteger(GLEnum.MaxSamples) : samples;
+
+		// DSA
+		this.DSA = gl.GetInteger(GLEnum.MajorVersion) >= 4 && gl.GetInteger(GLEnum.MinorVersion) >= 5;
+
+		// MSAAx4
+		this.samples = samples is 0 ? (4 <= gl.GetInteger(GLEnum.MaxSamples) ? 4u : 1u) : samples;
 
 		Check();
 
@@ -212,8 +216,6 @@ public unsafe class OpenGLGPUDriver
 		},
 		CreateTexture = (entryId, bitmap) =>
 		{
-			Console.WriteLine("CreateTexture");
-			Check();
 			var isRT = bitmap.IsEmpty;
 
 			uint textureId;
@@ -229,7 +231,8 @@ public unsafe class OpenGLGPUDriver
 					gl.CreateTextures(TextureTarget.Texture2D, 1, &textureId);
 					gl.TextureStorage2D(textureId, 1, SizedInternalFormat.Rgba8, width, height);
 
-					if(samples is not 1){
+					if (samples is not 1)
+					{
 						gl.CreateTextures(TextureTarget.Texture2DMultisample, 1, &multisampledTextureId);
 						gl.TextureStorage2DMultisample(multisampledTextureId, samples, SizedInternalFormat.Rgba8, width, height, true);
 					}
@@ -282,7 +285,6 @@ public unsafe class OpenGLGPUDriver
 
 				if (isRT)
 				{
-					Console.WriteLine("RT");
 					gl.TexImage2D(TextureTarget.Texture2D, 0, (int)InternalFormat.Rgba8, width, height, 0, PixelFormat.Bgra, PixelType.UnsignedByte, null);
 				}
 				else
@@ -370,15 +372,13 @@ public unsafe class OpenGLGPUDriver
 			var entry = textures[id];
 
 			gl.DeleteTexture(entry.textureId);
-			if(entry.multisampledTextureId is not 0) gl.DeleteTexture(entry.multisampledTextureId);
+			if (entry.multisampledTextureId is not 0) gl.DeleteTexture(entry.multisampledTextureId);
 
 			textures.Remove(id);
 		},
 		CreateRenderBuffer = (id, renderBuffer) =>
 		{
 			var entry = renderBuffers[id];
-
-			Console.WriteLine("CreateRenderBuffer");
 
 			entry.textureEntry = textures[renderBuffer.texture_id];
 
@@ -393,7 +393,8 @@ public unsafe class OpenGLGPUDriver
 				gl.NamedFramebufferTexture(framebuffer, FramebufferAttachment.ColorAttachment0, textureGLId, 0);
 				gl.NamedFramebufferDrawBuffer(framebuffer, ColorBuffer.ColorAttachment0);
 
-				if(multisampledTextureId is not 0){
+				if (multisampledTextureId is not 0)
+				{
 					multisampledFramebuffer = gl.CreateFramebuffer();
 					gl.NamedFramebufferTexture(multisampledFramebuffer, FramebufferAttachment.ColorAttachment0, multisampledTextureId, 0);
 					gl.NamedFramebufferDrawBuffer(multisampledFramebuffer, ColorBuffer.ColorAttachment0);
@@ -429,7 +430,6 @@ public unsafe class OpenGLGPUDriver
 		},
 		DestroyRenderBuffer = (id) =>
 		{
-			Console.WriteLine("DestroyRenderBuffer");
 			var entry = renderBuffers[id];
 			gl.DeleteFramebuffer(entry.textureEntry.framebuffer);
 			gl.DeleteFramebuffer(entry.textureEntry.multisampledFramebuffer);
@@ -603,34 +603,36 @@ public unsafe class OpenGLGPUDriver
 
 			geometries.Remove(id);
 		},
-		UpdateCommandList = (commandList) =>
+
+		UpdateCommandList = [SkipLocalsInit](commandList) =>
 		{
-			Check();
 			var commandSpan = commandList.ToSpan();
-			Check();
-			gl.Enable(EnableCap.Blend);
-			gl.Disable(EnableCap.ScissorTest);
+			//gl.Enable(EnableCap.Blend);
+			//gl.Disable(EnableCap.ScissorTest);
 			gl.Disable(EnableCap.DepthTest);
 			gl.DepthFunc(DepthFunction.Never);
 			gl.BlendFunc(BlendingFactor.One, BlendingFactor.OneMinusSrcAlpha);
-			Check();
 
 			if (!DSA) gl.BindBuffer(BufferTargetARB.UniformBuffer, UBO);
 
+			uint currentFramebuffer = uint.MaxValue;
+
 			foreach (var command in commandSpan)
 			{
-				Check();
 				var gpuState = command.gpu_state;
 				var renderBufferEntry = renderBuffers[gpuState.render_buffer_id];
+				var rtTextureEntry = renderBufferEntry.textureEntry;
 
-				gl.BindFramebuffer(FramebufferTarget.Framebuffer, renderBufferEntry.textureEntry.multisampledFramebuffer is not 0 ? renderBufferEntry.textureEntry.multisampledFramebuffer : renderBufferEntry.textureEntry.framebuffer);
-				Check();
-				if(samples is not 1)
-					renderBufferEntry.textureEntry.needsConversion = true;
+				var framebufferToUse = rtTextureEntry.multisampledFramebuffer is not 0 ? rtTextureEntry.multisampledFramebuffer : rtTextureEntry.framebuffer;
+				if (currentFramebuffer != framebufferToUse)
+				{
+					gl.BindFramebuffer(FramebufferTarget.Framebuffer, framebufferToUse);
+					currentFramebuffer = framebufferToUse;
+					if (rtTextureEntry.multisampledFramebuffer != rtTextureEntry.framebuffer) rtTextureEntry.needsConversion = true;
+				}
 				if (command.command_type is ULCommandType.DrawGeometry)
 				{
 					gl.Viewport(0, 0, gpuState.viewport_width, gpuState.viewport_height);
-					Check();
 					uint program;
 
 					if (gpuState.shader_type is ULShaderType.FillPath) program = pathProgram; //gl.UseProgram(pathProgram);
@@ -638,16 +640,16 @@ public unsafe class OpenGLGPUDriver
 
 					var geometryEntry = geometries[command.geometry_id];
 					gl.UseProgram(program);
-					Check();
 
-					Uniforms uniforms = new();
+					#region Uniforms
+					Uniforms uniforms = default;
 					uniforms.State.X = gpuState.viewport_width;
 					uniforms.State.Y = gpuState.viewport_height;
 					uniforms.Transform = gpuState.transform.ApplyProjection(gpuState.viewport_width, gpuState.viewport_height, true);
 					new ReadOnlySpan<Vector4>(&gpuState.scalar_0, 2).CopyTo(new Span<Vector4>(&uniforms.Scalar4_0.W, 2));
 					new ReadOnlySpan<Vector4>(&gpuState.vector_0.W, 8).CopyTo(new Span<Vector4>(&uniforms.Vector_0.W, 8));
-					uniforms.ClipSize = (uint)gpuState.clip_size;
 					new ReadOnlySpan<Matrix4x4>(&gpuState.clip_0.M11, 8).CopyTo(new Span<Matrix4x4>(&uniforms.Clip_0.M11, 8));
+					uniforms.ClipSize = (uint)gpuState.clip_size;
 
 					if (DSA)
 						gl.NamedBufferData(UBO, 768, &uniforms, GLEnum.DynamicDraw);
@@ -655,20 +657,34 @@ public unsafe class OpenGLGPUDriver
 					{
 						gl.BufferData(BufferTargetARB.UniformBuffer, 768, &uniforms, BufferUsageARB.DynamicDraw);
 					}
+					#endregion Uniforms
 
 					gl.BindVertexArray(geometryEntry.vao);
 
-					if (gpuState.shader_type is ULShaderType.Fill){
+					if (gpuState.shader_type is ULShaderType.Fill)
+					{
 						if (DSA)
 						{
-							if(textures.ContainsKey(gpuState.texture_1_id)){
+							if (textures.ContainsKey(gpuState.texture_1_id))
+							{
 								TextureEntry textureEntry = textures[gpuState.texture_1_id];
-								if(textureEntry.needsConversion){
-									gl.BlitNamedFramebuffer(textureEntry.multisampledFramebuffer, textureEntry.framebuffer, 0, 0, (int) textureEntry.width, (int) textureEntry.height, 0, 0, (int) textureEntry.width, (int) textureEntry.height,ClearBufferMask.ColorBufferBit,BlitFramebufferFilter.Linear);
+								if (textureEntry.needsConversion)
+								{
+									gl.BlitNamedFramebuffer(textureEntry.multisampledFramebuffer, textureEntry.framebuffer, 0, 0, (int)textureEntry.width, (int)textureEntry.height, 0, 0, (int)textureEntry.width, (int)textureEntry.height, ClearBufferMask.ColorBufferBit, BlitFramebufferFilter.Linear);
 								}
 								gl.BindTextureUnit(0, textureEntry.textureId);
-							}else gl.BindTextureUnit(0, 0);
-							gl.BindTextureUnit(1, textures.ContainsKey(gpuState.texture_2_id) ? textures[gpuState.texture_2_id].textureId : 0);
+							}
+							//else gl.BindTextureUnit(0, 0);
+							if (textures.ContainsKey(gpuState.texture_2_id))
+							{
+								TextureEntry textureEntry = textures[gpuState.texture_2_id];
+								if (textureEntry.needsConversion)
+								{
+									gl.BlitNamedFramebuffer(textureEntry.multisampledFramebuffer, textureEntry.framebuffer, 0, 0, (int)textureEntry.width, (int)textureEntry.height, 0, 0, (int)textureEntry.width, (int)textureEntry.height, ClearBufferMask.ColorBufferBit, BlitFramebufferFilter.Linear);
+								}
+								gl.BindTextureUnit(1, textureEntry.textureId);
+							}
+							//else gl.BindTextureUnit(1, 0);
 						}
 						else
 						{
@@ -678,7 +694,6 @@ public unsafe class OpenGLGPUDriver
 							gl.BindTexture(GLEnum.Texture2D, textures.ContainsKey(gpuState.texture_2_id) ? textures[gpuState.texture_2_id].textureId : 0);
 						}
 					}
-					Check();
 
 					if (gpuState.enable_scissor)
 					{
@@ -687,21 +702,15 @@ public unsafe class OpenGLGPUDriver
 					}
 					else gl.Disable(EnableCap.ScissorTest);
 
-					Check();
-
 					if (gpuState.enable_blend) gl.Enable(EnableCap.Blend);
 					else gl.Disable(EnableCap.Blend);
-					Check();
 					gl.DrawElements(PrimitiveType.Triangles, command.indices_count, DrawElementsType.UnsignedInt, (void*)(command.indices_offset * sizeof(uint)));
-					Check();
 				}
 				else if (command.command_type is ULCommandType.ClearRenderBuffer)
 				{
-					Check();
 					gl.Disable(GLEnum.ScissorTest);
 					gl.ClearColor(0, 0, 0, 0);
 					gl.Clear((uint)GLEnum.ColorBufferBit);
-					Check();
 				}
 				else throw new Exception();
 			}
@@ -716,14 +725,17 @@ public unsafe class OpenGLGPUDriver
 	public class TextureEntry
 	{
 		public uint textureId;
+		public uint framebuffer;
 
 		public uint multisampledTextureId;
-
-		public bool needsConversion;
-
-		public uint framebuffer;
 		public uint multisampledFramebuffer;
 
+		/// <summary>
+		/// Copy multisampledFramebuffer data to framebuffer
+		/// </summary>
+		public bool needsConversion;
+
+		// blitting arguments
 		public uint width;
 		public uint height;
 	}

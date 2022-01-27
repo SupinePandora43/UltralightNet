@@ -16,7 +16,6 @@ internal ref struct Uniforms
 	public Vector4 Vector_5;
 	public Vector4 Vector_6;
 	public Vector4 Vector_7;
-	public uint ClipSize;
 	public Matrix4x4 Clip_0;
 	public Matrix4x4 Clip_1;
 	public Matrix4x4 Clip_2;
@@ -25,4 +24,5 @@ internal ref struct Uniforms
 	public Matrix4x4 Clip_5;
 	public Matrix4x4 Clip_6;
 	public Matrix4x4 Clip_7;
+	public uint ClipSize;
 }

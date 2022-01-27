@@ -6,8 +6,8 @@ layout(std140, set=0, binding=0) uniform Uniforms {
 	uniform mat4 Transform;
 	uniform vec4 Scalar4[2];
 	uniform vec4 Vector[8];
-	uniform uint ClipSize;
 	uniform mat4 Clip[8];
+	uniform uint ClipSize;
 };
 
 // Uniform Accessor Functions
@@ -536,6 +536,7 @@ void applyClip() {
     p = transformAffine(p, data[2].xy, data[2].zw, data[3].xy);
     p -= origin;
 
+		// d_clip is high
     float d_clip = sdRoundRect(p, size, radii_x, radii_y) * (inverse? -1.0 : 1.0);
     float alpha = antialias2(-d_clip);
     out_Color = vec4(out_Color.rgb * alpha, out_Color.a * alpha);

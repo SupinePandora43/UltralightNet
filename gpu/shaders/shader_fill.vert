@@ -5,8 +5,8 @@ layout(set=0, binding=0) uniform Uniforms {
 	uniform mat4 Transform;
 	uniform vec4 Scalar4[2];
 	uniform vec4 Vector[8];
-	uniform uint ClipSize;
 	uniform mat4 Clip[8];
+	uniform uint ClipSize;
 };
 
 // Uniform Accessor Functions
