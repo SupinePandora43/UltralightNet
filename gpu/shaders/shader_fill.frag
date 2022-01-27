@@ -1,13 +1,13 @@
-#version 450
+#version 420
 
 // Program Uniforms
-layout(std140, set=0, binding=0) uniform Uniforms {
-	uniform vec4 State;
-	uniform mat4 Transform;
-	uniform vec4 Scalar4[2];
-	uniform vec4 Vector[8];
-	uniform mat4 Clip[8];
-	uniform uint ClipSize;
+layout(set=0, binding=0) uniform Uniforms {
+	vec4 State;
+	mat4 Transform;
+	vec4 Scalar4[2];
+	vec4 Vector[8];
+	mat4 Clip[8];
+	uint ClipSize;
 };
 
 // Uniform Accessor Functions
