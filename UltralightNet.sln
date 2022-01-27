@@ -33,7 +33,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UltralightNet.AppCore", "Ul
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UltralightNet.Resources", "UltralightNet.Resources\UltralightNet.Resources.csproj", "{553CF6D4-7E36-438D-9D1A-A97670C482AF}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UltralightNet.Veldrid", "UltralightNet.Veldrid\UltralightNet.Veldrid.csproj", "{644D1546-4849-45EB-8B45-DAE8333A5654}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UltralightNet.Veldrid", "gpu/libs/UltralightNet.Veldrid/UltralightNet.Veldrid.csproj", "{644D1546-4849-45EB-8B45-DAE8333A5654}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UltralightNet.Veldrid.TestApp", "UltralightNet.Veldrid.TestApp\UltralightNet.Veldrid.TestApp.csproj", "{F6F0F247-9E1D-469C-81D1-4FAAD701933C}"
 EndProject

@@ -10,18 +10,13 @@
 		<SymbolPackageFormat>snupkg</SymbolPackageFormat>
 	</PropertyGroup>
 
-	<ItemGroup>
-	  <None Remove="shaders\spirv_cross\shader_fill.frag.glsl" />
-	  <None Remove="shaders\spirv_cross\shader_fill.vert.glsl" />
-	  <None Remove="shaders\spirv_cross\shader_fill_path.frag.glsl" />
-	  <None Remove="shaders\spirv_cross\shader_fill_path.vert.glsl" />
-	</ItemGroup>
+	<Import Project="../CompileShaders.targets" />
 
 	<ItemGroup>
-	  <EmbeddedResource Include="shaders\spirv_cross\shader_fill.frag.glsl" />
-	  <EmbeddedResource Include="shaders\spirv_cross\shader_fill_path.frag.glsl" />
-	  <EmbeddedResource Include="shaders\spirv_cross\shader_fill_path.vert.glsl" />
-	  <EmbeddedResource Include="shaders\spirv_cross\shader_fill.vert.glsl" />
+	  <EmbeddedResource Include="../../shaders/compiled/spirv/shader_fill.vert.spv" />
+	  <EmbeddedResource Include="../../shaders/compiled/spirv/shader_fill.frag.spv" />
+	  <EmbeddedResource Include="../../shaders/compiled/spirv/shader_fill_path.vert.spv" />
+	  <EmbeddedResource Include="../../shaders/compiled/spirv/shader_fill_path.frag.spv" />
 	</ItemGroup>
 
 	<ItemGroup>
