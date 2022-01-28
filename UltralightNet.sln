@@ -53,7 +53,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UltralightNet.OpenGL", "gpu
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UltralightNet.Vulkan.TestApp", "UltralightNet.Vulkan.TestApp\UltralightNet.Vulkan.TestApp.csproj", "{9EEB642C-B091-4E80-AED1-B24C06F2C820}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UltralightNet.Vulkan", "UltralightNet.Vulkan\UltralightNet.Vulkan.csproj", "{5533F4FD-2126-4506-80EA-20CF5F533DDD}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UltralightNet.Vulkan", "gpu/libsUltralightNet.Vulkan/UltralightNet.Vulkan.csproj", "{5533F4FD-2126-4506-80EA-20CF5F533DDD}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

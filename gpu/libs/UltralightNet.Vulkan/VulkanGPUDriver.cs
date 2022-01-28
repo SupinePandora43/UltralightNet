@@ -46,6 +46,8 @@ public unsafe partial class VulkanGPUDriver
 	private Queue graphicsQueue;
 	private Queue transferQueue;
 
+	private DeviceMemory uniformBufferMemory;
+
 	// TODO: is it useful at all currently?
 	private const uint mipLevels = 1;
 	private const SampleCountFlags msaaSamples = SampleCountFlags.SampleCount4Bit;
@@ -305,5 +307,10 @@ public unsafe partial class VulkanGPUDriver
 		geometriesFreeIds.Enqueue(id);
 
 		geometries[(int)id] = null;
+	}
+
+	[SkipLocalsInit]
+	private void UpdateUniformBuffer(){
+
 	}
 }
