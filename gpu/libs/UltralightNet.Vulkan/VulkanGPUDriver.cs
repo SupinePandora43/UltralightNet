@@ -13,14 +13,20 @@ using Silk.NET.Vulkan.Extensions.KHR;
 using UltralightNet;
 using Buffer = Silk.NET.Vulkan.Buffer;
 
+// https://github.com/SaschaWillems/Vulkan/blob/master/examples/offscreen/offscreen.cpp for reference
+
 internal class RenderBufferEntry
 {
+	public Framebuffer framebuffer;
+	public RenderPass renderPass;
 
+	public TextureEntry textureEntry;
 }
 
 internal class TextureEntry
 {
-
+	public ImageView imageView;
+	public DeviceMemory imageMemory;
 }
 
 internal class GeometryEntry
@@ -46,7 +52,10 @@ public unsafe partial class VulkanGPUDriver
 	private Queue graphicsQueue;
 	private Queue transferQueue;
 
-	private DeviceMemory uniformBufferMemory;
+	private readonly DeviceMemory uniformBufferMemory;
+	private readonly Image pipelineImage;
+	private readonly ImageView pipelineImageView;
+	private readonly Framebuffer pipelineFramebuffer;
 
 	// TODO: is it useful at all currently?
 	private const uint mipLevels = 1;
