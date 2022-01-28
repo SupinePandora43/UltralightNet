@@ -57,8 +57,7 @@ public unsafe partial class VulkanGPUDriver
 	private readonly ImageView pipelineImageView;
 	private readonly Framebuffer pipelineFramebuffer;
 
-	// TODO: is it useful at all currently?
-	private const uint mipLevels = 1;
+	// TODO: implement MSAA
 	private const SampleCountFlags msaaSamples = SampleCountFlags.SampleCount4Bit;
 
 	private readonly List<TextureEntry> textures = new();
