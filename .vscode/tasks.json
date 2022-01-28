@@ -35,7 +35,7 @@
 			"type": "process",
 			"args": [
 				"build",
-				"${workspaceFolder}/UltralightNet.Veldrid.TestApp/UltralightNet.Veldrid.TestApp.csproj",
+				"${workspaceFolder}/Examples/gpu/UltralightNet.Veldrid.TestApp/UltralightNet.Veldrid.TestApp.csproj",
 				"/property:GenerateFullPaths=true",
 				"/consoleloggerparameters:NoSummary"
 			],

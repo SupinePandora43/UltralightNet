@@ -9,6 +9,7 @@ using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using Silk.NET.OpenGL;
 using UltralightNet;
+using UltralightNet.GPUCommon;
 
 public unsafe partial class OpenGLGPUDriver
 {

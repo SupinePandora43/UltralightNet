@@ -20,12 +20,12 @@
 		<DirectPInvoke Include="Ultralight" />
 		<NativeLibrary Include="Ultralight.lib" />
 	</ItemGroup-->
-	
+
 	<ItemGroup>
-		<ProjectReference Include="..\UltralightNet.Veldrid.SDL2\UltralightNet.Veldrid.SDL2.csproj" />
-		<ProjectReference Include="..\UltralightNet\UltralightNet.csproj" />
-		<ProjectReference Include="..\UltralightNet.AppCore\UltralightNet.AppCore.csproj" />
-		<ProjectReference Include="..\UltralightNet.Veldrid\UltralightNet.Veldrid.csproj" />
+		<ProjectReference Include="..\..\..\UltralightNet.Veldrid.SDL2\UltralightNet.Veldrid.SDL2.csproj" />
+		<ProjectReference Include="..\..\..\UltralightNet\UltralightNet.csproj" />
+		<ProjectReference Include="..\..\..\UltralightNet.AppCore\UltralightNet.AppCore.csproj" />
+		<ProjectReference Include="..\..\..\gpu/libs/UltralightNet.Veldrid\UltralightNet.Veldrid.csproj" />
 	</ItemGroup>
 
 </Project>

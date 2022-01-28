@@ -1,8 +1,11 @@
 using System.Numerics;
 
-namespace UltralightNet.OpenGL;
+namespace UltralightNet.GPUCommon;
 
-internal ref struct Uniforms
+/// <summary>
+/// Uniform Buffer data
+/// </summary>
+public struct Uniforms
 {
 	public Vector4 State;
 	public Matrix4x4 Transform;

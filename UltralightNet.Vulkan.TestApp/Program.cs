@@ -237,8 +237,8 @@ unsafe class HelloTriangleApplication
 		CreateTextureImageView();
 		CreateTextureSampler();
 		LoadModel();
-		CreateVertexBuffer();
-		CreateIndexBuffer();
+		//CreateVertexBuffer();
+		//CreateIndexBuffer();
 		CreateUniformBuffers();
 		CreateDescriptorPool();
 		CreateDescriptorSets();

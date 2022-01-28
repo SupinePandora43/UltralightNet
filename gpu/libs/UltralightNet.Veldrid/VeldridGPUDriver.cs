@@ -1,13 +1,15 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Numerics;
 using System.Runtime.CompilerServices;
-using UltralightNet.Veldrid.Shaders;
+using UltralightNet.GPUCommon;
 using Veldrid;
+using Veldrid.SPIRV;
 
 namespace UltralightNet.Veldrid
 {
-	public class VeldridGPUDriver
+	public unsafe class VeldridGPUDriver
 	{
 		private readonly GraphicsDevice graphicsDevice;
 		private readonly ResourceLayout textureResourceLayout;
@@ -101,7 +103,8 @@ namespace UltralightNet.Veldrid
 		};
 
 		#region NextId
-		[MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		[SkipLocalsInit]
 		private static uint GetKey<TValue>(Dictionary<uint, TValue> dictionary)
 		{
 			for (uint i = 1; ; i++)
@@ -110,7 +113,7 @@ namespace UltralightNet.Veldrid
 					return i;
 			}
 		}
-		[MethodImpl(MethodImplOptions.AggressiveOptimization)]
+		[SkipLocalsInit]
 		private uint NextTextureId()
 		{
 			uint id = GetKey(TextureEntries);
@@ -120,7 +123,7 @@ namespace UltralightNet.Veldrid
 #endif
 			return id;
 		}
-		[MethodImpl(MethodImplOptions.AggressiveOptimization)]
+		[SkipLocalsInit]
 		private uint NextGeometryId()
 		{
 			uint id = GetKey(GeometryEntries);
@@ -130,7 +133,7 @@ namespace UltralightNet.Veldrid
 #endif
 			return id;
 		}
-		[MethodImpl(MethodImplOptions.AggressiveOptimization)]
+		[SkipLocalsInit]
 		private uint NextRenderBufferId()
 		{
 			uint id = GetKey(RenderBufferEntries);
@@ -145,7 +148,7 @@ namespace UltralightNet.Veldrid
 		/// <summary>
 		/// Thx https://github.com/TechnologicalPizza
 		/// </summary>
-		[MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		private unsafe void Set2DTextureData(ReadOnlySpan<byte> pixels, uint width, uint height, int stride, uint bpp, Texture dst, uint dstX, uint dstY, uint dstZ, uint dstMipLevel, uint dstArrayLayer)
 		{
 			_commandList.Begin();
@@ -185,7 +188,8 @@ namespace UltralightNet.Veldrid
 			_commandList.End();
 			graphicsDevice.SubmitCommands(_commandList);
 		}
-		[MethodImpl(MethodImplOptions.AggressiveOptimization)]
+		[SkipLocalsInit]
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		private void UploadTexture(Texture texture, IntPtr bitmap, uint width, uint height, uint bpp)
 		{
 			IntPtr pixels = Methods.ulBitmapLockPixels(bitmap);
@@ -207,6 +211,7 @@ namespace UltralightNet.Veldrid
 
 			Methods.ulBitmapUnlockPixels(bitmap);
 		}
+		[SkipLocalsInit]
 		private void CreateTexture(uint texture_id, IntPtr bitmapPTR)
 		{
 #if DEBUG
@@ -253,7 +258,7 @@ namespace UltralightNet.Veldrid
 				)
 			);
 		}
-		[MethodImpl(MethodImplOptions.AggressiveOptimization)]
+		[SkipLocalsInit]
 		private void UpdateTexture(uint texture_id, IntPtr bitmapPTR)
 		{
 			TextureEntry entry = TextureEntries[texture_id];
@@ -274,6 +279,7 @@ namespace UltralightNet.Veldrid
 				cl.Dispose();
 			}
 		}
+		[SkipLocalsInit]
 		private void DestroyTexture(uint texture_id)
 		{
 #if DEBUG
@@ -287,6 +293,7 @@ namespace UltralightNet.Veldrid
 		}
 		#endregion Texture
 		#region Geometry
+		[SkipLocalsInit]
 		private unsafe void CreateGeometry(uint geometry_id, ULVertexBuffer vertices, ULIndexBuffer indices)
 		{
 #if DEBUG
@@ -302,6 +309,7 @@ namespace UltralightNet.Veldrid
 			graphicsDevice.UpdateBuffer(entry.vertices, 0, (IntPtr)vertices.data, vertices.size);
 			graphicsDevice.UpdateBuffer(entry.indicies, 0, (IntPtr)indices.data, indices.size);
 		}
+		[SkipLocalsInit]
 		private unsafe void UpdateGeometry(uint geometry_id, ULVertexBuffer vertices, ULIndexBuffer indices)
 		{
 			//Console.WriteLine($"UpdateGeometry({geometry_id})");
@@ -310,6 +318,7 @@ namespace UltralightNet.Veldrid
 			graphicsDevice.UpdateBuffer(entry.vertices, 0, (IntPtr)vertices.data, vertices.size);
 			graphicsDevice.UpdateBuffer(entry.indicies, 0, (IntPtr)indices.data, indices.size);
 		}
+		[SkipLocalsInit]
 		private void DestroyGeometry(uint geometry_id)
 		{
 #if DEBUG
@@ -322,6 +331,7 @@ namespace UltralightNet.Veldrid
 		}
 		#endregion
 		#region RenderBuffer
+		[SkipLocalsInit]
 		private void CreateRenderBuffer(uint render_buffer_id, ULRenderBuffer buffer)
 		{
 #if DEBUG
@@ -341,6 +351,7 @@ namespace UltralightNet.Veldrid
 
 			entry.framebuffer = graphicsDevice.ResourceFactory.CreateFramebuffer(ref fd);
 		}
+		[SkipLocalsInit]
 		private void DestroyRenderBuffer(uint render_buffer_id)
 		{
 #if DEBUG
@@ -353,7 +364,7 @@ namespace UltralightNet.Veldrid
 		}
 		#endregion RenderBuffer
 
-		[MethodImpl(MethodImplOptions.AggressiveOptimization)]
+		[SkipLocalsInit]
 		private void UpdateCommandList(ULCommandList list)
 		{
 			foreach (ULCommand command in list.ToSpan())
@@ -411,42 +422,16 @@ namespace UltralightNet.Veldrid
 					}
 
 					#region Uniforms
-					Uniforms uniforms = new()
-					{
-						State = new Vector4(time, state.viewport_width, state.viewport_height, 1f),
-						Transform = state.transform.ApplyProjection(state.viewport_width, state.viewport_height, IsOpenGL),
-
-						scalar_0 = state.scalar_0,
-						scalar_1 = state.scalar_1,
-						scalar_2 = state.scalar_2,
-						scalar_3 = state.scalar_3,
-						scalar_4 = state.scalar_4,
-						scalar_5 = state.scalar_5,
-						scalar_6 = state.scalar_6,
-						scalar_7 = state.scalar_7,
-
-						vector_0 = state.vector_0,
-						vector_1 = state.vector_1,
-						vector_2 = state.vector_2,
-						vector_3 = state.vector_3,
-						vector_4 = state.vector_4,
-						vector_5 = state.vector_5,
-						vector_6 = state.vector_6,
-						vector_7 = state.vector_7,
-
-						clip_size = state.clip_size,
-
-						clip_0 = state.clip_0,
-						clip_1 = state.clip_1,
-						clip_2 = state.clip_2,
-						clip_3 = state.clip_3,
-						clip_4 = state.clip_4,
-						clip_5 = state.clip_5,
-						clip_6 = state.clip_6,
-						clip_7 = state.clip_7
-					};
+					Uniforms uniforms = default;
+					uniforms.State.X = state.viewport_width;
+					uniforms.State.Y = state.viewport_height;
+					uniforms.Transform = state.transform.ApplyProjection(state.viewport_width, state.viewport_height, true);
+					new ReadOnlySpan<Vector4>(&state.scalar_0, 2).CopyTo(new Span<Vector4>(&uniforms.Scalar4_0.W, 2));
+					new ReadOnlySpan<Vector4>(&state.vector_0.W, 8).CopyTo(new Span<Vector4>(&uniforms.Vector_0.W, 8));
+					new ReadOnlySpan<Matrix4x4>(&state.clip_0.M11, 8).CopyTo(new Span<Matrix4x4>(&uniforms.Clip_0.M11, 8));
+					uniforms.ClipSize = (uint)state.clip_size;
+					#endregion Uniforms
 					CommandList.UpdateBuffer(uniformBuffer, 0, ref uniforms);
-					#endregion
 
 
 					//commandList.SetFramebuffer(renderBufferEntry.framebuffer);
@@ -473,7 +458,8 @@ namespace UltralightNet.Veldrid
 
 		/// <remarks>will throw exception when view doesn't have RenderTarget</remarks>
 		/// <exception cref="KeyNotFoundException">When called on view without RenderTarget</exception>
-		[MethodImpl(MethodImplOptions.AggressiveInlining | MethodImplOptions.AggressiveOptimization)]
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		[SkipLocalsInit]
 		public ResourceSet GetRenderTarget(View view) => TextureEntries[view.RenderTarget.texture_id].resourceSet;
 
 		public class TextureEntry
@@ -524,8 +510,24 @@ namespace UltralightNet.Veldrid
 
 		private void InitShaders()
 		{
-			ultralightShaders = SpirvCross.ul(graphicsDevice);
-			ultralightPathShaders = SpirvCross.ulPath(graphicsDevice);
+			var a = typeof(VeldridGPUDriver).Assembly;
+			var fillVert = a.GetManifestResourceStream("UltralightNet.Veldrid.shader_fill.vert.spv");
+			byte[] fillVertBytes = new byte[fillVert.Length];
+			fillVert.Read(fillVertBytes, 0, (int)fillVert.Length);
+			var fillFrag = a.GetManifestResourceStream("UltralightNet.Veldrid.shader_fill.frag.spv");
+			byte[] fillFragBytes = new byte[fillFrag.Length];
+			fillFrag.Read(fillFragBytes, 0, (int)fillFrag.Length);
+
+			ultralightShaders = graphicsDevice.ResourceFactory.CreateFromSpirv(new(ShaderStages.Vertex, fillVertBytes, "main"), new ShaderDescription(ShaderStages.Fragment, fillFragBytes, "main"));
+
+			var pathVert = a.GetManifestResourceStream("UltralightNet.Veldrid.shader_fill_path.vert.spv");
+			byte[] pathVertBytes = new byte[pathVert.Length];
+			pathVert.Read(pathVertBytes, 0, (int)pathVert.Length);
+			var pathFrag = a.GetManifestResourceStream("UltralightNet.Veldrid.shader_fill_path.frag.spv");
+			byte[] pathFragBytes = new byte[pathFrag.Length];
+			pathFrag.Read(pathFragBytes, 0, (int)pathFrag.Length);
+
+			ultralightPathShaders = graphicsDevice.ResourceFactory.CreateFromSpirv(new(ShaderStages.Vertex, pathVertBytes, "main"), new ShaderDescription(ShaderStages.Fragment, pathFragBytes, "main"));
 		}
 
 		private VertexElementSemantic HLSL_to_any(VertexElementSemantic hlsl_semantic) => IsDirectX ? hlsl_semantic : VertexElementSemantic.TextureCoordinate;
@@ -638,10 +640,12 @@ namespace UltralightNet.Veldrid
 				}
 			);
 		}
-		private static void EnableScissors(ref GraphicsPipelineDescription pipa){
+		private static void EnableScissors(ref GraphicsPipelineDescription pipa)
+		{
 			pipa.RasterizerState.ScissorTestEnabled = true;
 		}
-		private static void DisableScissors(ref GraphicsPipelineDescription pipa){
+		private static void DisableScissors(ref GraphicsPipelineDescription pipa)
+		{
 			pipa.RasterizerState.ScissorTestEnabled = false;
 		}
 		private static void DisableBlend(ref GraphicsPipelineDescription pipa)
@@ -777,41 +781,6 @@ namespace UltralightNet.Veldrid
 			ulPath_blend = graphicsDevice.ResourceFactory.CreateGraphicsPipeline(ref ultralightPath_pd__SCISSOR_FALSE__ENALBE_BLEND);
 			ulPath_scissor = graphicsDevice.ResourceFactory.CreateGraphicsPipeline(ref ultralightPath_pd__SCISSOR_TRUE__DISABLE_BLEND);
 			ulPath = graphicsDevice.ResourceFactory.CreateGraphicsPipeline(ref ultralightPath_pd__SCISSOR_FALSE__DISABLE_BLEND);
-		}
-
-		private struct Uniforms
-		{
-			public Vector4 State;
-			public Matrix4x4 Transform;
-
-			public float scalar_0;
-			public float scalar_1;
-			public float scalar_2;
-			public float scalar_3;
-			public float scalar_4;
-			public float scalar_5;
-			public float scalar_6;
-			public float scalar_7;
-
-			public Vector4 vector_0;
-			public Vector4 vector_1;
-			public Vector4 vector_2;
-			public Vector4 vector_3;
-			public Vector4 vector_4;
-			public Vector4 vector_5;
-			public Vector4 vector_6;
-			public Vector4 vector_7;
-
-			public uint clip_size;
-
-			public Matrix4x4 clip_0;
-			public Matrix4x4 clip_1;
-			public Matrix4x4 clip_2;
-			public Matrix4x4 clip_3;
-			public Matrix4x4 clip_4;
-			public Matrix4x4 clip_5;
-			public Matrix4x4 clip_6;
-			public Matrix4x4 clip_7;
 		}
 	}
 }

@@ -21,6 +21,7 @@
 
 	<ItemGroup>
 		<ProjectReference Include="../../../UltralightNet/UltralightNet.csproj" />
+		<ProjectReference Include="../UltralightNet.GPUCommon/UltralightNet.GPUCommon.csproj" />
 
 		<PackageReference Include="Silk.NET.OpenGL" Version="2.12.0"/>
 		<PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0" PrivateAssets="All" />
