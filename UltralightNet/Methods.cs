@@ -44,7 +44,11 @@ namespace UltralightNet
 				ReadOnlySpan<string> libsOSX = new[] { "libgstreamer-full-1.0.dylib", "libUltralightCore.dylib", "libWebCore.dylib", "libUltralight.dylib" };
 
 				string absoluteAssemblyLocationDir = Path.GetDirectoryName(typeof(Methods).Assembly.Location);
-				if(string.IsNullOrEmpty(absoluteAssemblyLocationDir))absoluteAssemblyLocationDir = "NonExistantFolder";
+				if (string.IsNullOrEmpty(absoluteAssemblyLocationDir)) absoluteAssemblyLocationDir = Path.GetDirectoryName(
+#if NET6_0_OR_GREATER
+					Environment.ProcessPath ??
+#endif
+					"NonExistantFolder");
 				string absoluteRuntimeNativesDir = Path.Combine(absoluteAssemblyLocationDir, "runtimes", isLinux ? "linux-x64" : "osx-x64", "native");
 
 #if !NETSTANDARD
