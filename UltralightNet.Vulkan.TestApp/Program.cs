@@ -11,6 +11,7 @@ using Silk.NET.Vulkan.Extensions.KHR;
 using Silk.NET.Windowing;
 using Semaphore = Silk.NET.Vulkan.Semaphore;
 using Buffer = Silk.NET.Vulkan.Buffer;
+using System.Numerics;
 //using Silk.NET.Assimp;
 
 var app = new HelloTriangleApplication();
@@ -36,10 +37,7 @@ struct SwapChainSupportDetails
 
 struct Vertex
 {
-	public Vector3D<float> pos;
-	public Vector3D<float> color;
-	public Vector2D<float> textCoord;
-
+	public Vector4 PositionUV;
 	public static VertexInputBindingDescription GetBindingDescription()
 	{
 		VertexInputBindingDescription bindingDescription = new()
@@ -60,22 +58,8 @@ struct Vertex
 			{
 				Binding = 0,
 				Location = 0,
-				Format = Format.R32G32B32Sfloat,
-				Offset = (uint)Marshal.OffsetOf<Vertex>(nameof(pos)),
-			},
-			new VertexInputAttributeDescription()
-			{
-				Binding = 0,
-				Location = 1,
-				Format = Format.R32G32B32Sfloat,
-				Offset = (uint)Marshal.OffsetOf<Vertex>(nameof(color)),
-			},
-			new VertexInputAttributeDescription()
-			{
-				Binding = 0,
-				Location = 2,
-				Format = Format.R32G32Sfloat,
-				Offset = (uint)Marshal.OffsetOf<Vertex>(nameof(textCoord)),
+				Format = Format.R32G32B32A32Sfloat,
+				Offset = 0
 			}
 		};
 
@@ -92,8 +76,8 @@ struct UniformBufferObject
 
 unsafe class HelloTriangleApplication
 {
-	const int WIDTH = 800;
-	const int HEIGHT = 600;
+	const int WIDTH = 512;
+	const int HEIGHT = 512;
 
 	const string MODEL_PATH = @"Assets\viking_room.obj";
 	const string TEXTURE_PATH = @"Assets\viking_room.png";
@@ -1800,7 +1784,7 @@ unsafe class HelloTriangleApplication
 			{
 				new()
 				{
-					Color = new (){ Float32_0 = 0, Float32_1 = 0, Float32_2 = 0, Float32_3 = 1 },
+					Color = new (){ Float32_0 = 0, Float32_1 = 1, Float32_2 = 0, Float32_3 = 1 },
 				},
 				new()
 				{
@@ -1819,7 +1803,7 @@ unsafe class HelloTriangleApplication
 
 			vk!.CmdBindPipeline(commandBuffers[i], PipelineBindPoint.Graphics, graphicsPipeline);
 
-			var vertexBuffers = new Buffer[] { vertexBuffer };
+			/*var vertexBuffers = new Buffer[] { vertexBuffer };
 			var offsets = new ulong[] { 0 };
 
 			fixed (ulong* offsetsPtr = offsets)
@@ -1833,7 +1817,7 @@ unsafe class HelloTriangleApplication
 			vk!.CmdBindDescriptorSets(commandBuffers[i], PipelineBindPoint.Graphics, pipelineLayout, 0, 1, descriptorSets![i], 0, null);
 
 			vk!.CmdDrawIndexed(commandBuffers[i], (uint)indices!.Length, 1, 0, 0, 0);
-
+			*/
 			vk!.CmdEndRenderPass(commandBuffers[i]);
 
 			if (vk!.EndCommandBuffer(commandBuffers[i]) != Result.Success)
