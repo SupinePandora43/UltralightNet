@@ -11,7 +11,7 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<ProjectReference Include="..\UltralightNet\UltralightNet.csproj" />
+		<ProjectReference Include="..\..\..\UltralightNet\UltralightNet.csproj" />
 
 		<PackageReference Include="Silk.NET.Vulkan" Version="2.11.0"/>
 		<PackageReference Include="Silk.NET.Vulkan.Extensions.EXT" Version="2.11.0" />
