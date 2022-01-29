@@ -232,16 +232,26 @@ void main()
 		renderer.Update();
 		renderer.Render();
 
-		var textureEntry = gpuDriver.renderBuffers[view.RenderTarget.render_buffer_id].textureEntry;
-		gl.BlitNamedFramebuffer(textureEntry.multisampledFramebuffer, textureEntry.framebuffer, 0, 0, (int)textureEntry.width, (int)textureEntry.height, 0, 0, (int)textureEntry.width, (int)textureEntry.height, ClearBufferMask.ColorBufferBit, BlitFramebufferFilter.Nearest);
-		//window.ClearContext();
-		gl.Clear((uint)ClearBufferMask.ColorBufferBit);
+		var renderBuffer = gpuDriver.renderBuffers[view.RenderTarget.render_buffer_id];
+		var textureEntry = renderBuffer.textureEntry;
 
-		gl.BindTextureUnit(0, textureEntry.textureId);
+		// redraw only when it has changed
+		if (renderBuffer.dirty)
+		{
+			gl.BlitNamedFramebuffer(textureEntry.multisampledFramebuffer, textureEntry.framebuffer, 0, 0, (int)textureEntry.width, (int)textureEntry.height, 0, 0, (int)textureEntry.width, (int)textureEntry.height, ClearBufferMask.ColorBufferBit, BlitFramebufferFilter.Nearest);
+			//window.ClearContext();
+			gl.Clear((uint)ClearBufferMask.ColorBufferBit);
 
-		gl.BindVertexArray(vao);
-		gl.UseProgram(quadProgram);
-		gl.DrawElements(PrimitiveType.Triangles, (uint)IndexBuffer.Length, DrawElementsType.UnsignedInt, null);
+			gl.BindTextureUnit(0, textureEntry.textureId);
+
+			gl.BindVertexArray(vao);
+			gl.UseProgram(quadProgram);
+			gl.DrawElements(PrimitiveType.Triangles, (uint)IndexBuffer.Length, DrawElementsType.UnsignedInt, null);
+			renderBuffer.dirty = false;
+			window.FramesPerSecond = 0;
+		}else
+			// lower fps
+			window.FramesPerSecond = 300;
 	}
 
 	static void OnUpdate(double obj)

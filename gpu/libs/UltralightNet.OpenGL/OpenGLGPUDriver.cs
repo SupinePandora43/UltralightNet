@@ -629,6 +629,7 @@ public unsafe partial class OpenGLGPUDriver
 				{
 					gl.BindFramebuffer(FramebufferTarget.Framebuffer, framebufferToUse);
 					currentFramebuffer = framebufferToUse;
+					renderBufferEntry.dirty = true;
 					if (rtTextureEntry.multisampledFramebuffer != rtTextureEntry.framebuffer) rtTextureEntry.needsConversion = true;
 				}
 				if (command.command_type is ULCommandType.DrawGeometry)
@@ -749,5 +750,6 @@ public unsafe partial class OpenGLGPUDriver
 	public class RenderBufferEntry
 	{
 		public TextureEntry textureEntry;
+		public bool dirty;
 	}
 }
