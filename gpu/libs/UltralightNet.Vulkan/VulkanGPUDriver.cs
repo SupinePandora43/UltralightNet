@@ -1,12 +1,12 @@
 namespace UltralightNet.Vulkan;
 
 using System;
+using System.Collections.Generic;
 using System.IO;
-using System.Text;
 using System.Numerics;
 using System.Reflection;
-using System.Collections.Generic;
 using System.Runtime.CompilerServices;
+using System.Text;
 using Silk.NET.Vulkan;
 using Silk.NET.Vulkan.Extensions.EXT;
 using Silk.NET.Vulkan.Extensions.KHR;
@@ -27,6 +27,7 @@ internal class TextureEntry
 {
 	public ImageView imageView;
 	public DeviceMemory imageMemory;
+	public DescriptorSet descriptorSet;
 }
 
 internal class GeometryEntry
@@ -56,7 +57,8 @@ public unsafe partial class VulkanGPUDriver
 	private readonly Image pipelineImage;
 	private readonly ImageView pipelineImageView;
 	private readonly Framebuffer pipelineFramebuffer;
-
+	private readonly DescriptorSetLayout textureSetLayout;
+	private readonly DescriptorPool descriptorPool;
 	// TODO: implement MSAA
 	private const SampleCountFlags msaaSamples = SampleCountFlags.SampleCount4Bit;
 
@@ -73,6 +75,62 @@ public unsafe partial class VulkanGPUDriver
 		this.device = device;
 
 		geometries.Add(new()); // id => 1 workaround
+
+		#region TextureSetLayout
+		DescriptorSetLayoutBinding samplerLayoutBinding = new()
+		{
+			Binding = 0,
+			DescriptorCount = 1,
+			DescriptorType = DescriptorType.CombinedImageSampler,
+			PImmutableSamplers = null,
+			StageFlags = ShaderStageFlags.ShaderStageFragmentBit,
+		};
+
+		fixed (DescriptorSetLayout* textureSetLayoutPtr = &textureSetLayout)
+		{
+			DescriptorSetLayoutCreateInfo layoutInfo = new()
+			{
+				SType = StructureType.DescriptorSetLayoutCreateInfo,
+				BindingCount = 1,
+				PBindings = &samplerLayoutBinding,
+			};
+
+			if (vk.CreateDescriptorSetLayout(device, layoutInfo, null, textureSetLayoutPtr) != Result.Success)
+			{
+				throw new Exception("failed to create descriptor set layout!");
+			}
+		}
+		#endregion TextureSetLayout
+
+		#region DescriptorPool
+		var poolSizes = new DescriptorPoolSize[]
+		{
+			new DescriptorPoolSize()
+			{
+				Type = DescriptorType.CombinedImageSampler,
+				DescriptorCount = 1,
+			}
+		};
+
+		fixed (DescriptorPoolSize* poolSizesPtr = poolSizes)
+		fixed (DescriptorPool* descriptorPoolPtr = &descriptorPool)
+		{
+
+			DescriptorPoolCreateInfo poolInfo = new()
+			{
+				SType = StructureType.DescriptorPoolCreateInfo,
+				PoolSizeCount = (uint)poolSizes.Length,
+				PPoolSizes = poolSizesPtr,
+				MaxSets = 2,
+			};
+
+			if (vk!.CreateDescriptorPool(device, poolInfo, null, descriptorPoolPtr) != Result.Success)
+			{
+				throw new Exception("failed to create descriptor pool!");
+			}
+
+		}
+		#endregion DescriptorPool
 
 		_gpuDriver = new()
 		{
@@ -119,6 +177,8 @@ public unsafe partial class VulkanGPUDriver
 
 	private void CreateTexture(uint id, ULBitmap bitmap)
 	{
+		TextureEntry textureEntry = textures[(int)id];
+
 		uint width = bitmap.Width;
 		uint height = bitmap.Height;
 
@@ -135,7 +195,7 @@ public unsafe partial class VulkanGPUDriver
 				Height = height,
 				Depth = 1,
 			},
-			MipLevels = mipLevels,
+			MipLevels = 1,
 			ArrayLayers = 1,
 			Format = isBgra ? Format.B8G8R8A8Srgb : Format.R8Srgb,
 			Tiling = ImageTiling.Optimal,
@@ -216,6 +276,25 @@ public unsafe partial class VulkanGPUDriver
 			vk.DestroyBuffer(device, stagingBuffer, null);
 			vk.FreeMemory(device, stagingBufferMemory, null);
 		}
+
+		DescriptorSet textureSet;
+
+		fixed (DescriptorSetLayout* textureSetLayoutPtr = &textureSetLayout)
+		{
+			DescriptorSetAllocateInfo allocateInfo = new()
+			{
+				SType = StructureType.DescriptorSetAllocateInfo,
+				DescriptorPool = descriptorPool,
+				DescriptorSetCount = 1,
+				PSetLayouts = textureSetLayoutPtr
+			};
+			if (vk.AllocateDescriptorSets(device, allocateInfo, &textureSet) != Result.Success)
+			{
+				throw new Exception("failed to allocate descriptor sets!");
+			}
+		}
+
+		textureEntry.descriptorSet = textureSet;
 	}
 
 	private void UpdateTexture(uint id, ULBitmap bitmap)
@@ -318,7 +397,8 @@ public unsafe partial class VulkanGPUDriver
 	}
 
 	[SkipLocalsInit]
-	private void UpdateUniformBuffer(){
+	private void UpdateUniformBuffer()
+	{
 
 	}
 }

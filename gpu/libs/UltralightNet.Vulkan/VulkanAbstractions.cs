@@ -155,7 +155,7 @@ public unsafe partial class VulkanGPUDriver
 			{
 				AspectMask = ImageAspectFlags.ImageAspectColorBit,
 				BaseMipLevel = 0,
-				LevelCount = mipLevels,
+				LevelCount = 1,
 				BaseArrayLayer = 0,
 				LayerCount = 1,
 			}
