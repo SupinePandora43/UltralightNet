@@ -1,6 +1,10 @@
 ﻿using System.Drawing;
+using System.Numerics;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
+using UltralightNet;
+using UltralightNet.AppCore;
+using UltralightNet.Vulkan;
 using Silk.NET.Core;
 using Silk.NET.Core.Native;
 using Silk.NET.Input;
@@ -9,9 +13,8 @@ using Silk.NET.Vulkan;
 using Silk.NET.Vulkan.Extensions.EXT;
 using Silk.NET.Vulkan.Extensions.KHR;
 using Silk.NET.Windowing;
-using Semaphore = Silk.NET.Vulkan.Semaphore;
 using Buffer = Silk.NET.Vulkan.Buffer;
-using System.Numerics;
+using Semaphore = Silk.NET.Vulkan.Semaphore;
 //using Silk.NET.Assimp;
 
 var app = new HelloTriangleApplication();
@@ -163,10 +166,14 @@ unsafe class HelloTriangleApplication
 
 	private bool frameBufferResized = false;
 
+	private Renderer renderer;
+	private View view;
+
 	public void Run()
 	{
 		InitWindow();
 		InitVulkan();
+		InitUltralight();
 		MainLoop();
 		CleanUp();
 	}
@@ -224,6 +231,22 @@ unsafe class HelloTriangleApplication
 		CreateDescriptorSets();
 		CreateCommandBuffers();
 		CreateSyncObjects();
+	}
+
+	private void InitUltralight(){
+		AppCoreMethods.ulEnablePlatformFontLoader();
+		AppCoreMethods.ulEnablePlatformFileSystem("./");
+		AppCoreMethods.ulEnableDefaultLogger("./log123as.txt");
+		VulkanGPUDriver dr = new(vk!, physicalDevice!, device!);
+		dr.commandPool = commandPool;
+		dr.graphicsQueue = graphicsQueue;
+		ULPlatform.GPUDriver = dr.GPUDriver;
+		renderer = ULPlatform.CreateRenderer(new ULConfig(){ForceRepaint = true});
+		view = renderer.CreateView((uint)window!.Size.X, (uint)window!.Size.Y, new(){IsAccelerated = true, IsTransparent = false});
+		view.HTML = "<html><body><p>123</p></body></html>";
+
+		renderer.Update();
+		renderer.Render();
 	}
 
 	private void MainLoop()
@@ -772,12 +795,12 @@ unsafe class HelloTriangleApplication
 		byte* vertBytesPtr = (byte*)Marshal.AllocHGlobal((int)vertStream!.Length);
 		vertStream.Read(new Span<byte>(vertBytesPtr, (int)vertStream.Length));
 		var vertShaderModule = CreateShaderModule(vertBytesPtr, (nuint)vertStream.Length);
-		Marshal.FreeHGlobal((IntPtr) vertBytesPtr);
+		Marshal.FreeHGlobal((IntPtr)vertBytesPtr);
 
 		byte* fragBytesPtr = (byte*)Marshal.AllocHGlobal((int)fragStream!.Length);
 		fragStream.Read(new Span<byte>(fragBytesPtr, (int)fragStream.Length));
 		var fragShaderModule = CreateShaderModule(fragBytesPtr, (nuint)fragStream.Length);
-		Marshal.FreeHGlobal((IntPtr) fragBytesPtr);
+		Marshal.FreeHGlobal((IntPtr)fragBytesPtr);
 
 		PipelineShaderStageCreateInfo vertShaderStageInfo = new()
 		{
@@ -1456,13 +1479,25 @@ unsafe class HelloTriangleApplication
 
 	private void CreateVertexBuffer()
 	{
-		Span<float> VertexBuffer = stackalloc float[]{
-			-1f, 1f, 0f, 1f,
-			1f, 1f, 1f, 1f,
-			1f,-1f, 1f, 0f,
-			-1f,-1f, 0f, 0f
+		Span<float> VertexBuffer = stackalloc float[] {
+			-1f,
+			1f,
+			0f,
+			1f,
+			1f,
+			1f,
+			1f,
+			1f,
+			1f,
+			-1f,
+			1f,
+			0f,
+			-1f,
+			-1f,
+			0f,
+			0f
 		};
-		ulong bufferSize = (ulong)sizeof(float)* 16;
+		ulong bufferSize = (ulong)sizeof(float) * 16;
 
 		Buffer stagingBuffer = default;
 		DeviceMemory stagingBufferMemory = default;
@@ -1483,11 +1518,15 @@ unsafe class HelloTriangleApplication
 
 	private void CreateIndexBuffer()
 	{
-		Span<uint> IndexBuffer = stackalloc uint[]{
-			0,1,2,
-			2,3,0
+		Span<uint> IndexBuffer = stackalloc uint[] {
+			0,
+			1,
+			2,
+			2,
+			3,
+			0
 		};
-		ulong bufferSize = (ulong)sizeof(uint)* 6;
+		ulong bufferSize = (ulong)sizeof(uint) * 6;
 
 		Buffer stagingBuffer = default;
 		DeviceMemory stagingBufferMemory = default;

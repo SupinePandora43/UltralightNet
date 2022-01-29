@@ -46,11 +46,11 @@ internal class GeometryEntry
 public unsafe partial class VulkanGPUDriver
 {
 	private readonly Vk vk;
-	private readonly PhysicalDevice physicalDevice;
+	private readonly PhysicalDevice physicalDevice; // TODO
 	private readonly Device device;
-	private readonly CommandPool commandPool;
+	public CommandPool commandPool; // TODO
 
-	private Queue graphicsQueue;
+	public Queue graphicsQueue; // TODO
 	private Queue transferQueue;
 
 	private readonly DeviceMemory uniformBufferMemory;
@@ -69,12 +69,15 @@ public unsafe partial class VulkanGPUDriver
 	private readonly List<RenderBufferEntry> renderBuffers = new();
 	private readonly Queue<uint> renderBuffersFreeIds = new();
 
-	public VulkanGPUDriver(Vk vk, Device device)
+	public VulkanGPUDriver(Vk vk, PhysicalDevice physicalDevice, Device device)
 	{
 		this.vk = vk;
+		this.physicalDevice = physicalDevice;
 		this.device = device;
 
 		geometries.Add(new()); // id => 1 workaround
+		textures.Add(new()); // id => 1 workaround
+		renderBuffers.Add(new()); // id => 1 workaround
 
 		#region TextureSetLayout
 		DescriptorSetLayoutBinding samplerLayoutBinding = new()
@@ -103,24 +106,19 @@ public unsafe partial class VulkanGPUDriver
 		#endregion TextureSetLayout
 
 		#region DescriptorPool
-		var poolSizes = new DescriptorPoolSize[]
+		var poolSize = new DescriptorPoolSize()
 		{
-			new DescriptorPoolSize()
-			{
-				Type = DescriptorType.CombinedImageSampler,
-				DescriptorCount = 1,
-			}
+			Type = DescriptorType.CombinedImageSampler,
+			DescriptorCount = 1,
 		};
 
-		fixed (DescriptorPoolSize* poolSizesPtr = poolSizes)
 		fixed (DescriptorPool* descriptorPoolPtr = &descriptorPool)
 		{
-
 			DescriptorPoolCreateInfo poolInfo = new()
 			{
 				SType = StructureType.DescriptorPoolCreateInfo,
-				PoolSizeCount = (uint)poolSizes.Length,
-				PPoolSizes = poolSizesPtr,
+				PoolSizeCount = 1,
+				PPoolSizes = &poolSize,
 				MaxSets = 2,
 			};
 
@@ -138,7 +136,8 @@ public unsafe partial class VulkanGPUDriver
 			CreateTexture = CreateTexture,
 			UpdateTexture = UpdateTexture,
 			DestroyTexture = DestroyTexture,
-			NextRenderBufferId = NextRenderBufferId
+			NextRenderBufferId = NextRenderBufferId,
+			CreateRenderBuffer = CreateRenderBuffer
 		};
 	}
 
@@ -175,6 +174,14 @@ public unsafe partial class VulkanGPUDriver
 	}
 	#endregion ID
 
+	private void CreateRenderBuffer(uint id, ULRenderBuffer renderBuffer)
+	{
+		RenderBufferEntry renderBufferEntry = renderBuffers[(int)id];
+
+
+	}
+
+	[SkipLocalsInit]
 	private void CreateTexture(uint id, ULBitmap bitmap)
 	{
 		TextureEntry textureEntry = textures[(int)id];
@@ -276,6 +283,7 @@ public unsafe partial class VulkanGPUDriver
 			vk.DestroyBuffer(device, stagingBuffer, null);
 			vk.FreeMemory(device, stagingBufferMemory, null);
 		}
+		return;
 
 		DescriptorSet textureSet;
 
