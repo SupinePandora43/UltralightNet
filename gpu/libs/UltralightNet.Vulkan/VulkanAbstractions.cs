@@ -189,4 +189,28 @@ public unsafe partial class VulkanGPUDriver
 
 		EndSingleTimeCommands(commandBuffer);
 	}
+	private ImageView CreateImageView(Image image, Format format)
+	{
+		ImageViewCreateInfo createInfo = new()
+		{
+			SType = StructureType.ImageViewCreateInfo,
+			Image = image,
+			ViewType = ImageViewType.ImageViewType2D,
+			Format = format,
+			SubresourceRange =
+			{
+				AspectMask = ImageAspectFlags.ImageAspectColorBit,
+				BaseMipLevel = 0,
+				LevelCount = 1,
+				BaseArrayLayer = 0,
+				LayerCount = 1,
+			}
+		};
+		ImageView imageView;
+		if (vk.CreateImageView(device, createInfo, null, &imageView) != Result.Success)
+		{
+			throw error;
+		}
+		return imageView;
+	}
 }

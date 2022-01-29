@@ -25,8 +25,11 @@ internal class RenderBufferEntry
 
 internal class TextureEntry
 {
+	public Image image;
 	public ImageView imageView;
 	public DeviceMemory imageMemory;
+
+	public DescriptorPool descriptorPool;
 	public DescriptorSet descriptorSet;
 }
 
@@ -58,7 +61,7 @@ public unsafe partial class VulkanGPUDriver
 	private readonly ImageView pipelineImageView;
 	private readonly Framebuffer pipelineFramebuffer;
 	private readonly DescriptorSetLayout textureSetLayout;
-	private readonly DescriptorPool descriptorPool;
+	private readonly Sampler textureSampler;
 	// TODO: implement MSAA
 	private const SampleCountFlags msaaSamples = SampleCountFlags.SampleCount4Bit;
 
@@ -104,32 +107,35 @@ public unsafe partial class VulkanGPUDriver
 			}
 		}
 		#endregion TextureSetLayout
-
-		#region DescriptorPool
-		var poolSize = new DescriptorPoolSize()
+		#region TextureSampler
+		SamplerCreateInfo samplerInfo = new()
 		{
-			Type = DescriptorType.CombinedImageSampler,
-			DescriptorCount = 1,
+			SType = StructureType.SamplerCreateInfo,
+			MagFilter = Filter.Linear,
+			MinFilter = Filter.Linear,
+			AddressModeU = SamplerAddressMode.Repeat,
+			AddressModeV = SamplerAddressMode.Repeat,
+			AddressModeW = SamplerAddressMode.Repeat,
+			AnisotropyEnable = false,
+			MaxAnisotropy = 1,
+			BorderColor = BorderColor.IntOpaqueBlack,
+			UnnormalizedCoordinates = false,
+			CompareEnable = false,
+			CompareOp = CompareOp.Always,
+			MipmapMode = SamplerMipmapMode.Linear,
+			MinLod = 0,
+			MaxLod = 1,
+			MipLodBias = 0,
 		};
 
-		fixed (DescriptorPool* descriptorPoolPtr = &descriptorPool)
+		fixed (Sampler* textureSamplerPtr = &textureSampler)
 		{
-			DescriptorPoolCreateInfo poolInfo = new()
+			if (vk.CreateSampler(device, samplerInfo, null, textureSamplerPtr) != Result.Success)
 			{
-				SType = StructureType.DescriptorPoolCreateInfo,
-				PoolSizeCount = 1,
-				PPoolSizes = &poolSize,
-				MaxSets = 2,
-			};
-
-			if (vk!.CreateDescriptorPool(device, poolInfo, null, descriptorPoolPtr) != Result.Success)
-			{
-				throw new Exception("failed to create descriptor pool!");
+				throw new Exception("failed to create texture sampler!");
 			}
-
 		}
-		#endregion DescriptorPool
-
+		#endregion
 		_gpuDriver = new()
 		{
 			NextTextureId = NextTextureId,
@@ -217,6 +223,9 @@ public unsafe partial class VulkanGPUDriver
 		{
 			throw new Exception("failed to create image!");
 		}
+		textureEntry.image = image;
+		ImageView imageView = CreateImageView(image, imageInfo.Format);
+		textureEntry.imageView = imageView;
 
 		if (isRt)
 		{
@@ -283,9 +292,31 @@ public unsafe partial class VulkanGPUDriver
 			vk.DestroyBuffer(device, stagingBuffer, null);
 			vk.FreeMemory(device, stagingBufferMemory, null);
 		}
-		return;
 
-		DescriptorSet textureSet;
+		#region DescriptorPool
+		var poolSize = new DescriptorPoolSize()
+		{
+			Type = DescriptorType.CombinedImageSampler,
+			DescriptorCount = 1,
+		};
+		DescriptorPool descriptorPool;
+
+		DescriptorPoolCreateInfo poolInfo = new()
+		{
+			SType = StructureType.DescriptorPoolCreateInfo,
+			PoolSizeCount = 1,
+			PPoolSizes = &poolSize,
+			MaxSets = 2,
+		};
+
+		if (vk!.CreateDescriptorPool(device, poolInfo, null, &descriptorPool) != Result.Success)
+		{
+			throw new Exception("failed to create descriptor pool!");
+		}
+		textureEntry.descriptorPool = descriptorPool;
+		#endregion DescriptorPool
+		#region DescriptorSet
+		DescriptorSet descriptorSet;
 
 		fixed (DescriptorSetLayout* textureSetLayoutPtr = &textureSetLayout)
 		{
@@ -296,13 +327,33 @@ public unsafe partial class VulkanGPUDriver
 				DescriptorSetCount = 1,
 				PSetLayouts = textureSetLayoutPtr
 			};
-			if (vk.AllocateDescriptorSets(device, allocateInfo, &textureSet) != Result.Success)
+			if (vk.AllocateDescriptorSets(device, allocateInfo, &descriptorSet) != Result.Success)
 			{
 				throw new Exception("failed to allocate descriptor sets!");
 			}
 		}
 
-		textureEntry.descriptorSet = textureSet;
+		textureEntry.descriptorSet = descriptorSet;
+		#endregion DescriptorSet
+		#region DescriptorSetUpdate
+		DescriptorImageInfo descriptorImageInfo = new()
+		{
+			ImageLayout = ImageLayout.ShaderReadOnlyOptimal,
+			ImageView = imageView,
+			Sampler = textureSampler,
+		};
+		WriteDescriptorSet descriptorWrite = new()
+		{
+			SType = StructureType.WriteDescriptorSet,
+			DstSet = descriptorSet,
+			DstBinding = 1,
+			DstArrayElement = 0,
+			DescriptorType = DescriptorType.CombinedImageSampler,
+			DescriptorCount = 1,
+			PImageInfo = &descriptorImageInfo
+		};
+		vk.UpdateDescriptorSets(device, 1, &descriptorWrite, 0, null);
+		#endregion DescriptorSetUpdate
 	}
 
 	private void UpdateTexture(uint id, ULBitmap bitmap)
