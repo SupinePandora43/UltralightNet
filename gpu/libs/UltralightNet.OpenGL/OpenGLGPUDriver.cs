@@ -268,7 +268,7 @@ public unsafe partial class OpenGLGPUDriver
 					gl.TextureParameterI(textureId, TextureParameterName.TextureWrapT, (int)GLEnum.ClampToEdge);
 					gl.TextureParameterI(textureId, TextureParameterName.TextureWrapR, (int)GLEnum.Repeat);
 
-					gl.GenerateTextureMipmap(textureId);
+					//gl.GenerateTextureMipmap(textureId);
 				}
 				Check();
 			}
@@ -306,7 +306,7 @@ public unsafe partial class OpenGLGPUDriver
 
 					bitmap.UnlockPixels();
 				}
-				gl.GenerateMipmap(TextureTarget.Texture2D);
+				//gl.GenerateMipmap(TextureTarget.Texture2D);
 			}
 
 			Check();
@@ -340,7 +340,7 @@ public unsafe partial class OpenGLGPUDriver
 
 				bitmap.UnlockPixels();
 
-				gl.GenerateTextureMipmap(textureId);
+				//gl.GenerateTextureMipmap(textureId);
 			}
 			else
 			{
@@ -363,7 +363,7 @@ public unsafe partial class OpenGLGPUDriver
 
 				bitmap.UnlockPixels();
 
-				gl.GenerateMipmap(TextureTarget.Texture2D);
+				//gl.GenerateMipmap(TextureTarget.Texture2D);
 			}
 
 			Check();
