@@ -163,10 +163,6 @@ unsafe class HelloTriangleApplication
 
 	private bool frameBufferResized = false;
 
-	private Vertex[]? vertices;
-
-	private uint[]? indices;
-
 	public void Run()
 	{
 		InitWindow();
@@ -221,8 +217,8 @@ unsafe class HelloTriangleApplication
 		CreateTextureImageView();
 		CreateTextureSampler();
 		LoadModel();
-		//CreateVertexBuffer();
-		//CreateIndexBuffer();
+		CreateVertexBuffer();
+		CreateIndexBuffer();
 		CreateUniformBuffers();
 		CreateDescriptorPool();
 		CreateDescriptorSets();
@@ -1460,7 +1456,13 @@ unsafe class HelloTriangleApplication
 
 	private void CreateVertexBuffer()
 	{
-		ulong bufferSize = (ulong)(Unsafe.SizeOf<Vertex>() * vertices!.Length);
+		Span<float> VertexBuffer = stackalloc float[]{
+			-1f, 1f, 0f, 1f,
+			1f, 1f, 1f, 1f,
+			1f,-1f, 1f, 0f,
+			-1f,-1f, 0f, 0f
+		};
+		ulong bufferSize = (ulong)sizeof(float)* 16;
 
 		Buffer stagingBuffer = default;
 		DeviceMemory stagingBufferMemory = default;
@@ -1468,7 +1470,7 @@ unsafe class HelloTriangleApplication
 
 		void* data;
 		vk!.MapMemory(device, stagingBufferMemory, 0, bufferSize, 0, &data);
-		vertices.AsSpan().CopyTo(new Span<Vertex>(data, vertices.Length));
+		VertexBuffer.CopyTo(new Span<float>(data, 16));
 		vk!.UnmapMemory(device, stagingBufferMemory);
 
 		CreateBuffer(bufferSize, BufferUsageFlags.BufferUsageTransferDstBit | BufferUsageFlags.BufferUsageVertexBufferBit, MemoryPropertyFlags.MemoryPropertyDeviceLocalBit, ref vertexBuffer, ref vertexBufferMemory);
@@ -1481,7 +1483,11 @@ unsafe class HelloTriangleApplication
 
 	private void CreateIndexBuffer()
 	{
-		ulong bufferSize = (ulong)(Unsafe.SizeOf<uint>() * indices!.Length);
+		Span<uint> IndexBuffer = stackalloc uint[]{
+			0,1,2,
+			2,3,0
+		};
+		ulong bufferSize = (ulong)sizeof(uint)* 6;
 
 		Buffer stagingBuffer = default;
 		DeviceMemory stagingBufferMemory = default;
@@ -1489,7 +1495,7 @@ unsafe class HelloTriangleApplication
 
 		void* data;
 		vk!.MapMemory(device, stagingBufferMemory, 0, bufferSize, 0, &data);
-		indices.AsSpan().CopyTo(new Span<uint>(data, indices.Length));
+		IndexBuffer.CopyTo(new Span<uint>(data, 6));
 		vk!.UnmapMemory(device, stagingBufferMemory);
 
 		CreateBuffer(bufferSize, BufferUsageFlags.BufferUsageTransferDstBit | BufferUsageFlags.BufferUsageIndexBufferBit, MemoryPropertyFlags.MemoryPropertyDeviceLocalBit, ref indexBuffer, ref indexBufferMemory);
@@ -1803,7 +1809,7 @@ unsafe class HelloTriangleApplication
 
 			vk!.CmdBindPipeline(commandBuffers[i], PipelineBindPoint.Graphics, graphicsPipeline);
 
-			/*var vertexBuffers = new Buffer[] { vertexBuffer };
+			var vertexBuffers = new Buffer[] { vertexBuffer };
 			var offsets = new ulong[] { 0 };
 
 			fixed (ulong* offsetsPtr = offsets)
@@ -1816,8 +1822,8 @@ unsafe class HelloTriangleApplication
 
 			vk!.CmdBindDescriptorSets(commandBuffers[i], PipelineBindPoint.Graphics, pipelineLayout, 0, 1, descriptorSets![i], 0, null);
 
-			vk!.CmdDrawIndexed(commandBuffers[i], (uint)indices!.Length, 1, 0, 0, 0);
-			*/
+			vk!.CmdDrawIndexed(commandBuffers[i], 6u, 1, 0, 0, 0);
+
 			vk!.CmdEndRenderPass(commandBuffers[i]);
 
 			if (vk!.EndCommandBuffer(commandBuffers[i]) != Result.Success)
