@@ -20,9 +20,9 @@
             "type": "coreclr",
             "request": "launch",
             "preLaunchTask": "buildVulkan",
-            "program": "${workspaceFolder}/UltralightNet.Vulkan.TestApp/bin/Debug/net6.0/UltralightNet.Vulkan.TestApp.dll",
+            "program": "${workspaceFolder}/Examples/gpu/UltralightNet.Vulkan.TestApp/bin/Debug/net6.0/UltralightNet.Vulkan.TestApp.dll",
             "args": [],
-            "cwd": "${workspaceFolder}/UltralightNet.Vulkan.TestApp/bin/Debug/net6.0",
+            "cwd": "${workspaceFolder}/Examples/gpu/UltralightNet.Vulkan.TestApp/bin/Debug/net6.0",
             "console": "internalConsole",
             "stopAtEntry": false
         },

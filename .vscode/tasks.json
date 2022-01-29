@@ -23,7 +23,7 @@
 			"type": "process",
 			"args": [
 				"build",
-				"${workspaceFolder}/UltralightNet.Vulkan.TestApp/UltralightNet.Vulkan.TestApp.csproj",
+				"${workspaceFolder}/Examples/gpu/UltralightNet.Vulkan.TestApp/UltralightNet.Vulkan.TestApp.csproj",
 				"/property:GenerateFullPaths=true",
 				"/consoleloggerparameters:NoSummary"
 			],

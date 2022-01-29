@@ -18,6 +18,10 @@
 		<PackageReference Include="Silk.NET.Vulkan.Extensions.EXT" Version="2.11.0" />
 		<PackageReference Include="Silk.NET.Vulkan.Extensions.KHR" Version="2.11.0" />
 		<!-- <PackageReference Include="SixLabors.ImageSharp" Version="1.0.4" /> -->
+
+		<ProjectReference Include="..\..\..\UltralightNet\UltralightNet.csproj" />
+		<ProjectReference Include="..\..\..\UltralightNet.AppCore\UltralightNet.AppCore.csproj" />
+		<ProjectReference Include="..\..\..\gpu/libs/UltralightNet.Vulkan\UltralightNet.Vulkan.csproj" />
 	</ItemGroup>
 
 	<ItemGroup>
