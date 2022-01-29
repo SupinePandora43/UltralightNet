@@ -213,7 +213,7 @@ public unsafe partial class VulkanGPUDriver
 			Format = isBgra ? Format.B8G8R8A8Srgb : Format.R8Srgb,
 			Tiling = ImageTiling.Optimal,
 			InitialLayout = ImageLayout.Undefined,
-			Usage = isRt ? ImageUsageFlags.ImageUsageTransientAttachmentBit | ImageUsageFlags.ImageUsageColorAttachmentBit : ImageUsageFlags.ImageUsageTransferSrcBit | ImageUsageFlags.ImageUsageTransferDstBit | ImageUsageFlags.ImageUsageSampledBit,
+			Usage = isRt ? ImageUsageFlags.ImageUsageColorAttachmentBit | ImageUsageFlags.ImageUsageSampledBit : ImageUsageFlags.ImageUsageTransferDstBit | ImageUsageFlags.ImageUsageSampledBit,
 			Samples = isRt ? msaaSamples : SampleCountFlags.SampleCount1Bit,
 			SharingMode = SharingMode.Exclusive,
 		};
@@ -224,12 +224,23 @@ public unsafe partial class VulkanGPUDriver
 			throw new Exception("failed to create image!");
 		}
 		textureEntry.image = image;
-		ImageView imageView = CreateImageView(image, imageInfo.Format);
-		textureEntry.imageView = imageView;
 
 		if (isRt)
 		{
-
+			MemoryRequirements memoryRequirements;
+			vk.GetImageMemoryRequirements(device, image, &memoryRequirements);
+			MemoryAllocateInfo allocInfo = new()
+			{
+				SType = StructureType.MemoryAllocateInfo,
+				AllocationSize = memoryRequirements.Size,
+				MemoryTypeIndex = FindMemoryType(memoryRequirements.MemoryTypeBits, MemoryPropertyFlags.MemoryPropertyDeviceLocalBit),
+			};
+			DeviceMemory imageMemory;
+			if (vk.AllocateMemory(device, allocInfo, null, &imageMemory) is not Result.Success)
+			{
+				throw new Exception("failed to allocate image memory!");
+			}
+			vk.BindImageMemory(device, image, imageMemory, 0);
 		}
 		else
 		{
@@ -292,7 +303,8 @@ public unsafe partial class VulkanGPUDriver
 			vk.DestroyBuffer(device, stagingBuffer, null);
 			vk.FreeMemory(device, stagingBufferMemory, null);
 		}
-
+		ImageView imageView = CreateImageView(image, imageInfo.Format);
+		textureEntry.imageView = imageView;
 		#region DescriptorPool
 		var poolSize = new DescriptorPoolSize()
 		{
@@ -346,7 +358,7 @@ public unsafe partial class VulkanGPUDriver
 		{
 			SType = StructureType.WriteDescriptorSet,
 			DstSet = descriptorSet,
-			DstBinding = 1,
+			DstBinding = 0,
 			DstArrayElement = 0,
 			DescriptorType = DescriptorType.CombinedImageSampler,
 			DescriptorCount = 1,
