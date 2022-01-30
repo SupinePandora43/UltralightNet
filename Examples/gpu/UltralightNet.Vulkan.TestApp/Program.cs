@@ -2,9 +2,6 @@
 using System.Numerics;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
-using UltralightNet;
-using UltralightNet.AppCore;
-using UltralightNet.Vulkan;
 using Silk.NET.Core;
 using Silk.NET.Core.Native;
 using Silk.NET.Input;
@@ -13,6 +10,9 @@ using Silk.NET.Vulkan;
 using Silk.NET.Vulkan.Extensions.EXT;
 using Silk.NET.Vulkan.Extensions.KHR;
 using Silk.NET.Windowing;
+using UltralightNet;
+using UltralightNet.AppCore;
+using UltralightNet.Vulkan;
 using Buffer = Silk.NET.Vulkan.Buffer;
 using Semaphore = Silk.NET.Vulkan.Semaphore;
 //using Silk.NET.Assimp;
@@ -185,6 +185,9 @@ unsafe class HelloTriangleApplication
 		{
 			Size = new Vector2D<int>(WIDTH, HEIGHT),
 			Title = "Vulkan",
+			UpdatesPerSecond = 0,
+			FramesPerSecond = 0,
+			VSync = false
 		};
 
 		//Window.PrioritizeSdl();
@@ -233,7 +236,8 @@ unsafe class HelloTriangleApplication
 		CreateSyncObjects();
 	}
 
-	private void InitUltralight(){
+	private void InitUltralight()
+	{
 		AppCoreMethods.ulEnablePlatformFontLoader();
 		AppCoreMethods.ulEnablePlatformFileSystem("./");
 		AppCoreMethods.ulEnableDefaultLogger("./log123as.txt");
@@ -241,8 +245,8 @@ unsafe class HelloTriangleApplication
 		dr.commandPool = commandPool;
 		dr.graphicsQueue = graphicsQueue;
 		ULPlatform.GPUDriver = dr.GPUDriver;
-		renderer = ULPlatform.CreateRenderer(new ULConfig(){ForceRepaint = true});
-		view = renderer.CreateView((uint)window!.Size.X, (uint)window!.Size.Y, new(){IsAccelerated = true, IsTransparent = false});
+		renderer = ULPlatform.CreateRenderer(new ULConfig() { ForceRepaint = true });
+		view = renderer.CreateView((uint)window!.Size.X, (uint)window!.Size.Y, new() { IsAccelerated = true, IsTransparent = false });
 		view.HTML = "<html><body><p>123</p></body></html>";
 
 		renderer.Update();
@@ -1198,12 +1202,12 @@ unsafe class HelloTriangleApplication
 
 		return counts switch
 		{
-			var c when (c & SampleCountFlags.SampleCount64Bit) != 0 => SampleCountFlags.SampleCount64Bit,
+			/*var c when (c & SampleCountFlags.SampleCount64Bit) != 0 => SampleCountFlags.SampleCount64Bit,
 			var c when (c & SampleCountFlags.SampleCount32Bit) != 0 => SampleCountFlags.SampleCount32Bit,
 			var c when (c & SampleCountFlags.SampleCount16Bit) != 0 => SampleCountFlags.SampleCount16Bit,
 			var c when (c & SampleCountFlags.SampleCount8Bit) != 0 => SampleCountFlags.SampleCount8Bit,
 			var c when (c & SampleCountFlags.SampleCount4Bit) != 0 => SampleCountFlags.SampleCount4Bit,
-			var c when (c & SampleCountFlags.SampleCount2Bit) != 0 => SampleCountFlags.SampleCount2Bit,
+			var c when (c & SampleCountFlags.SampleCount2Bit) != 0 => SampleCountFlags.SampleCount2Bit,*/
 			_ => SampleCountFlags.SampleCount1Bit
 		};
 	}
@@ -1849,17 +1853,16 @@ unsafe class HelloTriangleApplication
 			vk!.CmdBindPipeline(commandBuffers[i], PipelineBindPoint.Graphics, graphicsPipeline);
 
 			var vertexBuffers = new Buffer[] { vertexBuffer };
-			var offsets = new ulong[] { 0 };
+			ulong offsets = 0;
 
-			fixed (ulong* offsetsPtr = offsets)
 			fixed (Buffer* vertexBuffersPtr = vertexBuffers)
 			{
-				vk!.CmdBindVertexBuffers(commandBuffers[i], 0, 1, vertexBuffersPtr, offsetsPtr);
+				vk!.CmdBindVertexBuffers(commandBuffers[i], 0, 1, vertexBuffersPtr, &offsets);
 			}
 
 			vk!.CmdBindIndexBuffer(commandBuffers[i], indexBuffer, 0, IndexType.Uint32);
 
-			vk!.CmdBindDescriptorSets(commandBuffers[i], PipelineBindPoint.Graphics, pipelineLayout, 0, 1, descriptorSets![i], 0, null);
+			//vk!.CmdBindDescriptorSets(commandBuffers[i], PipelineBindPoint.Graphics, pipelineLayout, 0, 1, descriptorSets![i], 0, null);
 
 			vk!.CmdDrawIndexed(commandBuffers[i], 6u, 1, 0, 0, 0);
 
@@ -2046,17 +2049,12 @@ unsafe class HelloTriangleApplication
 		return availableFormats[0];
 	}
 
-	private PresentModeKHR ChoosePresentMode(IReadOnlyList<PresentModeKHR> availablePresentModes)
+	private static PresentModeKHR ChoosePresentMode(IReadOnlyList<PresentModeKHR> availablePresentModes)
 	{
-		foreach (var availablePresentMode in availablePresentModes)
-		{
-			if (availablePresentMode == PresentModeKHR.PresentModeMailboxKhr)
-			{
-				return availablePresentMode;
-			}
-		}
-
-		return PresentModeKHR.PresentModeFifoKhr;
+		return availablePresentModes.Contains(PresentModeKHR.PresentModeMailboxKhr) ? PresentModeKHR.PresentModeMailboxKhr
+			: availablePresentModes.Contains(PresentModeKHR.PresentModeImmediateKhr) ? PresentModeKHR.PresentModeImmediateKhr
+			: availablePresentModes.Contains(PresentModeKHR.PresentModeFifoRelaxedKhr) ? PresentModeKHR.PresentModeFifoRelaxedKhr
+			: PresentModeKHR.PresentModeFifoKhr;
 	}
 
 	private Extent2D ChooseSwapExtent(SurfaceCapabilitiesKHR capabilities)
