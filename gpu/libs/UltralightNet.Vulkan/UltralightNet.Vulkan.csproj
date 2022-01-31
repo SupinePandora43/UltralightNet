@@ -11,6 +11,13 @@
 	</PropertyGroup>
 
 	<ItemGroup>
+	  <EmbeddedResource Include="../../shaders/compiled/spirv/shader_fill.vert.spv" />
+	  <EmbeddedResource Include="../../shaders/compiled/spirv/shader_fill.frag.spv" />
+	  <EmbeddedResource Include="../../shaders/compiled/spirv/shader_fill_path.vert.spv" />
+	  <EmbeddedResource Include="../../shaders/compiled/spirv/shader_fill_path.frag.spv" />
+	</ItemGroup>
+
+	<ItemGroup>
 		<ProjectReference Include="..\..\..\UltralightNet\UltralightNet.csproj" />
 
 		<PackageReference Include="Silk.NET.Vulkan" Version="2.11.0"/>
