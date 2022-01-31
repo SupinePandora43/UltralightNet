@@ -7,6 +7,7 @@ using System.Numerics;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Text;
+using Silk.NET.Core.Native;
 using Silk.NET.Vulkan;
 using Silk.NET.Vulkan.Extensions.EXT;
 using Silk.NET.Vulkan.Extensions.KHR;
@@ -18,13 +19,15 @@ using Buffer = Silk.NET.Vulkan.Buffer;
 internal class RenderBufferEntry
 {
 	public Framebuffer framebuffer;
-	public RenderPass renderPass;
 
 	public TextureEntry textureEntry;
 }
 
 internal class TextureEntry
 {
+	public uint width;
+	public uint height;
+
 	public Image image;
 	public ImageView imageView;
 	public DeviceMemory imageMemory;
@@ -60,7 +63,12 @@ public unsafe partial class VulkanGPUDriver
 	private readonly Image pipelineImage;
 	private readonly ImageView pipelineImageView;
 	private readonly Framebuffer pipelineFramebuffer;
+	private readonly RenderPass pipelineRenderPass;
 	private readonly DescriptorSetLayout textureSetLayout;
+	private readonly DescriptorSetLayout uniformSetLayout;
+	private readonly PipelineLayout fillPipelineLayout;
+	private readonly Pipeline fillPipeline;
+	private readonly Pipeline pathPipeline;
 	private readonly Sampler textureSampler;
 	// TODO: implement MSAA
 	private const SampleCountFlags msaaSamples = SampleCountFlags.SampleCount4Bit;
@@ -135,7 +143,292 @@ public unsafe partial class VulkanGPUDriver
 				throw new Exception("failed to create texture sampler!");
 			}
 		}
-		#endregion
+		#endregion TextureSampler
+		#region RenderPass
+		{
+			AttachmentDescription colorAttachment = new()
+			{
+				Format = Format.B8G8R8A8Unorm,
+				Samples = SampleCountFlags.SampleCount1Bit,
+				LoadOp = AttachmentLoadOp.Clear,
+				StoreOp = AttachmentStoreOp.Store,
+				StencilLoadOp = AttachmentLoadOp.DontCare,
+				StencilStoreOp = AttachmentStoreOp.DontCare,
+				InitialLayout = ImageLayout.Undefined,
+				FinalLayout = ImageLayout.ColorAttachmentOptimal,
+			};
+
+			AttachmentReference colorAttachmentRef = new()
+			{
+				Attachment = 0,
+				Layout = ImageLayout.ColorAttachmentOptimal,
+			};
+
+			SubpassDescription subpass = new()
+			{
+				PipelineBindPoint = PipelineBindPoint.Graphics,
+				ColorAttachmentCount = 1,
+				PColorAttachments = &colorAttachmentRef,
+				//PResolveAttachments = &colorAttachmentRef
+			};
+
+			SubpassDependency dependency = new()
+			{
+				SrcSubpass = Vk.SubpassExternal,
+				DstSubpass = 0,
+				SrcStageMask = PipelineStageFlags.PipelineStageColorAttachmentOutputBit | PipelineStageFlags.PipelineStageEarlyFragmentTestsBit,
+				SrcAccessMask = 0,
+				DstStageMask = PipelineStageFlags.PipelineStageColorAttachmentOutputBit | PipelineStageFlags.PipelineStageEarlyFragmentTestsBit,
+				DstAccessMask = AccessFlags.AccessColorAttachmentWriteBit
+			};
+
+			RenderPassCreateInfo renderPassInfo = new()
+			{
+				SType = StructureType.RenderPassCreateInfo,
+				AttachmentCount = 1,
+				PAttachments = &colorAttachment,
+				SubpassCount = 1,
+				PSubpasses = &subpass,
+				//DependencyCount = 1,
+				//PDependencies = &dependency
+			};
+
+			if (vk.CreateRenderPass(device, renderPassInfo, null, out pipelineRenderPass) is not Result.Success)
+			{
+				throw new Exception("failed to create render pass!");
+			}
+		}
+		#endregion RenderPass
+		#region UnfiromSetLayout
+		{
+			DescriptorSetLayoutBinding uniformLayoutBinding = new()
+			{
+				Binding = 0,
+				DescriptorCount = 1,
+				DescriptorType = DescriptorType.UniformBuffer,
+				PImmutableSamplers = null,
+				StageFlags = ShaderStageFlags.ShaderStageVertexBit | ShaderStageFlags.ShaderStageFragmentBit
+			};
+
+			fixed (DescriptorSetLayout* uniformSetLayoutPtr = &uniformSetLayout)
+			{
+				DescriptorSetLayoutCreateInfo layoutInfo = new()
+				{
+					SType = StructureType.DescriptorSetLayoutCreateInfo,
+					BindingCount = 1,
+					PBindings = &uniformLayoutBinding,
+				};
+				if (vk.CreateDescriptorSetLayout(device, layoutInfo, null, uniformSetLayoutPtr) != Result.Success)
+				{
+					throw new Exception("failed to create descriptor set layout!");
+				}
+			}
+		}
+		#endregion UniformSetLayout
+		#region FillPipeline
+		{
+			VertexInputBindingDescription vertexInputBindingDescription = new()
+			{
+				Binding = 0,
+				Stride = 140,
+				InputRate = VertexInputRate.Vertex,
+			};
+			VertexInputAttributeDescription[] vertexInputAttributeDescriptions = new VertexInputAttributeDescription[]{
+				new (){
+					Binding = 0,
+					Location = 0,
+					Format = Format.R32G32Sfloat,
+					Offset = 0
+				}, new(){
+					Binding = 0,
+					Location = 1,
+					Format = Format.R8G8B8A8Unorm,
+					Offset = 8
+				}, new(){
+					Binding = 0,
+					Location = 2,
+					Format = Format.R32G32Sfloat,
+					Offset = 12
+				}, new(){ // in_ObjCoord
+					Binding = 0,
+					Location = 3,
+					Format = Format.R32G32Sfloat,
+					Offset = 20
+				}, new(){ // in_Data0
+					Binding = 0,
+					Location = 4,
+					Format = Format.R32G32B32A32Sfloat,
+					Offset = 28
+				}, new(){ // in_Data1
+					Binding = 0,
+					Location = 5,
+					Format = Format.R32G32B32A32Sfloat,
+					Offset = 44
+				}, new(){ // in_Data2
+					Binding = 0,
+					Location = 6,
+					Format = Format.R32G32B32A32Sfloat,
+					Offset = 60
+				}, new(){ // in_Data3
+					Binding = 0,
+					Location = 7,
+					Format = Format.R32G32B32A32Sfloat,
+					Offset = 76
+				}, new(){ // in_Data4
+					Binding = 0,
+					Location = 8,
+					Format = Format.R32G32B32A32Sfloat,
+					Offset = 92
+				}, new(){ // in_Data5
+					Binding = 0,
+					Location = 9,
+					Format = Format.R32G32B32A32Sfloat,
+					Offset = 108
+				}, new(){ // in_Data6
+					Binding = 0,
+					Location = 10,
+					Format = Format.R32G32B32A32Sfloat,
+					Offset = 124
+				}
+			};
+
+			fixed (VertexInputAttributeDescription* vertexInputAttributeDescriptionsPtr = vertexInputAttributeDescriptions)
+			{
+				var pipelineVertexInputStateCreateInfo = new PipelineVertexInputStateCreateInfo()
+				{
+					SType = StructureType.PipelineVertexInputStateCreateInfo,
+					VertexBindingDescriptionCount = 1,
+					PVertexBindingDescriptions = &vertexInputBindingDescription,
+					PVertexAttributeDescriptions = vertexInputAttributeDescriptionsPtr,
+					VertexAttributeDescriptionCount = (uint)vertexInputAttributeDescriptions.Length
+				};
+
+				var pipelineInputAssemblyStateCreateInfo = new PipelineInputAssemblyStateCreateInfo()
+				{
+					SType = StructureType.PipelineInputAssemblyStateCreateInfo,
+					Topology = PrimitiveTopology.TriangleList,
+					PrimitiveRestartEnable = false
+				};
+
+				var viewport = new Viewport()
+				{
+					X = 0,
+					Y = 0,
+					Width = 512,
+					Height = 512,
+					MinDepth = 0,
+					MaxDepth = 1,
+				};
+
+				var scissor = new Rect2D()
+				{
+					Offset = { X = 0, Y = 0 },
+					Extent = new(512, 512),
+				};
+				var pipelineViewportStateCreateInfo = new PipelineViewportStateCreateInfo()
+				{
+					SType = StructureType.PipelineViewportStateCreateInfo,
+					ViewportCount = 1,
+					PViewports = &viewport,
+					ScissorCount = 1,
+					PScissors = &scissor,
+				};
+				PipelineRasterizationStateCreateInfo rasterizer = new()
+				{
+					SType = StructureType.PipelineRasterizationStateCreateInfo,
+					DepthClampEnable = false,
+					RasterizerDiscardEnable = false,
+					PolygonMode = PolygonMode.Fill,
+					LineWidth = 1,
+					CullMode = CullModeFlags.CullModeNone, // TODO
+					FrontFace = FrontFace.CounterClockwise, // TODO
+					DepthBiasEnable = false,
+				};
+
+				PipelineMultisampleStateCreateInfo multisampling = new()
+				{
+					SType = StructureType.PipelineMultisampleStateCreateInfo,
+					SampleShadingEnable = false,
+					RasterizationSamples = SampleCountFlags.SampleCount1Bit,
+				};
+
+				PipelineDepthStencilStateCreateInfo depthStencil = new()
+				{
+					SType = StructureType.PipelineDepthStencilStateCreateInfo,
+					DepthTestEnable = true,
+					DepthWriteEnable = true,
+					DepthCompareOp = CompareOp.Less,
+					DepthBoundsTestEnable = false,
+					StencilTestEnable = false,
+				};
+
+				PipelineColorBlendAttachmentState colorBlendAttachment = new()
+				{
+					ColorWriteMask = ColorComponentFlags.ColorComponentRBit | ColorComponentFlags.ColorComponentGBit | ColorComponentFlags.ColorComponentBBit | ColorComponentFlags.ColorComponentABit,
+					BlendEnable = false,
+				};
+
+				PipelineColorBlendStateCreateInfo colorBlending = new()
+				{
+					SType = StructureType.PipelineColorBlendStateCreateInfo,
+					LogicOpEnable = false,
+					LogicOp = LogicOp.Copy,
+					AttachmentCount = 1,
+					PAttachments = &colorBlendAttachment,
+				};
+
+				colorBlending.BlendConstants[0] = 0;
+				colorBlending.BlendConstants[1] = 0;
+				colorBlending.BlendConstants[2] = 0;
+				colorBlending.BlendConstants[3] = 0;
+				DescriptorSetLayout* sets = stackalloc DescriptorSetLayout[] { uniformSetLayout, textureSetLayout, textureSetLayout };
+				PipelineLayoutCreateInfo pipelineLayoutInfo = new()
+				{
+					SType = StructureType.PipelineLayoutCreateInfo,
+					PushConstantRangeCount = 0,
+					SetLayoutCount = 3,
+					PSetLayouts = sets
+				};
+
+				if (vk.CreatePipelineLayout(device, pipelineLayoutInfo, null, out fillPipelineLayout) is not Result.Success)
+				{
+					throw new Exception("failed to create pipeline layout!");
+				}
+
+				_shader_main = (byte*)SilkMarshal.StringToPtr("main");
+
+				var shaderStages = stackalloc[] {
+					LoadShader("UltralightNet.Vulkan.shader_fill.vert.spv", ShaderStageFlags.ShaderStageVertexBit),
+					LoadShader("UltralightNet.Vulkan.shader_fill.frag.spv", ShaderStageFlags.ShaderStageFragmentBit)
+				};
+
+				GraphicsPipelineCreateInfo pipelineInfo = new()
+				{
+					SType = StructureType.GraphicsPipelineCreateInfo,
+					StageCount = 2,
+					PStages = shaderStages,
+					PVertexInputState = &pipelineVertexInputStateCreateInfo,
+					PInputAssemblyState = &pipelineInputAssemblyStateCreateInfo,
+					PViewportState = &pipelineViewportStateCreateInfo,
+					PRasterizationState = &rasterizer,
+					PMultisampleState = &multisampling,
+					PDepthStencilState = &depthStencil,
+					PColorBlendState = &colorBlending,
+					Layout = fillPipelineLayout,
+					RenderPass = pipelineRenderPass,
+					Subpass = 0,
+					BasePipelineHandle = default
+				};
+
+				if (vk.CreateGraphicsPipelines(device, default, 1, pipelineInfo, null, out fillPipeline) is not Result.Success)
+				{
+					throw new Exception("failed to create graphics pipeline!");
+				}
+
+				SilkMarshal.Free((nint)_shader_main);
+			}
+		}
+		#endregion FillPipeline
 		_gpuDriver = new()
 		{
 			NextTextureId = NextTextureId,
@@ -143,7 +436,13 @@ public unsafe partial class VulkanGPUDriver
 			UpdateTexture = UpdateTexture,
 			DestroyTexture = DestroyTexture,
 			NextRenderBufferId = NextRenderBufferId,
-			CreateRenderBuffer = CreateRenderBuffer
+			CreateRenderBuffer = CreateRenderBuffer,
+			DestroyRenderBuffer = DestroyRenderBuffer,
+			NextGeometryId = NextGeometryId,
+			CreateGeometry = CreateGeometry,
+			UpdateGeometry = UpdateGeometry,
+			DestroyGeometry = DestroyGeometry,
+			UpdateCommandList = UpdateCommandList
 		};
 	}
 
@@ -180,11 +479,37 @@ public unsafe partial class VulkanGPUDriver
 	}
 	#endregion ID
 
+	[SkipLocalsInit]
 	private void CreateRenderBuffer(uint id, ULRenderBuffer renderBuffer)
 	{
 		RenderBufferEntry renderBufferEntry = renderBuffers[(int)id];
+		TextureEntry textureEntry = textures[(int)renderBuffer.texture_id];
+		renderBufferEntry.textureEntry = textureEntry;
 
-
+		fixed (ImageView* attachmentsPtr = &textureEntry.imageView)
+		{
+			FramebufferCreateInfo framebufferInfo = new()
+			{
+				SType = StructureType.FramebufferCreateInfo,
+				RenderPass = pipelineRenderPass,
+				AttachmentCount = 1,
+				PAttachments = attachmentsPtr,
+				Width = textureEntry.width,
+				Height = textureEntry.height,
+				Layers = 1,
+			};
+			if (vk.CreateFramebuffer(device, framebufferInfo, null, out renderBufferEntry.framebuffer) is not Result.Success)
+			{
+				throw new Exception("failed to create framebuffer!");
+			}
+		}
+	}
+	[SkipLocalsInit]
+	private void DestroyRenderBuffer(uint id)
+	{
+		RenderBufferEntry renderBufferEntry = renderBuffers[(int)id];
+		vk.DestroyFramebuffer(device, renderBufferEntry.framebuffer, null);
+		renderBuffersFreeIds.Enqueue(id);
 	}
 
 	[SkipLocalsInit]
@@ -192,8 +517,8 @@ public unsafe partial class VulkanGPUDriver
 	{
 		TextureEntry textureEntry = textures[(int)id];
 
-		uint width = bitmap.Width;
-		uint height = bitmap.Height;
+		uint width = textureEntry.width = bitmap.Width;
+		uint height = textureEntry.height = bitmap.Height;
 
 		bool isBgra = bitmap.Format is ULBitmapFormat.BGRA8_UNORM_SRGB;
 		bool isRt = bitmap.IsEmpty;
@@ -210,11 +535,11 @@ public unsafe partial class VulkanGPUDriver
 			},
 			MipLevels = 1,
 			ArrayLayers = 1,
-			Format = isBgra ? Format.B8G8R8A8Srgb : Format.R8Srgb,
+			Format = isBgra ? Format.B8G8R8A8Unorm : Format.R8Unorm,
 			Tiling = ImageTiling.Optimal,
 			InitialLayout = ImageLayout.Undefined,
 			Usage = isRt ? ImageUsageFlags.ImageUsageColorAttachmentBit | ImageUsageFlags.ImageUsageSampledBit : ImageUsageFlags.ImageUsageTransferDstBit | ImageUsageFlags.ImageUsageSampledBit,
-			Samples = isRt ? msaaSamples : SampleCountFlags.SampleCount1Bit,
+			Samples = isRt ? SampleCountFlags.SampleCount1Bit : SampleCountFlags.SampleCount1Bit,
 			SharingMode = SharingMode.Exclusive,
 		};
 
@@ -225,22 +550,29 @@ public unsafe partial class VulkanGPUDriver
 		}
 		textureEntry.image = image;
 
+		#region Allocate DeviceMemory
+		MemoryRequirements memoryRequirements;
+		vk.GetImageMemoryRequirements(device, image, &memoryRequirements);
+
+		MemoryAllocateInfo allocInfo = new()
+		{
+			SType = StructureType.MemoryAllocateInfo,
+			AllocationSize = memoryRequirements.Size,
+			MemoryTypeIndex = FindMemoryType(memoryRequirements.MemoryTypeBits, MemoryPropertyFlags.MemoryPropertyDeviceLocalBit),
+		};
+
+		DeviceMemory imageMemory;
+		if (vk.AllocateMemory(device, allocInfo, null, &imageMemory) is not Result.Success)
+		{
+			throw new Exception("failed to allocate image memory!");
+		}
+
+		vk.BindImageMemory(device, image, imageMemory, 0);
+		#endregion Allocate DeviceMemory
+
 		if (isRt)
 		{
-			MemoryRequirements memoryRequirements;
-			vk.GetImageMemoryRequirements(device, image, &memoryRequirements);
-			MemoryAllocateInfo allocInfo = new()
-			{
-				SType = StructureType.MemoryAllocateInfo,
-				AllocationSize = memoryRequirements.Size,
-				MemoryTypeIndex = FindMemoryType(memoryRequirements.MemoryTypeBits, MemoryPropertyFlags.MemoryPropertyDeviceLocalBit),
-			};
-			DeviceMemory imageMemory;
-			if (vk.AllocateMemory(device, allocInfo, null, &imageMemory) is not Result.Success)
-			{
-				throw new Exception("failed to allocate image memory!");
-			}
-			vk.BindImageMemory(device, image, imageMemory, 0);
+
 		}
 		else
 		{
@@ -256,24 +588,6 @@ public unsafe partial class VulkanGPUDriver
 			new ReadOnlySpan<byte>((void*)bitmap.LockPixels(), (int)bitmapSize).CopyTo(new Span<byte>(mappedStagingBufferMemory, (int)bitmapSize));
 			bitmap.UnlockPixels();
 			vk.UnmapMemory(device, stagingBufferMemory);
-
-			MemoryRequirements memoryRequirements;
-			vk.GetImageMemoryRequirements(device, image, &memoryRequirements);
-
-			MemoryAllocateInfo allocInfo = new()
-			{
-				SType = StructureType.MemoryAllocateInfo,
-				AllocationSize = memoryRequirements.Size,
-				MemoryTypeIndex = FindMemoryType(memoryRequirements.MemoryTypeBits, MemoryPropertyFlags.MemoryPropertyDeviceLocalBit),
-			};
-
-			DeviceMemory imageMemory;
-			if (vk.AllocateMemory(device, allocInfo, null, &imageMemory) is not Result.Success)
-			{
-				throw new Exception("failed to allocate image memory!");
-			}
-
-			vk.BindImageMemory(device, image, imageMemory, 0);
 
 			TransitionImageLayout(image, ImageLayout.Undefined, ImageLayout.TransferDstOptimal);
 
@@ -321,7 +635,7 @@ public unsafe partial class VulkanGPUDriver
 			MaxSets = 2,
 		};
 
-		if (vk!.CreateDescriptorPool(device, poolInfo, null, &descriptorPool) != Result.Success)
+		if (vk.CreateDescriptorPool(device, poolInfo, null, &descriptorPool) is not Result.Success)
 		{
 			throw new Exception("failed to create descriptor pool!");
 		}
@@ -377,6 +691,7 @@ public unsafe partial class VulkanGPUDriver
 		// TODO
 	}
 
+	[SkipLocalsInit]
 	private void CreateGeometry(uint id, ULVertexBuffer vb, ULIndexBuffer ib)
 	{
 		Buffer vertexStagingBuffer;
@@ -409,7 +724,6 @@ public unsafe partial class VulkanGPUDriver
 		vk.UnmapMemory(device, indexStagingMemory);
 
 		CommandBuffer stageCopy = BeginSingleTimeCommands();
-
 		CopyBuffer(stageCopy, vertexStagingBuffer, vertexBuffer, vb.size);
 		CopyBuffer(stageCopy, indexStagingBuffer, indexBuffer, ib.size);
 		EndSingleTimeCommands(stageCopy);
@@ -426,6 +740,7 @@ public unsafe partial class VulkanGPUDriver
 			indexMemory = indexMemory
 		};
 	}
+	[SkipLocalsInit]
 	private void UpdateGeometry(uint id, ULVertexBuffer vb, ULIndexBuffer ib)
 	{
 		GeometryEntry geometryEntry = geometries[(int)id];
@@ -448,6 +763,7 @@ public unsafe partial class VulkanGPUDriver
 		CopyBuffer(stageCopy, geometryEntry.indexStagingBuffer, geometryEntry.indexBuffer, ib.size);
 		EndSingleTimeCommands(stageCopy);
 	}
+	[SkipLocalsInit]
 	private void DestroyGeometry(uint id)
 	{
 		GeometryEntry geometryEntry = geometries[(int)id];
@@ -463,13 +779,59 @@ public unsafe partial class VulkanGPUDriver
 		vk.FreeMemory(device, geometryEntry.indexMemory, null);
 
 		geometriesFreeIds.Enqueue(id);
-
-		geometries[(int)id] = null;
 	}
 
+	#region Rendering
 	[SkipLocalsInit]
 	private void UpdateUniformBuffer()
 	{
 
 	}
+	//[SkipLocalsInit]
+	private void UpdateCommandList(ULCommandList list)
+	{
+		CommandBuffer commandBuffer = BeginSingleTimeCommands(); // TODO LMAO
+		var s = list.ToSpan();
+		foreach (var command in s)
+		{
+			ULGPUState state = command.gpu_state;
+			RenderBufferEntry renderBufferEntry = renderBuffers[(int)command.gpu_state.render_buffer_id];
+
+			RenderPassBeginInfo renderPassBeginInfo = new()
+			{
+				SType = StructureType.RenderPassBeginInfo,
+				RenderPass = pipelineRenderPass,
+				Framebuffer = renderBufferEntry.framebuffer,
+				RenderArea =
+				{
+					Offset = { X = 0, Y = 0 },
+					Extent = new(state.viewport_width, state.viewport_height),
+				}
+			};
+			//if (command.command_type is ULCommandType.ClearRenderBuffer)
+			{
+				ClearValue clearValue = new() { Color = new() { Float32_3 = 1 } };
+				renderPassBeginInfo.PClearValues = &clearValue; // TODO: check if it's valid after } end
+				renderPassBeginInfo.ClearValueCount = 1;
+			}
+			vk.CmdBeginRenderPass(commandBuffer, &renderPassBeginInfo, SubpassContents.Inline);
+			if (command.command_type is ULCommandType.DrawGeometry)
+			{
+				if (state.shader_type is ULShaderType.Fill) vk!.CmdBindPipeline(commandBuffer, PipelineBindPoint.Graphics, fillPipeline);
+				else goto asd;
+
+				vk.CmdBindPipeline(commandBuffer, PipelineBindPoint.Graphics, fillPipeline);
+
+				GeometryEntry geometryEntry = geometries[(int)command.geometry_id];
+
+				vk.CmdBindVertexBuffers(commandBuffer, 0, 1, geometryEntry.vertexBuffer, 0);
+				vk.CmdBindIndexBuffer(commandBuffer, geometryEntry.indexBuffer, 0, IndexType.Uint32);
+				vk.CmdDrawIndexed(commandBuffer, command.indices_count, 1, command.indices_offset, 0, 0);
+			}
+		asd:
+			vk.CmdEndRenderPass(commandBuffer);
+		}
+		EndSingleTimeCommands(commandBuffer);
+	}
+	#endregion Rendering
 }

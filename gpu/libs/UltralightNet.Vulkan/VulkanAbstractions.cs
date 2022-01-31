@@ -213,4 +213,19 @@ public unsafe partial class VulkanGPUDriver
 		}
 		return imageView;
 	}
+	private ShaderModule CreateShaderModule(byte* code, nuint len)
+	{
+		ShaderModuleCreateInfo createInfo = new()
+		{
+			SType = StructureType.ShaderModuleCreateInfo,
+			CodeSize = len,
+		};
+		createInfo.PCode = (uint*)code;
+		ShaderModule shaderModule;
+		if (vk.CreateShaderModule(device, createInfo, null, &shaderModule) is not Result.Success)
+		{
+			throw error;
+		}
+		return shaderModule;
+	}
 }
