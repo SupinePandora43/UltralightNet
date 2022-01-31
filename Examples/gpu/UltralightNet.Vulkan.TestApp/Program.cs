@@ -110,7 +110,7 @@ unsafe class HelloTriangleApplication
 	private SurfaceKHR surface;
 
 	private PhysicalDevice physicalDevice;
-	private SampleCountFlags msaaSamples = SampleCountFlags.SampleCount1Bit;
+	private SampleCountFlags msaaSamples = SampleCountFlags.SampleCount4Bit;
 	private Device device;
 
 	private Queue graphicsQueue;
@@ -248,6 +248,9 @@ unsafe class HelloTriangleApplication
 		renderer = ULPlatform.CreateRenderer(new ULConfig() { ForceRepaint = true });
 		view = renderer.CreateView((uint)window!.Size.X, (uint)window!.Size.Y, new() { IsAccelerated = true, IsTransparent = false });
 		view.HTML = "<html><body><p>123</p></body></html>";
+
+		renderer.Update();
+		renderer.Render();
 
 		renderer.Update();
 		renderer.Render();
@@ -1208,6 +1211,7 @@ unsafe class HelloTriangleApplication
 			var c when (c & SampleCountFlags.SampleCount8Bit) != 0 => SampleCountFlags.SampleCount8Bit,
 			var c when (c & SampleCountFlags.SampleCount4Bit) != 0 => SampleCountFlags.SampleCount4Bit,
 			var c when (c & SampleCountFlags.SampleCount2Bit) != 0 => SampleCountFlags.SampleCount2Bit,*/
+			var c when (c & SampleCountFlags.SampleCount4Bit) is not 0 => SampleCountFlags.SampleCount4Bit,
 			_ => SampleCountFlags.SampleCount1Bit
 		};
 	}
@@ -2228,7 +2232,9 @@ unsafe class HelloTriangleApplication
 
 	private uint DebugCallback(DebugUtilsMessageSeverityFlagsEXT messageSeverity, DebugUtilsMessageTypeFlagsEXT messageTypes, DebugUtilsMessengerCallbackDataEXT* pCallbackData, void* pUserData)
 	{
-		System.Diagnostics.Debug.WriteLine($"validation layer:" + Marshal.PtrToStringAnsi((nint)pCallbackData->PMessage));
+		var message = Marshal.PtrToStringAnsi((nint)pCallbackData->PMessage);
+		if(message!.StartsWith("Validation Error:")) throw new Exception(message);
+		System.Diagnostics.Debug.WriteLine($"validation layer:" + message);
 
 		return Vk.False;
 	}
