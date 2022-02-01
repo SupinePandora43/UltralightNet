@@ -127,8 +127,8 @@ public unsafe partial class VulkanGPUDriver
 			SType = StructureType.SamplerCreateInfo,
 			MagFilter = Filter.Linear,
 			MinFilter = Filter.Linear,
-			AddressModeU = SamplerAddressMode.Repeat,
-			AddressModeV = SamplerAddressMode.Repeat,
+			AddressModeU = SamplerAddressMode.ClampToEdge,
+			AddressModeV = SamplerAddressMode.ClampToEdge,
 			AddressModeW = SamplerAddressMode.Repeat,
 			AnisotropyEnable = false,
 			MaxAnisotropy = 1,
@@ -371,7 +371,13 @@ public unsafe partial class VulkanGPUDriver
 				PipelineColorBlendAttachmentState colorBlendAttachment = new()
 				{
 					ColorWriteMask = ColorComponentFlags.ColorComponentRBit | ColorComponentFlags.ColorComponentGBit | ColorComponentFlags.ColorComponentBBit | ColorComponentFlags.ColorComponentABit,
-					BlendEnable = false,
+					BlendEnable = true,
+					ColorBlendOp = BlendOp.Add,
+					AlphaBlendOp = BlendOp.Add,
+					SrcAlphaBlendFactor = BlendFactor.One,
+					DstAlphaBlendFactor = BlendFactor.OneMinusSrcAlpha,
+					SrcColorBlendFactor = BlendFactor.One,
+					DstColorBlendFactor = BlendFactor.OneMinusSrcAlpha
 				};
 
 				PipelineColorBlendStateCreateInfo colorBlending = new()
@@ -855,7 +861,7 @@ public unsafe partial class VulkanGPUDriver
 	}
 
 	#region Rendering
-	[SkipLocalsInit]
+	//[SkipLocalsInit]
 	[MethodImpl(MethodImplOptions.AggressiveInlining)]
 	private void UpdateUniformBuffer(ULGPUState state)
 	{
@@ -863,8 +869,10 @@ public unsafe partial class VulkanGPUDriver
 		Uniforms* uniformBufferMappedMemory;
 		vk.MapMemory(device, uniformBufferMemory, 0, UniformBufferSize, 0, (void**)&uniformBufferMappedMemory);
 		uniformBufferMappedMemory->State.X = state.viewport_width;
+		uniformBufferMappedMemory->State.Z = state.viewport_width; // TODO WTF
+		uniformBufferMappedMemory->State.W = state.viewport_width;
 		uniformBufferMappedMemory->State.Y = state.viewport_height;
-		uniformBufferMappedMemory->Transform = state.transform.ApplyProjection(state.viewport_width, state.viewport_height, false); // TODO managed transformation
+		uniformBufferMappedMemory->Transform = state.transform.ApplyProjection(state.viewport_width, state.viewport_height, true); // TODO managed transformation
 		uniformBufferMappedMemory->ClipSize = state.clip_size;
 		new ReadOnlySpan<Vector4>((Vector4*)&state.scalar_0, 10).CopyTo(new Span<Vector4>(&uniformBufferMappedMemory->Scalar4_0, 10));
 		new ReadOnlySpan<Matrix4x4>(&state.clip_0, 8).CopyTo(new Span<Matrix4x4>(&uniformBufferMappedMemory->Clip_0, 8));
