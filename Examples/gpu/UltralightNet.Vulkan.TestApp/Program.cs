@@ -1,5 +1,4 @@
-﻿using System.Drawing;
-using System.Numerics;
+﻿using System.Numerics;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using Silk.NET.Core;
@@ -2232,8 +2231,12 @@ unsafe class HelloTriangleApplication
 
 	private uint DebugCallback(DebugUtilsMessageSeverityFlagsEXT messageSeverity, DebugUtilsMessageTypeFlagsEXT messageTypes, DebugUtilsMessengerCallbackDataEXT* pCallbackData, void* pUserData)
 	{
+		static void N(){};
 		var message = Marshal.PtrToStringAnsi((nint)pCallbackData->PMessage);
-		if(message!.StartsWith("Validation Error:")) throw new Exception(message);
+		if(message!.StartsWith("Validation Warning:"))
+			N();
+		if(message!.StartsWith("Validation Error:"))
+			throw new Exception(message);
 		System.Diagnostics.Debug.WriteLine($"validation layer:" + message);
 
 		return Vk.False;

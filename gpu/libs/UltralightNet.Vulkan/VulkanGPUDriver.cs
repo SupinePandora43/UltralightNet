@@ -12,6 +12,7 @@ using Silk.NET.Vulkan;
 using Silk.NET.Vulkan.Extensions.EXT;
 using Silk.NET.Vulkan.Extensions.KHR;
 using UltralightNet;
+using UltralightNet.GPUCommon;
 using Buffer = Silk.NET.Vulkan.Buffer;
 
 // https://github.com/SaschaWillems/Vulkan/blob/master/examples/offscreen/offscreen.cpp for reference
@@ -51,6 +52,8 @@ internal class GeometryEntry
 
 public unsafe partial class VulkanGPUDriver
 {
+	private const ulong UniformBufferSize = 768;
+
 	private readonly Vk vk;
 	private readonly PhysicalDevice physicalDevice; // TODO
 	private readonly Device device;
@@ -59,16 +62,19 @@ public unsafe partial class VulkanGPUDriver
 	public Queue graphicsQueue; // TODO
 	private Queue transferQueue;
 
-	private readonly DeviceMemory uniformBufferMemory;
 	private readonly Image pipelineImage;
 	private readonly ImageView pipelineImageView;
 	private readonly Framebuffer pipelineFramebuffer;
 	private readonly RenderPass pipelineRenderPass;
 	private readonly DescriptorSetLayout textureSetLayout;
-	private readonly DescriptorSetLayout uniformSetLayout;
+	//private readonly DescriptorSetLayout uniformSetLayout;
 	private readonly PipelineLayout fillPipelineLayout;
 	private readonly Pipeline fillPipeline;
 	private readonly Pipeline pathPipeline;
+	private readonly DescriptorPool uniformDescriptorPool;
+	private readonly DescriptorSet uniformSet;
+	private readonly DeviceMemory uniformBufferMemory;
+	private readonly Buffer uniformBuffer;
 	private readonly Sampler textureSampler;
 	// TODO: implement MSAA
 	private const SampleCountFlags msaaSamples = SampleCountFlags.SampleCount4Bit;
@@ -150,11 +156,11 @@ public unsafe partial class VulkanGPUDriver
 			{
 				Format = Format.B8G8R8A8Unorm,
 				Samples = SampleCountFlags.SampleCount1Bit,
-				LoadOp = AttachmentLoadOp.Clear,
+				LoadOp = AttachmentLoadOp.Load,
 				StoreOp = AttachmentStoreOp.Store,
 				StencilLoadOp = AttachmentLoadOp.DontCare,
 				StencilStoreOp = AttachmentStoreOp.DontCare,
-				InitialLayout = ImageLayout.Undefined,
+				InitialLayout = ImageLayout.ColorAttachmentOptimal,
 				FinalLayout = ImageLayout.ColorAttachmentOptimal,
 			};
 
@@ -175,9 +181,9 @@ public unsafe partial class VulkanGPUDriver
 			SubpassDependency dependency = new()
 			{
 				SrcSubpass = Vk.SubpassExternal,
-				DstSubpass = 0,
+				DstSubpass = Vk.SubpassExternal,
 				SrcStageMask = PipelineStageFlags.PipelineStageColorAttachmentOutputBit | PipelineStageFlags.PipelineStageEarlyFragmentTestsBit,
-				SrcAccessMask = 0,
+				SrcAccessMask = AccessFlags.AccessColorAttachmentReadBit,
 				DstStageMask = PipelineStageFlags.PipelineStageColorAttachmentOutputBit | PipelineStageFlags.PipelineStageEarlyFragmentTestsBit,
 				DstAccessMask = AccessFlags.AccessColorAttachmentWriteBit
 			};
@@ -199,6 +205,7 @@ public unsafe partial class VulkanGPUDriver
 			}
 		}
 		#endregion RenderPass
+		DescriptorSetLayout uniformSetLayout;
 		#region UnfiromSetLayout
 		{
 			DescriptorSetLayoutBinding uniformLayoutBinding = new()
@@ -210,19 +217,18 @@ public unsafe partial class VulkanGPUDriver
 				StageFlags = ShaderStageFlags.ShaderStageVertexBit | ShaderStageFlags.ShaderStageFragmentBit
 			};
 
-			fixed (DescriptorSetLayout* uniformSetLayoutPtr = &uniformSetLayout)
+
+			DescriptorSetLayoutCreateInfo layoutInfo = new()
 			{
-				DescriptorSetLayoutCreateInfo layoutInfo = new()
-				{
-					SType = StructureType.DescriptorSetLayoutCreateInfo,
-					BindingCount = 1,
-					PBindings = &uniformLayoutBinding,
-				};
-				if (vk.CreateDescriptorSetLayout(device, layoutInfo, null, uniformSetLayoutPtr) != Result.Success)
-				{
-					throw new Exception("failed to create descriptor set layout!");
-				}
+				SType = StructureType.DescriptorSetLayoutCreateInfo,
+				BindingCount = 1,
+				PBindings = &uniformLayoutBinding,
+			};
+			if (vk.CreateDescriptorSetLayout(device, layoutInfo, null, &uniformSetLayout) != Result.Success)
+			{
+				throw new Exception("failed to create descriptor set layout!");
 			}
+			//this.uniformSetLayout = uniformSetLayout;
 		}
 		#endregion UniformSetLayout
 		#region FillPipeline
@@ -401,6 +407,8 @@ public unsafe partial class VulkanGPUDriver
 					LoadShader("UltralightNet.Vulkan.shader_fill.vert.spv", ShaderStageFlags.ShaderStageVertexBit),
 					LoadShader("UltralightNet.Vulkan.shader_fill.frag.spv", ShaderStageFlags.ShaderStageFragmentBit)
 				};
+				var dynamicStateScissor = DynamicState.Scissor;
+				var dynamicState = new PipelineDynamicStateCreateInfo(dynamicStateCount: 1, pDynamicStates: &dynamicStateScissor);
 
 				GraphicsPipelineCreateInfo pipelineInfo = new()
 				{
@@ -417,7 +425,8 @@ public unsafe partial class VulkanGPUDriver
 					Layout = fillPipelineLayout,
 					RenderPass = pipelineRenderPass,
 					Subpass = 0,
-					BasePipelineHandle = default
+					BasePipelineHandle = default,
+					PDynamicState = &dynamicState
 				};
 
 				if (vk.CreateGraphicsPipelines(device, default, 1, pipelineInfo, null, out fillPipeline) is not Result.Success)
@@ -429,6 +438,68 @@ public unsafe partial class VulkanGPUDriver
 			}
 		}
 		#endregion FillPipeline
+		#region UniformSet
+		#region DescriptorPool
+		var poolSize = new DescriptorPoolSize()
+		{
+			Type = DescriptorType.UniformBuffer,
+			DescriptorCount = 1,
+		};
+		DescriptorPool uniformDescriptorPool;
+
+		DescriptorPoolCreateInfo poolInfo = new()
+		{
+			SType = StructureType.DescriptorPoolCreateInfo,
+			PoolSizeCount = 1,
+			PPoolSizes = &poolSize,
+			MaxSets = 1
+		};
+
+		if (vk.CreateDescriptorPool(device, poolInfo, null, &uniformDescriptorPool) is not Result.Success)
+		{
+			throw new Exception("failed to create descriptor pool!");
+		}
+		this.uniformDescriptorPool = uniformDescriptorPool;
+		#endregion DescriptorPool
+		#region DescriptorSet
+		DescriptorSet uniformSet;
+
+		DescriptorSetAllocateInfo allocateInfo = new()
+		{
+			SType = StructureType.DescriptorSetAllocateInfo,
+			DescriptorPool = uniformDescriptorPool,
+			DescriptorSetCount = 1,
+			PSetLayouts = &uniformSetLayout
+		};
+		if (vk.AllocateDescriptorSets(device, allocateInfo, &uniformSet) is not Result.Success)
+		{
+			throw new Exception("failed to allocate descriptor sets!");
+		}
+		this.uniformSet = uniformSet;
+		#endregion DescriptorSet
+		#region Buffer
+		CreateBuffer(UniformBufferSize, BufferUsageFlags.BufferUsageUniformBufferBit, MemoryPropertyFlags.MemoryPropertyHostVisibleBit | MemoryPropertyFlags.MemoryPropertyHostCoherentBit, out uniformBuffer, out uniformBufferMemory);
+		#endregion Buffer
+		#region DescriptorWrite
+		var bufferInfo = new DescriptorBufferInfo()
+		{
+			Buffer = uniformBuffer,
+			Offset = 0,
+			Range = UniformBufferSize
+		};
+		var uniformWriteDescriptorSet = new WriteDescriptorSet()
+		{
+			SType = StructureType.WriteDescriptorSet,
+			DstSet = uniformSet,
+			DstBinding = 0,
+			DstArrayElement = 0,
+			DescriptorType = DescriptorType.UniformBuffer,
+			DescriptorCount = 1,
+			PBufferInfo = &bufferInfo,
+		};
+		vk.UpdateDescriptorSets(device, 1, &uniformWriteDescriptorSet, 0, null);
+		#endregion
+		#endregion UniformSet
 		_gpuDriver = new()
 		{
 			NextTextureId = NextTextureId,
@@ -479,7 +550,7 @@ public unsafe partial class VulkanGPUDriver
 	}
 	#endregion ID
 
-	[SkipLocalsInit]
+	//[SkipLocalsInit]
 	private void CreateRenderBuffer(uint id, ULRenderBuffer renderBuffer)
 	{
 		RenderBufferEntry renderBufferEntry = renderBuffers[(int)id];
@@ -512,7 +583,7 @@ public unsafe partial class VulkanGPUDriver
 		renderBuffersFreeIds.Enqueue(id);
 	}
 
-	[SkipLocalsInit]
+	//[SkipLocalsInit]
 	private void CreateTexture(uint id, ULBitmap bitmap)
 	{
 		TextureEntry textureEntry = textures[(int)id];
@@ -572,7 +643,7 @@ public unsafe partial class VulkanGPUDriver
 
 		if (isRt)
 		{
-
+			TransitionImageLayout(image, ImageLayout.Undefined, ImageLayout.ColorAttachmentOptimal);
 		}
 		else
 		{
@@ -612,6 +683,8 @@ public unsafe partial class VulkanGPUDriver
 			vk.CmdCopyBufferToImage(commandBuffer, stagingBuffer, image, ImageLayout.TransferDstOptimal, 1, &region);
 
 			EndSingleTimeCommands(commandBuffer);
+
+			TransitionImageLayout(image, ImageLayout.TransferDstOptimal, ImageLayout.ShaderReadOnlyOptimal);
 
 			// TODO: reuse staging buffers
 			vk.DestroyBuffer(device, stagingBuffer, null);
@@ -783,9 +856,19 @@ public unsafe partial class VulkanGPUDriver
 
 	#region Rendering
 	[SkipLocalsInit]
-	private void UpdateUniformBuffer()
+	[MethodImpl(MethodImplOptions.AggressiveInlining)]
+	private void UpdateUniformBuffer(ULGPUState state)
 	{
-
+		// TODO: device-wise update, not per command like
+		Uniforms* uniformBufferMappedMemory;
+		vk.MapMemory(device, uniformBufferMemory, 0, UniformBufferSize, 0, (void**)&uniformBufferMappedMemory);
+		uniformBufferMappedMemory->State.X = state.viewport_width;
+		uniformBufferMappedMemory->State.Y = state.viewport_height;
+		uniformBufferMappedMemory->Transform = state.transform.ApplyProjection(state.viewport_width, state.viewport_height, false); // TODO managed transformation
+		uniformBufferMappedMemory->ClipSize = state.clip_size;
+		new ReadOnlySpan<Vector4>((Vector4*)&state.scalar_0, 10).CopyTo(new Span<Vector4>(&uniformBufferMappedMemory->Scalar4_0, 10));
+		new ReadOnlySpan<Matrix4x4>(&state.clip_0, 8).CopyTo(new Span<Matrix4x4>(&uniformBufferMappedMemory->Clip_0, 8));
+		vk.UnmapMemory(device, uniformBufferMemory);
 	}
 	//[SkipLocalsInit]
 	private void UpdateCommandList(ULCommandList list)
@@ -805,7 +888,8 @@ public unsafe partial class VulkanGPUDriver
 				RenderArea =
 				{
 					Offset = { X = 0, Y = 0 },
-					Extent = new(state.viewport_width, state.viewport_height),
+					//Extent = new(state.viewport_width, state.viewport_height),
+					Extent = new(512,512)
 				}
 			};
 			//if (command.command_type is ULCommandType.ClearRenderBuffer)
@@ -822,10 +906,20 @@ public unsafe partial class VulkanGPUDriver
 
 				vk.CmdBindPipeline(commandBuffer, PipelineBindPoint.Graphics, fillPipeline);
 
+				UpdateUniformBuffer(state);
+
+				TextureEntry textureEntry1 = textures[(int)state.texture_1_id];
+				TextureEntry textureEntry2 = textures[(int)state.texture_2_id is 0 ? (int)state.texture_1_id : (int)state.texture_2_id];
+
+				var descriptorSets = stackalloc[] { uniformSet, textureEntry1.descriptorSet, textureEntry2.descriptorSet };
+
+				vk.CmdBindDescriptorSets(commandBuffer, PipelineBindPoint.Graphics, fillPipelineLayout, 0, 3, descriptorSets, 0, 0);
+
 				GeometryEntry geometryEntry = geometries[(int)command.geometry_id];
 
 				vk.CmdBindVertexBuffers(commandBuffer, 0, 1, geometryEntry.vertexBuffer, 0);
 				vk.CmdBindIndexBuffer(commandBuffer, geometryEntry.indexBuffer, 0, IndexType.Uint32);
+				vk.CmdSetScissor(commandBuffer, 0, 1, (Rect2D*)&state.scissor_rect);
 				vk.CmdDrawIndexed(commandBuffer, command.indices_count, 1, command.indices_offset, 0, 0);
 			}
 		asd:
