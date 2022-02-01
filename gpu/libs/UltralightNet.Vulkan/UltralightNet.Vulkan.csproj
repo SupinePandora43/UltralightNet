@@ -10,6 +10,8 @@
 		<SymbolPackageFormat>snupkg</SymbolPackageFormat>
 	</PropertyGroup>
 
+	<Import Project="../CompileShaders.targets" />
+
 	<ItemGroup>
 	  <EmbeddedResource Include="../../shaders/compiled/spirv/shader_fill.vert.spv" />
 	  <EmbeddedResource Include="../../shaders/compiled/spirv/shader_fill.frag.spv" />
