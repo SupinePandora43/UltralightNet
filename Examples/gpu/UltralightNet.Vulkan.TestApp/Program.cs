@@ -246,12 +246,12 @@ unsafe class HelloTriangleApplication
 		ULPlatform.GPUDriver = dr.GPUDriver;
 		renderer = ULPlatform.CreateRenderer(new ULConfig() { ForceRepaint = true });
 		view = renderer.CreateView((uint)window!.Size.X, (uint)window!.Size.Y, new() { IsAccelerated = true, IsTransparent = false });
+		bool loaded = false;
+		view.OnFinishLoading += (frameId, isMain, url) => loaded = true;
 		view.HTML = "<html><body><p>123</p></body></html>";
 
-		renderer.Update();
-		renderer.Render();
+		while (!loaded) renderer.Update();
 
-		renderer.Update();
 		renderer.Render();
 	}
 
@@ -2231,11 +2231,11 @@ unsafe class HelloTriangleApplication
 
 	private uint DebugCallback(DebugUtilsMessageSeverityFlagsEXT messageSeverity, DebugUtilsMessageTypeFlagsEXT messageTypes, DebugUtilsMessengerCallbackDataEXT* pCallbackData, void* pUserData)
 	{
-		static void N(){}; // linux debugger workaround
+		static void N() { }; // linux debugger workaround
 		var message = Marshal.PtrToStringAnsi((nint)pCallbackData->PMessage);
-		if(message!.StartsWith("Validation Warning:"))
+		if (message!.StartsWith("Validation Warning:"))
 			N();
-		if(message!.StartsWith("Validation Error:"))
+		if (message!.StartsWith("Validation Error:"))
 			throw new Exception(message);
 		System.Diagnostics.Debug.WriteLine($"validation layer:" + message);
 
