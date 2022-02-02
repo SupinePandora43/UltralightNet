@@ -2231,7 +2231,7 @@ unsafe class HelloTriangleApplication
 
 	private uint DebugCallback(DebugUtilsMessageSeverityFlagsEXT messageSeverity, DebugUtilsMessageTypeFlagsEXT messageTypes, DebugUtilsMessengerCallbackDataEXT* pCallbackData, void* pUserData)
 	{
-		static void N(){};
+		static void N(){}; // linux debugger workaround
 		var message = Marshal.PtrToStringAnsi((nint)pCallbackData->PMessage);
 		if(message!.StartsWith("Validation Warning:"))
 			N();
