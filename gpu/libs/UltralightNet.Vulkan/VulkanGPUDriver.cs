@@ -17,14 +17,14 @@ using Buffer = Silk.NET.Vulkan.Buffer;
 
 // https://github.com/SaschaWillems/Vulkan/blob/master/examples/offscreen/offscreen.cpp for reference
 
-internal class RenderBufferEntry
+public class RenderBufferEntry
 {
 	public Framebuffer framebuffer;
 
 	public TextureEntry textureEntry;
 }
 
-internal class TextureEntry
+public class TextureEntry
 {
 	public uint width;
 	public uint height;
@@ -526,6 +526,15 @@ public unsafe partial class VulkanGPUDriver
 	private ULGPUDriver _gpuDriver;
 	public ULGPUDriver GPUDriver => _gpuDriver;
 
+	public RenderBufferEntry GetRenderBuffer(uint id)
+	{
+		return renderBuffers[(int)id];
+	}
+	public TextureEntry GetTexture(uint id)
+	{
+		return textures[(int)id];
+	}
+
 	#region ID
 	private uint NextGeometryId()
 	{
@@ -645,6 +654,7 @@ public unsafe partial class VulkanGPUDriver
 		}
 
 		vk.BindImageMemory(device, image, imageMemory, 0);
+		textureEntry.imageMemory = imageMemory;
 		#endregion Allocate DeviceMemory
 
 		if (isRt)
@@ -868,10 +878,7 @@ public unsafe partial class VulkanGPUDriver
 		// TODO: device-wise update, not per command like
 		Uniforms* uniformBufferMappedMemory;
 		vk.MapMemory(device, uniformBufferMemory, 0, UniformBufferSize, 0, (void**)&uniformBufferMappedMemory);
-		uniformBufferMappedMemory->State.X = state.viewport_width;
-		uniformBufferMappedMemory->State.Z = state.viewport_width; // TODO WTF
-		uniformBufferMappedMemory->State.W = state.viewport_width;
-		uniformBufferMappedMemory->State.Y = state.viewport_height;
+		// State is useless
 		uniformBufferMappedMemory->Transform = state.transform.ApplyProjection(state.viewport_width, state.viewport_height, true); // TODO managed transformation
 		uniformBufferMappedMemory->ClipSize = state.clip_size;
 		new ReadOnlySpan<Vector4>((Vector4*)&state.scalar_0, 10).CopyTo(new Span<Vector4>(&uniformBufferMappedMemory->Scalar4_0, 10));
@@ -896,8 +903,7 @@ public unsafe partial class VulkanGPUDriver
 				RenderArea =
 				{
 					Offset = { X = 0, Y = 0 },
-					//Extent = new(state.viewport_width, state.viewport_height),
-					Extent = new(512,512)
+					Extent = new(state.viewport_width, state.viewport_height),
 				}
 			};
 
@@ -922,7 +928,7 @@ public unsafe partial class VulkanGPUDriver
 
 				vk.CmdBindVertexBuffers(commandBuffer, 0, 1, geometryEntry.vertexBuffer, 0);
 				vk.CmdBindIndexBuffer(commandBuffer, geometryEntry.indexBuffer, 0, IndexType.Uint32);
-				vk.CmdSetScissor(commandBuffer, 0, 1, (Rect2D*)&state.scissor_rect);
+				if (state.enable_scissor) vk.CmdSetScissor(commandBuffer, 0, 1, (Rect2D*)&state.scissor_rect);
 				vk.CmdDrawIndexed(commandBuffer, command.indices_count, 1, command.indices_offset, 0, 0);
 			asd:
 				vk.CmdEndRenderPass(commandBuffer);
