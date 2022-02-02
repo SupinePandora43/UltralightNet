@@ -135,7 +135,7 @@ public unsafe partial class VulkanGPUDriver
 			BorderColor = BorderColor.IntOpaqueBlack,
 			UnnormalizedCoordinates = false,
 			CompareEnable = false,
-			CompareOp = CompareOp.Always,
+			CompareOp = CompareOp.Never,
 			MipmapMode = SamplerMipmapMode.Linear,
 			MinLod = 0,
 			MaxLod = 1,
@@ -900,15 +900,10 @@ public unsafe partial class VulkanGPUDriver
 					Extent = new(512,512)
 				}
 			};
-			//if (command.command_type is ULCommandType.ClearRenderBuffer)
+
+			if (command.command_type is ULCommandType.DrawGeometry) // TODO: clearrenderbuffer
 			{
-				ClearValue clearValue = new() { Color = new() { Float32_3 = 1 } };
-				renderPassBeginInfo.PClearValues = &clearValue; // TODO: check if it's valid after } end
-				renderPassBeginInfo.ClearValueCount = 1;
-			}
-			vk.CmdBeginRenderPass(commandBuffer, &renderPassBeginInfo, SubpassContents.Inline);
-			if (command.command_type is ULCommandType.DrawGeometry)
-			{
+				vk.CmdBeginRenderPass(commandBuffer, &renderPassBeginInfo, SubpassContents.Inline);
 				if (state.shader_type is ULShaderType.Fill) vk!.CmdBindPipeline(commandBuffer, PipelineBindPoint.Graphics, fillPipeline);
 				else goto asd;
 
@@ -929,9 +924,9 @@ public unsafe partial class VulkanGPUDriver
 				vk.CmdBindIndexBuffer(commandBuffer, geometryEntry.indexBuffer, 0, IndexType.Uint32);
 				vk.CmdSetScissor(commandBuffer, 0, 1, (Rect2D*)&state.scissor_rect);
 				vk.CmdDrawIndexed(commandBuffer, command.indices_count, 1, command.indices_offset, 0, 0);
+			asd:
+				vk.CmdEndRenderPass(commandBuffer);
 			}
-		asd:
-			vk.CmdEndRenderPass(commandBuffer);
 		}
 		EndSingleTimeCommands(commandBuffer);
 	}
