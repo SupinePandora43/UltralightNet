@@ -180,12 +180,21 @@ public unsafe partial class VulkanGPUDriver
 			sourceStage = PipelineStageFlags.PipelineStageTransferBit;
 			destinationStage = PipelineStageFlags.PipelineStageFragmentShaderBit;
 		}
-		else if(oldLayout is ImageLayout.Undefined && newLayout is ImageLayout.ColorAttachmentOptimal){
+		else if (oldLayout is ImageLayout.Undefined && newLayout is ImageLayout.ColorAttachmentOptimal)
+		{
 			barrier.SrcAccessMask = 0;
 			barrier.DstAccessMask = AccessFlags.AccessColorAttachmentWriteBit;
 
 			sourceStage = PipelineStageFlags.PipelineStageTopOfPipeBit;
 			destinationStage = PipelineStageFlags.PipelineStageColorAttachmentOutputBit;
+		}
+		else if (oldLayout is ImageLayout.Undefined && newLayout is ImageLayout.ShaderReadOnlyOptimal)
+		{
+			barrier.SrcAccessMask = 0;
+			barrier.DstAccessMask = AccessFlags.AccessShaderReadBit;
+
+			sourceStage = PipelineStageFlags.PipelineStageTopOfPipeBit;
+			destinationStage = PipelineStageFlags.PipelineStageFragmentShaderBit;
 		}
 		else
 		{

@@ -160,8 +160,8 @@ public unsafe partial class VulkanGPUDriver
 				StoreOp = AttachmentStoreOp.Store,
 				StencilLoadOp = AttachmentLoadOp.DontCare,
 				StencilStoreOp = AttachmentStoreOp.DontCare,
-				InitialLayout = ImageLayout.ColorAttachmentOptimal,
-				FinalLayout = ImageLayout.ColorAttachmentOptimal,
+				InitialLayout = ImageLayout.ShaderReadOnlyOptimal,
+				FinalLayout = ImageLayout.ShaderReadOnlyOptimal,
 			};
 
 			AttachmentReference colorAttachmentRef = new()
@@ -181,10 +181,10 @@ public unsafe partial class VulkanGPUDriver
 			SubpassDependency dependency = new()
 			{
 				SrcSubpass = Vk.SubpassExternal,
-				DstSubpass = Vk.SubpassExternal,
-				SrcStageMask = PipelineStageFlags.PipelineStageColorAttachmentOutputBit | PipelineStageFlags.PipelineStageEarlyFragmentTestsBit,
-				SrcAccessMask = AccessFlags.AccessColorAttachmentReadBit,
-				DstStageMask = PipelineStageFlags.PipelineStageColorAttachmentOutputBit | PipelineStageFlags.PipelineStageEarlyFragmentTestsBit,
+				DstSubpass = 0,
+				SrcStageMask = PipelineStageFlags.PipelineStageFragmentShaderBit,
+				SrcAccessMask = AccessFlags.AccessShaderReadBit,
+				DstStageMask = PipelineStageFlags.PipelineStageColorAttachmentOutputBit,
 				DstAccessMask = AccessFlags.AccessColorAttachmentWriteBit
 			};
 
@@ -195,8 +195,8 @@ public unsafe partial class VulkanGPUDriver
 				PAttachments = &colorAttachment,
 				SubpassCount = 1,
 				PSubpasses = &subpass,
-				//DependencyCount = 1,
-				//PDependencies = &dependency
+				DependencyCount = 1,
+				PDependencies = &dependency
 			};
 
 			if (vk.CreateRenderPass(device, renderPassInfo, null, out pipelineRenderPass) is not Result.Success)
@@ -659,7 +659,7 @@ public unsafe partial class VulkanGPUDriver
 
 		if (isRt)
 		{
-			TransitionImageLayout(image, ImageLayout.Undefined, ImageLayout.ColorAttachmentOptimal);
+			TransitionImageLayout(image, ImageLayout.Undefined, ImageLayout.ShaderReadOnlyOptimal);
 		}
 		else
 		{
@@ -928,7 +928,7 @@ public unsafe partial class VulkanGPUDriver
 
 				vk.CmdBindVertexBuffers(commandBuffer, 0, 1, geometryEntry.vertexBuffer, 0);
 				vk.CmdBindIndexBuffer(commandBuffer, geometryEntry.indexBuffer, 0, IndexType.Uint32);
-				if (state.enable_scissor) vk.CmdSetScissor(commandBuffer, 0, 1, (Rect2D*)&state.scissor_rect);
+				vk.CmdSetScissor(commandBuffer, 0, 1, state.enable_scissor ? (Rect2D*)&state.scissor_rect : &renderPassBeginInfo.RenderArea);
 				vk.CmdDrawIndexed(commandBuffer, command.indices_count, 1, command.indices_offset, 0, 0);
 			asd:
 				vk.CmdEndRenderPass(commandBuffer);

@@ -165,6 +165,7 @@ unsafe class HelloTriangleApplication
 
 	private bool frameBufferResized = false;
 
+	private VulkanGPUDriver dr;
 	private Renderer renderer;
 	private View view;
 
@@ -172,7 +173,6 @@ unsafe class HelloTriangleApplication
 	{
 		InitWindow();
 		InitVulkan();
-		InitUltralight();
 		MainLoop();
 		CleanUp();
 	}
@@ -231,6 +231,7 @@ unsafe class HelloTriangleApplication
 		CreateUniformBuffers();
 		CreateDescriptorPool();
 		CreateDescriptorSets();
+		InitUltralight();
 		CreateCommandBuffers();
 		CreateSyncObjects();
 	}
@@ -240,7 +241,7 @@ unsafe class HelloTriangleApplication
 		AppCoreMethods.ulEnablePlatformFontLoader();
 		AppCoreMethods.ulEnablePlatformFileSystem("./");
 		AppCoreMethods.ulEnableDefaultLogger("./log123as.txt");
-		VulkanGPUDriver dr = new(vk!, physicalDevice!, device!);
+		dr = new(vk!, physicalDevice!, device!);
 		dr.commandPool = commandPool;
 		dr.graphicsQueue = graphicsQueue;
 		ULPlatform.GPUDriver = dr.GPUDriver;
@@ -833,8 +834,31 @@ unsafe class HelloTriangleApplication
 		var bindingDescription = Vertex.GetBindingDescription();
 		var attributeDescriptions = Vertex.GetAttributeDescriptions();
 
+		DescriptorSetLayoutBinding samplerLayoutBinding = new()
+		{
+			Binding = 0,
+			DescriptorCount = 1,
+			DescriptorType = DescriptorType.CombinedImageSampler,
+			PImmutableSamplers = null,
+			StageFlags = ShaderStageFlags.ShaderStageFragmentBit,
+		};
+
+		DescriptorSetLayout textureSetLayout;
+		{
+			DescriptorSetLayoutCreateInfo layoutInfo = new()
+			{
+				SType = StructureType.DescriptorSetLayoutCreateInfo,
+				BindingCount = 1,
+				PBindings = &samplerLayoutBinding,
+			};
+
+			if (vk!.CreateDescriptorSetLayout(device, layoutInfo, null, &textureSetLayout) != Result.Success)
+			{
+				throw new Exception("failed to create descriptor set layout!");
+			}
+		}
+
 		fixed (VertexInputAttributeDescription* attributeDescriptionsPtr = attributeDescriptions)
-		fixed (DescriptorSetLayout* descriptorSetLayoutPtr = &descriptorSetLayout)
 		{
 
 			PipelineVertexInputStateCreateInfo vertexInputInfo = new()
@@ -932,7 +956,7 @@ unsafe class HelloTriangleApplication
 				SType = StructureType.PipelineLayoutCreateInfo,
 				PushConstantRangeCount = 0,
 				SetLayoutCount = 1,
-				PSetLayouts = descriptorSetLayoutPtr
+				PSetLayouts = &textureSetLayout
 			};
 
 			if (vk!.CreatePipelineLayout(device, pipelineLayoutInfo, null, out pipelineLayout) != Result.Success)
@@ -1864,6 +1888,8 @@ unsafe class HelloTriangleApplication
 			}
 
 			vk!.CmdBindIndexBuffer(commandBuffers[i], indexBuffer, 0, IndexType.Uint32);
+
+			vk!.CmdBindDescriptorSets(commandBuffers[i], PipelineBindPoint.Graphics, pipelineLayout, 0, 1, dr.GetTexture(view.RenderTarget.texture_id).descriptorSet, 0, null);
 
 			//vk!.CmdBindDescriptorSets(commandBuffers[i], PipelineBindPoint.Graphics, pipelineLayout, 0, 1, descriptorSets![i], 0, null);
 
