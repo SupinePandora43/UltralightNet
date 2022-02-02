@@ -32,7 +32,7 @@ layout(location = 9)in vec2 ex_ObjectCoord;
 // Out Params
 layout(location = 0)out vec4 out_Color;
 
-uint FillType() { return uint(ex_Data0.x + 0.5); }
+uint FillType() { return uint(ex_Data0.x /*+ 0.5*/); }
 vec4 TileRectUV() { return Vector[0]; }
 vec2 TileSize() { return Vector[1].zw; }
 vec2 PatternTransformA() { return Vector[2].xy; }
