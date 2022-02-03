@@ -69,6 +69,7 @@ public unsafe partial class VulkanGPUDriver
 	private readonly DescriptorSetLayout textureSetLayout;
 	//private readonly DescriptorSetLayout uniformSetLayout;
 	private readonly PipelineLayout fillPipelineLayout;
+	private readonly PipelineLayout pathPipelineLayout;
 	private readonly Pipeline fillPipeline;
 	private readonly Pipeline pathPipeline;
 	private readonly DescriptorPool uniformDescriptorPool;
@@ -216,8 +217,6 @@ public unsafe partial class VulkanGPUDriver
 				PImmutableSamplers = null,
 				StageFlags = ShaderStageFlags.ShaderStageVertexBit | ShaderStageFlags.ShaderStageFragmentBit
 			};
-
-
 			DescriptorSetLayoutCreateInfo layoutInfo = new()
 			{
 				SType = StructureType.DescriptorSetLayoutCreateInfo,
@@ -228,7 +227,6 @@ public unsafe partial class VulkanGPUDriver
 			{
 				throw new Exception("failed to create descriptor set layout!");
 			}
-			//this.uniformSetLayout = uniformSetLayout;
 		}
 		#endregion UniformSetLayout
 		#region FillPipeline
@@ -308,36 +306,20 @@ public unsafe partial class VulkanGPUDriver
 					PVertexAttributeDescriptions = vertexInputAttributeDescriptionsPtr,
 					VertexAttributeDescriptionCount = (uint)vertexInputAttributeDescriptions.Length
 				};
-
 				var pipelineInputAssemblyStateCreateInfo = new PipelineInputAssemblyStateCreateInfo()
 				{
 					SType = StructureType.PipelineInputAssemblyStateCreateInfo,
 					Topology = PrimitiveTopology.TriangleList,
 					PrimitiveRestartEnable = false
 				};
-
-				var viewport = new Viewport()
-				{
-					X = 0,
-					Y = 0,
-					Width = 512,
-					Height = 512,
-					MinDepth = 0,
-					MaxDepth = 1,
-				};
-
-				var scissor = new Rect2D()
-				{
-					Offset = { X = 0, Y = 0 },
-					Extent = new(512, 512),
-				};
 				var pipelineViewportStateCreateInfo = new PipelineViewportStateCreateInfo()
 				{
 					SType = StructureType.PipelineViewportStateCreateInfo,
 					ViewportCount = 1,
-					PViewports = &viewport,
+					PViewports = null,
 					ScissorCount = 1,
-					PScissors = &scissor,
+					PScissors = null,
+					Flags = 0
 				};
 				PipelineRasterizationStateCreateInfo rasterizer = new()
 				{
@@ -350,24 +332,21 @@ public unsafe partial class VulkanGPUDriver
 					FrontFace = FrontFace.CounterClockwise, // TODO
 					DepthBiasEnable = false,
 				};
-
 				PipelineMultisampleStateCreateInfo multisampling = new()
 				{
 					SType = StructureType.PipelineMultisampleStateCreateInfo,
 					SampleShadingEnable = false,
 					RasterizationSamples = SampleCountFlags.SampleCount1Bit,
 				};
-
 				PipelineDepthStencilStateCreateInfo depthStencil = new()
 				{
 					SType = StructureType.PipelineDepthStencilStateCreateInfo,
-					DepthTestEnable = true,
-					DepthWriteEnable = true,
+					DepthTestEnable = false,
+					DepthWriteEnable = false,
 					DepthCompareOp = CompareOp.Less,
 					DepthBoundsTestEnable = false,
 					StencilTestEnable = false,
 				};
-
 				PipelineColorBlendAttachmentState colorBlendAttachment = new()
 				{
 					ColorWriteMask = ColorComponentFlags.ColorComponentRBit | ColorComponentFlags.ColorComponentGBit | ColorComponentFlags.ColorComponentBBit | ColorComponentFlags.ColorComponentABit,
@@ -379,7 +358,6 @@ public unsafe partial class VulkanGPUDriver
 					SrcColorBlendFactor = BlendFactor.One,
 					DstColorBlendFactor = BlendFactor.OneMinusSrcAlpha
 				};
-
 				PipelineColorBlendStateCreateInfo colorBlending = new()
 				{
 					SType = StructureType.PipelineColorBlendStateCreateInfo,
@@ -388,7 +366,6 @@ public unsafe partial class VulkanGPUDriver
 					AttachmentCount = 1,
 					PAttachments = &colorBlendAttachment,
 				};
-
 				colorBlending.BlendConstants[0] = 0;
 				colorBlending.BlendConstants[1] = 0;
 				colorBlending.BlendConstants[2] = 0;
@@ -401,21 +378,17 @@ public unsafe partial class VulkanGPUDriver
 					SetLayoutCount = 3,
 					PSetLayouts = sets
 				};
-
 				if (vk.CreatePipelineLayout(device, pipelineLayoutInfo, null, out fillPipelineLayout) is not Result.Success)
 				{
 					throw new Exception("failed to create pipeline layout!");
 				}
-
 				_shader_main = (byte*)SilkMarshal.StringToPtr("main");
-
 				var shaderStages = stackalloc[] {
 					LoadShader("UltralightNet.Vulkan.shader_fill.vert.spv", ShaderStageFlags.ShaderStageVertexBit),
 					LoadShader("UltralightNet.Vulkan.shader_fill.frag.spv", ShaderStageFlags.ShaderStageFragmentBit)
 				};
-				var dynamicStateScissor = DynamicState.Scissor;
-				var dynamicState = new PipelineDynamicStateCreateInfo(dynamicStateCount: 1, pDynamicStates: &dynamicStateScissor);
-
+				DynamicState* dynamicStates = stackalloc DynamicState[] { DynamicState.Viewport, DynamicState.Scissor };
+				var dynamicState = new PipelineDynamicStateCreateInfo(dynamicStateCount: 2, pDynamicStates: dynamicStates);
 				GraphicsPipelineCreateInfo pipelineInfo = new()
 				{
 					SType = StructureType.GraphicsPipelineCreateInfo,
@@ -434,8 +407,22 @@ public unsafe partial class VulkanGPUDriver
 					BasePipelineHandle = default,
 					PDynamicState = &dynamicState
 				};
-
 				if (vk.CreateGraphicsPipelines(device, default, 1, pipelineInfo, null, out fillPipeline) is not Result.Success)
+				{
+					throw new Exception("failed to create graphics pipeline!");
+				}
+
+
+				vertexInputBindingDescription.Stride = 20;
+				pipelineVertexInputStateCreateInfo.VertexAttributeDescriptionCount = 3;
+				pipelineLayoutInfo.SetLayoutCount = 1;
+				if (vk.CreatePipelineLayout(device, pipelineLayoutInfo, null, out pathPipelineLayout) is not Result.Success)
+				{
+					throw new Exception("failed to create pipeline layout!");
+				}
+				shaderStages[0] = LoadShader("UltralightNet.Vulkan.shader_fill_path.vert.spv", ShaderStageFlags.ShaderStageVertexBit);
+				shaderStages[1] = LoadShader("UltralightNet.Vulkan.shader_fill_path.frag.spv", ShaderStageFlags.ShaderStageFragmentBit);
+				if (vk.CreateGraphicsPipelines(device, default, 1, pipelineInfo, null, out pathPipeline) is not Result.Success)
 				{
 					throw new Exception("failed to create graphics pipeline!");
 				}
@@ -626,7 +613,7 @@ public unsafe partial class VulkanGPUDriver
 			InitialLayout = ImageLayout.Undefined,
 			Usage = isRt ? ImageUsageFlags.ImageUsageTransferDstBit | ImageUsageFlags.ImageUsageColorAttachmentBit | ImageUsageFlags.ImageUsageSampledBit : ImageUsageFlags.ImageUsageTransferDstBit | ImageUsageFlags.ImageUsageSampledBit,
 			Samples = isRt ? SampleCountFlags.SampleCount1Bit : SampleCountFlags.SampleCount1Bit,
-			SharingMode = SharingMode.Exclusive,
+			SharingMode = SharingMode.Exclusive
 		};
 
 		Image image;
@@ -683,7 +670,7 @@ public unsafe partial class VulkanGPUDriver
 			BufferImageCopy region = new()
 			{
 				BufferOffset = 0,
-				BufferRowLength = bitmap.RowBytes,
+				BufferRowLength = bitmap.RowBytes / bitmap.Bpp,
 				BufferImageHeight = 0,
 				ImageSubresource =
 				{
@@ -956,6 +943,10 @@ public unsafe partial class VulkanGPUDriver
 
 				vk.CmdBindVertexBuffers(commandBuffer, 0, 1, geometryEntry.vertexBuffer, 0);
 				vk.CmdBindIndexBuffer(commandBuffer, geometryEntry.indexBuffer, 0, IndexType.Uint32);
+				{
+					Viewport viewport = new(0, 0, state.viewport_width, state.viewport_height, 0, 0);
+					vk.CmdSetViewport(commandBuffer, 0, 1, &viewport);
+				}
 				vk.CmdSetScissor(commandBuffer, 0, 1, state.enable_scissor ? (Rect2D*)&state.scissor_rect : &renderPassBeginInfo.RenderArea);
 				vk.CmdDrawIndexed(commandBuffer, command.indices_count, 1, command.indices_offset, 0, 0);
 			}
