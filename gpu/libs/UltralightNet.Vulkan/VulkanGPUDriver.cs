@@ -624,7 +624,7 @@ public unsafe partial class VulkanGPUDriver
 			Format = isBgra ? Format.B8G8R8A8Unorm : Format.R8Unorm,
 			Tiling = ImageTiling.Optimal,
 			InitialLayout = ImageLayout.Undefined,
-			Usage = isRt ? ImageUsageFlags.ImageUsageColorAttachmentBit | ImageUsageFlags.ImageUsageSampledBit : ImageUsageFlags.ImageUsageTransferDstBit | ImageUsageFlags.ImageUsageSampledBit,
+			Usage = isRt ? ImageUsageFlags.ImageUsageTransferDstBit | ImageUsageFlags.ImageUsageColorAttachmentBit | ImageUsageFlags.ImageUsageSampledBit : ImageUsageFlags.ImageUsageTransferDstBit | ImageUsageFlags.ImageUsageSampledBit,
 			Samples = isRt ? SampleCountFlags.SampleCount1Bit : SampleCountFlags.SampleCount1Bit,
 			SharingMode = SharingMode.Exclusive,
 		};
@@ -889,31 +889,59 @@ public unsafe partial class VulkanGPUDriver
 	private void UpdateCommandList(ULCommandList list)
 	{
 		CommandBuffer commandBuffer = BeginSingleTimeCommands(); // TODO LMAO
+
 		var s = list.ToSpan();
+		uint currentRenderBuffer = uint.MaxValue;
 		foreach (var command in s)
 		{
 			ULGPUState state = command.gpu_state;
 			RenderBufferEntry renderBufferEntry = renderBuffers[(int)command.gpu_state.render_buffer_id];
 
-			RenderPassBeginInfo renderPassBeginInfo = new()
+			if (command.command_type is ULCommandType.ClearRenderBuffer)
 			{
-				SType = StructureType.RenderPassBeginInfo,
-				RenderPass = pipelineRenderPass,
-				Framebuffer = renderBufferEntry.framebuffer,
-				RenderArea =
+				if (currentRenderBuffer is not uint.MaxValue)
 				{
-					Offset = { X = 0, Y = 0 },
-					Extent = new(state.viewport_width, state.viewport_height),
+					vk.CmdEndRenderPass(commandBuffer);
+					currentRenderBuffer = uint.MaxValue;
 				}
-			};
+				TextureEntry rt = renderBufferEntry.textureEntry;
+				PipelineBarrier(commandBuffer, rt.image, ImageLayout.ShaderReadOnlyOptimal, ImageLayout.TransferDstOptimal);
+				ClearColorValue clearColorValue = new()
+				{
+					Float32_0 = 0,
+					Float32_1 = 0,
+					Float32_2 = 0,
+					Float32_3 = 0
+				};
+				ImageSubresourceRange imageSubresourceRange = new(ImageAspectFlags.ImageAspectColorBit, 0, 1, 0, 1);
+				vk.CmdClearColorImage(commandBuffer, rt.image, ImageLayout.TransferDstOptimal, &clearColorValue, 1, &imageSubresourceRange);
+				PipelineBarrier(commandBuffer, rt.image, ImageLayout.TransferDstOptimal, ImageLayout.ShaderReadOnlyOptimal);
+			}
 
 			if (command.command_type is ULCommandType.DrawGeometry) // TODO: clearrenderbuffer
 			{
-				vk.CmdBeginRenderPass(commandBuffer, &renderPassBeginInfo, SubpassContents.Inline);
-				if (state.shader_type is ULShaderType.Fill) vk!.CmdBindPipeline(commandBuffer, PipelineBindPoint.Graphics, fillPipeline);
-				else goto asd;
+				RenderPassBeginInfo renderPassBeginInfo = new()
+				{
+					SType = StructureType.RenderPassBeginInfo,
+					RenderPass = pipelineRenderPass,
+					Framebuffer = renderBufferEntry.framebuffer,
+					RenderArea =
+					{
+						Offset = { X = 0, Y = 0 },
+						Extent = new(state.viewport_width, state.viewport_height),
+					},
+					ClearValueCount = 0,
+					PClearValues = null,
+					PNext = null
+				};
+				if (currentRenderBuffer != state.render_buffer_id)
+				{
+					if (currentRenderBuffer is not uint.MaxValue) vk.CmdEndRenderPass(commandBuffer);
+					currentRenderBuffer = state.render_buffer_id;
+					vk.CmdBeginRenderPass(commandBuffer, &renderPassBeginInfo, SubpassContents.Inline);
+				}
 
-				vk.CmdBindPipeline(commandBuffer, PipelineBindPoint.Graphics, fillPipeline);
+				vk.CmdBindPipeline(commandBuffer, PipelineBindPoint.Graphics, state.shader_type is ULShaderType.Fill ? fillPipeline : pathPipeline);
 
 				UpdateUniformBuffer(state);
 
@@ -922,7 +950,7 @@ public unsafe partial class VulkanGPUDriver
 
 				var descriptorSets = stackalloc[] { uniformSet, textureEntry1.descriptorSet, textureEntry2.descriptorSet };
 
-				vk.CmdBindDescriptorSets(commandBuffer, PipelineBindPoint.Graphics, fillPipelineLayout, 0, 3, descriptorSets, 0, 0);
+				vk.CmdBindDescriptorSets(commandBuffer, PipelineBindPoint.Graphics, fillPipelineLayout, 0, state.shader_type is ULShaderType.Fill ? 3u : 1u, descriptorSets, 0, 0);
 
 				GeometryEntry geometryEntry = geometries[(int)command.geometry_id];
 
@@ -930,10 +958,11 @@ public unsafe partial class VulkanGPUDriver
 				vk.CmdBindIndexBuffer(commandBuffer, geometryEntry.indexBuffer, 0, IndexType.Uint32);
 				vk.CmdSetScissor(commandBuffer, 0, 1, state.enable_scissor ? (Rect2D*)&state.scissor_rect : &renderPassBeginInfo.RenderArea);
 				vk.CmdDrawIndexed(commandBuffer, command.indices_count, 1, command.indices_offset, 0, 0);
-			asd:
-				vk.CmdEndRenderPass(commandBuffer);
 			}
 		}
+
+		if (currentRenderBuffer is not uint.MaxValue) vk.CmdEndRenderPass(commandBuffer);
+
 		EndSingleTimeCommands(commandBuffer);
 	}
 	#endregion Rendering

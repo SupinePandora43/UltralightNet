@@ -205,6 +205,46 @@ public unsafe partial class VulkanGPUDriver
 
 		EndSingleTimeCommands(commandBuffer);
 	}
+	[MethodImpl(MethodImplOptions.AggressiveInlining)]
+	private void PipelineBarrier(CommandBuffer commandBuffer, Image image, ImageLayout oldLayout, ImageLayout newLayout)
+	{
+		ImageMemoryBarrier barrier = new()
+		{
+			SType = StructureType.ImageMemoryBarrier,
+			OldLayout = oldLayout,
+			NewLayout = newLayout,
+			SrcQueueFamilyIndex = Vk.QueueFamilyIgnored,
+			DstQueueFamilyIndex = Vk.QueueFamilyIgnored,
+			Image = image,
+			SubresourceRange =
+			{
+				AspectMask = ImageAspectFlags.ImageAspectColorBit,
+				BaseMipLevel = 0,
+				LevelCount = 1,
+				BaseArrayLayer = 0,
+				LayerCount = 1,
+			},
+			SrcAccessMask = ImageLayoutToAccessFlags(oldLayout),
+			DstAccessMask = ImageLayoutToAccessFlags(newLayout)
+		};
+
+		static AccessFlags ImageLayoutToAccessFlags(ImageLayout imageLayout) => imageLayout switch
+		{
+			ImageLayout.Undefined => AccessFlags.AccessNoneKhr,
+			ImageLayout.TransferDstOptimal => AccessFlags.AccessTransferWriteBit,
+			ImageLayout.ShaderReadOnlyOptimal => AccessFlags.AccessShaderReadBit,
+			_ => AccessFlags.AccessNoneKhr
+		};
+		static PipelineStageFlags ImageLayoutToPipelineStageFlags(ImageLayout imageLayout) => imageLayout switch
+		{
+			ImageLayout.Undefined => PipelineStageFlags.PipelineStageTopOfPipeBit,
+			ImageLayout.TransferDstOptimal => PipelineStageFlags.PipelineStageTransferBit,
+			ImageLayout.ShaderReadOnlyOptimal => PipelineStageFlags.PipelineStageFragmentShaderBit,
+			_ => PipelineStageFlags.PipelineStageNoneKhr
+		};
+
+		vk.CmdPipelineBarrier(commandBuffer, ImageLayoutToPipelineStageFlags(oldLayout), ImageLayoutToPipelineStageFlags(newLayout), 0, 0, null, 0, null, 1, barrier);
+	}
 	private ImageView CreateImageView(Image image, Format format)
 	{
 		ImageViewCreateInfo createInfo = new()
