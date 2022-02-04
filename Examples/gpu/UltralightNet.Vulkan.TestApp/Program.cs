@@ -243,17 +243,20 @@ unsafe class HelloTriangleApplication
 		AppCoreMethods.ulEnableDefaultLogger("./log123as.txt");
 		dr = new(vk!, physicalDevice!, device!);
 		dr.commandPool = commandPool;
+		dr.commandBuffer = BeginSingleTimeCommands();
 		dr.graphicsQueue = graphicsQueue;
 		ULPlatform.GPUDriver = dr.GPUDriver;
 		renderer = ULPlatform.CreateRenderer(new ULConfig() { ForceRepaint = true });
 		view = renderer.CreateView((uint)window!.Size.X, (uint)window!.Size.Y, new() { IsAccelerated = true, IsTransparent = false });
 		bool loaded = false;
 		view.OnFinishLoading += (frameId, isMain, url) => loaded = true;
-		view.HTML = "<html><body><p>123</p></body></html>";
-
-		while (!loaded) renderer.Update();
+		//view.HTML = "<html><body><p>123</p></body></html>";
+		view.URL = "https://google.com";
+		while (!loaded) { renderer.Update(); Thread.Sleep(10); }
 
 		renderer.Render();
+
+		EndSingleTimeCommands(dr.commandBuffer);
 	}
 
 	private void MainLoop()
@@ -1774,9 +1777,16 @@ unsafe class HelloTriangleApplication
 			CommandBufferCount = 1,
 			PCommandBuffers = &commandBuffer,
 		};
+		FenceCreateInfo fenceCreateInfo = new(){
+			SType = StructureType.FenceCreateInfo,
+			//Flags = FenceCreateFlags.FenceCreateSignaledBit
+		};
+		Fence fence;
+		vk!.CreateFence(device, &fenceCreateInfo, null, &fence);
 
-		vk!.QueueSubmit(graphicsQueue, 1, submitInfo, default);
-		vk!.QueueWaitIdle(graphicsQueue);
+		vk!.QueueSubmit(graphicsQueue, 1, submitInfo, fence);
+		var r = vk!.WaitForFences(device, 1, &fence, true, ulong.MaxValue);
+		//vk!.QueueWaitIdle(graphicsQueue);
 
 		vk!.FreeCommandBuffers(device, commandPool, 1, commandBuffer);
 	}
@@ -2262,7 +2272,7 @@ unsafe class HelloTriangleApplication
 		if (message!.StartsWith("Validation Warning:"))
 			N();
 		if (message!.StartsWith("Validation Error:"))
-			throw new Exception(message);
+			N();
 		System.Diagnostics.Debug.WriteLine($"validation layer:" + message);
 
 		return Vk.False;
