@@ -951,7 +951,7 @@ public unsafe partial class VulkanGPUDriver
 				TextureEntry textureEntry1 = textures[(int)state.texture_1_id];
 				TextureEntry textureEntry2 = textures[(int)state.texture_2_id is 0 ? (int)state.texture_1_id : (int)state.texture_2_id];
 
-				var descriptorSets = stackalloc[] { GetUniformBuffer(state, true), textureEntry1.descriptorSet, textureEntry2.descriptorSet };
+				var descriptorSets = stackalloc[] { GetUniformBuffer(state), textureEntry1.descriptorSet, textureEntry2.descriptorSet };
 
 				vk.CmdBindDescriptorSets(commandBuffer, PipelineBindPoint.Graphics, fillPipelineLayout, 0, state.shader_type is ULShaderType.Fill ? 3u : 1u, descriptorSets, 0, 0);
 

@@ -25,7 +25,7 @@ public unsafe partial class VulkanGPUDriver
 
 	//[SkipLocalsInit]
 	[MethodImpl(MethodImplOptions.AggressiveInlining)]
-	private DescriptorSet GetUniformBuffer(ULGPUState state, bool t = false)
+	private DescriptorSet GetUniformBuffer(ULGPUState state)
 	{
 		if (uniformBuffers.TryGetValue(state, out UniformBufferEntry entry))
 		{
@@ -33,14 +33,13 @@ public unsafe partial class VulkanGPUDriver
 		}
 		else
 		{
-			if (t) throw error;
 			CreateBuffer(UniformBufferSize, BufferUsageFlags.BufferUsageUniformBufferBit, MemoryPropertyFlags.MemoryPropertyHostVisibleBit | MemoryPropertyFlags.MemoryPropertyHostCoherentBit, out Buffer buffer, out DeviceMemory memory);
 			Uniforms* mapped;
 			vk.MapMemory(device, memory, 0, UniformBufferSize, 0, (void**)&mapped);
 			mapped->Transform = state.transform.ApplyProjection(state.viewport_width, state.viewport_height, true);
 			mapped->ClipSize = state.clip_size;
-			new ReadOnlySpan<Vector4>(&state.scalar_0, 10).CopyTo(new Span<Vector4>(mapped + sizeof(Vector4) + sizeof(Matrix4x4), 10));
-			new ReadOnlySpan<Matrix4x4>(&state.clip_0, 8).CopyTo(new Span<Matrix4x4>(mapped + (sizeof(Vector4) * 11) + sizeof(Matrix4x4), 8));
+			new ReadOnlySpan<Vector4>(&state.scalar_0, 10).CopyTo(new Span<Vector4>(&mapped->Scalar4_0.W, 10));
+			new ReadOnlySpan<Matrix4x4>(&state.clip_0.M11, 8).CopyTo(new Span<Matrix4x4>(&mapped->Clip_0.M11, 8));
 			vk.UnmapMemory(device, memory);
 
 			var poolSize = new DescriptorPoolSize()
