@@ -1,7 +1,11 @@
 using System;
 using System.IO;
 using System.Reflection;
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
+using System.Text;
+
+[assembly: InternalsVisibleTo("UltralightNet.AppCore")]
 
 namespace UltralightNet
 {
@@ -11,8 +15,8 @@ namespace UltralightNet
 	{
 		static Methods() => Preload();
 
-		[GeneratedDllImport("Ultralight", CharSet = CharSet.Ansi)]
-		[return: MarshalAs(UnmanagedType.LPStr)]
+		[GeneratedDllImport("Ultralight")]
+		[return: MarshalUsing(typeof(UTF8Marshaller))]
 		public static partial string ulVersionString();
 
 		[DllImport("Ultralight")]
@@ -108,9 +112,115 @@ namespace UltralightNet
 			public static IntPtr Load(string libraryPath) => dlopen(libraryPath, 0x002); // RTLD_NOW
 
 			// LPUTF8Str = 48
-			[GeneratedDllImport("libdl")]
-			private static partial IntPtr dlopen([MarshalAs(48)] string path, int mode);
+			[DllImport("libdl")]
+			private static extern IntPtr dlopen([MarshalAs(48)] string path, int mode);
 		}
 #endif
+	}
+	[SkipLocalsInit]
+	internal unsafe ref struct UTF8Marshaller
+	{
+		public const int StackBufferSize = 0x100;
+
+		public byte* bytes;
+		public Span<byte> span;
+
+		[SkipLocalsInit]
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		public UTF8Marshaller(string str)
+		{
+			span = null;
+			int strLen = str.Length;
+			int byteCount = (strLen + 1) * 3 + 1;
+			bytes = (byte*)Marshal.AllocHGlobal(byteCount);
+
+#if NETSTANDARD2_1 || NET
+			int written = Encoding.UTF8.GetBytes(str.AsSpan(), new Span<byte>(bytes, byteCount));
+#else
+			int written;
+			fixed(char* characterPtr = str){
+				written = Encoding.UTF8.GetBytes(characterPtr, strLen, bytes, byteCount);
+			}
+#endif
+			bytes[written] = 0;
+		}
+		[SkipLocalsInit]
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		public UTF8Marshaller(string str, Span<byte> buffer)
+		{
+			int strLen = str.Length;
+			int byteCount = (strLen + 1) * 3 + 1;
+
+			if (buffer.Length >= byteCount)
+			{
+				bytes = null;
+				span = buffer;
+#if NETSTANDARD2_1 || NET
+				int written = Encoding.UTF8.GetBytes(str.AsSpan(), span);
+				span[written] = 0;
+#else
+				int written;
+				fixed(char* characterPtr = str)
+				fixed(byte* bytePtr = span){
+					written = Encoding.UTF8.GetBytes(characterPtr, strLen, bytePtr, byteCount);
+					bytePtr[written] = 0;
+				}
+#endif
+			}
+			else
+			{
+				span = null;
+				bytes = (byte*)Marshal.AllocHGlobal(byteCount);
+
+#if NETSTANDARD2_1 || NET
+				int written = Encoding.UTF8.GetBytes(str.AsSpan(), new Span<byte>(bytes, byteCount));
+#else
+				int written;
+				fixed(char* characterPtr = str){
+					written = Encoding.UTF8.GetBytes(characterPtr, strLen, bytes, byteCount);
+				}
+#endif
+				bytes[written] = 0;
+			}
+		}
+
+		[SkipLocalsInit]
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		public ref byte GetPinnableReference()
+		{
+			if (bytes is not null) return ref *bytes;
+			return ref span.GetPinnableReference();
+		}
+
+		[SkipLocalsInit]
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		public string ToManaged() =>
+#if NETSTANDARD2_1 || NETCOREAPP1_1_OR_GREATER
+			Marshal.PtrToStringUTF8((IntPtr)bytes);
+#else
+			new((sbyte*)bytes);
+#endif
+
+		public unsafe byte* Value
+		{
+			[SkipLocalsInit]
+			[MethodImpl(MethodImplOptions.AggressiveInlining)]
+			get => bytes;
+
+			[SkipLocalsInit]
+			[MethodImpl(MethodImplOptions.AggressiveInlining)]
+			set
+			{
+				bytes = value;
+				span = default;
+			}
+		}
+
+		[SkipLocalsInit]
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		public void FreeNative()
+		{
+			if (bytes is not null) Marshal.FreeHGlobal((IntPtr)bytes);
+		}
 	}
 }

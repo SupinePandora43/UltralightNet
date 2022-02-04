@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<TargetFrameworks>net6.0;net5.0</TargetFrameworks> <!--net451;net45;netstandard2.1;netstandard2-->
+		<TargetFrameworks>net6.0;net5.0;net451;net45;netstandard2.1;netstandard2</TargetFrameworks>
 		<EmitCompilerGeneratedFiles>true</EmitCompilerGeneratedFiles>
 		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
 		<LangVersion>preview</LangVersion>
@@ -16,6 +16,7 @@
 
 		<PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
 
+		<DefineConstants Condition="'$(TargetFramework)'=='net6.0'">$(DefineConstants);GENERATED</DefineConstants>
 		<DefineConstants Condition="'$(TargetFramework)'=='net5.0'">$(DefineConstants);GENERATED</DefineConstants>
 	</PropertyGroup>
 	<ItemGroup>
@@ -32,6 +33,7 @@
 		<Content Include="@(_ExistingAssets->'%(Identity)')" CopyToOutputDirectory="PreserveNewest" PackagePath="%(PackagePath)" Pack="true" />
 	</ItemGroup>
 	<ItemGroup>
+		<PackageReference Condition="'$(TargetFramework)'=='net6.0'" Include="DllImportGenerator" Version="1.0.0-alpha.20604.3" OutputItemType="Analyzer" ReferenceOutputAssembly="false" PrivateAssets="All" />
 		<PackageReference Condition="'$(TargetFramework)'=='net5.0'" Include="DllImportGenerator" Version="1.0.0-alpha.20604.3" OutputItemType="Analyzer" ReferenceOutputAssembly="false" PrivateAssets="All" />
 		<PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0" PrivateAssets="All" />
 		<ProjectReference Include="..\UltralightNet\UltralightNet.csproj" />

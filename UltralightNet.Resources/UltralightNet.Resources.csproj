@@ -6,6 +6,7 @@
 		<PackageId>UltralightNet.Resources</PackageId>
 		<Description>Ultralight 'resources' folder</Description>
 
+		<IncludeBuildOutput>false</IncludeBuildOutput>
 		<RunAnalyzersDuringBuild>false</RunAnalyzersDuringBuild>
 		<RunAnalyzersDuringLiveAnalysis>false</RunAnalyzersDuringLiveAnalysis>
 		<RunAnalyzers>false</RunAnalyzers>

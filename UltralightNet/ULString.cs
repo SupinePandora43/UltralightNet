@@ -1,6 +1,7 @@
 using System;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
+using System.Text;
 
 namespace UltralightNet
 {
@@ -8,18 +9,13 @@ namespace UltralightNet
 	{
 		/// <summary>Create string from null-terminated ASCII C-string.</summary>
 		[GeneratedDllImport("Ultralight")]
-		public unsafe static partial ULString* ulCreateString([MarshalAs(UnmanagedType.LPStr)] string str);
+		public unsafe static partial ULString* ulCreateString([MarshalUsing(typeof(UTF8Marshaller))] string str);
 
 		/// <summary>Create string from UTF-8 buffer.</summary>
-		[GeneratedDllImport("Ultralight")]
+		[DllImport("Ultralight")]
 		[Obsolete("Unexpected behaviour")]
-		public static unsafe partial ULString* ulCreateStringUTF8(
-#if NET5_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
-			[MarshalAs(UnmanagedType.LPUTF8Str)]
-#else
-			[MarshalAs(UnmanagedType.LPStr)]
-#endif
-			string str,
+		public static unsafe extern ULString* ulCreateStringUTF8(
+			byte* data,
 			nuint len
 		);
 
@@ -53,16 +49,8 @@ namespace UltralightNet
 		[DllImport("Ultralight")]
 		public static unsafe extern void ulStringAssignString(ULString* str, ULString* newStr);
 
-		[GeneratedDllImport("Ultralight")]
-		public static partial void ulStringAssignCString(
-			IntPtr str,
-			[MarshalAs(
-#if NET5_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
-				UnmanagedType.LPUTF8Str
-#else
-				UnmanagedType.LPStr
-#endif
-			)] string c_str);
+		[DllImport("Ultralight")]
+		public static unsafe extern void ulStringAssignCString(ULString* str, byte* c_str);
 	}
 
 	public unsafe ref struct ULStringGeneratedDllImportMarshaler
@@ -72,15 +60,17 @@ namespace UltralightNet
 		[SkipLocalsInit]
 		public ULStringGeneratedDllImportMarshaler(string str)
 		{
-			ulstringPtr = Methods.ulCreateStringUTF16(str, (nuint) str.Length);
+			ulstringPtr = Methods.ulCreateStringUTF16(str, (nuint)str.Length);
 		}
 
-		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		[SkipLocalsInit]
-		public string ToManaged()
-		{
-			return Marshal.PtrToStringUTF8((IntPtr)ulstringPtr->data, (int)ulstringPtr->length);
-		}
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		public string ToManaged() =>
+#if NETFRAMEWORK || NETSTANDARD2_0
+			new((sbyte*)ulstringPtr->data, 0, (int)ulstringPtr->length, Encoding.UTF8);
+#else
+			Marshal.PtrToStringUTF8((IntPtr)ulstringPtr->data, (int)ulstringPtr->length);
+#endif
 
 		public unsafe ULString* Value
 		{
@@ -109,15 +99,26 @@ namespace UltralightNet
 		public nuint length;
 
 		/// <summary>Do not use on pointers</summary>
-		public string ToManaged()
-		{
-			return Marshal.PtrToStringUTF8((IntPtr)data, (int)length);
-		}
+		[SkipLocalsInit]
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		public string ToManaged() =>
+#if NETSTANDARD2_0
+			Encoding.UTF8.GetString(data, (int)length);
+#elif NETFRAMEWORK
+			new string((sbyte*)data, 0, (int)length);
+#else
+			Marshal.PtrToStringUTF8((IntPtr)data, (int)length);
+#endif
 
+		[SkipLocalsInit]
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public static unsafe string NativeToManaged(ULString* ulString)
 		{
+#if NETSTANDARD2_1 || NETCOREAPP1_1_OR_GREATER
 			return Marshal.PtrToStringUTF8((IntPtr)ulString->data, (int)ulString->length);
+#else
+			return new((sbyte*)ulString->data, 0, (int)ulString->length, Encoding.UTF8);
+#endif
 		}
 	}
 }

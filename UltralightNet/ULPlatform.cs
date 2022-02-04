@@ -96,10 +96,10 @@ namespace UltralightNet
 		/// </summary>
 		public static void Free()
 		{
-			foreach(List<GCHandle> handles in loggerHandles.Values) foreach(GCHandle handle in handles) if (handle.IsAllocated) handle.Free();
-			foreach(List<GCHandle> handles in filesystemHandles.Values) foreach(GCHandle handle in handles) if (handle.IsAllocated) handle.Free();
-			foreach(List<GCHandle> handles in gpudriverHandles.Values) foreach(GCHandle handle in handles) if (handle.IsAllocated) handle.Free();
-			foreach(List<GCHandle> handles in clipboardHandles.Values) foreach(GCHandle handle in handles) if (handle.IsAllocated) handle.Free();
+			foreach (List<GCHandle> handles in loggerHandles.Values) foreach (GCHandle handle in handles) if (handle.IsAllocated) handle.Free();
+			foreach (List<GCHandle> handles in filesystemHandles.Values) foreach (GCHandle handle in handles) if (handle.IsAllocated) handle.Free();
+			foreach (List<GCHandle> handles in gpudriverHandles.Values) foreach (GCHandle handle in handles) if (handle.IsAllocated) handle.Free();
+			foreach (List<GCHandle> handles in clipboardHandles.Values) foreach (GCHandle handle in handles) if (handle.IsAllocated) handle.Free();
 		}
 
 		public static bool SetDefaultLogger { get; set; } = true;
@@ -176,7 +176,7 @@ namespace UltralightNet
 
 					nuint GetFileId()
 					{
-						return (nuint) files.Count;
+						return (nuint)files.Count;
 					}
 
 					FileSystem = new()
@@ -231,9 +231,9 @@ namespace UltralightNet
 							fixed(byte* dataPtr = data)
 							{
 								UnmanagedMemoryStream unmanagedMemoryStream = new(dataPtr, data.Length, data.Length, FileAccess.Write);
-								files[handle].CopyTo(unmanagedMemoryStream);
+								files[(int)handle].CopyTo(unmanagedMemoryStream);
 							}
-							return files[handle].Length;
+							return files[(int)handle].Length;
 #endif
 						},
 						CloseFile = (handle) =>

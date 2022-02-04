@@ -48,8 +48,8 @@ namespace UltralightNet.AppCore
 		[DllImport("AppCore")]
 		public static extern double ulWindowGetScale(IntPtr window);
 
-		[GeneratedDllImport("AppCore", CharSet = CharSet.Ansi)]
-		public static partial void ulWindowSetTitle(IntPtr window, string title);
+		[GeneratedDllImport("AppCore")]
+		public static partial void ulWindowSetTitle(IntPtr window, [MarshalUsing(typeof(UTF8Marshaller))]string title);
 
 		[DllImport("AppCore")]
 		public static extern void ulWindowSetCursor(IntPtr window, ULCursor cursor);

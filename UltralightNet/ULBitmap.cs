@@ -80,18 +80,9 @@ namespace UltralightNet
 		public static extern void ulBitmapErase(IntPtr bitmap);
 
 		/// <summary>Write bitmap to a PNG on disk.</summary>
-		[GeneratedDllImport("Ultralight", CharSet = CharSet.Ansi)]
+		[GeneratedDllImport("Ultralight")]
 		[return: MarshalAs(UnmanagedType.I1)]
-		public static partial bool ulBitmapWritePNG(
-			IntPtr bitmap,
-			[MarshalAs(
-#if NET5_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
-				UnmanagedType.LPUTF8Str
-#else
-				UnmanagedType.LPStr
-#endif
-			)] string path
-		);
+		public static partial bool ulBitmapWritePNG(IntPtr bitmap, [MarshalUsing(typeof(UTF8Marshaller))] string path);
 
 		/// <summary>This converts a BGRA bitmap to RGBA bitmap and vice-versa by swapping the red and blue channels.</summary>
 		[DllImport("Ultralight")]

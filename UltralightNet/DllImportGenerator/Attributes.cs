@@ -54,6 +54,26 @@ namespace System.Runtime.InteropServices
 		public Type NativeType { get; }
 	}
 }
-
+#if NETFRAMEWORK || NETSTANDARD
+namespace System.Runtime.CompilerServices
+{
+	[AttributeUsage(AttributeTargets.Module | AttributeTargets.Class | AttributeTargets.Struct | AttributeTargets.Constructor | AttributeTargets.Method | AttributeTargets.Property | AttributeTargets.Event | AttributeTargets.Interface, Inherited = false)]
+	internal sealed class SkipLocalsInitAttribute : Attribute
+	{
+		public SkipLocalsInitAttribute() { }
+	}
+}
+namespace System
+{
+	internal static class OperatingSystem {
+		public static bool IsWindows() =>
+#if NETFRAMEWORK
+			true;
+#else
+			System.Runtime.InteropServices.RuntimeInformation.IsOSPlatform(System.Runtime.InteropServices.OSPlatform.Windows);
+#endif
+	}
+}
+#endif
 #pragma warning restore 0649
 #nullable restore

@@ -53,11 +53,9 @@ namespace UltralightNet.AppCore
 			IsDisposed = !dispose;
 			Ptr = AppCoreMethods.ulCreateSettings();
 		}
-#if NET5_0_OR_GREATER || NET_451 || NETSTANDARD2_0
-		public ULSettings_C ULSettings_C => Marshal.PtrToStructure<ULSettings_C>(Ptr);
-#else
-		public ULSettings_C ULSettings_C => (ULSettings_C)Marshal.PtrToStructure(Ptr, typeof(ULSettings_C));
-#endif
+
+		public unsafe ULSettings_C ULSettings_C => *(ULSettings_C*)Ptr;
+
 		public string DeveloperName
 		{
 			get => ULSettings_C.developer_name.ToManaged();
