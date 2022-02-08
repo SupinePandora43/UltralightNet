@@ -96,7 +96,7 @@ public unsafe partial class VulkanGPUDriver
 	[MethodImpl(MethodImplOptions.AggressiveInlining)]
 	private void CopyBuffer(CommandBuffer commandBuffer, Buffer from, Buffer to, ulong size)
 	{
-		BufferCopy copyRegion = new() { Size = size };
+		BufferCopy copyRegion = new() { Size = size, SrcOffset = 0, DstOffset = 0 };
 		vk.CmdCopyBuffer(commandBuffer, from, to, 1, &copyRegion);
 	}
 
@@ -112,7 +112,7 @@ public unsafe partial class VulkanGPUDriver
 
 		Buffer refBuffer;
 
-		if (vk.CreateBuffer(device, bufferInfo, null, &refBuffer) != Result.Success)
+		if (vk.CreateBuffer(device, &bufferInfo, null, &refBuffer) is not Result.Success)
 		{
 			throw error;
 		}
