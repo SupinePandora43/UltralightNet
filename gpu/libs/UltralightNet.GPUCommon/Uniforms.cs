@@ -28,4 +28,7 @@ public struct Uniforms
 	public Matrix4x4 Clip_6;
 	public Matrix4x4 Clip_7;
 	public uint ClipSize;
+	private float _alignment_0;
+	private float _alignment_1;
+	private float _alignment_2;
 }
