@@ -9,8 +9,10 @@ using Buffer = Silk.NET.Vulkan.Buffer;
 
 namespace UltralightNet.Vulkan;
 
-internal class UniformBufferEntry
+internal unsafe struct UniformBufferEntry
 {
+	public Uniforms data;
+	public Uniforms* mappedMemory;
 	public DeviceMemory memory;
 	public Buffer buffer;
 	public DescriptorPool descriptorPool;
@@ -24,7 +26,7 @@ public unsafe partial class VulkanGPUDriver
 	private readonly Dictionary<ULGPUState, UniformBufferEntry> uniformBuffers = new();
 
 	//[SkipLocalsInit]
-	[MethodImpl(MethodImplOptions.AggressiveInlining)]
+	/*[MethodImpl(MethodImplOptions.AggressiveInlining)]
 	private DescriptorSet GetUniformBuffer(ULGPUState state)
 	{
 		if (uniformBuffers.TryGetValue(state, out UniformBufferEntry entry))
@@ -106,5 +108,6 @@ public unsafe partial class VulkanGPUDriver
 
 			return uniformBuffers[state].descriptorSet;
 		}
-	}
+	}*/
+
 }
