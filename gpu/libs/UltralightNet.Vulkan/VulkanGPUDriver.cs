@@ -690,7 +690,8 @@ public unsafe partial class VulkanGPUDriver
 			SType = StructureType.DescriptorPoolCreateInfo,
 			PoolSizeCount = 1,
 			PPoolSizes = &poolSize,
-			MaxSets = 2,
+			MaxSets = 1,
+			Flags = DescriptorPoolCreateFlags.DescriptorPoolCreateFreeDescriptorSetBit
 		};
 
 		if (vk.CreateDescriptorPool(device, poolInfo, null, &descriptorPool) is not Result.Success)
@@ -781,8 +782,12 @@ public unsafe partial class VulkanGPUDriver
 		vk.FreeDescriptorSets(device, textureEntry.descriptorPool, 1, textureEntry.descriptorSet);
 		vk.DestroyDescriptorPool(device, textureEntry.descriptorPool, null);
 
-		vk.DestroyBuffer(device, textureEntry.stagingBuffer, null);
-		vk.FreeMemory(device, textureEntry.stagingMemory, null);
+		if(textureEntry.stagingBuffer.Handle is not 0){
+			vk.DestroyBuffer(device, textureEntry.stagingBuffer, null);
+			vk.FreeMemory(device, textureEntry.stagingMemory, null);
+			textureEntry.stagingBuffer = default;
+			textureEntry.stagingMemory = default;
+		}
 
 		vk.DestroyImageView(device, textureEntry.imageView, null);
 		vk.DestroyImage(device, textureEntry.image, null);
