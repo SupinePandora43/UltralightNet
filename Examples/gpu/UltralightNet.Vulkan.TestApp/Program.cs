@@ -84,7 +84,7 @@ unsafe class HelloTriangleApplication
 	const string MODEL_PATH = @"Assets\viking_room.obj";
 	const string TEXTURE_PATH = @"Assets\viking_room.png";
 
-	const int MAX_FRAMES_IN_FLIGHT = 2;
+	const int MAX_FRAMES_IN_FLIGHT = 3;
 
 	bool EnableValidationLayers = true;
 
@@ -236,6 +236,8 @@ unsafe class HelloTriangleApplication
 		CreateSyncObjects();
 	}
 
+	private Fence ultralightFence;
+
 	private void InitUltralight()
 	{
 		AppCoreMethods.ulEnablePlatformFontLoader();
@@ -246,17 +248,36 @@ unsafe class HelloTriangleApplication
 		dr.commandBuffer = BeginSingleTimeCommands();
 		dr.graphicsQueue = graphicsQueue;
 		ULPlatform.GPUDriver = dr.GPUDriver;
-		renderer = ULPlatform.CreateRenderer(new ULConfig() { ForceRepaint = true });
+		renderer = ULPlatform.CreateRenderer(new ULConfig() { ForceRepaint = true, FaceWinding = ULFaceWinding.CounterClockwise });
 		view = renderer.CreateView((uint)window!.Size.X, (uint)window!.Size.Y, new() { IsAccelerated = true, IsTransparent = false });
 		bool loaded = false;
 		view.OnFinishLoading += (frameId, isMain, url) => loaded = true;
-		//view.HTML = "<html><body><p>123</p></body></html>";
-		view.URL = "https://google.com";
+		view.HTML = "<html><body><p>123</p></body></html>";
+		//view.URL = "https://youtube.com";
 		while (!loaded) { renderer.Update(); Thread.Sleep(10); }
 
 		renderer.Render();
 
 		EndSingleTimeCommands(dr.commandBuffer);
+
+		CommandBufferAllocateInfo allocateInfo = new()
+		{
+			SType = StructureType.CommandBufferAllocateInfo,
+			Level = CommandBufferLevel.Primary,
+			CommandPool = commandPool,
+			CommandBufferCount = 1,
+		};
+
+		vk!.AllocateCommandBuffers(device, &allocateInfo, out dr.commandBuffer);
+
+		FenceCreateInfo fenceCI = new()
+		{
+			SType = StructureType.FenceCreateInfo,
+			PNext = null,
+			Flags = FenceCreateFlags.FenceCreateSignaledBit
+		};
+
+		vk!.CreateFence(device, &fenceCI, null, out ultralightFence);
 	}
 
 	private void MainLoop()
@@ -1035,6 +1056,7 @@ unsafe class HelloTriangleApplication
 		{
 			SType = StructureType.CommandPoolCreateInfo,
 			QueueFamilyIndex = queueFamiliyIndicies.GraphicsFamily!.Value,
+			Flags = CommandPoolCreateFlags.CommandPoolCreateResetCommandBufferBit // Required for efficient ultralight rendering
 		};
 
 		if (vk!.CreateCommandPool(device, poolInfo, null, out commandPool) != Result.Success)
@@ -1774,20 +1796,21 @@ unsafe class HelloTriangleApplication
 		SubmitInfo submitInfo = new()
 		{
 			SType = StructureType.SubmitInfo,
+			PNext = null,
 			CommandBufferCount = 1,
 			PCommandBuffers = &commandBuffer,
 		};
-		FenceCreateInfo fenceCreateInfo = new(){
+		FenceCreateInfo fenceCreateInfo = new()
+		{
 			SType = StructureType.FenceCreateInfo,
-			//Flags = FenceCreateFlags.FenceCreateSignaledBit
+			Flags = 0
 		};
 		Fence fence;
 		vk!.CreateFence(device, &fenceCreateInfo, null, &fence);
 
 		vk!.QueueSubmit(graphicsQueue, 1, submitInfo, fence);
-		var r = vk!.WaitForFences(device, 1, &fence, true, ulong.MaxValue);
-		//vk!.QueueWaitIdle(graphicsQueue);
-
+		vk!.WaitForFences(device, 1, &fence, true, ulong.MaxValue);
+		vk!.DestroyFence(device, fence, null);
 		vk!.FreeCommandBuffers(device, commandPool, 1, commandBuffer);
 	}
 
@@ -1969,22 +1992,53 @@ unsafe class HelloTriangleApplication
 	{
 		vk!.WaitForFences(device, 1, inFlightFences![currentFrame], true, ulong.MaxValue);
 
+		if (vk!.GetFenceStatus(device, ultralightFence) is not Result.NotReady)
+		{
+			vk!.ResetFences(device, 1, ultralightFence);
+
+			CommandBufferBeginInfo beginInfo = new()
+			{
+				SType = StructureType.CommandBufferBeginInfo,
+				Flags = CommandBufferUsageFlags.CommandBufferUsageOneTimeSubmitBit,
+			};
+
+			vk!.BeginCommandBuffer(dr.commandBuffer, beginInfo);
+
+			renderer.Update();
+			renderer.Render();
+
+			vk!.EndCommandBuffer(dr.commandBuffer);
+
+			fixed (CommandBuffer* cbPtr = &dr.commandBuffer)
+			{
+				SubmitInfo ulSubmitInfo = new()
+				{
+					SType = StructureType.SubmitInfo,
+					PNext = null,
+					CommandBufferCount = 1,
+					PCommandBuffers = cbPtr
+				};
+
+				vk!.QueueSubmit(graphicsQueue, 1, ulSubmitInfo, ultralightFence);
+			}
+		}
+
 		uint imageIndex = 0;
 		var result = khrSwapChain!.AcquireNextImage(device, swapChain, ulong.MaxValue, imageAvailableSemaphores![currentFrame], default, ref imageIndex);
 
-		if (result == Result.ErrorOutOfDateKhr)
+		if (result is Result.ErrorOutOfDateKhr)
 		{
 			RecreateSwapChain();
 			return;
 		}
-		else if (result != Result.Success && result != Result.SuboptimalKhr)
+		else if (result is not Result.Success && result is not Result.SuboptimalKhr)
 		{
 			throw new Exception("failed to acquire swap chain image!");
 		}
 
 		UpdateUniformBuffer(imageIndex);
 
-		if (imagesInFlight![imageIndex].Handle != default)
+		if (imagesInFlight![imageIndex].Handle is not 0)
 		{
 			vk!.WaitForFences(device, 1, imagesInFlight[imageIndex], true, ulong.MaxValue);
 		}
@@ -2019,7 +2073,7 @@ unsafe class HelloTriangleApplication
 
 		vk!.ResetFences(device, 1, inFlightFences[currentFrame]);
 
-		if (vk!.QueueSubmit(graphicsQueue, 1, submitInfo, inFlightFences[currentFrame]) != Result.Success)
+		if (vk!.QueueSubmit(graphicsQueue, 1, submitInfo, inFlightFences[currentFrame]) is not Result.Success)
 		{
 			throw new Exception("failed to submit draw command buffer!");
 		}
@@ -2040,18 +2094,17 @@ unsafe class HelloTriangleApplication
 
 		result = khrSwapChain.QueuePresent(presentQueue, presentInfo);
 
-		if (result == Result.ErrorOutOfDateKhr || result == Result.SuboptimalKhr || frameBufferResized)
+		if (result is Result.ErrorOutOfDateKhr || result is Result.SuboptimalKhr || frameBufferResized)
 		{
 			frameBufferResized = false;
 			RecreateSwapChain();
 		}
-		else if (result != Result.Success)
+		else if (result is not Result.Success)
 		{
 			throw new Exception("failed to present swap chain image!");
 		}
 
 		currentFrame = (currentFrame + 1) % MAX_FRAMES_IN_FLIGHT;
-
 	}
 
 	private ShaderModule CreateShaderModule(byte* code, nuint len)
@@ -2090,10 +2143,10 @@ unsafe class HelloTriangleApplication
 
 	private static PresentModeKHR ChoosePresentMode(IReadOnlyList<PresentModeKHR> availablePresentModes)
 	{
-		return availablePresentModes.Contains(PresentModeKHR.PresentModeMailboxKhr) ? PresentModeKHR.PresentModeMailboxKhr
-			: availablePresentModes.Contains(PresentModeKHR.PresentModeImmediateKhr) ? PresentModeKHR.PresentModeImmediateKhr
-			: availablePresentModes.Contains(PresentModeKHR.PresentModeFifoRelaxedKhr) ? PresentModeKHR.PresentModeFifoRelaxedKhr
-			: PresentModeKHR.PresentModeFifoKhr;
+		return availablePresentModes.Contains(PresentModeKHR.PresentModeMailboxKhr) ? PresentModeKHR.PresentModeMailboxKhr // vsync buffering
+			: availablePresentModes.Contains(PresentModeKHR.PresentModeImmediateKhr) ? PresentModeKHR.PresentModeImmediateKhr // instant
+			: availablePresentModes.Contains(PresentModeKHR.PresentModeFifoRelaxedKhr) ? PresentModeKHR.PresentModeFifoRelaxedKhr // kinda vsync
+			: PresentModeKHR.PresentModeFifoKhr; // vsync
 	}
 
 	private Extent2D ChooseSwapExtent(SurfaceCapabilitiesKHR capabilities)
