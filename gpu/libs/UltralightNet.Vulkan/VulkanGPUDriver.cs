@@ -74,8 +74,8 @@ public unsafe partial class VulkanGPUDriver
 	private readonly DescriptorPool uniformDescriptorPool;
 	private readonly DescriptorSet uniformSet;
 	private Uniforms* uniforms;
-	private readonly DeviceMemory uniformBufferMemory;
-	private readonly Buffer uniformBuffer;
+	private DeviceMemory uniformBufferMemory;
+	private Buffer uniformBuffer;
 	private readonly Sampler textureSampler;
 	// TODO: implement MSAA
 	private const SampleCountFlags msaaSamples = SampleCountFlags.SampleCount4Bit;
@@ -464,7 +464,6 @@ public unsafe partial class VulkanGPUDriver
 		#endregion DescriptorPool
 		#region DescriptorSet
 		DescriptorSet uniformSet;
-
 		DescriptorSetAllocateInfo allocateInfo = new()
 		{
 			SType = StructureType.DescriptorSetAllocateInfo,
@@ -478,31 +477,6 @@ public unsafe partial class VulkanGPUDriver
 		}
 		this.uniformSet = uniformSet;
 		#endregion DescriptorSet
-		#region Buffer
-		CreateBuffer(UniformBufferSize * 100, BufferUsageFlags.BufferUsageUniformBufferBit, MemoryPropertyFlags.MemoryPropertyHostVisibleBit | MemoryPropertyFlags.MemoryPropertyHostCoherentBit, out uniformBuffer, out uniformBufferMemory);
-		void* mapAddress;
-		vk.MapMemory(device, uniformBufferMemory, 0, UniformBufferSize * 100, 0, &mapAddress);
-		uniforms = (Uniforms*)mapAddress;
-		#endregion Buffer
-		#region DescriptorWrite
-		var bufferInfo = new DescriptorBufferInfo()
-		{
-			Buffer = uniformBuffer,
-			Offset = 0,
-			Range = UniformBufferSize
-		};
-		var uniformWriteDescriptorSet = new WriteDescriptorSet()
-		{
-			SType = StructureType.WriteDescriptorSet,
-			DstSet = uniformSet,
-			DstBinding = 0,
-			DstArrayElement = 0,
-			DescriptorType = DescriptorType.UniformBufferDynamic,
-			DescriptorCount = 1,
-			PBufferInfo = &bufferInfo,
-		};
-		vk.UpdateDescriptorSets(device, 1, &uniformWriteDescriptorSet, 0, null);
-		#endregion
 		#endregion UniformSet
 		_gpuDriver = new()
 		{
@@ -911,6 +885,9 @@ public unsafe partial class VulkanGPUDriver
 	private void UpdateCommandList(ULCommandList list)
 	{
 		var s = list.ToSpan();
+
+		KeepUniformBufferSizeEnough(list.size);
+
 		uint currentRenderBuffer = uint.MaxValue;
 		uint uniformBufferId = 0;
 		foreach (var command in s)

@@ -23,91 +23,45 @@ public unsafe partial class VulkanGPUDriver
 {
 	private const ulong UniformBufferSize = 768;
 
-	private readonly Dictionary<ULGPUState, UniformBufferEntry> uniformBuffers = new();
+	private uint currentUniformBufferCount = 0;
 
-	//[SkipLocalsInit]
-	/*[MethodImpl(MethodImplOptions.AggressiveInlining)]
-	private DescriptorSet GetUniformBuffer(ULGPUState state)
+	[SkipLocalsInit]
+	[MethodImpl(MethodImplOptions.AggressiveInlining)]
+	private void KeepUniformBufferSizeEnough(uint count)
 	{
-		if (uniformBuffers.TryGetValue(state, out UniformBufferEntry entry))
+		if (currentUniformBufferCount >= count) return;
+
+		if (uniformBuffer.Handle is not 0)
 		{
-			return entry.descriptorSet;
+			vk.DestroyBuffer(device, uniformBuffer, null);
+			vk.UnmapMemory(device, uniformBufferMemory);
+			vk.FreeMemory(device, uniformBufferMemory, null);
 		}
-		else
+
+		CreateBuffer(UniformBufferSize * count, BufferUsageFlags.BufferUsageUniformBufferBit, MemoryPropertyFlags.MemoryPropertyHostVisibleBit | MemoryPropertyFlags.MemoryPropertyHostCoherentBit, out uniformBuffer, out uniformBufferMemory);
+
+		fixed (Uniforms** m = &uniforms)
 		{
-			CreateBuffer(UniformBufferSize, BufferUsageFlags.BufferUsageUniformBufferBit, MemoryPropertyFlags.MemoryPropertyHostVisibleBit | MemoryPropertyFlags.MemoryPropertyHostCoherentBit, out Buffer buffer, out DeviceMemory memory);
-			Uniforms* mapped;
-			vk.MapMemory(device, memory, 0, UniformBufferSize, 0, (void**)&mapped);
-			mapped->Transform = state.transform.ApplyProjection(state.viewport_width, state.viewport_height, true);
-			mapped->ClipSize = state.clip_size;
-			new ReadOnlySpan<Vector4>(&state.scalar_0, 10).CopyTo(new Span<Vector4>(&mapped->Scalar4_0.W, 10));
-			new ReadOnlySpan<Matrix4x4>(&state.clip_0.M11, 8).CopyTo(new Span<Matrix4x4>(&mapped->Clip_0.M11, 8));
-			vk.UnmapMemory(device, memory);
-
-			var poolSize = new DescriptorPoolSize()
-			{
-				Type = DescriptorType.UniformBuffer,
-				DescriptorCount = 1,
-			};
-
-			DescriptorPool uniformDescriptorPool;
-
-			DescriptorPoolCreateInfo poolInfo = new()
-			{
-				SType = StructureType.DescriptorPoolCreateInfo,
-				PoolSizeCount = 1,
-				PPoolSizes = &poolSize,
-				MaxSets = 1
-			};
-
-			if (vk.CreateDescriptorPool(device, poolInfo, null, &uniformDescriptorPool) is not Result.Success)
-			{
-				throw new Exception("failed to create descriptor pool!");
-			}
-			DescriptorSet uniformSet;
-			fixed (DescriptorSetLayout* u = &uniformSetLayout)
-			{
-				DescriptorSetAllocateInfo allocateInfo = new()
-				{
-					SType = StructureType.DescriptorSetAllocateInfo,
-					DescriptorPool = uniformDescriptorPool,
-					DescriptorSetCount = 1,
-					PSetLayouts = u
-				};
-				if (vk.AllocateDescriptorSets(device, allocateInfo, &uniformSet) is not Result.Success)
-				{
-					throw new Exception("failed to allocate descriptor sets!");
-				}
-			}
-
-			var bufferInfo = new DescriptorBufferInfo()
-			{
-				Buffer = buffer,
-				Offset = 0,
-				Range = UniformBufferSize
-			};
-			var uniformWriteDescriptorSet = new WriteDescriptorSet()
-			{
-				SType = StructureType.WriteDescriptorSet,
-				DstSet = uniformSet,
-				DstBinding = 0,
-				DstArrayElement = 0,
-				DescriptorType = DescriptorType.UniformBuffer,
-				DescriptorCount = 1,
-				PBufferInfo = &bufferInfo,
-			};
-			vk.UpdateDescriptorSets(device, 1, &uniformWriteDescriptorSet, 0, null);
-
-			uniformBuffers[state] = new()
-			{
-				buffer = buffer,
-				memory = memory,
-				descriptorPool = uniformDescriptorPool,
-				descriptorSet = uniformSet
-			};
-
-			return uniformBuffers[state].descriptorSet;
+			vk.MapMemory(device, uniformBufferMemory, 0, UniformBufferSize * count, 0, (void**)m);
 		}
-	}*/
 
+		var bufferInfo = new DescriptorBufferInfo()
+		{
+			Buffer = uniformBuffer,
+			Offset = 0,
+			Range = UniformBufferSize
+		};
+		var uniformWriteDescriptorSet = new WriteDescriptorSet()
+		{
+			SType = StructureType.WriteDescriptorSet,
+			DstSet = uniformSet,
+			DstBinding = 0,
+			DstArrayElement = 0,
+			DescriptorType = DescriptorType.UniformBufferDynamic,
+			DescriptorCount = 1,
+			PBufferInfo = &bufferInfo,
+		};
+		vk.UpdateDescriptorSets(device, 1, &uniformWriteDescriptorSet, 0, null);
+		currentUniformBufferCount = count;
+	}
 }
