@@ -199,6 +199,32 @@ unsafe class HelloTriangleApplication
 		}
 
 		window.Resize += FramebufferResizeCallback;
+
+		var input = window.CreateInput();
+
+		input.Mice[0].Scroll += OnScroll;
+		input.Mice[0].MouseDown += OnMouseDown;
+		input.Mice[0].MouseUp += OnMouseUp;
+		input.Mice[0].MouseMove += OnMouseMove;
+	}
+
+	void OnScroll(IMouse _, ScrollWheel scroll)
+	{
+		view.FireScrollEvent(new ULScrollEvent { type = ULScrollEventType.ByPixel, deltaX = (int)scroll.X * 100, deltaY = (int)scroll.Y * 100 });
+	}
+
+	void OnMouseDown(IMouse mouse, MouseButton button)
+	{
+		view.FireMouseEvent(new() { type = ULMouseEventType.MouseDown, button = button is MouseButton.Left ? ULMouseEventButton.Left : (button is MouseButton.Right ? ULMouseEventButton.Right : ULMouseEventButton.Middle), x = (int)mouse.Position.X, y = (int)mouse.Position.Y });
+	}
+
+	void OnMouseUp(IMouse mouse, MouseButton button)
+	{
+		view.FireMouseEvent(new() { type = ULMouseEventType.MouseUp, button = button is MouseButton.Left ? ULMouseEventButton.Left : (button is MouseButton.Right ? ULMouseEventButton.Right : ULMouseEventButton.Middle), x = (int)mouse.Position.X, y = (int)mouse.Position.Y });
+	}
+	void OnMouseMove(IMouse mouse, Vector2 position)
+	{
+		view.FireMouseEvent(new() { type = ULMouseEventType.MouseMoved, x = (int)position.X, y = (int)position.Y });
 	}
 
 	private void FramebufferResizeCallback(Vector2D<int> obj)
@@ -1988,38 +2014,48 @@ unsafe class HelloTriangleApplication
 
 	}
 
+	private bool BeganULCB = false;
+
 	private void DrawFrame(double delta)
 	{
 		vk!.WaitForFences(device, 1, inFlightFences![currentFrame], true, ulong.MaxValue);
+		renderer.Update();
 
 		if (vk!.GetFenceStatus(device, ultralightFence) is not Result.NotReady)
 		{
-			vk!.ResetFences(device, 1, ultralightFence);
-
-			CommandBufferBeginInfo beginInfo = new()
+			if (!BeganULCB)
 			{
-				SType = StructureType.CommandBufferBeginInfo,
-				Flags = CommandBufferUsageFlags.CommandBufferUsageOneTimeSubmitBit,
-			};
+				CommandBufferBeginInfo beginInfo = new()
+				{
+					SType = StructureType.CommandBufferBeginInfo,
+					Flags = CommandBufferUsageFlags.CommandBufferUsageOneTimeSubmitBit,
+				};
+				vk!.BeginCommandBuffer(dr.commandBuffer, beginInfo);
+				BeganULCB = true;
+			}
 
-			vk!.BeginCommandBuffer(dr.commandBuffer, beginInfo);
-
-			renderer.Update();
 			renderer.Render();
 
-			vk!.EndCommandBuffer(dr.commandBuffer);
-
-			fixed (CommandBuffer* cbPtr = &dr.commandBuffer)
+			if (dr.RequiresResubmission)
 			{
-				SubmitInfo ulSubmitInfo = new()
-				{
-					SType = StructureType.SubmitInfo,
-					PNext = null,
-					CommandBufferCount = 1,
-					PCommandBuffers = cbPtr
-				};
+				vk!.EndCommandBuffer(dr.commandBuffer);
 
-				vk!.QueueSubmit(graphicsQueue, 1, ulSubmitInfo, ultralightFence);
+				vk!.ResetFences(device, 1, ultralightFence);
+
+				fixed (CommandBuffer* cbPtr = &dr.commandBuffer)
+				{
+					SubmitInfo ulSubmitInfo = new()
+					{
+						SType = StructureType.SubmitInfo,
+						PNext = null,
+						CommandBufferCount = 1,
+						PCommandBuffers = cbPtr
+					};
+					vk!.QueueSubmit(graphicsQueue, 1, ulSubmitInfo, ultralightFence);
+				}
+
+				BeganULCB = false;
+				dr.RequiresResubmission = false;
 			}
 		}
 
