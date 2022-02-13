@@ -881,9 +881,11 @@ public unsafe partial class VulkanGPUDriver
 	}
 
 	#region Rendering
+	public bool RequiresResubmission = false;
 	//[SkipLocalsInit]
 	private void UpdateCommandList(ULCommandList list)
 	{
+		RequiresResubmission = true;
 		var s = list.ToSpan();
 
 		KeepUniformBufferSizeEnough(list.size);
