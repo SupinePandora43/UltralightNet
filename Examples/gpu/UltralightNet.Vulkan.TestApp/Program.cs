@@ -184,7 +184,8 @@ unsafe class HelloTriangleApplication
 		{
 			Size = new Vector2D<int>(WIDTH, HEIGHT),
 			Title = "Vulkan",
-			UpdatesPerSecond = 0,
+			Samples = 1,
+			UpdatesPerSecond = 60,
 			FramesPerSecond = 0,
 			VSync = false
 		};
@@ -278,8 +279,8 @@ unsafe class HelloTriangleApplication
 		view = renderer.CreateView((uint)window!.Size.X, (uint)window!.Size.Y, new() { IsAccelerated = true, IsTransparent = false });
 		bool loaded = false;
 		view.OnFinishLoading += (frameId, isMain, url) => loaded = true;
-		view.HTML = "<html><body><p>123</p></body></html>";
-		//view.URL = "https://youtube.com";
+		//view.HTML = "<html><body><p>123</p></body></html>";
+		view.URL = "https://youtube.com";
 		while (!loaded) { renderer.Update(); Thread.Sleep(10); }
 
 		renderer.Render();
@@ -308,6 +309,7 @@ unsafe class HelloTriangleApplication
 
 	private void MainLoop()
 	{
+		window!.Update += (_) => renderer.Update();
 		window!.Render += DrawFrame;
 		window!.Run();
 		vk!.DeviceWaitIdle(device);
@@ -2018,9 +2020,6 @@ unsafe class HelloTriangleApplication
 
 	private void DrawFrame(double delta)
 	{
-		vk!.WaitForFences(device, 1, inFlightFences![currentFrame], true, ulong.MaxValue);
-		renderer.Update();
-
 		if (vk!.GetFenceStatus(device, ultralightFence) is not Result.NotReady)
 		{
 			if (!BeganULCB)
@@ -2058,6 +2057,8 @@ unsafe class HelloTriangleApplication
 				dr.RequiresResubmission = false;
 			}
 		}
+
+		vk!.WaitForFences(device, 1, inFlightFences![currentFrame], true, ulong.MaxValue);
 
 		uint imageIndex = 0;
 		var result = khrSwapChain!.AcquireNextImage(device, swapChain, ulong.MaxValue, imageAvailableSemaphores![currentFrame], default, ref imageIndex);
