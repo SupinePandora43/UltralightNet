@@ -11,10 +11,7 @@ namespace UltralightNet
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public ReadOnlySpan<ULCommand> ToSpan()
 		{
-			unsafe
-			{
-				return new(commandsPtr, (int)size);
-			}
+			return new(commandsPtr, (int)size);
 		}
 	}
 }
