@@ -1,12 +1,12 @@
 namespace UltralightNet.OpenGL;
 
 using System;
+using System.Collections.Generic;
 using System.IO;
-using System.Text;
 using System.Numerics;
 using System.Reflection;
-using System.Collections.Generic;
 using System.Runtime.CompilerServices;
+using System.Text;
 using Silk.NET.OpenGL;
 using UltralightNet;
 using UltralightNet.GPUCommon;
@@ -35,17 +35,20 @@ public unsafe partial class OpenGLGPUDriver
 	private readonly bool DSA = true;
 	private readonly uint samples = 0;
 
-	public OpenGLGPUDriver(GL glapi, bool DSA = true, uint samples = 0)
+	public OpenGLGPUDriver(GL glapi, uint samples = 0)
 	{
 		gl = glapi;
 
 		// DSA
-		this.DSA = gl.GetInteger(GLEnum.MajorVersion) >= 4 && gl.GetInteger(GLEnum.MinorVersion) >= 5;
-
+		DSA = gl.GetInteger(GLEnum.MajorVersion) >= 4 && gl.GetInteger(GLEnum.MinorVersion) >= 5;
 		// MSAAx4
 		this.samples = samples is 0 ? (4 <= gl.GetInteger(GLEnum.MaxSamples) ? 4u : 1u) : samples;
 
 		Check();
+
+		// Save state
+		uint glProgram;
+		gl.GetInteger(GetPName.CurrentProgram, (int*)&glProgram);
 
 		#region pathProgram
 		{
@@ -61,7 +64,7 @@ public unsafe partial class OpenGLGPUDriver
 			string vertLog = gl.GetShaderInfoLog(vert);
 			if (!string.IsNullOrWhiteSpace(vertLog))
 			{
-				throw new Exception($"Error compiling shader of type, failed with error {vertLog}");
+				//throw new Exception($"Error compiling shader of type, failed with error {vertLog}");
 			}
 			string fragLog = gl.GetShaderInfoLog(frag);
 			if (!string.IsNullOrWhiteSpace(fragLog))
@@ -107,12 +110,12 @@ public unsafe partial class OpenGLGPUDriver
 			string vertLog = gl.GetShaderInfoLog(vert);
 			if (!string.IsNullOrWhiteSpace(vertLog))
 			{
-				throw new Exception($"Error compiling shader of type, failed with error {vertLog}");
+				//throw new Exception($"Error compiling shader of type, failed with error {vertLog}");
 			}
 			string fragLog = gl.GetShaderInfoLog(frag);
 			if (!string.IsNullOrWhiteSpace(fragLog))
 			{
-				throw new Exception($"Error compiling shader of type, failed with error {fragLog}");
+				//throw new Exception($"Error compiling shader of type, failed with error {fragLog}");
 			}
 
 			fillProgram = gl.CreateProgram();
@@ -148,7 +151,6 @@ public unsafe partial class OpenGLGPUDriver
 			gl.Uniform1(gl.GetUniformLocation(fillProgram, "Texture1"), 0);
 			gl.Uniform1(gl.GetUniformLocation(fillProgram, "Texture2"), 1);
 			gl.UniformBlockBinding(fillProgram, gl.GetUniformBlockIndex(fillProgram, "Uniforms"), 0);
-			gl.UseProgram(0);
 		}
 		#endregion
 
@@ -167,6 +169,9 @@ public unsafe partial class OpenGLGPUDriver
 			gl.BindBuffer(GLEnum.UniformBuffer, 0);
 		}
 		gl.BindBufferRange(GLEnum.UniformBuffer, 0, UBO, 0, 768);
+
+		// Restore state
+		gl.UseProgram(glProgram);
 	}
 
 	private static string GetShader(string name)
@@ -176,7 +181,6 @@ public unsafe partial class OpenGLGPUDriver
 		StreamReader resourceStreamReader = new(stream, Encoding.UTF8, false, 16, true);
 		return resourceStreamReader.ReadToEnd();
 	}
-
 
 	public ULGPUDriver GetGPUDriver() => new()
 	{
@@ -287,6 +291,12 @@ public unsafe partial class OpenGLGPUDriver
 				if (isRT)
 				{
 					gl.TexImage2D(TextureTarget.Texture2D, 0, (int)InternalFormat.Rgba8, width, height, 0, PixelFormat.Bgra, PixelType.UnsignedByte, null);
+					if (samples is not 1)
+					{
+						gl.GenTextures(1, &multisampledTextureId);
+						gl.BindTexture(TextureTarget.Texture2DMultisample, multisampledTextureId);
+						gl.TexImage2DMultisample(TextureTarget.Texture2DMultisample, samples, GLEnum.Rgba8, width, height, true);
+					}
 				}
 				else
 				{
@@ -416,6 +426,15 @@ public unsafe partial class OpenGLGPUDriver
 				gl.BindTexture(TextureTarget.Texture2D, textureGLId);
 				gl.FramebufferTexture2D(FramebufferTarget.Framebuffer, FramebufferAttachment.ColorAttachment0, TextureTarget.Texture2D, textureGLId, 0);
 				gl.DrawBuffer(DrawBufferMode.ColorAttachment0);
+
+				if (multisampledTextureId is not 0)
+				{
+					multisampledFramebuffer = gl.GenFramebuffer();
+					gl.BindFramebuffer(FramebufferTarget.Framebuffer, multisampledFramebuffer);
+					gl.BindTexture(TextureTarget.Texture2DMultisample, multisampledTextureId);
+					gl.FramebufferTexture2D(FramebufferTarget.Framebuffer, FramebufferAttachment.ColorAttachment0, TextureTarget.Texture2DMultisample, multisampledTextureId, 0);
+					gl.DrawBuffer(DrawBufferMode.ColorAttachment0);
+				}
 
 #if DEBUG
 				var status = gl.CheckFramebufferStatus(FramebufferTarget.Framebuffer);
@@ -607,17 +626,32 @@ public unsafe partial class OpenGLGPUDriver
 
 		UpdateCommandList = [SkipLocalsInit](commandList) =>
 		{
-			var commandSpan = commandList.ToSpan();
+			Check();
+			uint glLastProgram = default;
+			uint glProgram = default;
+			uint glViewportWidth = unchecked((uint)-1);
+			uint glViewportHeight = unchecked((uint)-1);
+
+			if (commandList.size is 0) return; // Skip everything
+
+			gl.GetInteger(GetPName.CurrentProgram, (int*)&glLastProgram);
+			glProgram = glLastProgram;
 			//gl.Enable(EnableCap.Blend);
 			//gl.Disable(EnableCap.ScissorTest);
 			gl.Disable(EnableCap.DepthTest);
 			gl.DepthFunc(DepthFunction.Never);
 			gl.BlendFunc(BlendingFactor.One, BlendingFactor.OneMinusSrcAlpha);
 
-			if (!DSA) gl.BindBuffer(BufferTargetARB.UniformBuffer, UBO);
+			if (!DSA)
+				gl.BindBuffer(BufferTargetARB.UniformBuffer, UBO);
+
 
 			uint currentFramebuffer = uint.MaxValue;
 
+			Uniforms uniforms = default;
+
+			var commandSpan = commandList.ToSpan();
+			Check();
 			foreach (var command in commandSpan)
 			{
 				var gpuState = command.gpu_state;
@@ -634,17 +668,20 @@ public unsafe partial class OpenGLGPUDriver
 				}
 				if (command.command_type is ULCommandType.DrawGeometry)
 				{
-					gl.Viewport(0, 0, gpuState.viewport_width, gpuState.viewport_height);
+					if (glViewportWidth != gpuState.viewport_width || glViewportHeight != gpuState.viewport_height) // Set viewport
+					{
+						gl.Viewport(0, 0, gpuState.viewport_width, gpuState.viewport_height);
+						glViewportWidth = gpuState.viewport_width;
+						glViewportHeight = gpuState.viewport_height;
+					}
 					uint program;
-
-					if (gpuState.shader_type is ULShaderType.FillPath) program = pathProgram; //gl.UseProgram(pathProgram);
-					else program = fillProgram; //gl.UseProgram(fillProgram);
+					if (gpuState.shader_type is ULShaderType.FillPath) program = pathProgram;
+					else program = fillProgram;
+					if (glProgram != program) gl.UseProgram(program);
 
 					var geometryEntry = geometries[command.geometry_id];
-					gl.UseProgram(program);
 
 					#region Uniforms
-					Uniforms uniforms = default;
 					uniforms.State.X = gpuState.viewport_width;
 					uniforms.State.Y = gpuState.viewport_height;
 					uniforms.Transform = gpuState.transform.ApplyProjection(gpuState.viewport_width, gpuState.viewport_height, true);
@@ -656,44 +693,54 @@ public unsafe partial class OpenGLGPUDriver
 					if (DSA)
 						gl.NamedBufferData(UBO, 768, &uniforms, GLEnum.DynamicDraw);
 					else
-					{
 						gl.BufferData(BufferTargetARB.UniformBuffer, 768, &uniforms, BufferUsageARB.DynamicDraw);
-					}
 					#endregion Uniforms
 
 					gl.BindVertexArray(geometryEntry.vao);
 
 					if (gpuState.shader_type is ULShaderType.Fill)
 					{
-						if (DSA)
+						if (textures.ContainsKey(gpuState.texture_1_id))
 						{
-							if (textures.ContainsKey(gpuState.texture_1_id))
+							TextureEntry textureEntry = textures[gpuState.texture_1_id];
+							if (DSA)
 							{
-								TextureEntry textureEntry = textures[gpuState.texture_1_id];
 								if (textureEntry.needsConversion)
-								{
 									gl.BlitNamedFramebuffer(textureEntry.multisampledFramebuffer, textureEntry.framebuffer, 0, 0, (int)textureEntry.width, (int)textureEntry.height, 0, 0, (int)textureEntry.width, (int)textureEntry.height, ClearBufferMask.ColorBufferBit, BlitFramebufferFilter.Linear);
-								}
 								gl.BindTextureUnit(0, textureEntry.textureId);
 							}
-							//else gl.BindTextureUnit(0, 0);
-							if (textures.ContainsKey(gpuState.texture_2_id))
+							else
 							{
-								TextureEntry textureEntry = textures[gpuState.texture_2_id];
 								if (textureEntry.needsConversion)
 								{
-									gl.BlitNamedFramebuffer(textureEntry.multisampledFramebuffer, textureEntry.framebuffer, 0, 0, (int)textureEntry.width, (int)textureEntry.height, 0, 0, (int)textureEntry.width, (int)textureEntry.height, ClearBufferMask.ColorBufferBit, BlitFramebufferFilter.Linear);
+									gl.BindFramebuffer(FramebufferTarget.ReadFramebuffer, textureEntry.multisampledFramebuffer);
+									gl.BindFramebuffer(FramebufferTarget.DrawFramebuffer, textureEntry.framebuffer);
+									gl.BlitFramebuffer(0, 0, (int)textureEntry.width, (int)textureEntry.height, 0, 0, (int)textureEntry.width, (int)textureEntry.height, ClearBufferMask.ColorBufferBit, BlitFramebufferFilter.Linear);
 								}
+								gl.ActiveTexture(GLEnum.Texture0);
+								gl.BindTexture(GLEnum.Texture2D, textureEntry.textureId);
+							}
+						}
+						if (textures.ContainsKey(gpuState.texture_2_id))
+						{
+							TextureEntry textureEntry = textures[gpuState.texture_2_id];
+							if (DSA)
+							{
+								if (textureEntry.needsConversion)
+									gl.BlitNamedFramebuffer(textureEntry.multisampledFramebuffer, textureEntry.framebuffer, 0, 0, (int)textureEntry.width, (int)textureEntry.height, 0, 0, (int)textureEntry.width, (int)textureEntry.height, ClearBufferMask.ColorBufferBit, BlitFramebufferFilter.Linear);
 								gl.BindTextureUnit(1, textureEntry.textureId);
 							}
-							//else gl.BindTextureUnit(1, 0);
-						}
-						else
-						{
-							gl.ActiveTexture(GLEnum.Texture0);
-							gl.BindTexture(GLEnum.Texture2D, textures.ContainsKey(gpuState.texture_1_id) ? textures[gpuState.texture_1_id].textureId : 0);
-							gl.ActiveTexture(GLEnum.Texture1);
-							gl.BindTexture(GLEnum.Texture2D, textures.ContainsKey(gpuState.texture_2_id) ? textures[gpuState.texture_2_id].textureId : 0);
+							else
+							{
+								if (textureEntry.needsConversion)
+								{
+									gl.BindFramebuffer(FramebufferTarget.ReadFramebuffer, textureEntry.multisampledFramebuffer);
+									gl.BindFramebuffer(FramebufferTarget.DrawFramebuffer, textureEntry.framebuffer);
+									gl.BlitFramebuffer(0, 0, (int)textureEntry.width, (int)textureEntry.height, 0, 0, (int)textureEntry.width, (int)textureEntry.height, ClearBufferMask.ColorBufferBit, BlitFramebufferFilter.Linear);
+								}
+								gl.ActiveTexture(GLEnum.Texture1);
+								gl.BindTexture(GLEnum.Texture2D, textureEntry.textureId);
+							}
 						}
 					}
 
@@ -714,8 +761,10 @@ public unsafe partial class OpenGLGPUDriver
 					gl.ClearColor(0, 0, 0, 0);
 					gl.Clear((uint)GLEnum.ColorBufferBit);
 				}
-				else throw new Exception();
+				else throw new Exception($"Invalid {nameof(ULCommandType)} value.");
 			}
+
+			gl.UseProgram(glLastProgram);
 
 			gl.BindVertexArray(0);
 			gl.BindFramebuffer(FramebufferTarget.Framebuffer, 0);
