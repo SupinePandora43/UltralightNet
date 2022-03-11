@@ -68,7 +68,7 @@ void main()
 		window = Window.Create(WindowOptions.Default with
 		{
 			Size = new Vector2D<int>(512, 512),
-			API = new GraphicsAPI(ContextAPI.OpenGL, ContextProfile.Core, ContextFlags.ForwardCompatible, new APIVersion(4, 5)),
+			API = new GraphicsAPI(ContextAPI.OpenGL, ContextProfile.Core, 0/*ContextFlags.ForwardCompatible*/, new APIVersion(4,5)),
 			Samples = 1,
 			FramesPerSecond = 0,
 			UpdatesPerSecond = 0,
@@ -195,7 +195,7 @@ void main()
 
 		window.SwapBuffers();
 
-		gpuDriver = new(gl, true, 4);
+		gpuDriver = new(gl, 16);
 
 		gpuDriver.Check();
 
@@ -206,8 +206,8 @@ void main()
 		renderer = ULPlatform.CreateRenderer(new ULConfig { FaceWinding = ULFaceWinding.Clockwise, ForceRepaint = false });
 
 		view = renderer.CreateView(512, 512, new ULViewConfig { IsAccelerated = true, IsTransparent = false });
-		view.URL = "https://vk.com/supinepandora43";
-		view.URL = "https://twitter.com/@supinepandora43";
+		//view.URL = "https://vk.com/supinepandora43";
+		//view.URL = "https://twitter.com/@supinepandora43";
 		view.URL = "https://youtube.com";
 		//view.HTML = "<html><body><p>123</p></body></html>";
 		bool loaded = false;
