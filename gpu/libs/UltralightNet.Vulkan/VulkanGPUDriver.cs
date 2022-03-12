@@ -887,7 +887,7 @@ public unsafe partial class VulkanGPUDriver
 
 	#region Rendering
 	public bool RequiresResubmission = false;
-	//[SkipLocalsInit]
+	[SkipLocalsInit]
 	private void UpdateCommandList(ULCommandList list)
 	{
 		RequiresResubmission = true;
@@ -897,6 +897,10 @@ public unsafe partial class VulkanGPUDriver
 
 		uint currentRenderBuffer = uint.MaxValue;
 		uint uniformBufferId = 0;
+
+		DescriptorSet* descriptorSets = stackalloc DescriptorSet[3];
+		descriptorSets[0] = uniformSet;
+
 		foreach (var command in s)
 		{
 			ULGPUState state = command.gpu_state;
@@ -956,7 +960,8 @@ public unsafe partial class VulkanGPUDriver
 				TextureEntry textureEntry1 = textures[(int)state.texture_1_id];
 				TextureEntry textureEntry2 = textures[(int)state.texture_2_id is 0 ? (int)state.texture_1_id : (int)state.texture_2_id];
 
-				var descriptorSets = stackalloc[] { uniformSet, textureEntry1.descriptorSet, textureEntry2.descriptorSet };
+				descriptorSets[1] = textureEntry1.descriptorSet;
+				descriptorSets[2] = textureEntry2.descriptorSet;
 
 				uint bufferOffset = (uint)UniformBufferSize * uniformBufferId;
 
@@ -966,11 +971,11 @@ public unsafe partial class VulkanGPUDriver
 
 				vk.CmdBindVertexBuffers(commandBuffer, 0, 1, geometryEntry.vertexBuffer, 0);
 				vk.CmdBindIndexBuffer(commandBuffer, geometryEntry.indexBuffer, 0, IndexType.Uint32);
-				{
-					Viewport viewport = new(0, 0, state.viewport_width, state.viewport_height, 0, 0);
-					vk.CmdSetViewport(commandBuffer, 0, 1, &viewport);
-				}
+
+				Viewport viewport = new(0, 0, state.viewport_width, state.viewport_height, 0, 0);
+				vk.CmdSetViewport(commandBuffer, 0, 1, &viewport);
 				vk.CmdSetScissor(commandBuffer, 0, 1, state.enable_scissor ? (Rect2D*)&state.scissor_rect : &renderPassBeginInfo.RenderArea);
+
 				vk.CmdDrawIndexed(commandBuffer, command.indices_count, 1, command.indices_offset, 0, 0);
 
 				uniformBufferId++; // TODO reuse?
@@ -979,7 +984,6 @@ public unsafe partial class VulkanGPUDriver
 
 		if (currentRenderBuffer is not uint.MaxValue) vk.CmdEndRenderPass(commandBuffer);
 
-		Console.WriteLine($"----------\nCG {stat_CreateGeometry}\nUG {stat_UpdateGeometry}\nDG {stat_DestroyGeometry}\nCT {stat_CreateTexture}\nUT {stat_UpdateTexture}\nDT {stat_DestroyTexture}");
 		stat_CreateGeometry = 0;
 		stat_UpdateGeometry = 0;
 		stat_DestroyGeometry = 0;
