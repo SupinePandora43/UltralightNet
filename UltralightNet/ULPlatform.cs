@@ -155,7 +155,7 @@ namespace UltralightNet
 			}
 		}
 
-		public static Renderer CreateRenderer(ULConfig config = null, bool dispose = true)
+		public static Renderer CreateRenderer(ULConfig config, bool dispose = true)
 		{
 			unsafe
 			{
@@ -256,7 +256,7 @@ namespace UltralightNet
 					m.FreeNative();
 				}
 			}
-			return new Renderer(config ?? new(), dispose);
+			return new Renderer(config, dispose);
 		}
 	}
 }

@@ -8,6 +8,8 @@ namespace UltralightNet
 	{
 		[DllImport("Ultralight")]
 		public static extern IntPtr ulCreateRenderer(IntPtr config);
+		[GeneratedDllImport("Ultralight")]
+		public static partial IntPtr ulCreateRenderer(in ULConfig config);
 
 		/// <summary>Destroy the renderer.</summary>
 		[DllImport("Ultralight")]
@@ -42,7 +44,7 @@ namespace UltralightNet
 
 		internal Renderer(ULConfig config, bool dispose)
 		{
-			Ptr = Methods.ulCreateRenderer(config.Ptr);
+			Ptr = Methods.ulCreateRenderer(config);
 			IsDisposed = !dispose;
 		}
 

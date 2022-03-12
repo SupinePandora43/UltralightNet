@@ -7,6 +7,8 @@ namespace UltralightNet.AppCore
 	{
 		[DllImport("AppCore")]
 		public static extern IntPtr ulCreateApp(IntPtr settings, IntPtr config);
+		[GeneratedDllImport("AppCore")]
+		public static partial IntPtr ulCreateApp(IntPtr settings, in ULConfig config);
 
 		[DllImport("AppCore")]
 		public static extern void ulDestroyApp(IntPtr app);
@@ -45,9 +47,9 @@ namespace UltralightNet.AppCore
 			IsDisposed = !dispose;
 		}
 
-		public ULApp(ULSettings settings, ULConfig config)
+		public ULApp(ULSettings settings, ULConfig config = default)
 		{
-			Ptr = AppCoreMethods.ulCreateApp(settings.Ptr, config.Ptr);
+			Ptr = AppCoreMethods.ulCreateApp(settings.Ptr, config);
 		}
 
 		public void SetUpdateCallback(ULUpdateCallback callback, IntPtr userData = default)

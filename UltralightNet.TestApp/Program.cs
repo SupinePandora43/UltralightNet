@@ -1,8 +1,6 @@
 using System;
-using System.IO;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
-using System.Text;
 using UltralightNet;
 using UltralightNet.AppCore;
 
@@ -15,7 +13,7 @@ namespace UltralightNetTestApplication
 			AppCoreMethods.ulEnablePlatformFileSystem("./");
 			AppCoreMethods.ulEnablePlatformFontLoader();
 
-			Renderer renderer = ULPlatform.CreateRenderer();
+			Renderer renderer = ULPlatform.CreateRenderer(new());
 			View view = renderer.CreateView(512, 512);
 
 			var context = view.LockJSContext();

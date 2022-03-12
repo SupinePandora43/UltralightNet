@@ -799,6 +799,44 @@ namespace UltralightNet
     public static partial class Methods
     {
         [System.Runtime.CompilerServices.SkipLocalsInitAttribute]
+        public static partial global::System.IntPtr ulCreateRenderer(in global::UltralightNet.ULConfig config)
+        {
+            unsafe
+            {
+                global::UltralightNet._ULConfig __config_gen_native = default;
+                global::System.IntPtr __retVal = default;
+                try
+                {
+                    //
+                    // Marshal
+                    //
+                    __config_gen_native = new global::UltralightNet._ULConfig(config);
+                    //
+                    // Invoke
+                    //
+                    __retVal = ulCreateRenderer__PInvoke__(&__config_gen_native);
+                }
+                finally
+                {
+                    //
+                    // Cleanup
+                    //
+                    __config_gen_native.FreeNative();
+                }
+
+                return __retVal;
+            }
+        }
+
+        [System.Runtime.InteropServices.DllImportAttribute("Ultralight", EntryPoint = "ulCreateRenderer")]
+        extern private static unsafe global::System.IntPtr ulCreateRenderer__PInvoke__(global::UltralightNet._ULConfig* config);
+    }
+}
+namespace UltralightNet
+{
+    public static partial class Methods
+    {
+        [System.Runtime.CompilerServices.SkipLocalsInitAttribute]
         public static partial global::System.IntPtr ulCreateSession(global::System.IntPtr renderer, bool is_persistent, string name)
         {
             unsafe

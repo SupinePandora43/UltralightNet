@@ -120,5 +120,38 @@ namespace UltralightNet
 			return new((sbyte*)ulString->data, 0, (int)ulString->length, Encoding.UTF8);
 #endif
 		}
+
+		/// <summary>Used for getting **opaque** <see cref="ULString" /> struct.<br />Performs worse than <see cref="ULStringGeneratedDllImportMarshaler" /></summary>
+		/// <remarks>Requires manual freeing</remarks>
+		[SkipLocalsInit]
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		public static ULString CreateOpaque(string str)
+		{
+			ULStringGeneratedDllImportMarshaler marshaler = new(str);
+			ULString* marshalled = marshaler.Value;
+			ULString ulString = new()
+			{
+#if NET6_0_OR_GREATER
+				data = (byte*)NativeMemory.Alloc(marshalled->length),
+#else
+				data = (byte*)Marshal.AllocHGlobal((int)marshalled->length), // INTEROPTODO: INT64
+#endif
+				length = marshalled->length
+			};
+			new ReadOnlySpan<byte>(marshalled->data, (int)marshalled->length).CopyTo(new Span<byte>(ulString.data, (int)ulString.length)); // INTEROPTODO: INT64
+			marshaler.FreeNative();
+			return ulString;
+		}
+		/// <summary>Free **opaque** <see cref="ULString" /> instance.</summary>
+		[SkipLocalsInit]
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		public static void FreeOpaque(ULString ulString)
+		{
+#if NET6_0_OR_GREATER
+			NativeMemory.Free(ulString.data);
+#else
+			Marshal.FreeHGlobal((IntPtr)ulString.data);
+#endif
+		}
 	}
 }

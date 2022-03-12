@@ -89,6 +89,44 @@ namespace UltralightNet.AppCore
     public static partial class AppCoreMethods
     {
         [System.Runtime.CompilerServices.SkipLocalsInitAttribute]
+        public static partial global::System.IntPtr ulCreateApp(global::System.IntPtr settings, in global::UltralightNet.ULConfig config)
+        {
+            unsafe
+            {
+                global::UltralightNet._ULConfig __config_gen_native = default;
+                global::System.IntPtr __retVal = default;
+                try
+                {
+                    //
+                    // Marshal
+                    //
+                    __config_gen_native = new global::UltralightNet._ULConfig(config);
+                    //
+                    // Invoke
+                    //
+                    __retVal = ulCreateApp__PInvoke__(settings, &__config_gen_native);
+                }
+                finally
+                {
+                    //
+                    // Cleanup
+                    //
+                    __config_gen_native.FreeNative();
+                }
+
+                return __retVal;
+            }
+        }
+
+        [System.Runtime.InteropServices.DllImportAttribute("AppCore", EntryPoint = "ulCreateApp")]
+        extern private static unsafe global::System.IntPtr ulCreateApp__PInvoke__(global::System.IntPtr settings, global::UltralightNet._ULConfig* config);
+    }
+}
+namespace UltralightNet.AppCore
+{
+    public static partial class AppCoreMethods
+    {
+        [System.Runtime.CompilerServices.SkipLocalsInitAttribute]
         public static partial bool ulAppIsRunning(global::System.IntPtr app)
         {
             unsafe
@@ -398,20 +436,35 @@ namespace UltralightNet.AppCore
         {
             unsafe
             {
-                global::UltralightNet.UTF8Marshaller __title_gen_native = default;
                 //
-                // Marshal
+                // Setup
                 //
-                __title_gen_native = new global::UltralightNet.UTF8Marshaller(title);
-                //
-                // Invoke
-                //
-                ulWindowSetTitle__PInvoke__(window, __title_gen_native);
+                global::UltralightNet.UTF8Marshaller __title_gen_native__marshaler = default;
+                try
+                {
+                    //
+                    // Marshal
+                    //
+                    byte* title__stackptr = stackalloc byte[global::UltralightNet.UTF8Marshaller.StackBufferSize];
+                    __title_gen_native__marshaler = new global::UltralightNet.UTF8Marshaller(title, new System.Span<byte>(title__stackptr, global::UltralightNet.UTF8Marshaller.StackBufferSize));
+                    //
+                    // Invoke
+                    //
+                    fixed (byte* __title_gen_native = &__title_gen_native__marshaler.GetPinnableReference())
+                        ulWindowSetTitle__PInvoke__(window, __title_gen_native);
+                }
+                finally
+                {
+                    //
+                    // Cleanup
+                    //
+                    __title_gen_native__marshaler.FreeNative();
+                }
             }
         }
 
         [System.Runtime.InteropServices.DllImportAttribute("AppCore", EntryPoint = "ulWindowSetTitle")]
-        extern private static unsafe void ulWindowSetTitle__PInvoke__(global::System.IntPtr window, global::UltralightNet.UTF8Marshaller title);
+        extern private static unsafe void ulWindowSetTitle__PInvoke__(global::System.IntPtr window, byte* title);
     }
 }
 namespace UltralightNet.AppCore
