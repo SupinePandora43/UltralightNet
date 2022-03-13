@@ -14,8 +14,6 @@ namespace UltralightNet.AppCore
 		public static extern void ulDestroyApp(IntPtr app);
 
 		[DllImport("AppCore")]
-		public static extern void ulAppSetUpdateCallback(IntPtr app, ULUpdateCallback callback, IntPtr user_data);
-		[DllImport("AppCore")]
 		public static extern unsafe void ulAppSetUpdateCallback(IntPtr app, delegate* unmanaged[Cdecl]<void*, void> callback, void* user_data);
 
 		[GeneratedDllImport("AppCore")]
@@ -52,18 +50,17 @@ namespace UltralightNet.AppCore
 			Ptr = AppCoreMethods.ulCreateApp(settings.Ptr, config);
 		}
 
-		public void SetUpdateCallback(ULUpdateCallback callback, IntPtr userData = default)
+		public unsafe void SetUpdateCallback(ULUpdateCallback callback, IntPtr userData = default)
 		{
+			if (updateHandle.IsAllocated) updateHandle.Free();
 			if (callback is not null)
 			{
-				if (updateHandle.IsAllocated) updateHandle.Free();
 				updateHandle = GCHandle.Alloc(callback, GCHandleType.Normal);
-				AppCoreMethods.ulAppSetUpdateCallback(Ptr, callback, userData);
+				SetUpdateCallback((delegate* unmanaged[Cdecl]<void*, void>)Marshal.GetFunctionPointerForDelegate(callback), (void*)userData);
 			}
 			else
 			{
-				if (updateHandle.IsAllocated) updateHandle.Free();
-				AppCoreMethods.ulAppSetUpdateCallback(Ptr, null, userData);
+				SetUpdateCallback((delegate* unmanaged[Cdecl]<void*, void>)null, (void*)userData);
 			}
 		}
 		public unsafe void SetUpdateCallback(delegate* unmanaged[Cdecl]<void*, void> callback, void* userData = null) => AppCoreMethods.ulAppSetUpdateCallback(Ptr, callback, userData);
