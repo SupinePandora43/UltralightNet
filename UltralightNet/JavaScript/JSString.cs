@@ -79,7 +79,7 @@ namespace UltralightNet
 		public nuint GetUTF8(byte* buffer, nuint bufferSize) => JavaScriptMethods.JSStringGetUTF8CString(Handle, buffer, bufferSize);
 		public nuint GetUTF8(Span<byte> buffer) { fixed (byte* bufferPtr = buffer) { return JavaScriptMethods.JSStringGetUTF8CString(Handle, bufferPtr, (nuint)buffer.Length); } } // INTEROPTODO: INT64
 
-		public override string? ToString() => new((char*)UTF16DataRaw, 0, (int)Length);
+		public override string ToString() => new((char*)UTF16DataRaw, 0, (int)Length);
 
 		public override bool Equals(object? other) => Equals(other is not null and string ? (JSString)((string)other) : other as JSString);
 		public bool Equals(JSString? other)
