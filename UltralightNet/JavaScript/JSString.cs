@@ -81,21 +81,36 @@ namespace UltralightNet
 
 		public override string ToString() => new((char*)UTF16DataRaw, 0, (int)Length);
 
-		public override bool Equals(object? other) => Equals(other is not null and string ? (JSString)((string)other) : other as JSString);
+		public override bool Equals(object? obj)
+		{
+			if (obj is null or not JSString) return false;
+			if (ReferenceEquals(this, (JSString)obj)) return true;
+			return Equals((JSString)obj);
+		}
 		public bool Equals(JSString? other)
 		{
 			if (other is null) return false;
+			if (ReferenceEquals(this, other)) return true;
 			return JavaScriptMethods.JSStringIsEqual(Handle, other.Handle);
 		}
-		public static bool operator ==(JSString left, JSString right) => left.Equals(right);
+		public static bool operator ==(JSString left, JSString right) => left is null ? right is null : left.Equals(right);
 		public static bool operator !=(JSString left, JSString right) => !(left == right);
 
-		public static bool ReferenceEquals(JSString s1, JSString s2) => s1.UTF16DataRaw == s2.UTF16DataRaw && s1.Length == s2.Length;
+		public static bool ReferenceEquals(JSString s1, JSString s2) => s1 is null ? s2 is null : (s1.UTF16DataRaw == s2.UTF16DataRaw && s1.Length == s2.Length);
 
 		public override int GetHashCode()
 		{
 			HashCode hash = new();
+#if !NET6_0_OR_GREATER
 			hash.AddBytes(new ReadOnlySpan<byte>((byte*)UTF16DataRaw, (int)(Length * 2))); // INTEROPTODO: INT64
+#else
+			ushort* data = UTF16DataRaw;
+			nuint length = Length;
+			for (nuint i = 0; i < length; i++)
+			{
+				hash.Add(data[i]);
+			}
+#endif
 			return hash.ToHashCode();
 		}
 
