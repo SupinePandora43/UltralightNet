@@ -19,11 +19,9 @@ namespace UltralightNetTestApplication
 			var context = view.LockJSContext();
 
 			// context.GlobalObject["GetMessage"] = (JSObject) (arguments) => (JSValue) "Hello from C#!";
-			// context.GlobalObject["GetMessage"] = (JSObject) &GetMessage;
 
-			void* funcObject = JavaScriptMethods.JSObjectMakeFunctionWithCallback(context.Handle, new JSString("GetMessage").Handle, &GetMessage);
-
-			context.GlobalObject["GetMessage"] = new JSObject(context.Handle, funcObject);
+			delegate* unmanaged[Cdecl]<void*, void*, void*, nuint, void**, void**, void*> f = &GetMessage;
+			context.GlobalObject["GetMessage"] = f;
 
 			Console.WriteLine(context.EvaluateScript("GetMessage()"));
 
@@ -39,7 +37,8 @@ namespace UltralightNetTestApplication
 			value.Context = context;
 			return value.Handle;
 		}
-		static JSValue GetMessageManaged(JSContext context, JSObject function, JSObject thisObject, ReadOnlySpan<JSValue> arguments, out JSValue exception){
+		static JSValue GetMessageManaged(JSContext context, JSObject function, JSObject thisObject, ReadOnlySpan<JSValue> arguments, out JSValue exception)
+		{
 			exception = null;
 			return context.MakeString("Hello from C#!");
 		}

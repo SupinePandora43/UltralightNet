@@ -109,18 +109,19 @@ namespace UltralightNet
 
 	public unsafe class JSValue
 	{
-		private void* handle = null;
+		protected void* handle = null;
 		private void* context = null;
-		private object managed;
-		private bool isManaged = false;
-		private bool isContextSet = false;
+		protected object managed;
 
 		public JSValue(void* context, void* handle)
 		{
 			this.context = context;
 			this.handle = handle;
 		}
-
+		public JSValue(object managed)
+		{
+			this.managed = managed;
+		}
 		protected JSValue() { }
 
 		public void* Context
@@ -128,7 +129,6 @@ namespace UltralightNet
 			get => context;
 			set
 			{
-				isContextSet = true;
 				context = value;
 			}
 		}
@@ -137,13 +137,14 @@ namespace UltralightNet
 		{
 			get
 			{
-				if (handle is null && isManaged)
+				if (handle is null && managed is not null)
 				{
-					if (!isContextSet) throw new Exception("JSValue.Context is not set.");
+					if (context is null) throw new Exception("JSValue.Context is not set.");
 					ConvertToNativeJSThing();
 				}
 				return handle;
 			}
+			protected set => handle = value;
 		}
 
 		virtual protected void ConvertToNativeJSThing()
@@ -220,11 +221,12 @@ namespace UltralightNet
 			void* exception;
 			var result = JavaScriptMethods.JSValueToStringCopy(jsValue.Context, jsValue.Handle, &exception);
 			var exceptionOOP = new JSValue(jsValue.Context, exception);
+			JSString jsString = new(result, true);
 			if (exceptionOOP.IsString)
 			{
+				jsString.Dispose();
 				throw new Exception((string)exceptionOOP);
 			}
-			JSString jsString = new(result, true);
 			string resultActual = jsString.ToString();
 			jsString.Dispose();
 			return resultActual;
@@ -257,18 +259,9 @@ namespace UltralightNet
 		public void Protect() => JavaScriptMethods.JSValueProtect(Context, Handle);
 		public void Unprotect() => JavaScriptMethods.JSValueUnprotect(Context, Handle);
 
-		public override string ToString() => (string) this;
+		public override string ToString() => (string)this;
 
-		public static implicit operator JSValue(string obj)
-		{
-			var v = new JSValue
-			{
-				isManaged = true,
-				managed = obj
-			};
-
-			return v;
-		}
+		public static implicit operator JSValue(string obj) => new(obj);
 	}
 
 }

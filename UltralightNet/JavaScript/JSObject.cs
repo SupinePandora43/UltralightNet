@@ -130,31 +130,50 @@ namespace UltralightNet
 
 	public unsafe class JSObject : JSValue
 	{
-		public JSObject(void* context, void* handle) : base(context, handle) {}
+		public JSObject(void* context, void* handle) : base(context, handle) { }
+		public JSObject(object managed) : base(managed) { }
 
 		override protected void ConvertToNativeJSThing()
 		{
-
+			base.ConvertToNativeJSThing();
+			if (handle is not null) return;
+			if (managed is null) handle = JavaScriptMethods.JSValueMakeNull(Context);
+			else if (managed is nint funcPtr)
+			{
+				handle = JavaScriptMethods.JSObjectMakeFunctionWithCallback(Context, ((JSString)"c#_js_stub").Handle, (delegate* unmanaged[Cdecl]<void*, void*, void*, nuint, void**, void**, void*>)funcPtr);
+			}
 		}
 
-		public JSObject this[string key]
+		public JSObject this[JSString key]
 		{
 			set
 			{
 				SetProperty(key, value);
 			}
+			get
+			{
+				void* exception;
+				JSObject obj = new(Context, JavaScriptMethods.JSObjectGetProperty(Context, Handle, key.Handle, &exception));
+				JSValue exceptionOOP = new(Context, exception);
+				if (exceptionOOP.IsString) throw new Exception(((string)exceptionOOP));
+				return obj;
+			}
 		}
 
 		public void SetProperty(JSString name, JSObject obj)
 		{
-			JavaScriptMethods.JSObjectSetProperty(Context, Handle, name.Handle, obj.Handle);
+			if (obj.Context is null && Context is null) throw new NotImplementedException("Not supported yet.");
+			if (obj.Context is null && Context is not null) obj.Context = Context;
+			void* exception;
+			JavaScriptMethods.JSObjectSetProperty(Context, Handle, name.Handle, obj.Handle, JSPropertyAttributes.None, &exception);
+			var exceptionOOP = new JSValue(Context, Handle);
+			if (exceptionOOP.IsString) throw new((string)exceptionOOP);
 		}
 
-		public void SetProperty(string name, JSObject obj)
+		public static implicit operator JSObject(delegate* unmanaged[Cdecl]<void*, void*, void*, nuint, void**, void**, void*> func)
 		{
-			SetProperty(new JSString(name), obj);
+			return new((object)(nint)func);
 		}
-
 	}
 
 }
