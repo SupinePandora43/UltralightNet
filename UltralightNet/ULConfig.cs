@@ -8,57 +8,70 @@ namespace UltralightNet
 	public static partial class Methods
 	{
 		/// <summary>Create config with default values (see <Ultralight/platform/Config.h>).</summary>
+		[Obsolete]
 		[DllImport("Ultralight")]
 		public static extern IntPtr ulCreateConfig();
 
 		/// <summary>Destroy config.</summary>
+		[Obsolete]
 		[DllImport("Ultralight")]
 		public static extern void ulDestroyConfig(IntPtr config);
 
 		/// <summary>Set the file path to a writable directory that will be used to store cookies, cached resources, and other persistent data.</summary>
+		[Obsolete]
 		[GeneratedDllImport("Ultralight")]
 		public static partial void ulConfigSetCachePath(IntPtr config, [MarshalUsing(typeof(ULStringGeneratedDllImportMarshaler))] string cache_path);
 
 		/// <summary>The winding order for front-facing triangles.</summary>
 		/// <see cref="ULFaceWinding"/>
 		/// <remarks>This is only used with custom GPUDrivers</remarks>
+		[Obsolete]
 		[DllImport("Ultralight")]
 		public static extern void ulConfigSetFaceWinding(IntPtr config, ULFaceWinding winding);
 
 		/// <summary>The hinting algorithm to use when rendering fonts.</summary>
 		/// <see cref="ULFontHinting"/>
+		[Obsolete]
 		[DllImport("Ultralight")]
 		public static extern void ulConfigSetFontHinting(IntPtr config, ULFontHinting font_hinting = ULFontHinting.Normal);
 
 		/// <summary>The gamma to use when compositing font glyphs, change this value to adjust contrast (Adobe and Apple prefer 1.8, others may prefer 2.2).</summary>
+		[Obsolete]
 		[DllImport("Ultralight")]
 		public static extern void ulConfigSetFontGamma(IntPtr config, double font_gamma = 1.8);
 
 		/// <summary>Set user stylesheet (CSS) (Default = Empty).</summary>
+		[Obsolete]
 		[GeneratedDllImport("Ultralight")]
 		public static partial void ulConfigSetUserStylesheet(IntPtr config, [MarshalUsing(typeof(ULStringGeneratedDllImportMarshaler))] string font_name);
 
 		/// <summary>Set whether or not we should continuously repaint any Views or compositor layers, regardless if they are dirty or not. This is mainly used to diagnose painting/shader issues.</summary>
+		[Obsolete]
 		[GeneratedDllImport("Ultralight")]
 		public static partial void ulConfigSetForceRepaint(IntPtr config, [MarshalAs(UnmanagedType.I1)] bool enabled = false);
 
 		/// <summary>Set the amount of time to wait before triggering another repaint when a CSS animation is active.</summary>
+		[Obsolete]
 		[DllImport("Ultralight")]
 		public static extern void ulConfigSetAnimationTimerDelay(IntPtr config, double delay = 1.0 / 60.0);
 
 		/// <summary>When a smooth scroll animation is active, the amount of time (in seconds) to wait before triggering another repaint.</summary>
+		[Obsolete]
 		[DllImport("Ultralight")]
 		public static extern void ulConfigSetScrollTimerDelay(IntPtr config, double delay = 1.0 / 60.0);
 
 		/// <summary>The amount of time (in seconds) to wait before running the recycler (will attempt to return excess memory back to the system).</summary>
+		[Obsolete]
 		[DllImport("Ultralight")]
 		public static extern void ulConfigSetRecycleDelay(IntPtr config, double delay = 4.0);
 
 		/// <summary>Set the size of WebCore's memory cache for decoded images, scripts, and other assets in bytes.</summary>
+		[Obsolete]
 		[DllImport("Ultralight")]
 		public static extern void ulConfigSetMemoryCacheSize(IntPtr config, uint size = 64 * 1024 * 1024);
 
 		/// <summary>Set the number of pages to keep in the cache.</summary>
+		[Obsolete]
 		[DllImport("Ultralight")]
 		public static extern void ulConfigSetPageCacheSize(IntPtr config, uint size = 0);
 
@@ -70,14 +83,17 @@ namespace UltralightNet
 		/// This can be used to force JavaScriptCore to be more conservative with
 		/// its allocation strategy (at the cost of some performance).
 		/// </summary>
+		[Obsolete]
 		[DllImport("Ultralight")]
 		public static extern void ulConfigSetOverrideRAMSize(IntPtr config, uint size);
 
 		/// <summary>The minimum size of large VM heaps in JavaScriptCore. Set this to a lower value to make these heaps start with a smaller initial value.</summary>
+		[Obsolete]
 		[DllImport("Ultralight")]
 		public static extern void ulConfigSetMinLargeHeapSize(IntPtr config, uint size);
 
 		/// <summary>The minimum size of small VM heaps in JavaScriptCore. Set this to a lower value to make these heaps start with a smaller initial value.</summary>
+		[Obsolete]
 		[DllImport("Ultralight")]
 		public static extern void ulConfigSetMinSmallHeapSize(IntPtr config, uint size);
 	}
@@ -181,7 +197,7 @@ namespace UltralightNet
 	public struct ULConfig
 	{
 		/// <inheritdoc cref="_ULConfig.CachePath" />
-		public string CachePath = "";
+		public string CachePath = string.Empty;
 		/// <inheritdoc cref="_ULConfig.ResourcePathPrefix" />
 		public string ResourcePathPrefix = "resources/";
 
@@ -194,7 +210,7 @@ namespace UltralightNet
 		public double FontGamma = 1.8;
 
 		/// <inheritdoc cref="_ULConfig.UserStylesheet" />
-		public string UserStylesheet = "";
+		public string UserStylesheet = string.Empty;
 
 		/// <inheritdoc cref="_ULConfig.ForceRepaint" />
 		public bool ForceRepaint = false;
