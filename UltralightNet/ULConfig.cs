@@ -194,7 +194,7 @@ namespace UltralightNet
 	}
 	/// <inheritdoc cref="_ULConfig" />
 	[NativeMarshalling(typeof(_ULConfig))]
-	public struct ULConfig
+	public struct ULConfig : IEquatable<ULConfig>
 	{
 		/// <inheritdoc cref="_ULConfig.CachePath" />
 		public string CachePath = string.Empty;
