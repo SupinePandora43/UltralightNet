@@ -1,4 +1,5 @@
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
@@ -147,12 +148,12 @@ namespace UltralightNet
 
 		public _ULConfig(ULConfig config)
 		{
-			CachePath = ULString.CreateOpaque(config.CachePath);
-			ResourcePathPrefix = ULString.CreateOpaque(config.ResourcePathPrefix);
+			CachePath = ULString.CreateOpaque(config.CachePath ?? string.Empty);
+			ResourcePathPrefix = ULString.CreateOpaque(config.ResourcePathPrefix ?? string.Empty);
 			_FaceWinding = Unsafe.As<ULFaceWinding, byte>(ref config.FaceWinding);
 			_FontHinting = Unsafe.As<ULFontHinting, byte>(ref config.FontHinting);
 			FontGamma = config.FontGamma;
-			UserStylesheet = ULString.CreateOpaque(config.UserStylesheet);
+			UserStylesheet = ULString.CreateOpaque(config.UserStylesheet ?? string.Empty);
 			_ForceRepaint = Unsafe.As<bool, byte>(ref config.ForceRepaint);
 			AnimationTimerDelay = config.AnimationTimerDelay;
 			ScrollTimerDelay = config.ScrollTimerDelay;
@@ -225,8 +226,28 @@ namespace UltralightNet
 		/// <inheritdoc cref="_ULConfig.BitmapAlignment" />
 		public uint BitmapAlignment = 16;
 
-		public ULConfig(){
-
-		}
+		public override bool Equals([NotNullWhen(true)] object? obj) => Equals((ULConfig)obj);
+		public bool Equals(ULConfig other) =>
+			CachePath == other.CachePath &&
+			ResourcePathPrefix == other.ResourcePathPrefix &&
+			FaceWinding == other.FaceWinding &&
+			FontHinting == other.FontHinting &&
+			FontGamma == other.FontGamma &&
+			UserStylesheet == other.UserStylesheet &&
+			ForceRepaint == other.ForceRepaint &&
+			AnimationTimerDelay == other.AnimationTimerDelay &&
+			ScrollTimerDelay == other.ScrollTimerDelay &&
+			RecycleDelay == other.RecycleDelay &&
+			MemoryCacheSize == other.MemoryCacheSize &&
+			PageCacheSize == other.PageCacheSize &&
+			OverrideRAMSize == other.OverrideRAMSize &&
+			MinLargeHeapSize == other.MinLargeHeapSize &&
+			MinSmallHeapSize == other.MinSmallHeapSize &&
+			NumRendererThreads == other.NumRendererThreads &&
+			MaxUpdateTime == other.MaxUpdateTime &&
+			BitmapAlignment == other.BitmapAlignment;
+		public override int GetHashCode() => HashCode.Combine(HashCode.Combine(CachePath, ResourcePathPrefix, FaceWinding, FontHinting, FontGamma, UserStylesheet, ForceRepaint, AnimationTimerDelay), HashCode.Combine(ScrollTimerDelay, RecycleDelay, MemoryCacheSize, PageCacheSize, OverrideRAMSize, MinLargeHeapSize, MinSmallHeapSize, NumRendererThreads), HashCode.Combine(MaxUpdateTime, BitmapAlignment));
+		public static bool operator ==(ULConfig left, ULConfig right) => left.Equals(right);
+		public static bool operator !=(ULConfig left, ULConfig right) => !(left == right);
 	}
 }

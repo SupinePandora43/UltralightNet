@@ -44,6 +44,7 @@ namespace UltralightNet
 
 		internal Renderer(ULConfig config, bool dispose)
 		{
+			if (config == default(ULConfig)) throw new ArgumentException($"You passed default({nameof(ULConfig)}). It's invalid. Use at least \"new {nameof(ULConfig)}()\"", nameof(config));
 			Ptr = Methods.ulCreateRenderer(config);
 			IsDisposed = !dispose;
 		}
