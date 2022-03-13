@@ -59,7 +59,7 @@ namespace UltralightNet
 			{
 				throw new Exception("No ULPlatform.GPUDriver set, but ULViewConfig.IsAccelerated==true. (Disable error by setting ULPlatform.ErrorGPUDriverNotSet to false.)");
 			}
-			View view = new(Methods.ulCreateView(Ptr, width, height, viewConfig.Ptr, session.Ptr), dispose);
+			View view = new(Methods.ulCreateView(Ptr, width, height, viewConfig, session.Ptr), dispose);
 			view.Renderer = this;
 			return view;
 		}

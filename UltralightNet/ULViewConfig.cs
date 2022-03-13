@@ -1,159 +1,164 @@
 using System;
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
 namespace UltralightNet
 {
 	public static partial class Methods
 	{
+		[Obsolete]
 		[DllImport("Ultralight")]
 		public static extern IntPtr ulCreateViewConfig();
 
+		[Obsolete]
 		[DllImport("Ultralight")]
 		public static extern void ulDestroyViewConfig(IntPtr config);
 
+		[Obsolete]
 		[GeneratedDllImport("Ultralight")]
 		public static partial void ulViewConfigSetIsAccelerated(IntPtr config, [MarshalAs(UnmanagedType.I1)] bool is_accelerated);
 
+		[Obsolete]
 		[GeneratedDllImport("Ultralight")]
 		public static partial void ulViewConfigSetIsTransparent(IntPtr config, [MarshalAs(UnmanagedType.I1)] bool is_transparent);
 
+		[Obsolete]
 		[DllImport("Ultralight")]
 		public static extern void ulViewConfigSetInitialDeviceScale(IntPtr config, double initial_device_scale);
 
+		[Obsolete]
 		[GeneratedDllImport("Ultralight")]
 		public static partial void ulViewConfigSetInitialFocus(IntPtr config, [MarshalAs(UnmanagedType.I1)] bool is_focused);
 
+		[Obsolete]
 		[GeneratedDllImport("Ultralight")]
 		public static partial void ulViewConfigSetEnableImages(IntPtr config, [MarshalAs(UnmanagedType.I1)] bool enabled);
 
+		[Obsolete]
 		[GeneratedDllImport("Ultralight")]
 		public static partial void ulViewConfigSetEnableJavaScript(IntPtr config, [MarshalAs(UnmanagedType.I1)] bool enabled);
 
+		[Obsolete]
 		[GeneratedDllImport("Ultralight")]
 		public static partial void ulViewConfigSetFontFamilyStandard(IntPtr config, [MarshalUsing(typeof(ULStringGeneratedDllImportMarshaler))] string font_name);
 
+		[Obsolete]
 		[GeneratedDllImport("Ultralight")]
 		public static partial void ulViewConfigSetFontFamilyFixed(IntPtr config, [MarshalUsing(typeof(ULStringGeneratedDllImportMarshaler))] string font_name);
 
+		[Obsolete]
 		[GeneratedDllImport("Ultralight")]
 		public static partial void ulViewConfigSetFontFamilySerif(IntPtr config, [MarshalUsing(typeof(ULStringGeneratedDllImportMarshaler))] string font_name);
 
+		[Obsolete]
 		[GeneratedDllImport("Ultralight")]
 		public static partial void ulViewConfigSetFontFamilySansSerif(IntPtr config, [MarshalUsing(typeof(ULStringGeneratedDllImportMarshaler))] string font_name);
 
+		[Obsolete]
 		[GeneratedDllImport("Ultralight")]
 		public static partial void ulViewConfigSetUserAgent(IntPtr config, [MarshalUsing(typeof(ULStringGeneratedDllImportMarshaler))] string agent_string);
-
 	}
 
-	public class ULViewConfig : IDisposable
+	[BlittableType]
+	public struct _ULViewConfig
 	{
-		public readonly IntPtr Ptr;
-		public bool IsDisposed { get; private set; }
+		private byte _IsAccelerated = 0;
+		/// <summary>The View will be rendered to an offscreen GPU texture using the <see cref="ULPlatform.GPUDriver" />. You can fetch details for the texture via <see cref="View.RenderTarget" />.</summary>
+		public bool IsAccelerated { get => Unsafe.As<byte, bool>(ref _IsAccelerated); set => _IsAccelerated = Unsafe.As<bool, byte>(ref value); }
+		private byte _IsTransparent = 0;
+		/// <summary>The view's background will be (0,0,0,0).</summary>
+		/// <remarks>HTML must also use transparent background.</remarks>
+		public bool IsTransparent { get => Unsafe.As<byte, bool>(ref _IsTransparent); set => _IsTransparent = Unsafe.As<bool, byte>(ref value); }
 
-		public ULViewConfig()
-		{
-			Ptr = Methods.ulCreateViewConfig();
-		}
+		public double InitialDeviceScale = 1.0;
+		private byte _InitialFocus = 1;
+		public bool InitialFocus { get => Unsafe.As<byte, bool>(ref _InitialFocus); set => _InitialFocus = Unsafe.As<bool, byte>(ref value); }
 
-		~ULViewConfig() => Dispose();
+		private byte _EnableImages = 1;
+		/// <summary>Whether or not images should be enabled.</summary>
+		public bool EnableImages { get => Unsafe.As<byte, bool>(ref _EnableImages); set => _EnableImages = Unsafe.As<bool, byte>(ref value); }
+		private byte _EnableJavaScript = 1;
+		/// <summary>Whether or not JavaScript should be enabled.</summary>
+		public bool EnableJavaScript { get => Unsafe.As<byte, bool>(ref _EnableJavaScript); set => _EnableJavaScript = Unsafe.As<bool, byte>(ref value); }
 
-		public void Dispose()
-		{
-			if (IsDisposed) return;
-			Methods.ulDestroyViewConfig(Ptr);
+		/// <summary>Default font-family to use.</summary>
+		public ULString FontFamilyStandard;
+		/// <summary>Default font-family to use for fixed fonts. (pre/code)</summary>
+		public ULString FontFamilyFixed;
+		/// <summary>Default font-family to use for serif fonts.</summary>
+		public ULString FontFamilySerif;
+		/// <summary>Default font-family to use for sans-serif fonts.</summary>
+		public ULString FontFamilySansSerif;
 
-			GC.SuppressFinalize(this);
-			IsDisposed = true;
-		}
+		/// <summary>Default user-agent string.</summary>
+		public ULString UserAgent;
 
-		public struct STRUCT
+		public _ULViewConfig(ULViewConfig config)
 		{
-			[MarshalAs(UnmanagedType.I1)]
-			public bool is_accelerated;
-			[MarshalAs(UnmanagedType.I1)]
-			public bool is_transparent;
-			public double initial_device_scale;
-			[MarshalAs(UnmanagedType.I1)]
-			public bool initial_focus;
-			[MarshalAs(UnmanagedType.I1)]
-			public bool enable_images;
-			[MarshalAs(UnmanagedType.I1)]
-			public bool enable_javascript;
+			_IsAccelerated = Unsafe.As<bool, byte>(ref config.IsAccelerated);
+			_IsTransparent = Unsafe.As<bool, byte>(ref config.IsTransparent);
+			InitialDeviceScale = config.InitialDeviceScale;
+			_InitialFocus = Unsafe.As<bool, byte>(ref config.InitialFocus);
+			_EnableImages = Unsafe.As<bool, byte>(ref config.EnableImages);
+			_EnableJavaScript = Unsafe.As<bool, byte>(ref config.EnableJavaScript);
+			FontFamilyStandard = ULString.CreateOpaque(config.FontFamilyStandard ?? string.Empty);
+			FontFamilyFixed = ULString.CreateOpaque(config.FontFamilyFixed ?? string.Empty);
+			FontFamilySerif = ULString.CreateOpaque(config.FontFamilySerif ?? string.Empty);
+			FontFamilySansSerif = ULString.CreateOpaque(config.FontFamilySansSerif ?? string.Empty);
+			UserAgent = ULString.CreateOpaque(config.UserAgent ?? string.Empty);
+		}
+		public void FreeNative()
+		{
+			// INTEROPTODO: ZEROFREE
+			ULString.FreeOpaque(FontFamilyStandard);
+			ULString.FreeOpaque(FontFamilyFixed);
+			ULString.FreeOpaque(FontFamilySerif);
+			ULString.FreeOpaque(FontFamilySansSerif);
+			ULString.FreeOpaque(UserAgent);
+		}
+	}
+	/// <inheritdoc cref="_ULViewConfig" />
+	[NativeMarshalling(typeof(_ULViewConfig))]
+	public struct ULViewConfig : IEquatable<ULViewConfig>
+	{
+		/// <inheritdoc cref="_ULViewConfig.IsAccelerated" />
+		public bool IsAccelerated = false;
+		/// <inheritdoc cref="_ULViewConfig.IsTransparent" />
+		public bool IsTransparent = false;
 
-			public ULString font_family_standard;
-			public ULString font_family_fixed;
-			public ULString font_family_serif;
-			public ULString font_family_sans_serif;
-			public ULString user_agent;
-		}
+		/// <inheritdoc cref="_ULViewConfig.InitialDeviceScale" />
+		public double InitialDeviceScale = 1.0;
+		/// <inheritdoc cref="_ULViewConfig.InitialFocus" />
+		public bool InitialFocus = true;
 
-		public STRUCT ULViewConfig_C
-		{
-#if NET5_0_OR_GREATER || NET451 || NETSTANDARD2_0_OR_GREATER
-			get => Marshal.PtrToStructure<STRUCT>(Ptr);
-#else
-			get => (STRUCT)Marshal.PtrToStructure(Ptr, typeof(STRUCT));
-#endif
-		}
+		/// <inheritdoc cref="_ULViewConfig.EnableImages" />
+		public bool EnableImages = true;
+		/// <inheritdoc cref="_ULViewConfig.EnableJavaScript" />
+		public bool EnableJavaScript = true;
 
-		public bool IsAccelerated
-		{
-			get => ULViewConfig_C.is_accelerated;
-			set => Methods.ulViewConfigSetIsAccelerated(Ptr, value);
-		}
-		public bool IsTransparent
-		{
-			get => ULViewConfig_C.is_transparent;
-			set => Methods.ulViewConfigSetIsTransparent(Ptr, value);
-		}
+		/// <inheritdoc cref="_ULViewConfig.FontFamilyStandard" />
+		public string FontFamilyStandard = "Times New Roman";
+		/// <inheritdoc cref="_ULViewConfig.FontFamilyFixed" />
+		public string FontFamilyFixed = "Courier New";
+		/// <inheritdoc cref="_ULViewConfig.FontFamilySerif" />
+		public string FontFamilySerif = "Times New Roman";
+		/// <inheritdoc cref="_ULViewConfig.FontFamilySansSerif" />
+		public string FontFamilySansSerif = "Arial";
 
-		public double InitialDeviceScale
-		{
-			get => ULViewConfig_C.initial_device_scale;
-			set => Methods.ulViewConfigSetInitialDeviceScale(Ptr, value);
-		}
+		/// <inheritdoc cref="_ULViewConfig.UserAgent" />
+		public string UserAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/608.3.10 (KHTML, like Gecko) Ultralight/1.3.0 Safari/608.3.10";
 
-		public bool InitialFocus
-		{
-			get => ULViewConfig_C.initial_focus;
-			set => Methods.ulViewConfigSetInitialFocus(Ptr, value);
-		}
-		public bool EnableImages
-		{
-			get => ULViewConfig_C.enable_images;
-			set => Methods.ulViewConfigSetEnableImages(Ptr, value);
-		}
-		public bool EnableJavaScript
-		{
-			get => ULViewConfig_C.enable_javascript;
-			set => Methods.ulViewConfigSetEnableJavaScript(Ptr, value);
-		}
-
-		public string FontFamilyStandard
-		{
-			get => ULViewConfig_C.font_family_standard.ToManaged();
-			set => Methods.ulViewConfigSetFontFamilyStandard(Ptr, value);
-		}
-		public string FontFamilyFixed
-		{
-			get => ULViewConfig_C.font_family_fixed.ToManaged();
-			set => Methods.ulViewConfigSetFontFamilyFixed(Ptr, value);
-		}
-		public string FontFamilySerif
-		{
-			get => ULViewConfig_C.font_family_serif.ToManaged();
-			set => Methods.ulViewConfigSetFontFamilySerif(Ptr, value);
-		}
-		public string FontFamilySansSerif
-		{
-			get => ULViewConfig_C.font_family_sans_serif.ToManaged();
-			set => Methods.ulViewConfigSetFontFamilySansSerif(Ptr, value);
-		}
-		public string UserAgent
-		{
-			get => ULViewConfig_C.user_agent.ToManaged();
-			set => Methods.ulViewConfigSetUserAgent(Ptr, value);
-		}
+		public bool Equals(ULViewConfig other) =>
+			IsAccelerated == other.IsAccelerated &&
+			IsTransparent == other.IsTransparent &&
+			InitialDeviceScale == other.InitialDeviceScale &&
+			InitialFocus == other.InitialFocus &&
+			EnableImages == other.EnableImages &&
+			EnableJavaScript == other.EnableJavaScript &&
+			FontFamilyStandard == other.FontFamilyStandard &&
+			FontFamilyFixed == other.FontFamilyFixed &&
+			FontFamilySerif == other.FontFamilySerif &&
+			FontFamilySansSerif == other.FontFamilySansSerif &&
+			UserAgent == other.UserAgent;
 	}
 }

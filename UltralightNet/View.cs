@@ -6,8 +6,8 @@ namespace UltralightNet
 {
 	public static partial class Methods
 	{
-		[DllImport("Ultralight")]
-		public static extern IntPtr ulCreateView(IntPtr renderer, uint width, uint height, IntPtr view_config, IntPtr session);
+		[GeneratedDllImport("Ultralight")]
+		public static partial IntPtr ulCreateView(IntPtr renderer, uint width, uint height, in ULViewConfig viewConfig, IntPtr session);
 
 		[DllImport("Ultralight")]
 		public static extern void ulDestroyView(IntPtr view);
