@@ -279,8 +279,8 @@ unsafe class HelloTriangleApplication
 		view = renderer.CreateView((uint)window!.Size.X, (uint)window!.Size.Y, new() { IsAccelerated = true, IsTransparent = false });
 		bool loaded = false;
 		view.OnFinishLoading += (frameId, isMain, url) => loaded = true;
-		//view.HTML = "<html><body><p>123</p></body></html>";
-		view.URL = "https://youtube.com";
+		view.HTML = "<html><body><p>123</p></body></html>";
+		//view.URL = "https://youtube.com";
 		while (!loaded) { renderer.Update(); Thread.Sleep(10); }
 
 		renderer.Render();

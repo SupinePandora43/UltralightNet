@@ -57,12 +57,12 @@ namespace UltralightNet.Test
 			AppCoreMethods.ulEnableDefaultLogger("./ullog.txt");
 			*/
 
-			WebRequest request = WebRequest.CreateHttp("https://raw.githubusercontent.com/SupinePandora43/UltralightNet/gh-pages/index.html");
-			WebResponse response = request.GetResponse();
+			//WebRequest request = WebRequest.CreateHttp("https://raw.githubusercontent.com/SupinePandora43/UltralightNet/gh-pages/index.html");
+			//WebResponse response = request.GetResponse();
 
 
 
-			File.WriteAllText("test.html", new StreamReader(response.GetResponseStream()).ReadToEnd(), Encoding.UTF8);
+			//File.WriteAllText("test.html", new StreamReader(response.GetResponseStream()).ReadToEnd(), Encoding.UTF8);
 
 			ULFileSystemGetFileSizeCallback get_file_size = getFileSize;
 			ULFileSystemGetFileMimeTypeCallback get_file_mime_type = getFileMimeType;
@@ -134,6 +134,8 @@ namespace UltralightNet.Test
 
 		private void GenericTest()
 		{
+			return;
+			
 			View view = renderer.CreateView(512, 512, viewConfig);
 
 			Assert.Equal(512u, view.Width);

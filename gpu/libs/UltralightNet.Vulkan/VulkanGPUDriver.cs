@@ -23,6 +23,9 @@ public class RenderBufferEntry
 	public Framebuffer framebuffer;
 
 	public TextureEntry textureEntry;
+	
+	public Image resolveImage;
+	internal DeviceMemory resolveImageMemory;
 }
 
 public class TextureEntry
