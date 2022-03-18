@@ -132,7 +132,11 @@ namespace UltralightNet
 			span = null;
 			int strLen = str.Length;
 			int byteCount = (strLen + 1) * 3 + 1;
-			bytes = (byte*)Marshal.AllocHGlobal(byteCount);
+#if NET6_0_OR_GREATER
+			bytes = (byte*)NativeMemory.Alloc((nuint)byteCount);
+#else
+			bytes = (byte*)Marshal.AllocHGlobal(byteCount); // INTEROPTODO: INT64
+#endif
 
 #if NETSTANDARD2_1 || NET
 			int written = Encoding.UTF8.GetBytes(str.AsSpan(), new Span<byte>(bytes, byteCount));
@@ -170,7 +174,11 @@ namespace UltralightNet
 			else
 			{
 				span = null;
+#if NET6_0_OR_GREATER
+				bytes = (byte*)NativeMemory.Alloc((nuint)byteCount); // INTEROPTODO: INT64
+#else
 				bytes = (byte*)Marshal.AllocHGlobal(byteCount);
+#endif
 
 #if NETSTANDARD2_1 || NET
 				int written = Encoding.UTF8.GetBytes(str.AsSpan(), new Span<byte>(bytes, byteCount));
@@ -220,7 +228,12 @@ namespace UltralightNet
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public void FreeNative()
 		{
-			if (bytes is not null) Marshal.FreeHGlobal((IntPtr)bytes);
+			if (bytes is not null)
+#if NET6_0_OR_GREATER
+				NativeMemory.Free(bytes);
+#else
+				Marshal.FreeHGlobal((IntPtr)bytes);
+#endif
 		}
 	}
 }
