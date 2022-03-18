@@ -63,6 +63,16 @@ namespace System.Runtime.CompilerServices
 		public SkipLocalsInitAttribute() { }
 	}
 }
+#if !NETSTANDARD2_1
+namespace System.Diagnostics.CodeAnalysis
+{
+	[AttributeUsage(AttributeTargets.Parameter)]
+	internal sealed class NotNullWhenAttribute : Attribute
+	{
+		public NotNullWhenAttribute(bool ReturnValue) { }
+	}
+}
+#endif
 namespace System
 {
 	internal static class OperatingSystem {
