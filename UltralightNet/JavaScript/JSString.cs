@@ -2,11 +2,11 @@
 
 using System;
 using System.Diagnostics;
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
 namespace UltralightNet
 {
-
 	unsafe partial class JavaScriptMethods
 	{
 		[DllImport("WebCore")]
@@ -51,22 +51,31 @@ namespace UltralightNet
 		private readonly bool dispose = true;
 		private bool isDisposed = false;
 
-		public JSString(void* handle, bool dispose = false)
+		public JSString(void* handle)
 		{
 			this.handle = handle;
-			this.dispose = dispose;
 		}
-		public JSString(string str)
+		public JSString(void* handle, bool dispose) : this(handle) { this.dispose = dispose; }
+		public JSString(ushort* characters, nuint length) : this(JavaScriptMethods.JSStringCreateWithCharacters(characters, length)) { }
+		public JSString(byte* utf8Bytes) : this(JavaScriptMethods.JSStringCreateWithUTF8CString(utf8Bytes)) { }
+		public JSString(ReadOnlySpan<ushort> chars)
 		{
-			fixed (char* characters = str)
+			fixed (ushort* characters = chars)
+				handle = JavaScriptMethods.JSStringCreateWithCharacters(characters, (nuint)chars.Length);
+		}
+		public JSString(ReadOnlySpan<char> characters) : this(MemoryMarshal.Cast<char, ushort>(characters)) { }
+
+		public void* Handle
+		{
+			get
 			{
-				handle = JavaScriptMethods.JSStringCreateWithCharacters((ushort*)characters, (nuint)str.Length);
+				static void Throw() => throw new ObjectDisposedException(nameof(JSString));
+				if (isDisposed) Throw();
+				return handle;
 			}
 		}
 
-		public void* Handle => handle;
-
-		public JSString Clone() => new(JavaScriptMethods.JSStringRetain(Handle), true);
+		public JSString Clone() => new(JavaScriptMethods.JSStringRetain(Handle));
 		object ICloneable.Clone() => Clone();
 
 		public nuint Length => JavaScriptMethods.JSStringGetLength(Handle);
@@ -83,8 +92,8 @@ namespace UltralightNet
 
 		public override bool Equals(object? obj)
 		{
-			if (obj is null or not JSString) return false;
-			if (ReferenceEquals(this, (JSString)obj)) return true;
+			if (obj is string s) return Equals(new JSString(s.AsSpan()));
+			if (obj is not JSString) return false;
 			return Equals((JSString)obj);
 		}
 		public bool Equals(JSString? other)
@@ -93,32 +102,18 @@ namespace UltralightNet
 			if (ReferenceEquals(this, other)) return true;
 			return JavaScriptMethods.JSStringIsEqual(Handle, other.Handle);
 		}
-		public static bool operator ==(JSString left, JSString right) => left is null ? right is null : left.Equals(right);
-		public static bool operator !=(JSString left, JSString right) => !(left == right);
+		public static bool operator ==(JSString? left, JSString? right) => left is null ? right is null : left.Equals(right);
+		public static bool operator !=(JSString? left, JSString? right) => !(left == right);
 
-		public static bool ReferenceEquals(JSString s1, JSString s2) => s1 is null ? s2 is null : (s1.UTF16DataRaw == s2.UTF16DataRaw && s1.Length == s2.Length);
+		public static bool ReferenceEquals(JSString s1, JSString s2) => s1 is null ? s2 is null : s1.Handle == s2.Handle;
 
-		public override int GetHashCode()
-		{
-			HashCode hash = new();
-#if !NET6_0_OR_GREATER
-			hash.AddBytes(new ReadOnlySpan<byte>((byte*)UTF16DataRaw, (int)(Length * 2))); // INTEROPTODO: INT64
-#else
-			ushort* data = UTF16DataRaw;
-			nuint length = Length;
-			for (nuint i = 0; i < length; i++)
-			{
-				hash.Add(data[i]);
-			}
-#endif
-			return hash.ToHashCode();
-		}
+		public override int GetHashCode() => HashCode.Combine((nint)handle, dispose, isDisposed);
 
 		public bool Equals(byte* other) => JavaScriptMethods.JSStringIsEqualToUTF8CString(Handle, other);
 		public bool Equals(ReadOnlySpan<byte> other) { fixed (byte* bytes = other) { return Equals(bytes); } }
 
-		public static implicit operator JSString(string obj) => new(obj ?? string.Empty);
-		public static explicit operator string(JSString str) => str?.ToString()!;
+		public static implicit operator JSString(string obj) => new(obj ?? MemoryMarshal.CreateReadOnlySpan(ref Unsafe.NullRef<char>(), 0));
+		public static explicit operator string(JSString str) => str.ToString()!;
 
 		~JSString() => Dispose();
 
