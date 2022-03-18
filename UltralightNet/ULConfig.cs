@@ -242,6 +242,7 @@ namespace UltralightNet
 		/// <inheritdoc cref="_ULConfig.BitmapAlignment" />
 		public uint BitmapAlignment = 16;
 
+		public override bool Equals([NotNullWhen(true)] object? obj) => obj is ULConfig ? Equals((ULConfig)obj) : false;
 		public bool Equals(ULConfig other) =>
 			CachePath == other.CachePath &&
 			ResourcePathPrefix == other.ResourcePathPrefix &&
