@@ -24,14 +24,22 @@ namespace Benchmarks
 	{
 		private ULString str;
 		public MyBenchmark(){
-			str = ULString.CreateOpaque();
+			str = ULString.CreateOpaque(new string('б',1000000));
 		}
 		~MyBenchmark(){
-
+			ULString.FreeOpaque(str);
 		}
 		[Benchmark]
-		public void Marshal(){
-
+		public string UsingMarshal(){
+			return Marshal.PtrToStringUTF8((IntPtr)str.data, (int)str.length);
+		}
+		[Benchmark]
+		public string UsingCtor(){
+			return new string((sbyte*)str.data, 0, (int)str.length);
+		}
+		[Benchmark]
+		public string UsingEncoding(){
+			return Encoding.UTF8.GetString(str.data, (int)str.length);
 		}
 	}
 }

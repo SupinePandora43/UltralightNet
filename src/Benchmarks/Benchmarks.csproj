@@ -14,8 +14,8 @@
 		<PackageReference Include="UltralightNet.AppCore" Version="$(Version)" />
 		<PackageReference Include="UltralightNet.Resources" Version="$(Version)" />
 
-		<ProjectReference Include="..\src\UltralightNet\UltralightNet.csproj" />
-		<ProjectReference Include="..\src\UltralightNet.AppCore\UltralightNet.AppCore.csproj" />
+		<ProjectReference Include="..\UltralightNet\UltralightNet.csproj" />
+		<ProjectReference Include="..\UltralightNet.AppCore\UltralightNet.AppCore.csproj" />
 	</ItemGroup>
 
 </Project>

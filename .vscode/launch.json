@@ -56,9 +56,9 @@
             "type": "coreclr",
             "request": "launch",
             "preLaunchTask": "buildTestApp",
-            "program": "${workspaceFolder}/UltralightNet.TestApp/bin/Debug/net6.0/UltralightNet.TestApp.dll",
+            "program": "${workspaceFolder}/src/UltralightNet.TestApp/bin/Debug/net6.0/UltralightNet.TestApp.dll",
             "args": [],
-            "cwd": "${workspaceFolder}/UltralightNet.TestApp/bin/Debug/net6.0",
+            "cwd": "${workspaceFolder}/src/UltralightNet.TestApp/bin/Debug/net6.0",
             "console": "internalConsole",
             "stopAtEntry": false
         },
