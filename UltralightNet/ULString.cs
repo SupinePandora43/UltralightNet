@@ -95,12 +95,18 @@ namespace UltralightNet
 	[DebuggerDisplay("{ToManaged(),raw}")]
 	[BlittableType]
 	[StructLayout(LayoutKind.Sequential)]
-	public unsafe struct ULString
+	public unsafe readonly struct ULString
 	{
-		public byte* data;
-		public nuint length;
+		public readonly byte* data;
+		public readonly nuint length;
 
-		/// <summary>Do not use on pointers</summary>
+		public ULString(byte* data, nuint length)
+		{
+			this.data = data;
+			this.length = length;
+		}
+
+		/// <remarks>Do not use on pointers</remarks>
 		[SkipLocalsInit]
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public string ToManaged() =>
@@ -131,16 +137,14 @@ namespace UltralightNet
 		{
 			ULStringGeneratedDllImportMarshaler marshaler = new(str);
 			ULString* marshalled = marshaler.Value;
-			ULString ulString = new()
-			{
+			byte* data =
 #if NET6_0_OR_GREATER
-				data = (byte*)NativeMemory.Alloc(marshalled->length),
+				(byte*)NativeMemory.Alloc(marshalled->length);
 #else
-				data = (byte*)Marshal.AllocHGlobal((int)marshalled->length), // INTEROPTODO: INT64
+				(byte*)Marshal.AllocHGlobal((int)marshalled->length); // INTEROPTODO: INT64
 #endif
-				length = marshalled->length
-			};
-			new ReadOnlySpan<byte>(marshalled->data, (int)marshalled->length).CopyTo(new Span<byte>(ulString.data, (int)ulString.length)); // INTEROPTODO: INT64
+			new ReadOnlySpan<byte>(marshalled->data, (int)marshalled->length).CopyTo(new Span<byte>(data, (int)marshalled->length)); // INTEROPTODO: INT64
+			ULString ulString = new(data, marshalled->length);
 			marshaler.FreeNative();
 			return ulString;
 		}
