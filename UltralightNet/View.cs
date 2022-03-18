@@ -176,16 +176,28 @@ namespace UltralightNet
 
 	public unsafe class View : IDisposable
 	{
-		public IntPtr Ptr { get; private set; }
-		public bool IsDisposed { get; private set; }
-		public Renderer Renderer { get; internal set; }
+		private void* _ptr;
+		public IntPtr Ptr
+		{
+			get
+			{
+				static void Throw() => throw new ObjectDisposedException(nameof(View));
+				if (IsDisposed) Throw();
+				return (IntPtr)_ptr;
+			}
+			private set => _ptr = value.ToPointer();
+		}
+		public bool IsDisposed { get; private set; } = false;
+		private bool dispose = true;
+		internal Renderer Renderer { get; set; }
 
 		private JSContext Context { get; set; }
+		private JSContext? lockedContext;
 
 		public View(IntPtr ptr, bool dispose = false)
 		{
 			Ptr = ptr;
-			IsDisposed = !dispose;
+			this.dispose = dispose;
 			Context = new();
 		}
 
@@ -235,12 +247,18 @@ namespace UltralightNet
 
 		public void Resize(in uint width, in uint height) => Methods.ulViewResize(Ptr, width, height);
 
-		public JSContext LockJSContext(){
+		public ref readonly JSContext LockJSContext()
+		{
 			void* contextHandle = Methods.ulViewLockJSContext(Ptr);
 			Context.OnLocked(contextHandle);
-			return Context;
+			lockedContext = Context;
+			return ref lockedContext!;
 		}
-		public void UnlockJSContext() => Methods.ulViewUnlockJSContext(Ptr);
+		public void UnlockJSContext()
+		{
+			lockedContext = null;
+			Methods.ulViewUnlockJSContext(Ptr);
+		}
 
 		public string EvaluateScript(string js_string, out string exception) => Methods.ulViewEvaluateScript(Ptr, js_string, out exception);
 
@@ -746,11 +764,12 @@ namespace UltralightNet
 				}
 			}
 
-			if (IsDisposed) return;
+			if (IsDisposed || !dispose) return;
+
 			Methods.ulDestroyView(Ptr);
+			IsDisposed = true;
 			Renderer = null;
 
-			IsDisposed = true;
 			GC.SuppressFinalize(this);
 		}
 

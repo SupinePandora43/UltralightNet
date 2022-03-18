@@ -16,7 +16,7 @@ namespace UltralightNetTestApplication
 			Renderer renderer = ULPlatform.CreateRenderer(new());
 			View view = renderer.CreateView(512, 512);
 
-			var context = view.LockJSContext();
+			ref readonly JSContext context = ref view.LockJSContext();
 
 			// context.GlobalObject["GetMessage"] = (JSObject) (arguments) => (JSValue) "Hello from C#!";
 
