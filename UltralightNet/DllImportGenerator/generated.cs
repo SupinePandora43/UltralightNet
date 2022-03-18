@@ -1680,6 +1680,44 @@ namespace UltralightNet
     public static partial class Methods
     {
         [System.Runtime.CompilerServices.SkipLocalsInitAttribute]
+        public static partial global::System.IntPtr ulCreateView(global::System.IntPtr renderer, uint width, uint height, in global::UltralightNet.ULViewConfig viewConfig, global::System.IntPtr session)
+        {
+            unsafe
+            {
+                global::UltralightNet._ULViewConfig __viewConfig_gen_native = default;
+                global::System.IntPtr __retVal = default;
+                try
+                {
+                    //
+                    // Marshal
+                    //
+                    __viewConfig_gen_native = new global::UltralightNet._ULViewConfig(viewConfig);
+                    //
+                    // Invoke
+                    //
+                    __retVal = ulCreateView__PInvoke__(renderer, width, height, &__viewConfig_gen_native, session);
+                }
+                finally
+                {
+                    //
+                    // Cleanup
+                    //
+                    __viewConfig_gen_native.FreeNative();
+                }
+
+                return __retVal;
+            }
+        }
+
+        [System.Runtime.InteropServices.DllImportAttribute("Ultralight", EntryPoint = "ulCreateView")]
+        extern private static unsafe global::System.IntPtr ulCreateView__PInvoke__(global::System.IntPtr renderer, uint width, uint height, global::UltralightNet._ULViewConfig* viewConfig, global::System.IntPtr session);
+    }
+}
+namespace UltralightNet
+{
+    public static partial class Methods
+    {
+        [System.Runtime.CompilerServices.SkipLocalsInitAttribute]
         public static partial string ulViewGetURL(global::System.IntPtr view)
         {
             unsafe
