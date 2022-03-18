@@ -99,7 +99,8 @@ namespace UltralightNet
 		public bool CheckScriptSyntax(JSString script, JSString sourceURL = null, int startingLineNumber = 0) => CheckScriptSyntax(script, sourceURL, startingLineNumber, out _);
 		public void GarbageCollect() => JavaScriptMethods.JSGarbageCollect(Handle);
 
-		public static JSContext CreateGlobalContext(void* jsClass) => new() { isGlobalContext = true, handle = JavaScriptMethods.JSGlobalContextCreate(jsClass) };
+		// INTEROPTODO: TEST
+		public static JSContext CreateGlobalContext(JSObject jsGlobalObject) => new() { isGlobalContext = true, handle = JavaScriptMethods.JSGlobalContextCreate(jsGlobalObject.Handle) };
 		public static JSContext CreateGlobalContextInGroup(JSContextGroup group, void* jsClass) => new() { isGlobalContext = true, handle = JavaScriptMethods.JSGlobalContextCreateInGroup(group.Handle, jsClass) };
 
 		public static JSContext Retain(JSContext context)
@@ -112,9 +113,9 @@ namespace UltralightNet
 		public JSValue MakeNull() => new(Handle, JavaScriptMethods.JSValueMakeNull(Handle));
 		public JSValue MakeBoolean(bool boolean) => new(Handle, JavaScriptMethods.JSValueMakeBoolean(Handle, boolean));
 		public JSValue MakeNumber(double number) => new(Handle, JavaScriptMethods.JSValueMakeNumber(Handle, number));
-		public JSValue MakeString(string str) => new(Handle, JavaScriptMethods.JSValueMakeString(Handle, new JSString(str).Handle));
-		public JSValue MakeSymbol(char chr) => new(Handle, JavaScriptMethods.JSValueMakeSymbol(Handle, new JSString(chr.ToString()).Handle));
-		public JSValue MakeFromJSON(string json) => new(Handle, JavaScriptMethods.JSValueMakeFromJSONString(Handle, new JSString(json).Handle));
+		public JSValue MakeString(string str) => new(Handle, JavaScriptMethods.JSValueMakeString(Handle, new JSString(str.AsSpan()).Handle));
+		public JSValue MakeSymbol(char chr) => new(Handle, JavaScriptMethods.JSValueMakeSymbol(Handle, new JSString(chr.ToString().AsSpan()).Handle));
+		public JSValue MakeFromJSON(string json) => new(Handle, JavaScriptMethods.JSValueMakeFromJSONString(Handle, new JSString(json.AsSpan()).Handle));
 
 		~JSContext() => Dispose();
 
