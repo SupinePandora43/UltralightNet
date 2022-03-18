@@ -1,4 +1,5 @@
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
@@ -160,5 +161,8 @@ namespace UltralightNet
 			FontFamilySerif == other.FontFamilySerif &&
 			FontFamilySansSerif == other.FontFamilySansSerif &&
 			UserAgent == other.UserAgent;
+
+		public override bool Equals([NotNullWhen(true)] object? obj) => obj is ULViewConfig ? Equals((ULViewConfig)obj) : false;
+		public override int GetHashCode() => HashCode.Combine(HashCode.Combine(IsAccelerated, IsTransparent, InitialDeviceScale, InitialFocus, EnableImages, EnableJavaScript, FontFamilyStandard, FontFamilyFixed), HashCode.Combine(FontFamilySerif, FontFamilySansSerif, UserAgent));
 	}
 }
