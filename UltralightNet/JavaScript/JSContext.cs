@@ -58,7 +58,6 @@ namespace UltralightNet
 
 		public void* Handle => handle;
 
-
 		internal void OnLocked(void* actualHandle)
 		{
 			handle = actualHandle;
