@@ -90,13 +90,25 @@ namespace UltralightNet
 	}
 	public unsafe class ULBitmap : IDisposable, ICloneable
 	{
-		public readonly IntPtr Ptr;
-		public bool IsDisposed { get; private set; }
+		private IntPtr _ptr;
+		public IntPtr Ptr
+		{
+			get
+			{
+				static void Throw() => throw new ObjectDisposedException(nameof(ULBitmap));
+				if (IsDisposed) Throw();
+				ULPlatform.CheckThread();
+				return _ptr;
+			}
+			init => _ptr = value;
+		}
+		public bool IsDisposed { get; private set; } = false;
+		private readonly bool dispose = true;
 
 		public ULBitmap(IntPtr ptr, bool dispose = false)
 		{
 			Ptr = ptr;
-			IsDisposed = !dispose;
+			this.dispose = dispose;
 		}
 
 		public ULBitmap(uint width, uint height, ULBitmapFormat format) => Ptr = Methods.ulCreateBitmap(width, height, format);
@@ -168,6 +180,7 @@ namespace UltralightNet
 			GC.SuppressFinalize(this);
 		}
 
-		public object Clone() => new ULBitmap(Methods.ulCreateBitmapFromCopy(Ptr), true);
+		public ULBitmap Clone() => new ULBitmap(Methods.ulCreateBitmapFromCopy(Ptr), true);
+		object ICloneable.Clone() => Clone();
 	}
 }
