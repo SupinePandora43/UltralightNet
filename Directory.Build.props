@@ -12,6 +12,13 @@
 		<PackageOutputPath>$(SolutionDir)</PackageOutputPath>
 		<DebugType>Portable</DebugType>
 
+		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+		<Nullable>enable</Nullable>
+
 		<NoWarn>1006</NoWarn>
 	</PropertyGroup>
+
+	<ItemGroup>
+		<PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0" PrivateAssets="All" />
+	</ItemGroup>
 </Project>
