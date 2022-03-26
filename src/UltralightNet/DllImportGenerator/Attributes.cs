@@ -62,6 +62,7 @@ namespace System.Runtime.CompilerServices
 	{
 		public SkipLocalsInitAttribute() { }
 	}
+	internal sealed class IsExternalInit {}
 }
 #if !NETSTANDARD2_1
 namespace System.Diagnostics.CodeAnalysis
