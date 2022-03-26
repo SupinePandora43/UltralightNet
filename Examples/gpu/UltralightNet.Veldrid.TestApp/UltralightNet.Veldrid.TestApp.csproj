@@ -25,7 +25,7 @@
 		<ProjectReference Include="..\..\..\src\UltralightNet.Veldrid.SDL2\UltralightNet.Veldrid.SDL2.csproj" />
 		<ProjectReference Include="..\..\..\src\UltralightNet\UltralightNet.csproj" />
 		<ProjectReference Include="..\..\..\src\UltralightNet.AppCore\UltralightNet.AppCore.csproj" />
-		<ProjectReference Include="..\..\..\src\gpu/libs/UltralightNet.Veldrid\UltralightNet.Veldrid.csproj" />
+		<ProjectReference Include="..\..\..\gpu/libs/UltralightNet.Veldrid\UltralightNet.Veldrid.csproj" />
 	</ItemGroup>
 
 </Project>

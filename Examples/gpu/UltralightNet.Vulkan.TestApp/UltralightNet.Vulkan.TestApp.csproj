@@ -19,9 +19,9 @@
 		<PackageReference Include="Silk.NET.Vulkan.Extensions.KHR" Version="2.11.0" />
 		<!-- <PackageReference Include="SixLabors.ImageSharp" Version="1.0.4" /> -->
 
-		<ProjectReference Include="..\..\src\UltralightNet\UltralightNet.csproj" />
-		<ProjectReference Include="..\..\src\UltralightNet.AppCore\UltralightNet.AppCore.csproj" />
-		<ProjectReference Include="..\..\gpu/libs/UltralightNet.Vulkan\UltralightNet.Vulkan.csproj" />
+		<ProjectReference Include="..\..\..\src\UltralightNet\UltralightNet.csproj" />
+		<ProjectReference Include="..\..\..\src\UltralightNet.AppCore\UltralightNet.AppCore.csproj" />
+		<ProjectReference Include="..\..\..\gpu/libs/UltralightNet.Vulkan\UltralightNet.Vulkan.csproj" />
 
 		<PackageReference Include="UltralightNet.Binaries" Version="$(Version)" />
 		<PackageReference Include="UltralightNet.AppCore" Version="$(Version)" />
