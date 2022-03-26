@@ -460,7 +460,7 @@ namespace UltralightNet.Veldrid
 		/// <exception cref="KeyNotFoundException">When called on view without RenderTarget</exception>
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		[SkipLocalsInit]
-		public ResourceSet GetRenderTarget(View view) => TextureEntries[view.RenderTarget.texture_id].resourceSet;
+		public ResourceSet GetRenderTarget(View view) => TextureEntries[view.RenderTarget.TextureId].resourceSet;
 
 		public class TextureEntry
 		{
