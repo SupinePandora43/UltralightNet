@@ -1,10 +1,10 @@
 // Until https://github.com/dotnet/runtimelab/issues/925
 // + (side story) https://github.com/dotnet/runtimelab/issues/938
 
-
 #if !GENERATED
 
 #pragma warning disable IDE0059
+#nullable disable
 
 namespace UltralightNet
 {
@@ -1809,33 +1809,6 @@ namespace UltralightNet
     public static partial class Methods
     {
         [System.Runtime.CompilerServices.SkipLocalsInitAttribute]
-        public static partial global::UltralightNet.RenderTarget ulViewGetRenderTarget(global::System.IntPtr view)
-        {
-            unsafe
-            {
-                global::UltralightNet.RenderTarget __retVal = default;
-                global::UltralightNet.RenderTargetNative __retVal_gen_native = default;
-                //
-                // Invoke
-                //
-                __retVal_gen_native = ulViewGetRenderTarget__PInvoke__(view);
-                //
-                // Unmarshal
-                //
-                __retVal = __retVal_gen_native.ToManaged();
-                return __retVal;
-            }
-        }
-
-        [System.Runtime.InteropServices.DllImportAttribute("Ultralight", EntryPoint = "ulViewGetRenderTarget")]
-        extern private static unsafe global::UltralightNet.RenderTargetNative ulViewGetRenderTarget__PInvoke__(global::System.IntPtr view);
-    }
-}
-namespace UltralightNet
-{
-    public static partial class Methods
-    {
-        [System.Runtime.CompilerServices.SkipLocalsInitAttribute]
         public static partial void ulViewLoadHTML(global::System.IntPtr view, string html_string)
         {
             unsafe
@@ -2079,6 +2052,354 @@ namespace UltralightNet
     public static partial class Methods
     {
         [System.Runtime.CompilerServices.SkipLocalsInitAttribute]
+        public static partial void ulViewSetChangeTitleCallback(global::System.IntPtr view, global::UltralightNet.ULChangeTitleCallback__PInvoke__ callback, global::System.IntPtr user_data)
+        {
+            unsafe
+            {
+                global::System.IntPtr __callback_gen_native = default;
+                //
+                // Marshal
+                //
+                __callback_gen_native = callback != null ? global::System.Runtime.InteropServices.Marshal.GetFunctionPointerForDelegate(callback) : default;
+                //
+                // Invoke
+                //
+                ulViewSetChangeTitleCallback__PInvoke__(view, __callback_gen_native, user_data);
+                //
+                // KeepAlive
+                //
+                global::System.GC.KeepAlive(callback);
+            }
+        }
+
+        [System.Runtime.InteropServices.DllImportAttribute("Ultralight", EntryPoint = "ulViewSetChangeTitleCallback")]
+        extern private static unsafe void ulViewSetChangeTitleCallback__PInvoke__(global::System.IntPtr view, global::System.IntPtr callback, global::System.IntPtr user_data);
+    }
+}
+namespace UltralightNet
+{
+    public static partial class Methods
+    {
+        [System.Runtime.CompilerServices.SkipLocalsInitAttribute]
+        public static partial void ulViewSetChangeURLCallback(global::System.IntPtr view, global::UltralightNet.ULChangeURLCallback__PInvoke__ callback, global::System.IntPtr user_data)
+        {
+            unsafe
+            {
+                global::System.IntPtr __callback_gen_native = default;
+                //
+                // Marshal
+                //
+                __callback_gen_native = callback != null ? global::System.Runtime.InteropServices.Marshal.GetFunctionPointerForDelegate(callback) : default;
+                //
+                // Invoke
+                //
+                ulViewSetChangeURLCallback__PInvoke__(view, __callback_gen_native, user_data);
+                //
+                // KeepAlive
+                //
+                global::System.GC.KeepAlive(callback);
+            }
+        }
+
+        [System.Runtime.InteropServices.DllImportAttribute("Ultralight", EntryPoint = "ulViewSetChangeURLCallback")]
+        extern private static unsafe void ulViewSetChangeURLCallback__PInvoke__(global::System.IntPtr view, global::System.IntPtr callback, global::System.IntPtr user_data);
+    }
+}
+namespace UltralightNet
+{
+    public static partial class Methods
+    {
+        [System.Runtime.CompilerServices.SkipLocalsInitAttribute]
+        public static partial void ulViewSetChangeTooltipCallback(global::System.IntPtr view, global::UltralightNet.ULChangeTooltipCallback__PInvoke__ callback, global::System.IntPtr user_data)
+        {
+            unsafe
+            {
+                global::System.IntPtr __callback_gen_native = default;
+                //
+                // Marshal
+                //
+                __callback_gen_native = callback != null ? global::System.Runtime.InteropServices.Marshal.GetFunctionPointerForDelegate(callback) : default;
+                //
+                // Invoke
+                //
+                ulViewSetChangeTooltipCallback__PInvoke__(view, __callback_gen_native, user_data);
+                //
+                // KeepAlive
+                //
+                global::System.GC.KeepAlive(callback);
+            }
+        }
+
+        [System.Runtime.InteropServices.DllImportAttribute("Ultralight", EntryPoint = "ulViewSetChangeTooltipCallback")]
+        extern private static unsafe void ulViewSetChangeTooltipCallback__PInvoke__(global::System.IntPtr view, global::System.IntPtr callback, global::System.IntPtr user_data);
+    }
+}
+namespace UltralightNet
+{
+    public static partial class Methods
+    {
+        [System.Runtime.CompilerServices.SkipLocalsInitAttribute]
+        public static partial void ulViewSetChangeCursorCallback(global::System.IntPtr view, global::UltralightNet.ULChangeCursorCallback__PInvoke__ callback, global::System.IntPtr user_data)
+        {
+            unsafe
+            {
+                global::System.IntPtr __callback_gen_native = default;
+                //
+                // Marshal
+                //
+                __callback_gen_native = callback != null ? global::System.Runtime.InteropServices.Marshal.GetFunctionPointerForDelegate(callback) : default;
+                //
+                // Invoke
+                //
+                ulViewSetChangeCursorCallback__PInvoke__(view, __callback_gen_native, user_data);
+                //
+                // KeepAlive
+                //
+                global::System.GC.KeepAlive(callback);
+            }
+        }
+
+        [System.Runtime.InteropServices.DllImportAttribute("Ultralight", EntryPoint = "ulViewSetChangeCursorCallback")]
+        extern private static unsafe void ulViewSetChangeCursorCallback__PInvoke__(global::System.IntPtr view, global::System.IntPtr callback, global::System.IntPtr user_data);
+    }
+}
+namespace UltralightNet
+{
+    public static partial class Methods
+    {
+        [System.Runtime.CompilerServices.SkipLocalsInitAttribute]
+        public static partial void ulViewSetAddConsoleMessageCallback(global::System.IntPtr view, global::UltralightNet.ULAddConsoleMessageCallback__PInvoke__ callback, global::System.IntPtr user_data)
+        {
+            unsafe
+            {
+                global::System.IntPtr __callback_gen_native = default;
+                //
+                // Marshal
+                //
+                __callback_gen_native = callback != null ? global::System.Runtime.InteropServices.Marshal.GetFunctionPointerForDelegate(callback) : default;
+                //
+                // Invoke
+                //
+                ulViewSetAddConsoleMessageCallback__PInvoke__(view, __callback_gen_native, user_data);
+                //
+                // KeepAlive
+                //
+                global::System.GC.KeepAlive(callback);
+            }
+        }
+
+        [System.Runtime.InteropServices.DllImportAttribute("Ultralight", EntryPoint = "ulViewSetAddConsoleMessageCallback")]
+        extern private static unsafe void ulViewSetAddConsoleMessageCallback__PInvoke__(global::System.IntPtr view, global::System.IntPtr callback, global::System.IntPtr user_data);
+    }
+}
+namespace UltralightNet
+{
+    public static partial class Methods
+    {
+        [System.Runtime.CompilerServices.SkipLocalsInitAttribute]
+        public static partial void ulViewSetCreateChildViewCallback(global::System.IntPtr view, global::UltralightNet.ULCreateChildViewCallback__PInvoke__ callback, global::System.IntPtr user_data)
+        {
+            unsafe
+            {
+                global::System.IntPtr __callback_gen_native = default;
+                //
+                // Marshal
+                //
+                __callback_gen_native = callback != null ? global::System.Runtime.InteropServices.Marshal.GetFunctionPointerForDelegate(callback) : default;
+                //
+                // Invoke
+                //
+                ulViewSetCreateChildViewCallback__PInvoke__(view, __callback_gen_native, user_data);
+                //
+                // KeepAlive
+                //
+                global::System.GC.KeepAlive(callback);
+            }
+        }
+
+        [System.Runtime.InteropServices.DllImportAttribute("Ultralight", EntryPoint = "ulViewSetCreateChildViewCallback")]
+        extern private static unsafe void ulViewSetCreateChildViewCallback__PInvoke__(global::System.IntPtr view, global::System.IntPtr callback, global::System.IntPtr user_data);
+    }
+}
+namespace UltralightNet
+{
+    public static partial class Methods
+    {
+        [System.Runtime.CompilerServices.SkipLocalsInitAttribute]
+        public static partial void ulViewSetBeginLoadingCallback(global::System.IntPtr view, global::UltralightNet.ULBeginLoadingCallback__PInvoke__ callback, global::System.IntPtr user_data)
+        {
+            unsafe
+            {
+                global::System.IntPtr __callback_gen_native = default;
+                //
+                // Marshal
+                //
+                __callback_gen_native = callback != null ? global::System.Runtime.InteropServices.Marshal.GetFunctionPointerForDelegate(callback) : default;
+                //
+                // Invoke
+                //
+                ulViewSetBeginLoadingCallback__PInvoke__(view, __callback_gen_native, user_data);
+                //
+                // KeepAlive
+                //
+                global::System.GC.KeepAlive(callback);
+            }
+        }
+
+        [System.Runtime.InteropServices.DllImportAttribute("Ultralight", EntryPoint = "ulViewSetBeginLoadingCallback")]
+        extern private static unsafe void ulViewSetBeginLoadingCallback__PInvoke__(global::System.IntPtr view, global::System.IntPtr callback, global::System.IntPtr user_data);
+    }
+}
+namespace UltralightNet
+{
+    public static partial class Methods
+    {
+        [System.Runtime.CompilerServices.SkipLocalsInitAttribute]
+        public static partial void ulViewSetFinishLoadingCallback(global::System.IntPtr view, global::UltralightNet.ULFinishLoadingCallback__PInvoke__ callback, global::System.IntPtr user_data)
+        {
+            unsafe
+            {
+                global::System.IntPtr __callback_gen_native = default;
+                //
+                // Marshal
+                //
+                __callback_gen_native = callback != null ? global::System.Runtime.InteropServices.Marshal.GetFunctionPointerForDelegate(callback) : default;
+                //
+                // Invoke
+                //
+                ulViewSetFinishLoadingCallback__PInvoke__(view, __callback_gen_native, user_data);
+                //
+                // KeepAlive
+                //
+                global::System.GC.KeepAlive(callback);
+            }
+        }
+
+        [System.Runtime.InteropServices.DllImportAttribute("Ultralight", EntryPoint = "ulViewSetFinishLoadingCallback")]
+        extern private static unsafe void ulViewSetFinishLoadingCallback__PInvoke__(global::System.IntPtr view, global::System.IntPtr callback, global::System.IntPtr user_data);
+    }
+}
+namespace UltralightNet
+{
+    public static partial class Methods
+    {
+        [System.Runtime.CompilerServices.SkipLocalsInitAttribute]
+        public static partial void ulViewSetFailLoadingCallback(global::System.IntPtr view, global::UltralightNet.ULFailLoadingCallback__PInvoke__ callback, global::System.IntPtr user_data)
+        {
+            unsafe
+            {
+                global::System.IntPtr __callback_gen_native = default;
+                //
+                // Marshal
+                //
+                __callback_gen_native = callback != null ? global::System.Runtime.InteropServices.Marshal.GetFunctionPointerForDelegate(callback) : default;
+                //
+                // Invoke
+                //
+                ulViewSetFailLoadingCallback__PInvoke__(view, __callback_gen_native, user_data);
+                //
+                // KeepAlive
+                //
+                global::System.GC.KeepAlive(callback);
+            }
+        }
+
+        [System.Runtime.InteropServices.DllImportAttribute("Ultralight", EntryPoint = "ulViewSetFailLoadingCallback")]
+        extern private static unsafe void ulViewSetFailLoadingCallback__PInvoke__(global::System.IntPtr view, global::System.IntPtr callback, global::System.IntPtr user_data);
+    }
+}
+namespace UltralightNet
+{
+    public static partial class Methods
+    {
+        [System.Runtime.CompilerServices.SkipLocalsInitAttribute]
+        public static partial void ulViewSetWindowObjectReadyCallback(global::System.IntPtr view, global::UltralightNet.ULWindowObjectReadyCallback__PInvoke__ callback, global::System.IntPtr user_data)
+        {
+            unsafe
+            {
+                global::System.IntPtr __callback_gen_native = default;
+                //
+                // Marshal
+                //
+                __callback_gen_native = callback != null ? global::System.Runtime.InteropServices.Marshal.GetFunctionPointerForDelegate(callback) : default;
+                //
+                // Invoke
+                //
+                ulViewSetWindowObjectReadyCallback__PInvoke__(view, __callback_gen_native, user_data);
+                //
+                // KeepAlive
+                //
+                global::System.GC.KeepAlive(callback);
+            }
+        }
+
+        [System.Runtime.InteropServices.DllImportAttribute("Ultralight", EntryPoint = "ulViewSetWindowObjectReadyCallback")]
+        extern private static unsafe void ulViewSetWindowObjectReadyCallback__PInvoke__(global::System.IntPtr view, global::System.IntPtr callback, global::System.IntPtr user_data);
+    }
+}
+namespace UltralightNet
+{
+    public static partial class Methods
+    {
+        [System.Runtime.CompilerServices.SkipLocalsInitAttribute]
+        public static partial void ulViewSetDOMReadyCallback(global::System.IntPtr view, global::UltralightNet.ULDOMReadyCallback__PInvoke__ callback, global::System.IntPtr user_data)
+        {
+            unsafe
+            {
+                global::System.IntPtr __callback_gen_native = default;
+                //
+                // Marshal
+                //
+                __callback_gen_native = callback != null ? global::System.Runtime.InteropServices.Marshal.GetFunctionPointerForDelegate(callback) : default;
+                //
+                // Invoke
+                //
+                ulViewSetDOMReadyCallback__PInvoke__(view, __callback_gen_native, user_data);
+                //
+                // KeepAlive
+                //
+                global::System.GC.KeepAlive(callback);
+            }
+        }
+
+        [System.Runtime.InteropServices.DllImportAttribute("Ultralight", EntryPoint = "ulViewSetDOMReadyCallback")]
+        extern private static unsafe void ulViewSetDOMReadyCallback__PInvoke__(global::System.IntPtr view, global::System.IntPtr callback, global::System.IntPtr user_data);
+    }
+}
+namespace UltralightNet
+{
+    public static partial class Methods
+    {
+        [System.Runtime.CompilerServices.SkipLocalsInitAttribute]
+        public static partial void ulViewSetUpdateHistoryCallback(global::System.IntPtr view, global::UltralightNet.ULUpdateHistoryCallback__PInvoke__ callback, global::System.IntPtr user_data)
+        {
+            unsafe
+            {
+                global::System.IntPtr __callback_gen_native = default;
+                //
+                // Marshal
+                //
+                __callback_gen_native = callback != null ? global::System.Runtime.InteropServices.Marshal.GetFunctionPointerForDelegate(callback) : default;
+                //
+                // Invoke
+                //
+                ulViewSetUpdateHistoryCallback__PInvoke__(view, __callback_gen_native, user_data);
+                //
+                // KeepAlive
+                //
+                global::System.GC.KeepAlive(callback);
+            }
+        }
+
+        [System.Runtime.InteropServices.DllImportAttribute("Ultralight", EntryPoint = "ulViewSetUpdateHistoryCallback")]
+        extern private static unsafe void ulViewSetUpdateHistoryCallback__PInvoke__(global::System.IntPtr view, global::System.IntPtr callback, global::System.IntPtr user_data);
+    }
+}
+namespace UltralightNet
+{
+    public static partial class Methods
+    {
+        [System.Runtime.CompilerServices.SkipLocalsInitAttribute]
         public static partial void ulViewSetNeedsPaint(global::System.IntPtr view, bool needs_paint)
         {
             unsafe
@@ -2127,6 +2448,7 @@ namespace UltralightNet
     }
 }
 
+#nullable enable
 #pragma warning restore IDE0059
 
 #endif

@@ -12,7 +12,7 @@ namespace UltralightNet
 		byte is_popup,
 		ULIntRect popup_rect
 	);
-	public delegate View ULCreateChildViewCallback(
+	public delegate View? ULCreateChildViewCallback(
 		IntPtr user_data,
 		View caller,
 		string opener_url,
@@ -20,7 +20,7 @@ namespace UltralightNet
 		bool is_popup,
 		ULIntRect popup_rect
 	);
-	public delegate View ULCreateChildViewCallbackEvent(
+	public delegate View? ULCreateChildViewCallbackEvent(
 		string openerUrl,
 		string targetUrl,
 		bool isPopup,
