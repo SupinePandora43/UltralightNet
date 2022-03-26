@@ -13,19 +13,21 @@ namespace UltralightNet
 	[System.Diagnostics.CodeAnalysis.SuppressMessage("Interoperability", "CA1401:P/Invokes should not be visible", Justification = "<Pending>")]
 	public static partial class Methods
 	{
+		public const string LibUltralight = "Ultralight";
+
 		static Methods() => Preload();
 
-		[GeneratedDllImport("Ultralight")]
+		[GeneratedDllImport(LibUltralight)]
 		[return: MarshalUsing(typeof(UTF8Marshaller))]
 		public static partial string ulVersionString();
 
-		[DllImport("Ultralight")]
+		[DllImport(LibUltralight)]
 		public static extern uint ulVersionMajor();
 
-		[DllImport("Ultralight")]
+		[DllImport(LibUltralight)]
 		public static extern uint ulVersionMinor();
 
-		[DllImport("Ultralight")]
+		[DllImport(LibUltralight)]
 		public static extern uint ulVersionPatch();
 
 		/// <summary>
@@ -47,12 +49,12 @@ namespace UltralightNet
 				ReadOnlySpan<string> libsLinux = new[] { "libglib-2.0.so.0.6800.3", "libgthread-2.0.so.0.6800.3", "libgobject-2.0.so.0.6800.3", "libgmodule-2.0.so.0.6800.3", "libgio-2.0.so.0.6800.3", /* --- */ "libgstreamer-full-1.0.so", "libUltralightCore.so", "libWebCore.so", "libUltralight.so" };
 				ReadOnlySpan<string> libsOSX = new[] { "libgstreamer-full-1.0.dylib", "libUltralightCore.dylib", "libWebCore.dylib", "libUltralight.dylib" };
 
-				string absoluteAssemblyLocationDir = Path.GetDirectoryName(typeof(Methods).Assembly.Location);
+				string? absoluteAssemblyLocationDir = Path.GetDirectoryName(typeof(Methods).Assembly.Location);
 				if (string.IsNullOrEmpty(absoluteAssemblyLocationDir)) absoluteAssemblyLocationDir = Path.GetDirectoryName(
 #if NET6_0_OR_GREATER
 					Environment.ProcessPath ??
 #endif
-					"NonExistantFolder");
+					"NonExistantFolder") ?? "AnotherNonExistantFolder";
 				string absoluteRuntimeNativesDir = Path.Combine(absoluteAssemblyLocationDir, "runtimes", isLinux ? "linux-x64" : "osx-x64", "native");
 
 #if !NETSTANDARD
@@ -204,7 +206,7 @@ namespace UltralightNet
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public string ToManaged() =>
 #if NETSTANDARD2_1 || NETCOREAPP1_1_OR_GREATER
-			Marshal.PtrToStringUTF8((IntPtr)bytes);
+			Marshal.PtrToStringUTF8((IntPtr)bytes)!;
 #else
 			new((sbyte*)bytes);
 #endif
