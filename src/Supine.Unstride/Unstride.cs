@@ -5,6 +5,13 @@ namespace Supine.Unstride
 {
 	public static class Unstrider
 	{
+		public static unsafe void Unstride(byte* inputPixels, byte* outputPixels, uint inputRowLength, uint outputRowLength, uint times)
+		{
+			for (uint y = 0; y < times; y++)
+			{
+				new ReadOnlySpan<byte>(inputPixels + (y * (inputRowLength)), unchecked((int)outputRowLength)).CopyTo(new Span<byte>(outputPixels + (y * outputRowLength), unchecked((int)outputRowLength)));
+			}
+		}
 		public static unsafe byte[] Unstride(byte* pixels, uint width, uint height, uint bpp, uint offset)
 		{
 			byte[] unstridedPixelByteArray = new byte[width * height * bpp];
