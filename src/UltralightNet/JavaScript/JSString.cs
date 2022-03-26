@@ -45,15 +45,25 @@ namespace UltralightNet
 	}
 
 	[DebuggerDisplay("{ToString(),raw}")]
-	public unsafe sealed class JSString : IDisposable, IEquatable<JSString>, ICloneable
+	public unsafe sealed class JSString : INativeContainer<JSString>, IEquatable<JSString>, ICloneable
 	{
 		private readonly void* handle;
-		private readonly bool dispose = true;
-		private bool isDisposed = false;
-
-		public JSString(void* handle)
+		public void* Handle
 		{
-			this.handle = handle;
+			get
+			{
+				static void Throw() => throw new ObjectDisposedException(nameof(JSString));
+				if (IsDisposed) Throw();
+				return handle;
+			}
+			init => handle = value;
+		}
+		private readonly bool dispose = true;
+		public bool IsDisposed { get; private set; } = false;
+
+		internal JSString(void* handle)
+		{
+			Handle = handle;
 		}
 		public JSString(void* handle, bool dispose) : this(handle) { this.dispose = dispose; }
 		public JSString(ushort* characters, nuint length) : this(JavaScriptMethods.JSStringCreateWithCharacters(characters, length)) { }
@@ -65,16 +75,6 @@ namespace UltralightNet
 		}
 		public JSString(ReadOnlySpan<char> characters) : this(MemoryMarshal.Cast<char, ushort>(characters)) { }
 
-		public void* Handle
-		{
-			get
-			{
-				static void Throw() => throw new ObjectDisposedException(nameof(JSString));
-				if (isDisposed) Throw();
-				return handle;
-			}
-		}
-
 		public JSString Clone() => new(JavaScriptMethods.JSStringRetain(Handle));
 		object ICloneable.Clone() => Clone();
 
@@ -82,6 +82,7 @@ namespace UltralightNet
 
 		public ReadOnlySpan<ushort> UTF16Data => new(JavaScriptMethods.JSStringGetCharactersPtr(Handle), (int)Length); // INTEROPTODO: INT64
 		public ushort* UTF16DataRaw => JavaScriptMethods.JSStringGetCharactersPtr(Handle);
+		// do not implement GetPinnableReference because there are UTF16DataRaw
 
 		public nuint MaximumUTF8CStringSize => JavaScriptMethods.JSStringGetMaximumUTF8CStringSize(Handle);
 
@@ -107,26 +108,42 @@ namespace UltralightNet
 
 		public static bool ReferenceEquals(JSString s1, JSString s2) => s1 is null ? s2 is null : s1.Handle == s2.Handle;
 
-		public override int GetHashCode() => HashCode.Combine((nint)handle, dispose, isDisposed);
+#if NETSTANDARD2_1 || NETCOREAPP2_1_OR_GREATER
+		public override int GetHashCode() => HashCode.Combine((nint)handle, dispose, IsDisposed);
+#endif
 
 		public bool Equals(byte* other) => JavaScriptMethods.JSStringIsEqualToUTF8CString(Handle, other);
 		public bool Equals(ReadOnlySpan<byte> other) { fixed (byte* bytes = other) { return Equals(bytes); } }
 
-		public static implicit operator JSString(string obj) => new(obj ?? MemoryMarshal.CreateReadOnlySpan(ref Unsafe.NullRef<char>(), 0));
+		public static implicit operator JSString(string obj) => new(obj is null ?
+#if NETSTANDARD2_1 || NETCOREAPP2_1_OR_GREATER
+		MemoryMarshal.CreateReadOnlySpan(
+#if NET5_0_OR_GREATER
+			ref Unsafe.NullRef<char>()
+#else
+			ref Unsafe.AsRef<char>(null)
+#endif
+			, 0)
+#else
+		new ReadOnlySpan<char>((char*)null, 0)
+#endif
+		: obj.AsSpan());
 		public static explicit operator string(JSString str) => str.ToString()!;
+
+		public JSString FromPointer(void* ptr) => new(ptr);
 
 		~JSString() => Dispose();
 
 		public void Dispose()
 		{
-			if (isDisposed) return;
+			if (IsDisposed) return;
 
 			if (dispose)
 			{
 				JavaScriptMethods.JSStringRelease(handle);
 			}
 
-			isDisposed = true;
+			IsDisposed = true;
 			GC.SuppressFinalize(this);
 		}
 	}
