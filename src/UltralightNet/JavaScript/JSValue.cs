@@ -111,7 +111,7 @@ namespace UltralightNet
 	{
 		protected void* handle = null;
 		private void* context = null;
-		protected object managed;
+		protected object? managed;
 
 		public JSValue(void* context, void* handle)
 		{
@@ -151,7 +151,7 @@ namespace UltralightNet
 		{
 			if (managed is string str)
 			{
-				handle = JavaScriptMethods.JSValueMakeString(Context, new JSString(str).Handle);
+				handle = JavaScriptMethods.JSValueMakeString(Context, new JSString(str.AsSpan()).Handle);
 			}
 		}
 
