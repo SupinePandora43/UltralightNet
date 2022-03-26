@@ -47,6 +47,11 @@ namespace UltralightNet
 		public static extern void JSGlobalContextSetName(void* globalContext, void* name);
 	}
 
+	public readonly ref struct JSContextN
+	{
+		public JSContextN() => JavaScriptMethods.ThrowUnsupportedConstructor();
+	}
+
 	public unsafe class JSContext : IDisposable
 	{
 		public JSContext() { }
@@ -81,22 +86,22 @@ namespace UltralightNet
 			}
 		}
 
-		public JSValue EvaluateScript(JSString script, JSObject thisObject, JSString sourceURL, int startingLineNumber, out JSValue exception)
+		public JSValue EvaluateScript(JSString script, JSObject? thisObject, JSString? sourceURL, int startingLineNumber, out JSValue exception)
 		{
 			void* exceptionPointer;
 			var resultNative = JavaScriptMethods.JSEvaluateScript(Handle, script.Handle, thisObject is null ? null : thisObject.Handle, sourceURL is null ? null : sourceURL.Handle, startingLineNumber, &exceptionPointer);
 			exception = new JSValue(Handle, exceptionPointer);
 			return new(Handle, resultNative);
 		}
-		public JSValue EvaluateScript(JSString script, JSObject thisObject = null, JSString sourceURL = null, int startingLineNumber = 0) => EvaluateScript(script, thisObject, sourceURL, startingLineNumber, out _);
-		public bool CheckScriptSyntax(JSString script, JSString sourceURL, int startingLineNumber, out JSValue exception)
+		public JSValue EvaluateScript(JSString script, JSObject? thisObject = null, JSString? sourceURL = null, int startingLineNumber = 0) => EvaluateScript(script, thisObject, sourceURL, startingLineNumber, out _);
+		public bool CheckScriptSyntax(JSString script, JSString? sourceURL, int startingLineNumber, out JSValue exception)
 		{
-			void* exceptionPointer;
+			void* exceptionPointer = null;
 			var result = JavaScriptMethods.JSCheckScriptSyntax(Handle, script.Handle, sourceURL is null ? null : sourceURL.Handle, startingLineNumber, &exceptionPointer);
 			exception = new(Handle, exceptionPointer);
 			return result;
 		}
-		public bool CheckScriptSyntax(JSString script, JSString sourceURL = null, int startingLineNumber = 0) => CheckScriptSyntax(script, sourceURL, startingLineNumber, out _);
+		public bool CheckScriptSyntax(JSString script, JSString? sourceURL = null, int startingLineNumber = 0) => CheckScriptSyntax(script, sourceURL, startingLineNumber, out _);
 		public void GarbageCollect() => JavaScriptMethods.JSGarbageCollect(Handle);
 
 		// INTEROPTODO: TEST
