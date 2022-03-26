@@ -110,24 +110,27 @@ namespace UltralightNet
 		public static extern void* JSObjectCallAsConstructor(void* context, void* jsObject, nuint argumentCount, void** arguments, void** exception);
 
 		[DllImport("WebCore")]
-		public static extern void* JSObjectCopyPropertyNames(void* context, void* jsObject);
+		public static extern JSPropertyNameArray* JSObjectCopyPropertyNames(void* context, void* jsObject);
 
 		[DllImport("WebCore")]
-		public static extern void* JSPropertyNameArrayRetain(void* array);
+		public static extern JSPropertyNameArray* JSPropertyNameArrayRetain(JSPropertyNameArray* array);
 
 		[DllImport("WebCore")]
-		public static extern void JSPropertyNameArrayRelease(void* array);
+		public static extern void JSPropertyNameArrayRelease(JSPropertyNameArray* array);
 
 		[DllImport("WebCore")]
-		public static extern nuint JSPropertyNameArrayGetCount(void* array);
+		public static extern nuint JSPropertyNameArrayGetCount(JSPropertyNameArray* array);
 
 		[DllImport("WebCore")]
-		public static extern void* JSPropertyNameArrayGetNameAtIndex(void* array, nuint index);
+		public static extern void* JSPropertyNameArrayGetNameAtIndex(JSPropertyNameArray* array, nuint index);
 
 		[DllImport("WebCore")]
-		public static extern void JSPropertyNameAccumulatorAddName(void* array, void* propertyName);
+		public static extern void JSPropertyNameAccumulatorAddName(JSPropertyNameAccumulator* accumulator, void* propertyName);
 	}
-
+	public readonly ref struct JSObjectN
+	{
+		public JSObjectN() => JavaScriptMethods.ThrowUnsupportedConstructor();
+	}
 	public unsafe class JSObject : JSValue
 	{
 		public JSObject(void* context, void* handle) : base(context, handle) { }
