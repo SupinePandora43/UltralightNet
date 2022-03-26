@@ -26,9 +26,9 @@
 	</ItemGroup-->
 
 	<ItemGroup>
-		<ProjectReference Include="../gpu/libs/UltralightNet.OpenGL/UltralightNet.OpenGL.csproj" />
-		<ProjectReference Include="..\UltralightNet\UltralightNet.csproj" />
-		<ProjectReference Include="..\UltralightNet.AppCore\UltralightNet.AppCore.csproj" />
+		<ProjectReference Include="../../../gpu/libs/UltralightNet.OpenGL/UltralightNet.OpenGL.csproj" />
+		<ProjectReference Include="../../../src\UltralightNet\UltralightNet.csproj" />
+		<ProjectReference Include="../../../src\UltralightNet.AppCore\UltralightNet.AppCore.csproj" />
 	</ItemGroup>
 
 </Project>

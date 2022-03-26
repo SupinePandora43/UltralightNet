@@ -20,13 +20,11 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<ProjectReference Include="..\..\..\UltralightNet\UltralightNet.csproj" />
+		<ProjectReference Include="..\..\..\src\UltralightNet\UltralightNet.csproj" />
 		<ProjectReference Include="../UltralightNet.GPUCommon/UltralightNet.GPUCommon.csproj" />
 
 		<PackageReference Include="Silk.NET.Vulkan" Version="2.11.0"/>
 		<PackageReference Include="Silk.NET.Vulkan.Extensions.EXT" Version="2.11.0" />
 		<PackageReference Include="Silk.NET.Vulkan.Extensions.KHR" Version="2.11.0" />
-
-		<PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0" PrivateAssets="All" />
 	</ItemGroup>
 </Project>
