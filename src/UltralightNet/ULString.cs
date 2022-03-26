@@ -102,6 +102,9 @@ namespace UltralightNet
 
 		public ULString(byte* data, nuint length)
 		{
+#if NET5_0_OR_GREATER
+			Unsafe.SkipInit(out this);
+#endif
 			this.data = data;
 			this.length = length;
 		}

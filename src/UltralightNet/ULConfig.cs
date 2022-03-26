@@ -164,6 +164,9 @@ namespace UltralightNet
 
 		public _ULConfig(ULConfig config)
 		{
+#if NET5_0_OR_GREATER
+			Unsafe.SkipInit(out this);
+#endif
 			CachePath = ULString.CreateOpaque(config.CachePath ?? string.Empty);
 			ResourcePathPrefix = ULString.CreateOpaque(config.ResourcePathPrefix ?? string.Empty);
 			_FaceWinding = Unsafe.As<ULFaceWinding, byte>(ref config.FaceWinding);
@@ -262,7 +265,12 @@ namespace UltralightNet
 			NumRendererThreads == other.NumRendererThreads &&
 			MaxUpdateTime == other.MaxUpdateTime &&
 			BitmapAlignment == other.BitmapAlignment;
+#if NETSTANDARD2_1 || NETCOREAPP2_1_OR_GREATER
 		public override int GetHashCode() => HashCode.Combine(HashCode.Combine(CachePath, ResourcePathPrefix, FaceWinding, FontHinting, FontGamma, UserStylesheet, ForceRepaint, AnimationTimerDelay), HashCode.Combine(ScrollTimerDelay, RecycleDelay, MemoryCacheSize, PageCacheSize, OverrideRAMSize, MinLargeHeapSize, MinSmallHeapSize, NumRendererThreads), HashCode.Combine(MaxUpdateTime, BitmapAlignment));
+#else
+		public override int GetHashCode() => base.GetHashCode();
+
+#endif
 		public static bool operator ==(ULConfig left, ULConfig right) => left.Equals(right);
 		public static bool operator !=(ULConfig left, ULConfig right) => !(left == right);
 	}

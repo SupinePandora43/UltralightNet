@@ -96,6 +96,9 @@ namespace UltralightNet
 
 		public _ULViewConfig(ULViewConfig config)
 		{
+#if NET5_0_OR_GREATER
+			Unsafe.SkipInit(out this);
+#endif
 			_IsAccelerated = Unsafe.As<bool, byte>(ref config.IsAccelerated);
 			_IsTransparent = Unsafe.As<bool, byte>(ref config.IsTransparent);
 			InitialDeviceScale = config.InitialDeviceScale;
@@ -163,6 +166,8 @@ namespace UltralightNet
 			UserAgent == other.UserAgent;
 
 		public override bool Equals([NotNullWhen(true)] object? obj) => obj is ULViewConfig ? Equals((ULViewConfig)obj) : false;
+#if NETSTANDARD2_1 || NETCOREAPP2_1_OR_GREATER
 		public override int GetHashCode() => HashCode.Combine(HashCode.Combine(IsAccelerated, IsTransparent, InitialDeviceScale, InitialFocus, EnableImages, EnableJavaScript, FontFamilyStandard, FontFamilyFixed), HashCode.Combine(FontFamilySerif, FontFamilySansSerif, UserAgent));
+#endif
 	}
 }
