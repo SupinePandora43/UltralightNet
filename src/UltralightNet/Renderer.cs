@@ -33,12 +33,23 @@ namespace UltralightNet
 
 	public class Renderer : IDisposable
 	{
-		public readonly IntPtr Ptr;
+		private readonly IntPtr _ptr;
+		public IntPtr Ptr
+		{
+			get
+			{
+				static void Throw() => throw new ObjectDisposedException(nameof(Renderer));
+				if (IsDisposed) Throw();
+				ULPlatform.CheckThread();
+				return _ptr;
+			}
+			internal init => _ptr = value;
+		}
 
 		private Renderer(IntPtr ptr, bool dispose)
 		{
 			Ptr = ptr;
-			IsDisposed = !dispose;
+			this.dispose = dispose;
 		}
 		public static Renderer FromIntPtr(IntPtr ptr, bool dispose = false) => new(ptr, dispose);
 
@@ -46,7 +57,7 @@ namespace UltralightNet
 		{
 			if (config == default(ULConfig)) throw new ArgumentException($"You passed default({nameof(ULConfig)}). It's invalid. Use at least \"new {nameof(ULConfig)}()\"", nameof(config));
 			Ptr = Methods.ulCreateRenderer(config);
-			IsDisposed = !dispose;
+			this.dispose = dispose;
 		}
 
 		public View CreateView(uint width, uint height) => CreateView(width, height, new ULViewConfig());
@@ -78,11 +89,13 @@ namespace UltralightNet
 			get;
 			private set;
 		}
+		private readonly bool dispose = true;
 		~Renderer() => Dispose();
 		public void Dispose()
 		{
-			if (IsDisposed) return;
+			if (IsDisposed || !dispose) return;
 			Methods.ulDestroyRenderer(Ptr);
+			ULPlatform.thread = null;
 
 			IsDisposed = true;
 			GC.SuppressFinalize(this);
