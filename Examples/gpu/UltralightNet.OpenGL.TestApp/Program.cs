@@ -232,7 +232,7 @@ void main()
 		renderer.Update();
 		renderer.Render();
 
-		var renderBuffer = gpuDriver.renderBuffers[view.RenderTarget.render_buffer_id];
+		var renderBuffer = gpuDriver.renderBuffers[view.RenderTarget.RenderBufferID];
 		var textureEntry = renderBuffer.textureEntry;
 
 		// redraw only when it has changed
