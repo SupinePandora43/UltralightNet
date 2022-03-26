@@ -1,8 +1,8 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Net;
 using System.Runtime.InteropServices;
+using System.Threading;
 
 namespace UltralightNet
 {
@@ -108,6 +108,14 @@ namespace UltralightNet
 		public static bool ErrorMissingResources { get; set; } = true;
 		public static bool ErrorGPUDriverNotSet { get; set; } = true;
 
+		public static bool ErrorWrongThread { get; set; } = true;
+		internal static Thread? thread;
+		internal static void CheckThread()
+		{
+			if (thread is null || !ErrorWrongThread) return;
+			if (Thread.CurrentThread != thread) throw new InvalidOperationException($"{nameof(ULPlatform.ErrorWrongThread)}: Use of ultralight api from a different thread.");
+		}
+
 		private static ULLogger _logger;
 		internal static ULFileSystem _filesystem;
 		private static ULGPUDriver _gpudriver;
@@ -157,6 +165,7 @@ namespace UltralightNet
 
 		public static Renderer CreateRenderer(ULConfig config, bool dispose = true)
 		{
+			thread = Thread.CurrentThread;
 			unsafe
 			{
 				if (SetDefaultLogger && _logger.__LogMessage is null)
@@ -173,11 +182,7 @@ namespace UltralightNet
 					Console.WriteLine("UltralightNet: no filesystem set, default (with access only to required files) will be used.");
 
 					List<Stream> files = new();
-
-					nuint GetFileId()
-					{
-						return (nuint)files.Count;
-					}
+					Stack<nuint> freeFileIds = new();
 
 					FileSystem = new()
 					{
@@ -207,16 +212,20 @@ namespace UltralightNet
 						},
 						OpenFile = (file, _) =>
 						{
-							files.Add(file switch
+							nuint id;
+							if (freeFileIds.Count is not 0) id = freeFileIds.Pop();
+							else id = (nuint)files.Count;
+							files.Insert((int)id, file switch
 							{
-								"resources/cacert.pem" => Resources.Cacertpem,
-								"resources/icudt67l.dat" => Resources.Icudt67ldat,
-								"resources/mediaControls.css" => Resources.MediaControlscss,
-								"resources/mediaControls.js" => Resources.MediaControlsjs,
-								"resources/mediaControlsLocalizedStrings.js" => Resources.MediaControlsLocalizedStringsjs,
+								"resources/cacert.pem" => Resources.Cacertpem!,
+								"resources/icudt67l.dat" => Resources.Icudt67ldat!,
+								"resources/mediaControls.css" => Resources.MediaControlscss!,
+								"resources/mediaControls.js" => Resources.MediaControlsjs!,
+								"resources/mediaControlsLocalizedStrings.js" => Resources.MediaControlsLocalizedStringsjs!,
 								_ => throw new ArgumentOutOfRangeException(nameof(file), "Tried to open not required file.")
 							});
-							return (nuint)files.Count - 1;
+
+							return id;
 						},
 						GetFileSize = (nuint handle, out long size) =>
 						{
@@ -240,7 +249,8 @@ namespace UltralightNet
 						{
 							Console.WriteLine($"CloseFile({handle})");
 							files[(int)handle].Close();
-							files.RemoveAt((int)handle);
+							files[(int)handle] = null!;
+							freeFileIds.Push(handle);
 						}
 					};
 				}
