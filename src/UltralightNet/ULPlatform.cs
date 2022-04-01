@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Threading;
 
@@ -28,7 +29,7 @@ namespace UltralightNet
 
 	[System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE1006:Naming Styles", Justification = "<Pending>")]
 	[System.Diagnostics.CodeAnalysis.SuppressMessage("Interoperability", "CA1401:P/Invokes should not be visible", Justification = "<Pending>")]
-	public static class ULPlatform
+	public static unsafe class ULPlatform
 	{
 		static void ULPLatform() => Methods.Preload();
 
@@ -37,15 +38,17 @@ namespace UltralightNet
 		private static readonly Dictionary<ULGPUDriver, List<GCHandle>> gpudriverHandles = new(1);
 		private static readonly Dictionary<ULClipboard, List<GCHandle>> clipboardHandles = new(1);
 
-		internal static void Handle(ULLogger logger, GCHandle handle)
+		internal static void Handle<TDelegate>(ref ULLogger originalLogger, in ULLogger newLogger, TDelegate? func = null) where TDelegate : Delegate
 		{
-			if (!loggerHandles.ContainsKey(logger)) loggerHandles.Add(logger, new(1));
-			loggerHandles[logger].Add(handle);
+			if (!loggerHandles.Remove(originalLogger, out List<GCHandle>? handles)) handles = new(1);
+			if (func is not null) handles.Add(GCHandle.Alloc(func));
+			loggerHandles[originalLogger = newLogger] = handles;
 		}
-		internal static void Handle(ULFileSystem filesystem, GCHandle handle)
+		internal static void Handle<TDelegate>(ref ULFileSystem originalFileSystem, in ULFileSystem newFileSystem, TDelegate? func = null) where TDelegate : Delegate
 		{
-			if (!filesystemHandles.ContainsKey(filesystem)) filesystemHandles.Add(filesystem, new(6));
-			filesystemHandles[filesystem].Add(handle);
+			if (!filesystemHandles.Remove(originalFileSystem, out List<GCHandle>? handles)) handles = new(6);
+			if (func is not null) handles.Add(GCHandle.Alloc(func));
+			filesystemHandles[originalFileSystem = newFileSystem] = handles;
 		}
 		internal static void Handle(ULGPUDriver gpudriver, GCHandle handle)
 		{
@@ -60,35 +63,23 @@ namespace UltralightNet
 
 		internal static void Free(ULLogger logger)
 		{
-			if (loggerHandles.ContainsKey(logger))
-			{
-				foreach (GCHandle handle in loggerHandles[logger]) if (handle.IsAllocated) handle.Free();
-				loggerHandles.Remove(logger);
-			}
+			if (loggerHandles.Remove(logger, out List<GCHandle>? handles))
+				foreach (GCHandle handle in handles) handle.Free();
 		}
 		internal static void Free(ULFileSystem filesystem)
 		{
-			if (filesystemHandles.ContainsKey(filesystem))
-			{
-				foreach (GCHandle handle in filesystemHandles[filesystem]) if (handle.IsAllocated) handle.Free();
-				filesystemHandles.Remove(filesystem);
-			}
+			if (filesystemHandles.Remove(filesystem, out List<GCHandle>? handles))
+				foreach (GCHandle handle in handles) handle.Free();
 		}
 		internal static void Free(ULGPUDriver gpudriver)
 		{
-			if (gpudriverHandles.ContainsKey(gpudriver))
-			{
-				foreach (GCHandle handle in gpudriverHandles[gpudriver]) if (handle.IsAllocated) handle.Free();
-				gpudriverHandles.Remove(gpudriver);
-			}
+			if (gpudriverHandles.Remove(gpudriver, out List<GCHandle>? handles))
+				foreach (GCHandle handle in handles) handle.Free();
 		}
 		internal static void Free(ULClipboard clipboard)
 		{
-			if (clipboardHandles.ContainsKey(clipboard))
-			{
-				foreach (GCHandle handle in clipboardHandles[clipboard]) if (handle.IsAllocated) handle.Free();
-				clipboardHandles.Remove(clipboard);
-			}
+			if (clipboardHandles.Remove(clipboard, out List<GCHandle>? handles))
+				foreach (GCHandle handle in handles) handle.Free();
 		}
 
 		/// <summary>
@@ -163,79 +154,113 @@ namespace UltralightNet
 			}
 		}
 
+		/// <summary>Cheap copy of MEZIANTOU's ROS<char> line enumerator</summary>
+		private ref struct LineEnumerator
+		{
+			private ReadOnlySpan<char> span;
+
+			public LineEnumerator(ReadOnlySpan<char> span)
+			{
+				this.span = span;
+				Current = default;
+			}
+
+			public LineEnumerator GetEnumerator() => this;
+
+			public bool MoveNext()
+			{
+				if (span.Length is 0) return false;
+				var index = span.IndexOf('\n');
+				if (index == -1)
+				{
+					Current = new() { line = span };
+					span = ReadOnlySpan<char>.Empty;
+					return true;
+				}
+				Current = new() { line = span.Slice(0, index) };
+				span = span.Slice(index + 1);
+				return true;
+			}
+
+			public LineEntry Current { get; private set; }
+
+			public ref struct LineEntry
+			{
+				internal ReadOnlySpan<char> line;
+				public static implicit operator ReadOnlySpan<char>(LineEntry entry) => entry.line;
+			}
+		}
+
 		public static Renderer CreateRenderer(ULConfig config, bool dispose = true)
 		{
 			thread = Thread.CurrentThread;
-			unsafe
+			if (SetDefaultLogger && _logger.__LogMessage is null)
 			{
-				if (SetDefaultLogger && _logger.__LogMessage is null)
+				Console.WriteLine("UltralightNet: no logger set, console logger will be used.");
+				Logger = new()
 				{
-					Console.WriteLine("UltralightNet: no logger set, console logger will be used.");
+					LogMessage = (ULLogLevel level, in string message) => { foreach (ReadOnlySpan<char> line in new LineEnumerator(message)) { Console.WriteLine($"(UL) {level}: {line}"); } }
+				};
+			}
+			if (SetDefaultFileSystem && !fileSystemSet) // TODO
+			{
+				Console.WriteLine("UltralightNet: no filesystem set, default (with access only to required files) will be used.");
 
-					Logger = new()
-					{
-						LogMessage = (level, message) => { foreach (string line in message.Split('\n')) { Console.WriteLine($"(UL) {level}: {line}"); } }
-					};
-				}
-				if (SetDefaultFileSystem && !fileSystemSet) // TODO
+				List<Stream> files = new();
+				Stack<nuint> freeFileIds = new();
+
+				FileSystem = new()
 				{
-					Console.WriteLine("UltralightNet: no filesystem set, default (with access only to required files) will be used.");
-
-					List<Stream> files = new();
-					Stack<nuint> freeFileIds = new();
-
-					FileSystem = new()
+					FileExists = (in string file) =>
 					{
-						FileExists = (file) =>
+						return file switch
 						{
-							return file switch
-							{
-								"resources/cacert.pem" => true,
-								"resources/icudt67l.dat" => true,
-								"resources/mediaControls.css" => true,
-								"resources/mediaControls.js" => true,
-								"resources/mediaControlsLocalizedStrings.js" => true,
-								_ => false
-							};
-						},
-						GetFileMimeType = (string file, out string result) =>
+							"resources/cacert.pem" => true,
+							"resources/icudt67l.dat" => true,
+							"resources/mediaControls.css" => true,
+							"resources/mediaControls.js" => true,
+							"resources/mediaControlsLocalizedStrings.js" => true,
+							_ => false
+						};
+					},
+					GetFileMimeType = (in string file, out string result) =>
+					{
+						result = file switch
 						{
-							result = file switch
-							{
-								"resources/mediaControls.css" => "text/css",
-								"resources/mediaControls.js" => "application/javascript",
-								"resources/mediaControlsLocalizedStrings.js" => "application/javascript",
-								_ => "application/octet-stream"
-							};
+							"resources/mediaControls.css" => "text/css",
+							"resources/mediaControls.js" => "application/javascript",
+							"resources/mediaControlsLocalizedStrings.js" => "application/javascript",
+							_ => "application/octet-stream"
+						};
 
-							return true;
-						},
-						OpenFile = (file, _) =>
+						return true;
+					},
+					OpenFile = (in string file, bool _) =>
+					{
+						nuint id;
+						if (freeFileIds.Count is not 0) id = freeFileIds.Pop();
+						else id = (nuint)files.Count;
+						files.Insert((int)id, file switch
 						{
-							nuint id;
-							if (freeFileIds.Count is not 0) id = freeFileIds.Pop();
-							else id = (nuint)files.Count;
-							files.Insert((int)id, file switch
-							{
-								"resources/cacert.pem" => Resources.Cacertpem!,
-								"resources/icudt67l.dat" => Resources.Icudt67ldat!,
-								"resources/mediaControls.css" => Resources.MediaControlscss!,
-								"resources/mediaControls.js" => Resources.MediaControlsjs!,
-								"resources/mediaControlsLocalizedStrings.js" => Resources.MediaControlsLocalizedStringsjs!,
-								_ => throw new ArgumentOutOfRangeException(nameof(file), "Tried to open not required file.")
-							});
+							"resources/cacert.pem" => Resources.Cacertpem!,
+							"resources/icudt67l.dat" => Resources.Icudt67ldat!,
+							"resources/mediaControls.css" => Resources.MediaControlscss!,
+							"resources/mediaControls.js" => Resources.MediaControlsjs!,
+							"resources/mediaControlsLocalizedStrings.js" => Resources.MediaControlsLocalizedStringsjs!,
+							_ => throw new ArgumentOutOfRangeException(nameof(file), "Tried to open not required file.")
+						});
 
-							return id;
-						},
-						GetFileSize = (nuint handle, out long size) =>
-						{
-							size = files[(int)handle].Length;
-							return true;
-						},
-						ReadFromFile = (handle, data) =>
-						{
+						return id;
+					},
+					GetFileSize = (nuint handle, out long size) =>
+					{
+						size = files[(int)handle].Length;
+						return true;
+					},
+					ReadFromFile = (handle, data) =>
+					{
 #if NET5_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
-							return files[(int)handle].Read(data);
+						return files[(int)handle].Read(data);
 #else
 							fixed(byte* dataPtr = data)
 							{
@@ -244,27 +269,26 @@ namespace UltralightNet
 							}
 							return files[(int)handle].Length;
 #endif
-						},
-						CloseFile = (handle) =>
-						{
-							Console.WriteLine($"CloseFile({handle})");
-							files[(int)handle].Close();
-							files[(int)handle] = null!;
-							freeFileIds.Push(handle);
-						}
-					};
-				}
-				else
-				{
-					ULStringGeneratedDllImportMarshaler m = new("resources/icudt67l.dat");
-
-					if (ErrorMissingResources && (!_filesystem.__FileExists(m.Value)))
+					},
+					CloseFile = (handle) =>
 					{
-						throw new FileNotFoundException($"{typeof(ULFileSystem)} doesn't provide icudt67l.dat from resources/ folder. (Disable error by setting ULPlatform.ErrorMissingResources to false.)");
+						Console.WriteLine($"CloseFile({handle})");
+						files[(int)handle].Close();
+						files[(int)handle] = null!;
+						freeFileIds.Push(handle);
 					}
+				};
+			}
+			else
+			{
+				ULStringGeneratedDllImportMarshaler m = new("resources/icudt67l.dat");
 
-					m.FreeNative();
+				if (ErrorMissingResources && _filesystem.__FileExists(m.Value) is 0)
+				{
+					throw new FileNotFoundException($"{typeof(ULFileSystem)} doesn't provide icudt67l.dat from resources/ folder. (Disable error by setting ULPlatform.ErrorMissingResources to false.)");
 				}
+
+				m.FreeNative();
 			}
 			return new Renderer(config, dispose);
 		}

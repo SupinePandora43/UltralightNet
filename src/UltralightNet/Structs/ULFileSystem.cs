@@ -1,180 +1,176 @@
 using System;
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
 namespace UltralightNet
 {
+	// INTEROPTODO: TEST
 	[StructLayout(LayoutKind.Sequential)]
 	public unsafe struct ULFileSystem : IDisposable
 	{
-		public ULFileSystemFileExistsCallback FileExists
-		{
-			set
-			{
-				unsafe
-				{
-					_FileExists = (path) => value(ULString.NativeToManaged(path));
-				}
-			}
-		}
-		public ULFileSystemGetFileMimeTypeCallback GetFileMimeType
-		{
-			set
-			{
-				unsafe
-				{
-					_GetFileMimeType = (path, resultUlStrPtr) =>
-					{
-						bool ret = value(ULString.NativeToManaged(path), out string result);
+		public static nuint InvalidFileHandle => nuint.MaxValue; // -1 is equal to MaxValue. Don't ask me how - i don't know either.
 
-						ULStringGeneratedDllImportMarshaler m = new(result);
-						Methods.ulStringAssignString(resultUlStrPtr, m.Value);
-						m.FreeNative();
+		public ULFileSystemFileExistsCallback? FileExists
+		{
+			set => _FileExists = value is null ? null : (path) => Unsafe.As<bool, byte>(ref Unsafe.AsRef(value(ULString.NativeToManaged(path))));
+			get
+			{
+				var c = _FileExists;
+				return c is null ? null : (in string path) =>
+				{
+					using ULStringDisposableStackToNativeMarshaller marshaller = new(path);
+					return Unsafe.As<byte, bool>(ref Unsafe.AsRef(c(marshaller.Native)));
+				};
+			}
+		}
+		public ULFileSystemGetFileSizeCallback? GetFileSize
+		{
+			set => _GetFileSize = value is null ? null : (handle, result) => Unsafe.As<bool, byte>(ref Unsafe.AsRef(value(handle, out Unsafe.AsRef<long>(result))));
+			get
+			{
+				var c = _GetFileSize;
+				return c is null ? null : (nuint fileHandle, out long size) =>
+				{
+					Unsafe.SkipInit(out size);
+					return Unsafe.As<byte, bool>(ref Unsafe.AsRef(c(fileHandle, (long*)Unsafe.AsPointer<long>(ref size))));
+				};
+			}
+		}
+		public ULFileSystemGetFileMimeTypeCallback? GetFileMimeType
+		{
+			set => _GetFileMimeType = value is null ? null : (path, resultUlStrPtr) =>
+				{
+					bool returnValue = value(ULString.NativeToManaged(path), out string result);
 
-						return ret;
-					};
-				}
+					using ULStringDisposableStackToNativeMarshaller marshaller = new(result);
+					Methods.ulStringAssignString(resultUlStrPtr, marshaller.Native);
+
+					return Unsafe.As<bool, byte>(ref returnValue);
+				};
+			get
+			{
+				var c = _GetFileMimeType;
+				return c is null ? null : (in string path, out string result) =>
+				{
+					using ULStringDisposableStackToNativeMarshaller pathMarshaller = new(path);
+					using ULStringDisposableStackToNativeMarshaller resultMarshaller = new(string.Empty);
+
+					var returnValue = c(pathMarshaller.Native, resultMarshaller.Native);
+
+					result = ULString.NativeToManaged(resultMarshaller.Native);
+					return Unsafe.As<byte, bool>(ref returnValue);
+				};
 			}
 		}
-		public ULFileSystemOpenFileCallback OpenFile
+		public ULFileSystemOpenFileCallback? OpenFile
 		{
-			set
+			set => _OpenFile = value is null ? null : (path, open_for_writing) => value(ULString.NativeToManaged(path), Unsafe.As<byte, bool>(ref Unsafe.AsRef<byte>(open_for_writing)));
+			get
 			{
-				unsafe
+				var c = _OpenFile;
+				return c is null ? null : (in string path, bool openForWriting) =>
 				{
-					_OpenFile = (path, open_for_writing) => value(ULString.NativeToManaged(path), open_for_writing);
-				}
+					using ULStringDisposableStackToNativeMarshaller pathMarshaller = new(path);
+					return c(pathMarshaller.Native, Unsafe.As<bool, byte>(ref Unsafe.AsRef(openForWriting)));
+				};
 			}
 		}
-		public ULFileSystemReadFromFileCallback ReadFromFile
+		public ULFileSystemReadFromFileCallback? ReadFromFile
 		{
-			set
-			{
-				unsafe
-				{
-					_ReadFromFile = (handle, data_native, len) => value(handle, new Span<byte>(data_native, (int)len));
-				}
-			}
+			set => _ReadFromFile = value is null ? null : (handle, data_native, len) => value(handle, new Span<byte>(data_native, (int)len)); // INTEROPTODO: INT64
 			get
 			{
 				var c = _ReadFromFile;
-				return (handle, data) =>
+				return c is null ? null : (handle, data) =>
 				{
 					fixed (byte* bytes = data) return c(handle, bytes, data.Length);
 				};
 			}
 		}
 
-		public ULFileSystemFileExistsCallback__PInvoke__ _FileExists
+		public ULFileSystemFileExistsCallback__PInvoke__? _FileExists
 		{
 			set
 			{
-				unsafe
-				{
-					ULFileSystemFileExistsCallback__PInvoke__ callback = value;
-					ULPlatform.Handle(this, GCHandle.Alloc(callback, GCHandleType.Normal));
-					__FileExists = (delegate* unmanaged[Cdecl]<ULString*, bool>)Marshal.GetFunctionPointerForDelegate(callback);
-				}
+				if (value is null) ULPlatform.Handle<ULFileSystemFileExistsCallback__PInvoke__>(ref this, this with { __FileExists = null });
+				else ULPlatform.Handle(ref this, this with { __FileExists = (delegate* unmanaged[Cdecl]<ULString*, byte>)Marshal.GetFunctionPointerForDelegate(value) }, value);
 			}
 			get
 			{
 				var p = __FileExists;
-				return (path) => p(path);
+				return p is null ? null : (path) => p(path);
 			}
 		}
-		public ULFileSystemGetFileSizeCallback GetFileSize
+		public ULFileSystemGetFileSizeCallback__PInvoke__? _GetFileSize
 		{
 			set
 			{
-				unsafe
-				{
-					ULFileSystemGetFileSizeCallback callback = value;
-					ULPlatform.Handle(this, GCHandle.Alloc(callback, GCHandleType.Normal));
-					__GetFileSize = (delegate* unmanaged[Cdecl]<nuint, long*, bool>)Marshal.GetFunctionPointerForDelegate(callback);
-				}
+				if (value is null) ULPlatform.Handle<ULFileSystemGetFileSizeCallback__PInvoke__>(ref this, this with { __GetFileSize = null });
+				else ULPlatform.Handle(ref this, this with { __GetFileSize = (delegate* unmanaged[Cdecl]<nuint, long*, byte>)Marshal.GetFunctionPointerForDelegate(value) }, value);
 			}
 			get
 			{
 				var p = __GetFileSize;
-				return (nuint handle, out long result) =>
-				{
-					fixed (long* resultPtr = &result)
-						return p(handle, resultPtr);
-				};
+				return p is null ? null : (nuint handle, long* result) => p(handle, result);
 			}
 		}
-		public ULFileSystemGetFileMimeTypeCallback__PInvoke__ _GetFileMimeType
+		public ULFileSystemGetFileMimeTypeCallback__PInvoke__? _GetFileMimeType
 		{
 			set
 			{
-				unsafe
-				{
-					ULFileSystemGetFileMimeTypeCallback__PInvoke__ callback = value;
-					ULPlatform.Handle(this, GCHandle.Alloc(callback, GCHandleType.Normal));
-					__GetFileMimeType = (delegate* unmanaged[Cdecl]<ULString*, ULString*, bool>)Marshal.GetFunctionPointerForDelegate(callback);
-				}
+				if (value is null) ULPlatform.Handle<ULFileSystemGetFileMimeTypeCallback__PInvoke__>(ref this, this with { __GetFileMimeType = null });
+				else ULPlatform.Handle(ref this, this with { __GetFileMimeType = (delegate* unmanaged[Cdecl]<ULString*, ULString*, byte>)Marshal.GetFunctionPointerForDelegate(value) }, value);
 			}
 			get
 			{
 				var p = __GetFileMimeType;
-				return (path, result) => p(path, result);
+				return p is null ? null : (path, result) => p(path, result);
 			}
 		}
-		public ULFileSystemOpenFileCallback__PInvoke__ _OpenFile
+		public ULFileSystemOpenFileCallback__PInvoke__? _OpenFile
 		{
 			set
 			{
-				unsafe
-				{
-					ULFileSystemOpenFileCallback__PInvoke__ callback = value;
-					ULPlatform.Handle(this, GCHandle.Alloc(callback, GCHandleType.Normal));
-					__OpenFile = (delegate* unmanaged[Cdecl]<ULString*, bool, nuint>)Marshal.GetFunctionPointerForDelegate(callback);
-				}
+				if (value is null) ULPlatform.Handle<ULFileSystemOpenFileCallback__PInvoke__>(ref this, this with { __OpenFile = null });
+				else ULPlatform.Handle(ref this, this with { __OpenFile = (delegate* unmanaged[Cdecl]<ULString*, byte, nuint>)Marshal.GetFunctionPointerForDelegate(value) }, value);
 			}
 			get
 			{
 				var p = __OpenFile;
-				return (path, openForWriting) => p(path, openForWriting);
+				return p is null ? null : (path, openForWriting) => p(path, openForWriting);
 			}
 		}
-		public ULFileSystemCloseFileCallback CloseFile
+		public ULFileSystemCloseFileCallback? CloseFile
 		{
 			set
 			{
-				unsafe
-				{
-					ULFileSystemCloseFileCallback callback = value;
-					ULPlatform.Handle(this, GCHandle.Alloc(callback, GCHandleType.Normal));
-					__CloseFile = (delegate* unmanaged[Cdecl]<nuint, void>)Marshal.GetFunctionPointerForDelegate(callback);
-				}
+				if (value is null) ULPlatform.Handle<ULFileSystemCloseFileCallback>(ref this, this with { __CloseFile = null });
+				else ULPlatform.Handle(ref this, this with { __CloseFile = (delegate* unmanaged[Cdecl]<nuint, void>)Marshal.GetFunctionPointerForDelegate(value) }, value);
 			}
 			get
 			{
 				var p = __CloseFile;
-				return (handle) => p(handle);
+				return p is null ? null : (handle) => p(handle);
 			}
 		}
-		public ULFileSystemReadFromFileCallback__PInvoke__ _ReadFromFile
+		public ULFileSystemReadFromFileCallback__PInvoke__? _ReadFromFile
 		{
 			set
 			{
-				unsafe
-				{
-					ULFileSystemReadFromFileCallback__PInvoke__ callback = value;
-					ULPlatform.Handle(this, GCHandle.Alloc(callback, GCHandleType.Normal));
-					__ReadFromFile = (delegate* unmanaged[Cdecl]<nuint, byte*, long, long>)Marshal.GetFunctionPointerForDelegate(callback);
-				}
+				if (value is null) ULPlatform.Handle<ULFileSystemReadFromFileCallback__PInvoke__>(ref this, this with { __ReadFromFile = null });
+				else ULPlatform.Handle(ref this, this with { __ReadFromFile = (delegate* unmanaged[Cdecl]<nuint, byte*, long, long>)Marshal.GetFunctionPointerForDelegate(value) }, value);
 			}
 			get
 			{
 				var p = __ReadFromFile;
-				return (handle, data, length) => p(handle, data, length);
+				return p is null ? null : (handle, data, length) => p(handle, data, length);
 			}
 		}
 
-		public delegate* unmanaged[Cdecl]<ULString*, bool> __FileExists;
-		public delegate* unmanaged[Cdecl]<nuint, long*, bool> __GetFileSize;
-		public delegate* unmanaged[Cdecl]<ULString*, ULString*, bool> __GetFileMimeType;
-		public delegate* unmanaged[Cdecl]<ULString*, bool, nuint> __OpenFile;
+		public delegate* unmanaged[Cdecl]<ULString*, byte> __FileExists;
+		public delegate* unmanaged[Cdecl]<nuint, long*, byte> __GetFileSize;
+		public delegate* unmanaged[Cdecl]<ULString*, ULString*, byte> __GetFileMimeType;
+		public delegate* unmanaged[Cdecl]<ULString*, byte, nuint> __OpenFile;
 		public delegate* unmanaged[Cdecl]<nuint, void> __CloseFile;
 		public delegate* unmanaged[Cdecl]<nuint, byte*, long, long> __ReadFromFile;
 

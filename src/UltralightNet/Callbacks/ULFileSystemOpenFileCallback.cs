@@ -5,11 +5,10 @@ namespace UltralightNet
 	[UnmanagedFunctionPointer(CallingConvention.Cdecl)]
 	public unsafe delegate nuint ULFileSystemOpenFileCallback__PInvoke__(
 		ULString* path,
-		[MarshalAs(UnmanagedType.I1)]
-		bool openForWriting
+		byte openForWriting
 	);
 	public delegate nuint ULFileSystemOpenFileCallback(
-		string path,
+		in string path,
 		bool openForWriting
 	);
 }

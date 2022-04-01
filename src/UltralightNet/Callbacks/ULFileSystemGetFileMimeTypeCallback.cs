@@ -6,12 +6,12 @@ namespace UltralightNet
 	// todo: test result
 	[UnmanagedFunctionPointer(CallingConvention.Cdecl)]
 	[return: MarshalAs(UnmanagedType.I1)]
-	public unsafe delegate bool ULFileSystemGetFileMimeTypeCallback__PInvoke__(
+	public unsafe delegate byte ULFileSystemGetFileMimeTypeCallback__PInvoke__(
 		ULString* path,
 		ULString* result
 	);
 	public delegate bool ULFileSystemGetFileMimeTypeCallback(
-		string path,
+		in string path,
 		out string result
 	);
 }
