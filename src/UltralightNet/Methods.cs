@@ -6,6 +6,7 @@ using System.Runtime.InteropServices;
 using System.Text;
 
 [assembly: InternalsVisibleTo("UltralightNet.AppCore")]
+[assembly: System.Runtime.InteropServices.DisableRuntimeMarshallingAttribute]
 
 namespace UltralightNet
 {
@@ -119,19 +120,22 @@ namespace UltralightNet
 		}
 #endif
 	}
+	// INTEROPTODO: CUSTOMTYPEMARSHALLER
 	[SkipLocalsInit]
 	internal unsafe ref struct UTF8Marshaller
 	{
-		public const int StackBufferSize = 0x100;
+		public const int BufferSize = 0x100;
 
 		public byte* bytes;
 		public Span<byte> span;
+		private bool allocated = false;
 
 		[SkipLocalsInit]
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public UTF8Marshaller(string str)
 		{
 			span = null;
+			allocated = true;
 			int strLen = str.Length;
 			int byteCount = (strLen + 1) * 3 + 1;
 #if NET6_0_OR_GREATER
@@ -176,6 +180,7 @@ namespace UltralightNet
 			else
 			{
 				span = null;
+				allocated = true;
 #if NET6_0_OR_GREATER
 				bytes = (byte*)NativeMemory.Alloc((nuint)byteCount); // INTEROPTODO: INT64
 #else
@@ -230,7 +235,7 @@ namespace UltralightNet
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public void FreeNative()
 		{
-			if (bytes is not null)
+			if (bytes is not null && allocated)
 #if NET6_0_OR_GREATER
 				NativeMemory.Free(bytes);
 #else

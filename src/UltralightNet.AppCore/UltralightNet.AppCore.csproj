@@ -14,16 +14,8 @@
 		<PackageId>UltralightNet.AppCore</PackageId>
 		<Description>AppCore's binaries and bindings</Description>
 
-		<PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
-
-		<DefineConstants Condition="'$(TargetFramework)'=='net6.0'">$(DefineConstants);GENERATED</DefineConstants>
-		<DefineConstants Condition="'$(TargetFramework)'=='net5.0'">$(DefineConstants);GENERATED</DefineConstants>
+		<!-- <PackageLicenseFile>LICENSE.txt</PackageLicenseFile> -->
 	</PropertyGroup>
-	<ItemGroup>
-		<None Include="../Ultralight_LICENSE.txt" Pack="true" PackagePath="LICENSE.txt" />
-		<None Include="../Ultralight_EULA.txt" Pack="true" PackagePath="EULA.txt" />
-		<None Include="../Ultralight_NOTICES.txt" Pack="true" PackagePath="NOTICES.txt" />
-	</ItemGroup>
 	<ItemGroup>
 		<_NativeAssetName Include="runtimes/win-x64/native/AppCore.dll" PackagePath="runtimes/win-x64/native" />
 		<_NativeAssetName Include="runtimes/osx-x64/native/libAppCore.dylib" PackagePath="runtimes/osx-x64/native" />
@@ -33,8 +25,7 @@
 		<Content Include="@(_ExistingAssets->'%(Identity)')" CopyToOutputDirectory="PreserveNewest" PackagePath="%(PackagePath)" Pack="true" />
 	</ItemGroup>
 	<ItemGroup>
-		<PackageReference Condition="'$(TargetFramework)'=='net6.0'" Include="DllImportGenerator" Version="1.0.0-alpha.20604.3" OutputItemType="Analyzer" ReferenceOutputAssembly="false" PrivateAssets="All" />
-		<PackageReference Condition="'$(TargetFramework)'=='net5.0'" Include="DllImportGenerator" Version="1.0.0-alpha.20604.3" OutputItemType="Analyzer" ReferenceOutputAssembly="false" PrivateAssets="All" />
+		<PackageReference Include="Microsoft.Interop.DllImportGenerator" Version="7.0.0-preview.3.22123.2" OutputItemType="Analyzer" ReferenceOutputAssembly="false" PrivateAssets="All" />
 		<PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0" PrivateAssets="All" />
 		<ProjectReference Include="..\UltralightNet\UltralightNet.csproj" />
 	</ItemGroup>

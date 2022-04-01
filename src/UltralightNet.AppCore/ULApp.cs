@@ -3,12 +3,20 @@ using System.Runtime.InteropServices;
 
 namespace UltralightNet.AppCore
 {
-	public static partial class AppCoreMethods
+	public static unsafe partial class AppCoreMethods
 	{
 		[DllImport("AppCore")]
-		public static extern IntPtr ulCreateApp(IntPtr settings, IntPtr config);
-		[GeneratedDllImport("AppCore")]
-		public static partial IntPtr ulCreateApp(IntPtr settings, in ULConfig config);
+		public static extern void* ulCreateApp(void* settings, _ULConfig* config);
+
+		// INTEROPTODO: NATIVEMARSHALLING
+		//[GeneratedDllImport("AppCore")]
+		public static IntPtr ulCreateApp(IntPtr settings, in ULConfig config)
+		{
+			_ULConfig nativeConfig = new(config);
+			var ret = ulCreateApp((void*)settings, &nativeConfig);
+			nativeConfig.FreeNative();
+			return (IntPtr)ret;
+		}
 
 		[DllImport("AppCore")]
 		public static extern void ulDestroyApp(IntPtr app);

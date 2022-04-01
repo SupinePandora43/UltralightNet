@@ -11,9 +11,9 @@
 		<PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
 	</PropertyGroup>
 	<ItemGroup>
-		<None Include="../Ultralight_LICENSE.txt" Pack="true" PackagePath="LICENSE.txt"/>
-		<None Include="../Ultralight_EULA.txt" Pack="true" PackagePath="EULA.txt"/>
-		<None Include="../Ultralight_NOTICES.txt" Pack="true" PackagePath="NOTICES.txt"/>
+		<None Include="LICENSE.txt" Pack="true" PackagePath="LICENSE.txt"/>
+		<None Include="EULA.txt" Pack="true" PackagePath="EULA.txt"/>
+		<None Include="NOTICES.txt" Pack="true" PackagePath="NOTICES.txt"/>
 	</ItemGroup>
 	<ItemGroup>
 		<_NativeAssetName Include="runtimes/win-x64/native/Ultralight.dll" PackagePath="runtimes/win-x64/native" />

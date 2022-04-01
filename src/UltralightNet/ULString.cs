@@ -54,14 +54,29 @@ namespace UltralightNet
 		public static unsafe extern void ulStringAssignCString(ULString* str, byte* c_str);
 	}
 
+	/// <remarks>Must be used with <code>using</code> statement</remarks
+	public unsafe ref struct ULStringDisposableStackToNativeMarshaller
+	{
+		public ULStringDisposableStackToNativeMarshaller(in string str)
+		{
+			if (str is null) throw new ArgumentNullException(nameof(str)); // INTEROPTODO: C#VER
+			Native = Methods.ulCreateStringUTF16(str, (nuint)str.Length);
+		}
+		public ULString* Native { get; }
+		public void Dispose() => Methods.ulDestroyString(Native);
+	}
+	// INTEROPTODO: CUSTOMTYPEMARSHALLER
+	[CustomTypeMarshaller(typeof(string), CustomTypeMarshallerKind.Value, Features = CustomTypeMarshallerFeatures.UnmanagedResources)]
 	public unsafe ref struct ULStringGeneratedDllImportMarshaler
 	{
-		public ULString* ulstringPtr;
+		private bool allocated = false; // INTEROPTODO: UNNECESSARYCHECK
 
 		[SkipLocalsInit]
 		public ULStringGeneratedDllImportMarshaler(string str)
 		{
-			ulstringPtr = Methods.ulCreateStringUTF16(str, (nuint)str.Length);
+			if (str is null) throw new ArgumentNullException(nameof(str)); // INTEROPTODO: C#VER
+			Value = Methods.ulCreateStringUTF16(str, (nuint)str.Length);
+			allocated = true;
 		}
 
 		[SkipLocalsInit]
@@ -70,25 +85,22 @@ namespace UltralightNet
 #if NETFRAMEWORK || NETSTANDARD2_0
 			new((sbyte*)ulstringPtr->data, 0, (int)ulstringPtr->length, Encoding.UTF8);
 #else
-			Marshal.PtrToStringUTF8((IntPtr)ulstringPtr->data, (int)ulstringPtr->length);
+			Marshal.PtrToStringUTF8((IntPtr)Value->data, (int)Value->length);
 #endif
 
 		public unsafe ULString* Value
 		{
 			[MethodImpl(MethodImplOptions.AggressiveInlining)]
-			[SkipLocalsInit]
-			get => ulstringPtr;
-
+			get;
 			[MethodImpl(MethodImplOptions.AggressiveInlining)]
-			[SkipLocalsInit]
-			set => ulstringPtr = value;
+			set;
 		}
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		[SkipLocalsInit]
 		public void FreeNative()
 		{
-			Methods.ulDestroyString(ulstringPtr);
+			if (allocated) Methods.ulDestroyString(Value);
 		}
 	}
 

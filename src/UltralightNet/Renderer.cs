@@ -4,12 +4,20 @@ using System.Runtime.InteropServices;
 
 namespace UltralightNet
 {
-	public static partial class Methods
+	public static unsafe partial class Methods
 	{
 		[DllImport("Ultralight")]
-		public static extern IntPtr ulCreateRenderer(IntPtr config);
-		[GeneratedDllImport("Ultralight")]
-		public static partial IntPtr ulCreateRenderer(in ULConfig config);
+		public static extern IntPtr ulCreateRenderer(_ULConfig* config);
+
+		// INTEROPTODO: NATIVEMARSHALLING
+		//[GeneratedDllImport("Ultralight")]
+		public static IntPtr ulCreateRenderer(in ULConfig config)
+		{
+			_ULConfig nativeConfig = new(config);
+			var ret = ulCreateRenderer(&nativeConfig);
+			nativeConfig.FreeNative();
+			return ret;
+		}
 
 		/// <summary>Destroy the renderer.</summary>
 		[DllImport("Ultralight")]

@@ -110,6 +110,8 @@ namespace UltralightNet
 
 #if NETSTANDARD2_1 || NETCOREAPP2_1_OR_GREATER
 		public override int GetHashCode() => HashCode.Combine((nint)handle, dispose, IsDisposed);
+#else
+		public override int GetHashCode() => unchecked((int)((nuint)handle ^ (Unsafe.As<bool, byte>(ref Unsafe.AsRef(dispose)))));
 #endif
 
 		public bool Equals(byte* other) => JavaScriptMethods.JSStringIsEqualToUTF8CString(Handle, other);

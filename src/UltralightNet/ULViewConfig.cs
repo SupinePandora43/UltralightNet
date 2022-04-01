@@ -168,6 +168,8 @@ namespace UltralightNet
 		public override bool Equals([NotNullWhen(true)] object? obj) => obj is ULViewConfig ? Equals((ULViewConfig)obj) : false;
 #if NETSTANDARD2_1 || NETCOREAPP2_1_OR_GREATER
 		public override int GetHashCode() => HashCode.Combine(HashCode.Combine(IsAccelerated, IsTransparent, InitialDeviceScale, InitialFocus, EnableImages, EnableJavaScript, FontFamilyStandard, FontFamilyFixed), HashCode.Combine(FontFamilySerif, FontFamilySansSerif, UserAgent));
+#else
+		public override int GetHashCode() => base.GetHashCode();
 #endif
 	}
 }

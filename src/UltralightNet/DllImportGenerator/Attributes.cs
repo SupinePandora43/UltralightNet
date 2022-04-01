@@ -32,7 +32,7 @@ namespace System.Runtime.InteropServices
 	{
 	}
 
-	[AttributeUsage(AttributeTargets.Struct | AttributeTargets.Class)]
+	[AttributeUsage(AttributeTargets.Struct | AttributeTargets.Class | AttributeTargets.Enum | AttributeTargets.Delegate)]
 	internal class NativeMarshallingAttribute : Attribute
 	{
 		public NativeMarshallingAttribute(Type nativeType)
@@ -43,17 +43,96 @@ namespace System.Runtime.InteropServices
 		public Type NativeType { get; }
 	}
 
-	[AttributeUsage(AttributeTargets.Parameter | AttributeTargets.ReturnValue | AttributeTargets.Field)]
+	[AttributeUsage(AttributeTargets.Parameter | AttributeTargets.ReturnValue)]
 	internal class MarshalUsingAttribute : Attribute
 	{
-		public MarshalUsingAttribute(Type nativeType)
+		public MarshalUsingAttribute()
+		{
+			CountElementName = string.Empty;
+		}
+		public MarshalUsingAttribute(Type nativeType) : this()
 		{
 			NativeType = nativeType;
 		}
 
-		public Type NativeType { get; }
+		public Type? NativeType { get; }
+		public string CountElementName { get; set; }
+		public int ConstantElementCount { get; set; }
+		public int ElementIndirectionDepth { get; set; }
+		public const string ReturnsCountValue = "return-value";
 	}
+
+#if !NET7_0_OR_GREATER
+
+	internal enum CustomTypeMarshallerKind
+	{
+		Value,
+		LinearCollection
+	}
+	[Flags]
+	internal enum CustomTypeMarshallerFeatures
+	{
+		None = 0,
+		UnmanagedResources = 0x1,
+		CallerAllocatedBuffer = 0x2,
+		TwoStageMarshalling = 0x4
+	}
+	[Flags]
+	internal enum CustomTypeMarshallerDirection
+	{
+		None = 0,
+		In = 0x1,
+		Out = 0x2,
+		Ref = In | Out
+	}
+
+	[AttributeUsage(AttributeTargets.Struct)]
+	internal sealed class CustomTypeMarshallerAttribute : Attribute
+	{
+		public CustomTypeMarshallerAttribute(Type managedType, CustomTypeMarshallerKind marshallerKind = CustomTypeMarshallerKind.Value)
+		{
+			ManagedType = managedType;
+			MarshallerKind = marshallerKind;
+		}
+
+		public Type ManagedType { get; set; }
+		public CustomTypeMarshallerKind MarshallerKind { get; set; }
+		public int BufferSize { get; set; }
+		public CustomTypeMarshallerDirection Direction { get; set; }
+		public CustomTypeMarshallerFeatures Features { get; set; }
+		public struct GenericPlaceholder
+		{
+
+		}
+	}
+
+	[AttributeUsage(AttributeTargets.Assembly, Inherited = false, AllowMultiple = false)]
+	internal sealed class DisableRuntimeMarshallingAttribute : Attribute
+	{
+		public DisableRuntimeMarshallingAttribute() { }
+	}
+
+	internal enum StringMarshalling {
+		Custom = 0,
+		Utf8,
+		Utf16
+	}
+
+	[AttributeUsage(AttributeTargets.Method, Inherited = false, AllowMultiple = false)]
+	internal sealed class LibraryImportAttribute : Attribute {
+		public LibraryImportAttribute(string libraryName){
+			LibraryName = libraryName;
+		}
+		public string LibraryName {get;}
+		public string? EntryPoint {get;set;}
+		public StringMarshalling StringMarshalling {get;set;}
+		public Type? StringMarshallingCustomType {get;set;}
+		public bool SetLastError {get;set;}
+	}
+
+#endif
 }
+
 #if NETFRAMEWORK || NETSTANDARD
 namespace System.Runtime.CompilerServices
 {

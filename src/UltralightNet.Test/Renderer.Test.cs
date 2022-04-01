@@ -29,7 +29,7 @@ namespace UltralightNet.Test
 			size = handles[(int)handle].Length;
 			return true;
 		}
-		private bool getFileMimeType(string path, out string result)
+		private bool getFileMimeType(in string path, out string result)
 		{
 			Console.WriteLine($"get_file_mime_type({path})");
 			result = "text/html";
@@ -47,13 +47,13 @@ namespace UltralightNet.Test
 		{
 			AppCoreMethods.ulEnablePlatformFontLoader();
 			AppCoreMethods.ulEnablePlatformFileSystem("./");
-			ULPlatform.Logger = new ULLogger()
+			/*ULPlatform.Logger = new ULLogger()
 			{
-				LogMessage = (level, message) =>
+				LogMessage = (ULLogLevel level, in string message) =>
 				{
 					Console.WriteLine(message);
 				}
-			};/*
+			};*//*
 			AppCoreMethods.ulEnableDefaultLogger("./ullog.txt");
 			*/
 
@@ -69,24 +69,24 @@ namespace UltralightNet.Test
 			ULFileSystemReadFromFileCallback read_from_file = readFromFile;
 			ULPlatform.FileSystem = new ULFileSystem()
 			{
-				FileExists = (path) =>
+				FileExists = (in string path) =>
 				{
 					Console.WriteLine($"file_exists({path})");
 					return File.Exists(path);
 				},
 				GetFileSize = get_file_size,
 				GetFileMimeType = get_file_mime_type,
-				OpenFile = (path, open_for_writing) =>
-				 {
-					 Console.WriteLine($"open_file({path}, {open_for_writing})");
-					 int handle = new Random().Next(0, 100);
-					 handles[handle] = File.OpenRead(path);
-					 return (nuint)handle;
-				 },
+				OpenFile = (in string path, bool open_for_writing) =>
+				{
+					Console.WriteLine($"open_file({path}, {open_for_writing})");
+					int handle = new Random().Next(0, 100);
+					handles[handle] = File.OpenRead(path);
+					return (nuint)handle;
+				},
 				CloseFile = (handle) =>
-				 {
-					 Console.WriteLine($"close_file({handle})");
-				 },
+				{
+					Console.WriteLine($"close_file({handle})");
+				},
 				ReadFromFile = read_from_file
 			};
 
@@ -100,14 +100,18 @@ namespace UltralightNet.Test
 
 			GenericTest();
 
+			Console.WriteLine("JSTest");
 			JSTest();
 
+			Console.WriteLine("HTMLTest");
 			HTMLTest();
 
 			FSTest();
 
+			Console.WriteLine("EVENTTest");
 			EventTest();
 
+			Console.WriteLine("MEMORYTest");
 			MemoryTest();
 
 
@@ -134,9 +138,7 @@ namespace UltralightNet.Test
 
 		private void GenericTest()
 		{
-			return;
-			
-			View view = renderer.CreateView(512, 512, viewConfig);
+			using View view = renderer.CreateView(512, 512, viewConfig);
 
 			Assert.Equal(512u, view.Width);
 			Assert.Equal(512u, view.Height);
@@ -174,22 +176,21 @@ namespace UltralightNet.Test
 
 		private void JSTest()
 		{
-			View view = renderer.CreateView(2, 2, viewConfig);
+			using View view = renderer.CreateView(2, 2, viewConfig);
+			Console.WriteLine("EVal");
 			Assert.Equal("3", view.EvaluateScript("1+2", out string exception));
 			Assert.True(string.IsNullOrEmpty(exception));
-			view.Dispose();
 		}
 
 		private void HTMLTest()
 		{
-			View view = renderer.CreateView(512, 512, viewConfig);
+			using View view = renderer.CreateView(512, 512, viewConfig);
 			view.HTML = "<html />";
-			view.Dispose();
 		}
 
 		private void FSTest()
 		{
-			View view = renderer.CreateView(256, 256, viewConfig);
+			using View view = renderer.CreateView(256, 256, viewConfig);
 			view.URL = "file:///test.html";
 
 			view.OnAddConsoleMessage += (source, level, message, line_number, column_number, source_id) =>
@@ -217,12 +218,12 @@ namespace UltralightNet.Test
 			}
 
 			renderer.Render();
-			view.Surface.Bitmap.WritePng("test_FS.png");
+			view.Surface!.Bitmap.WritePng("test_FS.png");
 		}
 
 		private void EventTest()
 		{
-			View view = renderer.CreateView(256, 256, viewConfig);
+			using View view = renderer.CreateView(256, 256, viewConfig);
 			Console.WriteLine("KeyEvent");
 			view.FireKeyEvent(new(ULKeyEventType.Char, ULKeyEventModifiers.ShiftKey, 0, 0, "A", "A", false, false, false));
 			Console.WriteLine("MouseEvent");

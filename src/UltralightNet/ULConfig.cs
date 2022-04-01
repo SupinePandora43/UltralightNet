@@ -101,6 +101,7 @@ namespace UltralightNet
 	/// <summary>Configuration settings for Ultralight.</summary>
 	[BlittableType]
 	[StructLayout(LayoutKind.Sequential)]
+	[CustomTypeMarshaller(typeof(ULConfig), CustomTypeMarshallerKind.Value, Direction = CustomTypeMarshallerDirection.In, Features = CustomTypeMarshallerFeatures.TwoStageMarshalling)]
 	public unsafe struct _ULConfig
 	{
 		/// <summary>The file path to a writable directory that will be used to store cookies, cached resources, and other persistent data.</summary>
@@ -186,7 +187,7 @@ namespace UltralightNet
 			MaxUpdateTime = config.MaxUpdateTime;
 			BitmapAlignment = config.BitmapAlignment;
 		}
-
+		
 		public void FreeNative()
 		{
 			// INTEROPTODO: ZEROFREE

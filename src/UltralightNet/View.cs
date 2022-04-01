@@ -4,10 +4,19 @@ using System.Runtime.InteropServices;
 
 namespace UltralightNet
 {
-	public static partial class Methods
+	public static unsafe partial class Methods
 	{
-		[GeneratedDllImport(LibUltralight)]
-		public static partial IntPtr ulCreateView(IntPtr renderer, uint width, uint height, in ULViewConfig viewConfig, IntPtr session);
+		[DllImport(LibUltralight)]
+		public static extern void* ulCreateView(void* renderer, uint width, uint height, _ULViewConfig* viewConfig, void* session);
+		// INTEROPTODO: NATIVEMARSHALLING
+		//[GeneratedDllImport(LibUltralight)]
+		public static IntPtr ulCreateView(IntPtr renderer, uint width, uint height, in ULViewConfig viewConfig, IntPtr session)
+		{
+			_ULViewConfig nativeConfig = new(viewConfig);
+			var ret = ulCreateView((void*)renderer, width, height, &nativeConfig, (void*)session);
+			nativeConfig.FreeNative();
+			return (IntPtr)ret;
+		}
 
 		[DllImport(LibUltralight)]
 		public static extern void ulDestroyView(IntPtr view);

@@ -13,9 +13,6 @@
 
 		<PackageId>UltralightNet</PackageId>
 		<Description>Ultralight .NET bindings</Description>
-
-		<DefineConstants Condition="'$(TargetFramework)'=='net5.0'">$(DefineConstants);GENERATED</DefineConstants>
-		<DefineConstants Condition="'$(TargetFramework)'=='net6.0'">$(DefineConstants);GENERATED</DefineConstants>
 	</PropertyGroup>
 	<ItemGroup>
 	  <None Remove="resources\cacert.pem" />
@@ -32,8 +29,7 @@
 	  <EmbeddedResource Include="resources\mediaControlsLocalizedStrings.js" />
 	</ItemGroup>
 	<ItemGroup>
-		<PackageReference Condition="'$(TargetFramework)'=='net6.0'" Include="DllImportGenerator" Version="1.0.0-alpha.20604.3" OutputItemType="Analyzer" ReferenceOutputAssembly="false" PrivateAssets="All" />
-		<PackageReference Condition="'$(TargetFramework)'=='net5.0'" Include="DllImportGenerator" Version="1.0.0-alpha.20604.3" OutputItemType="Analyzer" ReferenceOutputAssembly="false" PrivateAssets="All" />
+		<PackageReference Include="Microsoft.Interop.DllImportGenerator" Version="7.0.0-preview.3.22123.2" OutputItemType="Analyzer" ReferenceOutputAssembly="false" PrivateAssets="All" />
 		<PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0" PrivateAssets="All" />
 
 		<PackageReference Condition="'$(TargetFramework)'!='net5.0'" Include="System.Memory" Version="4.5.4" />
