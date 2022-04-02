@@ -6,58 +6,76 @@ namespace UltralightNet
 	[StructLayout(LayoutKind.Sequential)]
 	public unsafe struct ULClipboard : IDisposable
 	{
-		public ULClipboardClearCallback Clear
+		public ULClipboardClearCallback? Clear
 		{
 			set
 			{
-				ULClipboardClearCallback callback = value;
-				ULPlatform.Handle(this, GCHandle.Alloc(callback, GCHandleType.Normal));
-				__Clear = (delegate* unmanaged[Cdecl]<void>)Marshal.GetFunctionPointerForDelegate(callback);
+				if (value is null) ULPlatform.Handle<ULClipboardClearCallback>(ref this, this with { __Clear = null });
+				else ULPlatform.Handle<ULClipboardClearCallback>(ref this, this with { __Clear = (delegate* unmanaged[Cdecl]<void>)Marshal.GetFunctionPointerForDelegate(value) }, value);
+			}
+			get
+			{
+				var p = __Clear;
+				return p is null ? null : () => p();
 			}
 		}
-		public ULClipboardReadPlainTextCallback ReadPlainText
+		public ULClipboardReadPlainTextCallback? ReadPlainText
 		{
-			set
-			{
-				unsafe
+			set => _ReadPlainText = value is null ? null : (result) =>
 				{
-					_ReadPlainText = (result) =>
-					{
-						value(out string managedResult);
+					value(out string managedResult);
 
-						ULStringGeneratedDllImportMarshaler m = new(managedResult);
-						Methods.ulStringAssignString(result, m.Value);
-						m.FreeNative();
-					};
-				}
-			}
-		}
-		public ULClipboardReadPlainTextCallback__PInvoke__ _ReadPlainText
-		{
-			set
+					using ULStringDisposableStackToNativeMarshaller marshaller = new(managedResult);
+					Methods.ulStringAssignString(result, marshaller.Native);
+				};
+			get
 			{
-				ULClipboardReadPlainTextCallback__PInvoke__ callback = value;
-				ULPlatform.Handle(this, GCHandle.Alloc(callback, GCHandleType.Normal));
-				__ReadPlainText = (delegate* unmanaged[Cdecl]<ULString*, void>)Marshal.GetFunctionPointerForDelegate(callback);
-			}
-		}
-		public ULClipboardWritePlainTextCallback WritePlainText
-		{
-			set
-			{
-				unsafe
+				var c = _ReadPlainText;
+				return c is null ? null : (out string managedResult) =>
 				{
-					_WritePlainText = (text) => value(ULString.NativeToManaged(text));
-				}
+					using ULStringDisposableStackToNativeMarshaller marshaller = new(string.Empty);
+					c(marshaller.Native);
+					managedResult = ULString.NativeToManaged(marshaller.Native);
+				};
 			}
 		}
-		public ULClipboardWritePlainTextCallback__PInvoke__ _WritePlainText
+		public ULClipboardReadPlainTextCallback__PInvoke__? _ReadPlainText
 		{
 			set
 			{
-				ULClipboardWritePlainTextCallback__PInvoke__ callback = value;
-				ULPlatform.Handle(this, GCHandle.Alloc(callback, GCHandleType.Normal));
-				__WritePlainText = (delegate* unmanaged[Cdecl]<ULString*, void>)Marshal.GetFunctionPointerForDelegate(callback);
+				if (value is null) ULPlatform.Handle<ULClipboardReadPlainTextCallback__PInvoke__>(ref this, this with { __ReadPlainText = null });
+				else ULPlatform.Handle(ref this, this with { __ReadPlainText = (delegate* unmanaged[Cdecl]<ULString*, void>)Marshal.GetFunctionPointerForDelegate(value) }, value);
+			}
+			get
+			{
+				var p = __ReadPlainText;
+				return p is null ? null : (result) => p(result);
+			}
+		}
+		public ULClipboardWritePlainTextCallback? WritePlainText
+		{
+			set => _WritePlainText = value is null ? null : (text) => value(ULString.NativeToManaged(text));
+			get
+			{
+				var c = _WritePlainText;
+				return c is null ? null : (in string text) =>
+				{
+					using ULStringDisposableStackToNativeMarshaller marshaller = new(text);
+					c(marshaller.Native);
+				};
+			}
+		}
+		public ULClipboardWritePlainTextCallback__PInvoke__? _WritePlainText
+		{
+			set
+			{
+				if (value is null) ULPlatform.Handle<ULClipboardWritePlainTextCallback__PInvoke__>(ref this, this with { __WritePlainText = null });
+				else ULPlatform.Handle(ref this, this with { __WritePlainText = (delegate* unmanaged[Cdecl]<ULString*, void>)Marshal.GetFunctionPointerForDelegate(value) }, value);
+			}
+			get
+			{
+				var p = __WritePlainText;
+				return p is null ? null : (text) => p(text);
 			}
 		}
 

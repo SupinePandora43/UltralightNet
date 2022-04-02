@@ -4,7 +4,7 @@ using System.Runtime.InteropServices;
 namespace UltralightNet
 {
 	public delegate void ULClipboardWritePlainTextCallback(
-		string text
+		in string text
 	);
 
 	[UnmanagedFunctionPointer(CallingConvention.Cdecl)]

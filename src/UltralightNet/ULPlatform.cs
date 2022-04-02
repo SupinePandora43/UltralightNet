@@ -55,10 +55,11 @@ namespace UltralightNet
 			if (!gpudriverHandles.ContainsKey(gpudriver)) gpudriverHandles.Add(gpudriver, new(14));
 			gpudriverHandles[gpudriver].Add(handle);
 		}
-		internal static void Handle(ULClipboard clipboard, GCHandle handle)
+		internal static void Handle<TDelegate>(ref ULClipboard originalClipboard, in ULClipboard newClipboard, TDelegate? func = null) where TDelegate : Delegate
 		{
-			if (!clipboardHandles.ContainsKey(clipboard)) clipboardHandles.Add(clipboard, new(3));
-			clipboardHandles[clipboard].Add(handle);
+			if (!clipboardHandles.Remove(originalClipboard, out List<GCHandle>? handles)) handles = new(3);
+			if (func is not null) handles.Add(GCHandle.Alloc(func));
+			clipboardHandles[originalClipboard = newClipboard] = handles;
 		}
 
 		internal static void Free(ULLogger logger)
