@@ -212,11 +212,12 @@ namespace UltralightNet.Veldrid
 			Methods.ulBitmapUnlockPixels(bitmap);
 		}
 		[SkipLocalsInit]
-		private void CreateTexture(uint texture_id, IntPtr bitmapPTR)
+		private unsafe void CreateTexture(uint texture_id, void* bitmapPTRV)
 		{
 #if DEBUG
 			Console.WriteLine($"CreateTexture({texture_id})");
 #endif
+			IntPtr bitmapPTR = (IntPtr)bitmapPTRV;
 			bool isRT = Methods.ulBitmapIsEmpty(bitmapPTR);
 			TextureEntry entry = TextureEntries[texture_id];
 
@@ -259,8 +260,9 @@ namespace UltralightNet.Veldrid
 			);
 		}
 		[SkipLocalsInit]
-		private void UpdateTexture(uint texture_id, IntPtr bitmapPTR)
+		private void UpdateTexture(uint texture_id, void* bitmapPTRV)
 		{
+			IntPtr bitmapPTR = (IntPtr)bitmapPTRV;
 			TextureEntry entry = TextureEntries[texture_id];
 
 			uint height = Methods.ulBitmapGetHeight(bitmapPTR);
