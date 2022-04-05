@@ -1,11 +1,11 @@
-namespace UltralightNet {
-	/// <summary>
-	/// Type of event
-	/// </summary>
-	public enum ULMouseEventType
-	{
-		MouseMoved,
-		MouseDown,
-		MouseUp
-	}
+namespace UltralightNet;
+
+/// <summary>
+/// Type of event
+/// </summary>
+public enum ULMouseEventType : int
+{
+	MouseMoved,
+	MouseDown,
+	MouseUp
 }

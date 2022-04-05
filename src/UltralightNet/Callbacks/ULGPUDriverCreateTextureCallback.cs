@@ -4,9 +4,9 @@ using System.Runtime.InteropServices;
 namespace UltralightNet
 {
 	[UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-	public delegate void ULGPUDriverCreateTextureCallback__PInvoke__(
+	public unsafe delegate void ULGPUDriverCreateTextureCallback__PInvoke__(
 		uint texture_id,
-		IntPtr bitmap
+		void* bitmap
 	);
 	public delegate void ULGPUDriverCreateTextureCallback(
 		uint texture_id,

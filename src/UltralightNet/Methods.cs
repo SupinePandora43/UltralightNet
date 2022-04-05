@@ -8,6 +8,10 @@ using System.Text;
 [assembly: InternalsVisibleTo("UltralightNet.AppCore")]
 [assembly: System.Runtime.InteropServices.DisableRuntimeMarshallingAttribute]
 
+#if RELEASE
+[module: SkipLocalsInit]
+#endif
+
 namespace UltralightNet
 {
 	[System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE1006:Naming Styles", Justification = "<Pending>")]
@@ -130,7 +134,6 @@ namespace UltralightNet
 		public Span<byte> span;
 		private bool allocated = false;
 
-		[SkipLocalsInit]
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public UTF8Marshaller(string str)
 		{
@@ -154,7 +157,6 @@ namespace UltralightNet
 #endif
 			bytes[written] = 0;
 		}
-		[SkipLocalsInit]
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public UTF8Marshaller(string str, Span<byte> buffer)
 		{
@@ -199,7 +201,6 @@ namespace UltralightNet
 			}
 		}
 
-		[SkipLocalsInit]
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public ref byte GetPinnableReference()
 		{
@@ -207,7 +208,6 @@ namespace UltralightNet
 			return ref span.GetPinnableReference();
 		}
 
-		[SkipLocalsInit]
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public string ToManaged() =>
 #if NETSTANDARD2_1 || NETCOREAPP1_1_OR_GREATER
@@ -218,11 +218,9 @@ namespace UltralightNet
 
 		public unsafe byte* Value
 		{
-			[SkipLocalsInit]
 			[MethodImpl(MethodImplOptions.AggressiveInlining)]
 			get => bytes;
 
-			[SkipLocalsInit]
 			[MethodImpl(MethodImplOptions.AggressiveInlining)]
 			set
 			{
@@ -231,7 +229,6 @@ namespace UltralightNet
 			}
 		}
 
-		[SkipLocalsInit]
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public void FreeNative()
 		{

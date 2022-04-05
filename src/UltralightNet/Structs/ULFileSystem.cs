@@ -31,8 +31,8 @@ namespace UltralightNet
 				var c = _GetFileSize;
 				return c is null ? null : (nuint fileHandle, out long size) =>
 				{
-					Unsafe.SkipInit(out size);
-					return Unsafe.As<byte, bool>(ref Unsafe.AsRef(c(fileHandle, (long*)Unsafe.AsPointer<long>(ref size))));
+					fixed(long* sizePtr = &size)
+						return Unsafe.As<byte, bool>(ref Unsafe.AsRef(c(fileHandle, sizePtr)));
 				};
 			}
 		}

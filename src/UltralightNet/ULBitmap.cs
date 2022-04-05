@@ -173,7 +173,7 @@ namespace UltralightNet
 
 		public void Dispose()
 		{
-			if (IsDisposed) return;
+			if (IsDisposed || !dispose) return;
 			Methods.ulDestroyBitmap(Ptr);
 
 			IsDisposed = true;

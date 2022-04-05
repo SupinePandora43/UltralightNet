@@ -9,140 +9,204 @@ namespace UltralightNet
 	[StructLayout(LayoutKind.Sequential)]
 	public unsafe struct ULGPUDriver : IDisposable
 	{
-		public ULGPUDriverBeginSynchronizeCallback BeginSynchronize
+		public ULGPUDriverBeginSynchronizeCallback? BeginSynchronize
 		{
 			set
 			{
-				ULGPUDriverBeginSynchronizeCallback callback = value;
-				if (callback is null) __BeginSynchronize = null;
-				else
-				{
-					ULPlatform.Handle(this, GCHandle.Alloc(callback, GCHandleType.Normal));
-					__BeginSynchronize = (delegate* unmanaged[Cdecl]<void>)Marshal.GetFunctionPointerForDelegate(callback);
-				}
+				if (value is null) ULPlatform.Handle(ref this, this with { __BeginSynchronize = null });
+				else ULPlatform.Handle(ref this, this with { __BeginSynchronize = (delegate* unmanaged[Cdecl]<void>)Marshal.GetFunctionPointerForDelegate(value) }, value);
+			}
+			get
+			{
+				var p = __BeginSynchronize;
+				return p is null ? null : () => p();
 			}
 		}
-		public ULGPUDriverEndSynchronizeCallback EndSynchronize
+		public ULGPUDriverEndSynchronizeCallback? EndSynchronize
 		{
 			set
 			{
-				ULGPUDriverEndSynchronizeCallback callback = value;
-				if (callback is null) __EndSynchronize = null;
-				else
-				{
-					ULPlatform.Handle(this, GCHandle.Alloc(callback, GCHandleType.Normal));
-					__EndSynchronize = (delegate* unmanaged[Cdecl]<void>)Marshal.GetFunctionPointerForDelegate(callback);
-				}
+				if (value is null) ULPlatform.Handle(ref this, this with { __EndSynchronize = null });
+				else ULPlatform.Handle(ref this, this with { __EndSynchronize = (delegate* unmanaged[Cdecl]<void>)Marshal.GetFunctionPointerForDelegate(value) }, value);
+			}
+			get
+			{
+				var p = __EndSynchronize;
+				return p is null ? null : () => p();
 			}
 		}
-		public ULGPUDriverNextTextureIdCallback NextTextureId
+		public ULGPUDriverNextTextureIdCallback? NextTextureId
 		{
 			set
 			{
-				ULGPUDriverNextTextureIdCallback callback = value;
-				ULPlatform.Handle(this, GCHandle.Alloc(callback, GCHandleType.Normal));
-				__NextTextureId = (delegate* unmanaged[Cdecl]<uint>)Marshal.GetFunctionPointerForDelegate(callback);
+				if (value is null) ULPlatform.Handle(ref this, this with { __NextTextureId = null });
+				else ULPlatform.Handle(ref this, this with { __NextTextureId = (delegate* unmanaged[Cdecl]<uint>)Marshal.GetFunctionPointerForDelegate(value) }, value);
+			}
+			get
+			{
+				var p = __NextTextureId;
+				return p is null ? null : () => p();
 			}
 		}
-		public ULGPUDriverCreateTextureCallback CreateTexture { set => _CreateTexture = (id, bitmap) => value(id, new ULBitmap(bitmap)); }
-		public ULGPUDriverCreateTextureCallback__PInvoke__ _CreateTexture
+		public ULGPUDriverCreateTextureCallback? CreateTexture
 		{
-			set
+			set => _CreateTexture = value is null ? null : (id, bitmap) => value(id, new ULBitmap((IntPtr)bitmap));
+			get
 			{
-				ULGPUDriverCreateTextureCallback__PInvoke__ callback = value;
-				ULPlatform.Handle(this, GCHandle.Alloc(callback, GCHandleType.Normal));
-				__CreateTexture = (delegate* unmanaged[Cdecl]<uint, void*, void>)Marshal.GetFunctionPointerForDelegate(callback);
+				var c = _CreateTexture;
+				return c is null ? null : (id, bitmap) => c(id, (void*)bitmap.Ptr);
 			}
 		}
-		public ULGPUDriverUpdateTextureCallback UpdateTexture { set => _UpdateTexture = (id, bitmap) => value(id, new ULBitmap(bitmap)); }
-		public ULGPUDriverUpdateTextureCallback__PInvoke__ _UpdateTexture
+		public ULGPUDriverCreateTextureCallback__PInvoke__? _CreateTexture
 		{
 			set
 			{
-				ULGPUDriverUpdateTextureCallback__PInvoke__ callback = value;
-				ULPlatform.Handle(this, GCHandle.Alloc(callback, GCHandleType.Normal));
-				__UpdateTexture = (delegate* unmanaged[Cdecl]<uint, void*, void>)Marshal.GetFunctionPointerForDelegate(callback);
+				if (value is null) ULPlatform.Handle(ref this, this with { __CreateTexture = null });
+				else ULPlatform.Handle(ref this, this with { __CreateTexture = (delegate* unmanaged[Cdecl]<uint, void*, void>)Marshal.GetFunctionPointerForDelegate(value) }, value);
+			}
+			get
+			{
+				var p = __CreateTexture;
+				return p is null ? null : (id, bitmap) => p(id, bitmap);
 			}
 		}
-		public ULGPUDriverDestroyTextureCallback DestroyTexture
+		public ULGPUDriverUpdateTextureCallback? UpdateTexture
 		{
-			set
+			set => _UpdateTexture = value is null ? null : (id, bitmap) => value(id, new ULBitmap((IntPtr)bitmap));
+			get
 			{
-				ULGPUDriverDestroyTextureCallback callback = value;
-				ULPlatform.Handle(this, GCHandle.Alloc(callback, GCHandleType.Normal));
-				__DestroyTexture = (delegate* unmanaged[Cdecl]<uint, void>)Marshal.GetFunctionPointerForDelegate(callback);
+				var c = _UpdateTexture;
+				return c is null ? null : (id, bitmap) => c(id, (void*)bitmap.Ptr);
 			}
 		}
-		public ULGPUDriverNextRenderBufferIdCallback NextRenderBufferId
+		public ULGPUDriverUpdateTextureCallback__PInvoke__? _UpdateTexture
 		{
 			set
 			{
-				ULGPUDriverNextRenderBufferIdCallback callback = value;
-				ULPlatform.Handle(this, GCHandle.Alloc(callback, GCHandleType.Normal));
-				__NextRenderBufferId = (delegate* unmanaged[Cdecl]<uint>)Marshal.GetFunctionPointerForDelegate(callback);
+				if (value is null) ULPlatform.Handle(ref this, this with { __UpdateTexture = null });
+				else ULPlatform.Handle(ref this, this with { __UpdateTexture = (delegate* unmanaged[Cdecl]<uint, void*, void>)Marshal.GetFunctionPointerForDelegate(value) }, value);
+			}
+			get
+			{
+				var p = __UpdateTexture;
+				return p is null ? null : (id, bitmap) => p(id, bitmap);
 			}
 		}
-		public ULGPUDriverCreateRenderBufferCallback CreateRenderBuffer
+		public ULGPUDriverDestroyTextureCallback? DestroyTexture
 		{
 			set
 			{
-				ULGPUDriverCreateRenderBufferCallback callback = value;
-				ULPlatform.Handle(this, GCHandle.Alloc(callback, GCHandleType.Normal));
-				__CreateRenderBuffer = (delegate* unmanaged[Cdecl]<uint, ULRenderBuffer, void>)Marshal.GetFunctionPointerForDelegate(callback);
+				if (value is null) ULPlatform.Handle(ref this, this with { __DestroyTexture = null });
+				else ULPlatform.Handle(ref this, this with { __DestroyTexture = (delegate* unmanaged[Cdecl]<uint, void>)Marshal.GetFunctionPointerForDelegate(value) }, value);
+			}
+			get
+			{
+				var p = __DestroyTexture;
+				return p is null ? null : (id) => p(id);
 			}
 		}
-		public ULGPUDriverDestroyRenderBufferCallback DestroyRenderBuffer
+		public ULGPUDriverNextRenderBufferIdCallback? NextRenderBufferId
 		{
 			set
 			{
-				ULGPUDriverDestroyRenderBufferCallback callback = value;
-				ULPlatform.Handle(this, GCHandle.Alloc(callback, GCHandleType.Normal));
-				__DestroyRenderBuffer = (delegate* unmanaged[Cdecl]<uint, void>)Marshal.GetFunctionPointerForDelegate(callback);
+				if (value is null) ULPlatform.Handle(ref this, this with { __NextRenderBufferId = null });
+				else ULPlatform.Handle(ref this, this with { __NextRenderBufferId = (delegate* unmanaged[Cdecl]<uint>)Marshal.GetFunctionPointerForDelegate(value) }, value);
+			}
+			get
+			{
+				var p = __NextRenderBufferId;
+				return p is null ? null : () => p();
 			}
 		}
-		public ULGPUDriverNextGeometryIdCallback NextGeometryId
+		public ULGPUDriverCreateRenderBufferCallback? CreateRenderBuffer
 		{
 			set
 			{
-				ULGPUDriverNextGeometryIdCallback callback = value;
-				ULPlatform.Handle(this, GCHandle.Alloc(callback, GCHandleType.Normal));
-				__NextGeometryId = (delegate* unmanaged[Cdecl]<uint>)Marshal.GetFunctionPointerForDelegate(callback);
+				if (value is null) ULPlatform.Handle(ref this, this with { __CreateRenderBuffer = null });
+				else ULPlatform.Handle(ref this, this with { __CreateRenderBuffer = (delegate* unmanaged[Cdecl]<uint, ULRenderBuffer, void>)Marshal.GetFunctionPointerForDelegate(value) }, value);
+			}
+			get
+			{
+				var p = __CreateRenderBuffer;
+				return p is null ? null : (id, renderBuffer) => p(id, renderBuffer);
 			}
 		}
-		public ULGPUDriverCreateGeometryCallback CreateGeometry
+		public ULGPUDriverDestroyRenderBufferCallback? DestroyRenderBuffer
 		{
 			set
 			{
-				ULGPUDriverCreateGeometryCallback callback = value;
-				ULPlatform.Handle(this, GCHandle.Alloc(callback, GCHandleType.Normal));
-				__CreateGeometry = (delegate* unmanaged[Cdecl]<uint, ULVertexBuffer, ULIndexBuffer, void>)Marshal.GetFunctionPointerForDelegate(callback);
+				if (value is null) ULPlatform.Handle(ref this, this with { __DestroyRenderBuffer = null });
+				else ULPlatform.Handle(ref this, this with { __DestroyRenderBuffer = (delegate* unmanaged[Cdecl]<uint, void>)Marshal.GetFunctionPointerForDelegate(value) }, value);
+			}
+			get
+			{
+				var p = __DestroyRenderBuffer;
+				return p is null ? null : (id) => p(id);
 			}
 		}
-		public ULGPUDriverUpdateGeometryCallback UpdateGeometry
+		public ULGPUDriverNextGeometryIdCallback? NextGeometryId
 		{
 			set
 			{
-				ULGPUDriverUpdateGeometryCallback callback = value;
-				ULPlatform.Handle(this, GCHandle.Alloc(callback, GCHandleType.Normal));
-				__UpdateGeometry = (delegate* unmanaged[Cdecl]<uint, ULVertexBuffer, ULIndexBuffer, void>)Marshal.GetFunctionPointerForDelegate(callback);
+				if (value is null) ULPlatform.Handle(ref this, this with { __NextGeometryId = null });
+				else ULPlatform.Handle(ref this, this with { __NextGeometryId = (delegate* unmanaged[Cdecl]<uint>)Marshal.GetFunctionPointerForDelegate(value) }, value);
+			}
+			get
+			{
+				var p = __NextGeometryId;
+				return p is null ? null : () => p();
 			}
 		}
-		public ULGPUDriverDestroyGeometryCallback DestroyGeometry
+		public ULGPUDriverCreateGeometryCallback? CreateGeometry
 		{
 			set
 			{
-				ULGPUDriverDestroyGeometryCallback callback = value;
-				ULPlatform.Handle(this, GCHandle.Alloc(callback, GCHandleType.Normal));
-				__DestroyGeometry = (delegate* unmanaged[Cdecl]<uint, void>)Marshal.GetFunctionPointerForDelegate(callback);
+				if (value is null) ULPlatform.Handle(ref this, this with { __CreateGeometry = null });
+				else ULPlatform.Handle(ref this, this with { __CreateGeometry = (delegate* unmanaged[Cdecl]<uint, ULVertexBuffer, ULIndexBuffer, void>)Marshal.GetFunctionPointerForDelegate(value) }, value);
+			}
+			get
+			{
+				var p = __CreateGeometry;
+				return p is null ? null : (id, vertexBuffer, indexBuffer) => p(id, vertexBuffer, indexBuffer);
 			}
 		}
-		public ULGPUDriverUpdateCommandListCallback UpdateCommandList
+		public ULGPUDriverUpdateGeometryCallback? UpdateGeometry
 		{
 			set
 			{
-				ULGPUDriverUpdateCommandListCallback callback = value;
-				ULPlatform.Handle(this, GCHandle.Alloc(callback, GCHandleType.Normal));
-				__UpdateCommandList = (delegate* unmanaged[Cdecl]<ULCommandList, void>)Marshal.GetFunctionPointerForDelegate(callback);
+				if (value is null) ULPlatform.Handle(ref this, this with { __UpdateGeometry = null });
+				else ULPlatform.Handle(ref this, this with { __UpdateGeometry = (delegate* unmanaged[Cdecl]<uint, ULVertexBuffer, ULIndexBuffer, void>)Marshal.GetFunctionPointerForDelegate(value) }, value);
+			}
+			get
+			{
+				var p = __UpdateGeometry;
+				return p is null ? null : (id, vertexBuffer, indexBuffer) => p(id, vertexBuffer, indexBuffer);
+			}
+		}
+		public ULGPUDriverDestroyGeometryCallback? DestroyGeometry
+		{
+			set
+			{
+				if (value is null) ULPlatform.Handle(ref this, this with { __DestroyGeometry = null });
+				else ULPlatform.Handle(ref this, this with { __DestroyGeometry = (delegate* unmanaged[Cdecl]<uint, void>)Marshal.GetFunctionPointerForDelegate(value) }, value);
+			}
+			get
+			{
+				var p = __DestroyGeometry;
+				return p is null ? null : (id) => p(id);
+			}
+		}
+		public ULGPUDriverUpdateCommandListCallback? UpdateCommandList
+		{
+			set
+			{
+				if (value is null) ULPlatform.Handle(ref this, this with { __UpdateCommandList = null });
+				else ULPlatform.Handle(ref this, this with { __UpdateCommandList = (delegate* unmanaged[Cdecl]<ULCommandList, void>)Marshal.GetFunctionPointerForDelegate(value) }, value);
+			}
+			get
+			{
+				var p = __UpdateCommandList;
+				return p is null ? null : (list) => p(list);
 			}
 		}
 

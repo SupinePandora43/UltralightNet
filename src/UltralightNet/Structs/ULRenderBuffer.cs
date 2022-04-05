@@ -1,3 +1,4 @@
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
 namespace UltralightNet
@@ -9,9 +10,15 @@ namespace UltralightNet
 		public uint width;
 		public uint height;
 
-		[MarshalAs(UnmanagedType.I1)]
-		public bool has_stencil_buffer;
-		[MarshalAs(UnmanagedType.I1)]
-		public bool has_depth_buffer;
+		private byte _HasStencilBuffer;
+		public bool HasStencilBuffer {
+			get => Unsafe.As<byte, bool>(ref Unsafe.AsRef(_HasStencilBuffer));
+			set => _HasStencilBuffer = Unsafe.As<bool, byte>(ref Unsafe.AsRef(value));
+		}
+		private byte _HasDepthBuffer; 
+		public bool HasDepthBuffer {
+			get => Unsafe.As<byte, bool>(ref Unsafe.AsRef(_HasDepthBuffer));
+			set => _HasDepthBuffer = Unsafe.As<bool, byte>(ref Unsafe.AsRef(value));
+		}
 	}
 }

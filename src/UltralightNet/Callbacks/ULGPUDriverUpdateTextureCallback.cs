@@ -1,12 +1,11 @@
-using System;
 using System.Runtime.InteropServices;
 
 namespace UltralightNet
 {
 	[UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-	public delegate void ULGPUDriverUpdateTextureCallback__PInvoke__(
+	public unsafe delegate void ULGPUDriverUpdateTextureCallback__PInvoke__(
 		uint texture_id,
-		IntPtr bitmap
+		void* bitmap
 	);
 	public delegate void ULGPUDriverUpdateTextureCallback(
 		uint texture_id,

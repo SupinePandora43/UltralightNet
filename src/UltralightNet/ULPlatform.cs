@@ -34,58 +34,62 @@ namespace UltralightNet
 		static void ULPLatform() => Methods.Preload();
 
 		private static readonly Dictionary<ULLogger, List<GCHandle>> loggerHandles = new(1);
+		private static readonly Dictionary<ULClipboard, List<GCHandle>> clipboardHandles = new(1);
 		private static readonly Dictionary<ULFileSystem, List<GCHandle>> filesystemHandles = new(1);
 		private static readonly Dictionary<ULGPUDriver, List<GCHandle>> gpudriverHandles = new(1);
-		private static readonly Dictionary<ULClipboard, List<GCHandle>> clipboardHandles = new(1);
 
-		internal static void Handle<TDelegate>(ref ULLogger originalLogger, in ULLogger newLogger, TDelegate? func = null) where TDelegate : Delegate
+		internal static void Handle<TDelegate>(ref ULLogger originalLogger, in ULLogger newLogger, in TDelegate? func = null) where TDelegate : Delegate
 		{
 			if (!loggerHandles.Remove(originalLogger, out List<GCHandle>? handles)) handles = new(1);
 			if (func is not null) handles.Add(GCHandle.Alloc(func));
 			loggerHandles[originalLogger = newLogger] = handles;
 		}
-		internal static void Handle<TDelegate>(ref ULFileSystem originalFileSystem, in ULFileSystem newFileSystem, TDelegate? func = null) where TDelegate : Delegate
-		{
-			if (!filesystemHandles.Remove(originalFileSystem, out List<GCHandle>? handles)) handles = new(6);
-			if (func is not null) handles.Add(GCHandle.Alloc(func));
-			filesystemHandles[originalFileSystem = newFileSystem] = handles;
-		}
-		internal static void Handle(ULGPUDriver gpudriver, GCHandle handle)
-		{
-			if (!gpudriverHandles.ContainsKey(gpudriver)) gpudriverHandles.Add(gpudriver, new(14));
-			gpudriverHandles[gpudriver].Add(handle);
-		}
-		internal static void Handle<TDelegate>(ref ULClipboard originalClipboard, in ULClipboard newClipboard, TDelegate? func = null) where TDelegate : Delegate
+		internal static void Handle<TDelegate>(ref ULClipboard originalClipboard, in ULClipboard newClipboard, in TDelegate? func = null) where TDelegate : Delegate
 		{
 			if (!clipboardHandles.Remove(originalClipboard, out List<GCHandle>? handles)) handles = new(3);
 			if (func is not null) handles.Add(GCHandle.Alloc(func));
 			clipboardHandles[originalClipboard = newClipboard] = handles;
 		}
+		internal static void Handle<TDelegate>(ref ULFileSystem originalFileSystem, in ULFileSystem newFileSystem, in TDelegate? func = null) where TDelegate : Delegate
+		{
+			if (!filesystemHandles.Remove(originalFileSystem, out List<GCHandle>? handles)) handles = new(6);
+			if (func is not null) handles.Add(GCHandle.Alloc(func));
+			filesystemHandles[originalFileSystem = newFileSystem] = handles;
+		}
+		internal static void Handle(ref ULGPUDriver originalGPUDriver, in ULGPUDriver newGPUDriver, in Delegate? func = null)
+		{
+			if(!gpudriverHandles.Remove(originalGPUDriver, out List<GCHandle>? handles)) handles = new(6);
+			if(func is not null) handles.Add(GCHandle.Alloc(func));
+			gpudriverHandles[originalGPUDriver = newGPUDriver] = handles;
+		}
 
-		internal static void Free(ULLogger logger)
+		internal static void Free(in ULLogger logger)
 		{
 			if (loggerHandles.Remove(logger, out List<GCHandle>? handles))
 				foreach (GCHandle handle in handles) handle.Free();
 		}
-		internal static void Free(ULFileSystem filesystem)
-		{
-			if (filesystemHandles.Remove(filesystem, out List<GCHandle>? handles))
-				foreach (GCHandle handle in handles) handle.Free();
-		}
-		internal static void Free(ULGPUDriver gpudriver)
-		{
-			if (gpudriverHandles.Remove(gpudriver, out List<GCHandle>? handles))
-				foreach (GCHandle handle in handles) handle.Free();
-		}
-		internal static void Free(ULClipboard clipboard)
+		internal static void Free(in ULClipboard clipboard)
 		{
 			if (clipboardHandles.Remove(clipboard, out List<GCHandle>? handles))
 				foreach (GCHandle handle in handles) handle.Free();
 		}
+		internal static void Free(in ULFileSystem filesystem)
+		{
+			if (filesystemHandles.Remove(filesystem, out List<GCHandle>? handles))
+				foreach (GCHandle handle in handles) handle.Free();
+		}
+		internal static void Free(in ULGPUDriver gpudriver)
+		{
+			if (gpudriverHandles.Remove(gpudriver, out List<GCHandle>? handles))
+				foreach (GCHandle handle in handles) handle.Free();
+		}
 
 		/// <summary>
-		/// Frees structures passed to methods
+		/// Free structures passed to methods
 		/// </summary>
+		/// <remarks>
+		/// Will make all structs with assigned delegates (not delegate pointers) invalid. (No matter where it is, passed to native or out of scope in managed)
+		/// <remarks/>
 		public static void Free()
 		{
 			foreach (List<GCHandle> handles in loggerHandles.Values) foreach (GCHandle handle in handles) if (handle.IsAllocated) handle.Free();
