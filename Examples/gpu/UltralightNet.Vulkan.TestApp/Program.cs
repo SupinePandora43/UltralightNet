@@ -1950,7 +1950,7 @@ unsafe class HelloTriangleApplication
 
 			vk!.CmdBindIndexBuffer(commandBuffers[i], indexBuffer, 0, IndexType.Uint32);
 
-			vk!.CmdBindDescriptorSets(commandBuffers[i], PipelineBindPoint.Graphics, pipelineLayout, 0, 1, dr.GetTexture(view.RenderTarget.texture_id).descriptorSet, 0, null);
+			vk!.CmdBindDescriptorSets(commandBuffers[i], PipelineBindPoint.Graphics, pipelineLayout, 0, 1, dr.GetTexture(view.RenderTarget.TextureId).descriptorSet, 0, null);
 
 			//vk!.CmdBindDescriptorSets(commandBuffers[i], PipelineBindPoint.Graphics, pipelineLayout, 0, 1, descriptorSets![i], 0, null);
 
