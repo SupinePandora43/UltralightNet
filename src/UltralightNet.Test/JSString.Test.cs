@@ -7,9 +7,9 @@ public unsafe class JSStringTest
 {
 	public static IEnumerable<object[]> GetTestStrings()
 	{
-		yield return new JSString[] { "TEST" };
-		yield return new JSString[] { "ТЕСТ" };
-		yield return new JSString[] { "" };
+		yield return (object[])new JSString[] { "TEST" };
+		yield return (object[])new JSString[] { "ТЕСТ" };
+		yield return (object[])new JSString[] { "" };
 	}
 
 	[Theory]

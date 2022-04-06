@@ -4,54 +4,66 @@ using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Text;
 
+using LibraryImportAttribute = System.Runtime.InteropServices.GeneratedDllImportAttribute;
+
 namespace UltralightNet
 {
-	public static partial class Methods
+	public static unsafe partial class Methods
 	{
 		/// <summary>Create string from null-terminated ASCII C-string.</summary>
-		[GeneratedDllImport("Ultralight")]
-		public unsafe static partial ULString* ulCreateString([MarshalUsing(typeof(UTF8Marshaller))] string str);
+		[LibraryImport(LibUltralight)]
+		public static partial ULString* ulCreateString([MarshalUsing(typeof(UTF8Marshaller))] string str);
 
 		/// <summary>Create string from UTF-8 buffer.</summary>
-		[DllImport("Ultralight")]
+		[LibraryImport(LibUltralight)]
 		[Obsolete("Unexpected behaviour")]
-		public static unsafe extern ULString* ulCreateStringUTF8(
+		public static partial ULString* ulCreateStringUTF8(
 			byte* data,
+			nuint len
+		);
+		[LibraryImport(LibUltralight)]
+		[Obsolete("Unexpected behaviour")]
+		public static partial ULString* ulCreateStringUTF8(
+			[MarshalAs(UnmanagedType.LPUTF8Str)] string data,
 			nuint len
 		);
 
 		/// <summary>Create string from UTF-16 buffer.</summary>
-		[GeneratedDllImport("Ultralight")]
+		[LibraryImport(LibUltralight)]
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		public static unsafe partial ULString* ulCreateStringUTF16([MarshalAs(UnmanagedType.LPWStr)] string str, nuint len);
+		public static partial ULString* ulCreateStringUTF16([MarshalAs(UnmanagedType.LPWStr)] string str, nuint len);
+
+		/// <summary>Create string from UTF-16 buffer.</summary>
+		[LibraryImport(LibUltralight)]
+		public static partial ULString* ulCreateStringUTF16(ushort* str, nuint len);
 
 		// <summary>Create string from copy of existing string.</summary>
-		[DllImport("Ultralight")]
-		public static unsafe extern ULString* ulCreateStringFromCopy(ULString* str);
+		[LibraryImport(LibUltralight)]
+		public static partial ULString* ulCreateStringFromCopy(ULString* str);
 
 		/// <summary>Destroy string (you should destroy any strings you explicitly Create).</summary>
-		[DllImport("Ultralight")]
-		public static unsafe extern void ulDestroyString(ULString* str);
+		[LibraryImport(LibUltralight)]
+		public static partial void ulDestroyString(ULString* str);
 
 		/// <summary>Get internal UTF-8 buffer data.</summary>
-		[DllImport("Ultralight", EntryPoint = "ulStringGetData")]
-		public static unsafe extern byte* ulStringGetDataPtr(ULString* str);
+		[LibraryImport(LibUltralight, EntryPoint = "ulStringGetData")]
+		public static partial byte* ulStringGetDataPtr(ULString* str);
 
 		/// <summary>Get length in UTF-8 characters.</summary>
-		[DllImport("Ultralight")]
-		public static unsafe extern nuint ulStringGetLength(ULString* str);
+		[LibraryImport(LibUltralight)]
+		public static partial nuint ulStringGetLength(ULString* str);
 
 		/// <summary>Whether this string is empty or not.</summary>
-		[GeneratedDllImport("Ultralight")]
+		[LibraryImport(LibUltralight)]
 		[return: MarshalAs(UnmanagedType.I1)]
-		public static unsafe partial bool ulStringIsEmpty(ULString* str);
+		public static partial bool ulStringIsEmpty(ULString* str);
 
 		/// <summary>Replaces the contents of 'str' with the contents of 'new_str'</summary>
-		[DllImport("Ultralight")]
-		public static unsafe extern void ulStringAssignString(ULString* str, ULString* newStr);
+		[LibraryImport(LibUltralight)]
+		public static partial void ulStringAssignString(ULString* str, ULString* newStr);
 
-		[DllImport("Ultralight")]
-		public static unsafe extern void ulStringAssignCString(ULString* str, byte* c_str);
+		[LibraryImport(LibUltralight)]
+		public static partial void ulStringAssignCString(ULString* str, byte* c_str);
 	}
 
 	/// <remarks>Must be used with <code>using</code> statement</remarks
@@ -66,12 +78,110 @@ namespace UltralightNet
 		public void Dispose() => Methods.ulDestroyString(Native);
 	}
 	// INTEROPTODO: CUSTOMTYPEMARSHALLER
+	[StructLayout(LayoutKind.Auto)]
+	public unsafe ref struct ULStringToNativeMarshaller
+	{
+#if !UL_CONSERVATIVESTACK
+		[StructLayout(LayoutKind.Explicit, Size = BufferSize)]
+		private struct Memory { }
+#endif
+
+		private const int BufferSize = 0x400;
+
+		private ULString native;
+		private byte* allocatedMemory = null;
+
+#if !UL_CONSERVATIVESTACK
+		private Memory stack;
+#endif
+
+		// INTEROPTODO: INT64
+		public ULStringToNativeMarshaller(ReadOnlySpan<char> str)
+		{
+			nuint byteCount =
+#if UL_CONSERVATIVEHEAP
+				(nuint)Encoding.UTF8.GetByteCount(str) + 1 // zero-byte end
+#else
+				// EXTREMELY fast length check with cost of memory usage
+				((nuint)str.Length + 1) * 3 + 1; // 3 because UTF16 can't produce more when converting to UTF8
+#endif
+#if !UL_CONSERVATIVESTACK
+			if (byteCount <= (nuint)BufferSize)
+			{
+				var stackPtr = (byte*)Unsafe.AsPointer(ref stack);
+				nuint written = (nuint)Encoding.UTF8.GetBytes(str, new Span<byte>(stackPtr, BufferSize));
+				stackPtr[written] = 0; // zero-byte end
+				native = new(stackPtr, (nuint)written);
+				allocatedMemory = null;
+			}
+			else if (byteCount <= (nuint)int.MaxValue)
+#endif
+			{
+				nuint written = (nuint)Encoding.UTF8.GetBytes(str, new Span<byte>(allocatedMemory = (byte*)NativeMemory.Alloc((nuint)byteCount), (int)byteCount));
+				allocatedMemory[written] = 0;
+				// 
+				// NativeMemory.Realloc(allocatedMemory, written);
+				native = new(allocatedMemory, (nuint)written);
+			}
+			else
+			{
+				// i can optimize it, but i will not, until you ask me to do so.
+				// (do not copy from temp and just use it instead)
+				ULString* temp;
+				fixed (char* strPtr = str)
+					temp = Methods.ulCreateStringUTF16((ushort*)strPtr, (nuint)str.Length);
+				try
+				{
+					nuint len = temp->length;
+					native.data = allocatedMemory = (byte*)NativeMemory.Alloc(len);
+					Buffer.MemoryCopy(temp->data, allocatedMemory, len, len);
+					native.length = len;
+				}
+				finally { Methods.ulDestroyString(temp); }
+			}
+		}
+		public ULStringToNativeMarshaller()
+		{
+			native.data = allocatedMemory = (byte*)NativeMemory.Alloc(1); // prevent potetntial errors
+			native.data[0] = 0; // zero-byte end
+			native.length = 0; // zero length
+		}
+
+		public ULString* ToNativeValue() => (ULString*)Unsafe.AsPointer(ref native); // INTEROPTODO: C#VER
+		public int ToManagedValue(Span<char> span) => Encoding.UTF8.GetChars(new ReadOnlySpan<byte>(native.data, (int)native.length), span);
+		public string ToManagedValue()
+		{
+			Span<char> chars = new char[native.length];
+			int written = ToManagedValue(chars);
+			return chars.Slice(0, written).ToString();
+		}
+		// INTEROPTODO: CUSTOMTYPEMARSHALLER
+		public ULString* Value => ToNativeValue();
+
+		public void FreeNative()
+		{
+			if (allocatedMemory is not null)
+			{
+				if (allocatedMemory == native.data)
+					NativeMemory.Free(allocatedMemory);
+				else
+					NativeMemory.Free(native.data);
+				allocatedMemory = null;
+				native.data = null;
+			}
+		}
+
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		public void Dispose() => FreeNative();
+
+		public ULString Opaque => native;
+	}
+	// INTEROPTODO: CUSTOMTYPEMARSHALLER
 	[CustomTypeMarshaller(typeof(string), CustomTypeMarshallerKind.Value, Features = CustomTypeMarshallerFeatures.UnmanagedResources)]
 	public unsafe ref struct ULStringGeneratedDllImportMarshaler
 	{
 		private bool allocated = false; // INTEROPTODO: UNNECESSARYCHECK
 
-		[SkipLocalsInit]
 		public ULStringGeneratedDllImportMarshaler(string str)
 		{
 			if (str is null) throw new ArgumentNullException(nameof(str)); // INTEROPTODO: C#VER
@@ -79,8 +189,6 @@ namespace UltralightNet
 			allocated = true;
 		}
 
-		[SkipLocalsInit]
-		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public string ToManaged() =>
 #if NETFRAMEWORK || NETSTANDARD2_0
 			new((sbyte*)ulstringPtr->data, 0, (int)ulstringPtr->length, Encoding.UTF8);
@@ -90,14 +198,10 @@ namespace UltralightNet
 
 		public unsafe ULString* Value
 		{
-			[MethodImpl(MethodImplOptions.AggressiveInlining)]
 			get;
-			[MethodImpl(MethodImplOptions.AggressiveInlining)]
 			set;
 		}
 
-		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		[SkipLocalsInit]
 		public void FreeNative()
 		{
 			if (allocated) Methods.ulDestroyString(Value);
@@ -107,10 +211,12 @@ namespace UltralightNet
 	[DebuggerDisplay("{ToManaged(),raw}")]
 	[BlittableType]
 	[StructLayout(LayoutKind.Sequential)]
-	public unsafe readonly struct ULString
+	public unsafe struct ULString
 	{
-		public readonly byte* data;
-		public readonly nuint length;
+		internal const bool Conservative = false;
+
+		public byte* data;
+		public nuint length;
 
 		public ULString(byte* data, nuint length)
 		{
@@ -122,7 +228,6 @@ namespace UltralightNet
 		}
 
 		/// <remarks>Do not use on pointers</remarks>
-		[SkipLocalsInit]
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public string ToManaged() =>
 #if NETSTANDARD2_0
@@ -133,9 +238,8 @@ namespace UltralightNet
 			Marshal.PtrToStringUTF8((IntPtr)data, (int)length);
 #endif
 
-		[SkipLocalsInit]
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		public static unsafe string NativeToManaged(ULString* ulString)
+		public static string NativeToManaged(ULString* ulString)
 		{
 #if NETSTANDARD2_1 || NETCOREAPP1_1_OR_GREATER
 			return Marshal.PtrToStringUTF8((IntPtr)ulString->data, (int)ulString->length);
@@ -146,7 +250,6 @@ namespace UltralightNet
 
 		/// <summary>Used for getting **opaque** <see cref="ULString" /> struct.<br />Performs worse than <see cref="ULStringGeneratedDllImportMarshaler" /></summary>
 		/// <remarks>Requires manual freeing</remarks>
-		[SkipLocalsInit]
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public static ULString CreateOpaque(string str)
 		{
@@ -164,7 +267,6 @@ namespace UltralightNet
 			return ulString;
 		}
 		/// <summary>Free **opaque** <see cref="ULString" /> instance.</summary>
-		[SkipLocalsInit]
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public static void FreeOpaque(ULString ulString)
 		{
