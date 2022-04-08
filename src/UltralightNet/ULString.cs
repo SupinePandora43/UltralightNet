@@ -100,7 +100,7 @@ namespace UltralightNet
 		{
 			nuint byteCount =
 #if UL_CONSERVATIVEHEAP
-				(nuint)Encoding.UTF8.GetByteCount(str) + 1 // zero-byte end
+				(nuint)Encoding.UTF8.GetByteCount(str) + 1; // zero-byte end
 #else
 				// EXTREMELY fast length check with cost of memory usage
 				((nuint)str.Length + 1) * 3 + 1; // 3 because UTF16 can't produce more when converting to UTF8
@@ -114,8 +114,9 @@ namespace UltralightNet
 				native = new(stackPtr, (nuint)written);
 				allocatedMemory = null;
 			}
-			else if (byteCount <= (nuint)int.MaxValue)
+			else
 #endif
+			if (byteCount <= (nuint)int.MaxValue)
 			{
 				nuint written = (nuint)Encoding.UTF8.GetBytes(str, new Span<byte>(allocatedMemory = (byte*)NativeMemory.Alloc((nuint)byteCount), (int)byteCount));
 				allocatedMemory[written] = 0;
@@ -169,6 +170,7 @@ namespace UltralightNet
 				allocatedMemory = null;
 				native.data = null;
 			}
+			native.length = 0;
 		}
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
