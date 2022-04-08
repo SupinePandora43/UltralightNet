@@ -10,8 +10,8 @@ namespace UltralightNet
 		{
 			set
 			{
-				if (value is null) ULPlatform.Handle<ULClipboardClearCallback>(ref this, this with { __Clear = null });
-				else ULPlatform.Handle<ULClipboardClearCallback>(ref this, this with { __Clear = (delegate* unmanaged[Cdecl]<void>)Marshal.GetFunctionPointerForDelegate(value) }, value);
+				if (value is null) ULPlatform.Handle(ref this, this with { __Clear = null });
+				else ULPlatform.Handle(ref this, this with { __Clear = (delegate* unmanaged[Cdecl]<void>)Marshal.GetFunctionPointerForDelegate(value) }, value);
 			}
 			get
 			{
@@ -43,7 +43,7 @@ namespace UltralightNet
 		{
 			set
 			{
-				if (value is null) ULPlatform.Handle<ULClipboardReadPlainTextCallback__PInvoke__>(ref this, this with { __ReadPlainText = null });
+				if (value is null) ULPlatform.Handle(ref this, this with { __ReadPlainText = null });
 				else ULPlatform.Handle(ref this, this with { __ReadPlainText = (delegate* unmanaged[Cdecl]<ULString*, void>)Marshal.GetFunctionPointerForDelegate(value) }, value);
 			}
 			get
@@ -69,7 +69,7 @@ namespace UltralightNet
 		{
 			set
 			{
-				if (value is null) ULPlatform.Handle<ULClipboardWritePlainTextCallback__PInvoke__>(ref this, this with { __WritePlainText = null });
+				if (value is null) ULPlatform.Handle(ref this, this with { __WritePlainText = null });
 				else ULPlatform.Handle(ref this, this with { __WritePlainText = (delegate* unmanaged[Cdecl]<ULString*, void>)Marshal.GetFunctionPointerForDelegate(value) }, value);
 			}
 			get

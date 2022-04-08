@@ -8,7 +8,12 @@ namespace UltralightNet
 	[StructLayout(LayoutKind.Sequential)]
 	public unsafe struct ULFileSystem : IDisposable
 	{
-		public static nuint InvalidFileHandle => nuint.MaxValue; // -1 is equal to MaxValue. Don't ask me how - i don't know either.
+		public static nuint InvalidFileHandle =>
+#if NET5_0_OR_GREATER
+			nuint.MaxValue; // -1 is equal to MaxValue. Don't ask me how - i don't know either.
+#else
+			sizeof(void*) == 8 ? unchecked((nuint)ulong.MaxValue) : uint.MaxValue;
+#endif
 
 		public ULFileSystemFileExistsCallback? FileExists
 		{
@@ -92,7 +97,7 @@ namespace UltralightNet
 		{
 			set
 			{
-				if (value is null) ULPlatform.Handle<ULFileSystemFileExistsCallback__PInvoke__>(ref this, this with { __FileExists = null });
+				if (value is null) ULPlatform.Handle(ref this, this with { __FileExists = null });
 				else ULPlatform.Handle(ref this, this with { __FileExists = (delegate* unmanaged[Cdecl]<ULString*, byte>)Marshal.GetFunctionPointerForDelegate(value) }, value);
 			}
 			get
@@ -105,7 +110,7 @@ namespace UltralightNet
 		{
 			set
 			{
-				if (value is null) ULPlatform.Handle<ULFileSystemGetFileSizeCallback__PInvoke__>(ref this, this with { __GetFileSize = null });
+				if (value is null) ULPlatform.Handle(ref this, this with { __GetFileSize = null });
 				else ULPlatform.Handle(ref this, this with { __GetFileSize = (delegate* unmanaged[Cdecl]<nuint, long*, byte>)Marshal.GetFunctionPointerForDelegate(value) }, value);
 			}
 			get
@@ -118,7 +123,7 @@ namespace UltralightNet
 		{
 			set
 			{
-				if (value is null) ULPlatform.Handle<ULFileSystemGetFileMimeTypeCallback__PInvoke__>(ref this, this with { __GetFileMimeType = null });
+				if (value is null) ULPlatform.Handle(ref this, this with { __GetFileMimeType = null });
 				else ULPlatform.Handle(ref this, this with { __GetFileMimeType = (delegate* unmanaged[Cdecl]<ULString*, ULString*, byte>)Marshal.GetFunctionPointerForDelegate(value) }, value);
 			}
 			get
@@ -131,7 +136,7 @@ namespace UltralightNet
 		{
 			set
 			{
-				if (value is null) ULPlatform.Handle<ULFileSystemOpenFileCallback__PInvoke__>(ref this, this with { __OpenFile = null });
+				if (value is null) ULPlatform.Handle(ref this, this with { __OpenFile = null });
 				else ULPlatform.Handle(ref this, this with { __OpenFile = (delegate* unmanaged[Cdecl]<ULString*, byte, nuint>)Marshal.GetFunctionPointerForDelegate(value) }, value);
 			}
 			get
@@ -144,7 +149,7 @@ namespace UltralightNet
 		{
 			set
 			{
-				if (value is null) ULPlatform.Handle<ULFileSystemCloseFileCallback>(ref this, this with { __CloseFile = null });
+				if (value is null) ULPlatform.Handle(ref this, this with { __CloseFile = null });
 				else ULPlatform.Handle(ref this, this with { __CloseFile = (delegate* unmanaged[Cdecl]<nuint, void>)Marshal.GetFunctionPointerForDelegate(value) }, value);
 			}
 			get
@@ -157,7 +162,7 @@ namespace UltralightNet
 		{
 			set
 			{
-				if (value is null) ULPlatform.Handle<ULFileSystemReadFromFileCallback__PInvoke__>(ref this, this with { __ReadFromFile = null });
+				if (value is null) ULPlatform.Handle(ref this, this with { __ReadFromFile = null });
 				else ULPlatform.Handle(ref this, this with { __ReadFromFile = (delegate* unmanaged[Cdecl]<nuint, byte*, long, long>)Marshal.GetFunctionPointerForDelegate(value) }, value);
 			}
 			get

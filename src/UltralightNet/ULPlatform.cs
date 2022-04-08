@@ -38,50 +38,67 @@ namespace UltralightNet
 		private static readonly Dictionary<ULFileSystem, List<GCHandle>> filesystemHandles = new(1);
 		private static readonly Dictionary<ULGPUDriver, List<GCHandle>> gpudriverHandles = new(1);
 
-		internal static void Handle<TDelegate>(ref ULLogger originalLogger, in ULLogger newLogger, in TDelegate? func = null) where TDelegate : Delegate
+		internal static void Handle(ref ULLogger originalLogger, in ULLogger newLogger, in Delegate? func = null)
 		{
 			if (!loggerHandles.Remove(originalLogger, out List<GCHandle>? handles)) handles = new(1);
-			if (func is not null) handles.Add(GCHandle.Alloc(func));
-			loggerHandles[originalLogger = newLogger] = handles;
+			if (func is not null) handles!.Add(GCHandle.Alloc(func));
+			loggerHandles[originalLogger = newLogger] = handles!;
 		}
-		internal static void Handle<TDelegate>(ref ULClipboard originalClipboard, in ULClipboard newClipboard, in TDelegate? func = null) where TDelegate : Delegate
+		internal static void Handle(ref ULClipboard originalClipboard, in ULClipboard newClipboard, in Delegate? func = null)
 		{
 			if (!clipboardHandles.Remove(originalClipboard, out List<GCHandle>? handles)) handles = new(3);
-			if (func is not null) handles.Add(GCHandle.Alloc(func));
-			clipboardHandles[originalClipboard = newClipboard] = handles;
+			if (func is not null) handles!.Add(GCHandle.Alloc(func));
+			clipboardHandles[originalClipboard = newClipboard] = handles!;
 		}
-		internal static void Handle<TDelegate>(ref ULFileSystem originalFileSystem, in ULFileSystem newFileSystem, in TDelegate? func = null) where TDelegate : Delegate
+		internal static void Handle(ref ULFileSystem originalFileSystem, in ULFileSystem newFileSystem, in Delegate? func = null)
 		{
 			if (!filesystemHandles.Remove(originalFileSystem, out List<GCHandle>? handles)) handles = new(6);
-			if (func is not null) handles.Add(GCHandle.Alloc(func));
-			filesystemHandles[originalFileSystem = newFileSystem] = handles;
+			if (func is not null) handles!.Add(GCHandle.Alloc(func));
+			filesystemHandles[originalFileSystem = newFileSystem] = handles!;
 		}
 		internal static void Handle(ref ULGPUDriver originalGPUDriver, in ULGPUDriver newGPUDriver, in Delegate? func = null)
 		{
-			if(!gpudriverHandles.Remove(originalGPUDriver, out List<GCHandle>? handles)) handles = new(6);
-			if(func is not null) handles.Add(GCHandle.Alloc(func));
-			gpudriverHandles[originalGPUDriver = newGPUDriver] = handles;
+			if (!gpudriverHandles.Remove(originalGPUDriver, out List<GCHandle>? handles)) handles = new(6);
+			if (func is not null) handles!.Add(GCHandle.Alloc(func));
+			gpudriverHandles[originalGPUDriver = newGPUDriver] = handles!;
 		}
+
+#if !(NETCOREAPP2_0_OR_GREATER || NETSTANDARD2_1)
+		private static bool Remove<TKey, TValue>(this Dictionary<TKey, TValue> dict, TKey key, [System.Diagnostics.CodeAnalysis.MaybeNullWhen(false)] out TValue? value) where TKey : notnull
+		{
+			if (dict.ContainsKey(key))
+			{
+				value = dict[key];
+				dict.Remove(key);
+				return true;
+			}
+			else
+			{
+				value = default;
+				return false;
+			}
+		}
+#endif
 
 		internal static void Free(in ULLogger logger)
 		{
 			if (loggerHandles.Remove(logger, out List<GCHandle>? handles))
-				foreach (GCHandle handle in handles) handle.Free();
+				foreach (GCHandle handle in handles!) handle.Free();
 		}
 		internal static void Free(in ULClipboard clipboard)
 		{
 			if (clipboardHandles.Remove(clipboard, out List<GCHandle>? handles))
-				foreach (GCHandle handle in handles) handle.Free();
+				foreach (GCHandle handle in handles!) handle.Free();
 		}
 		internal static void Free(in ULFileSystem filesystem)
 		{
 			if (filesystemHandles.Remove(filesystem, out List<GCHandle>? handles))
-				foreach (GCHandle handle in handles) handle.Free();
+				foreach (GCHandle handle in handles!) handle.Free();
 		}
 		internal static void Free(in ULGPUDriver gpudriver)
 		{
 			if (gpudriverHandles.Remove(gpudriver, out List<GCHandle>? handles))
-				foreach (GCHandle handle in handles) handle.Free();
+				foreach (GCHandle handle in handles!) handle.Free();
 		}
 
 		/// <summary>
@@ -204,7 +221,7 @@ namespace UltralightNet
 				Console.WriteLine("UltralightNet: no logger set, console logger will be used.");
 				Logger = new()
 				{
-					LogMessage = (ULLogLevel level, in string message) => { foreach (ReadOnlySpan<char> line in new LineEnumerator(message)) { Console.WriteLine($"(UL) {level}: {line}"); } }
+					LogMessage = (ULLogLevel level, in string message) => { foreach (ReadOnlySpan<char> line in new LineEnumerator(message.AsSpan())) { Console.WriteLine($"(UL) {level}: {line.ToString()}"); } }
 				};
 			}
 			if (SetDefaultFileSystem && !fileSystemSet) // TODO

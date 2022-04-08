@@ -21,12 +21,6 @@ namespace UltralightNet
 			byte* data,
 			nuint len
 		);
-		[LibraryImport(LibUltralight)]
-		[Obsolete("Unexpected behaviour")]
-		public static partial ULString* ulCreateStringUTF8(
-			[MarshalAs(UnmanagedType.LPUTF8Str)] string data,
-			nuint len
-		);
 
 		/// <summary>Create string from UTF-16 buffer.</summary>
 		[LibraryImport(LibUltralight)]
@@ -109,7 +103,15 @@ namespace UltralightNet
 			if (byteCount <= (nuint)BufferSize)
 			{
 				var stackPtr = (byte*)Unsafe.AsPointer(ref stack);
-				nuint written = (nuint)Encoding.UTF8.GetBytes(str, new Span<byte>(stackPtr, BufferSize));
+				nuint written
+#if NETCOREAPP2_1_OR_GREATER || NETSTANDARD2_1
+					= (nuint)Encoding.UTF8.GetBytes(str, new Span<byte>(stackPtr, BufferSize));
+#else
+					;
+				fixed(char* chars = str)
+					written = (nuint) Encoding.UTF8.GetBytes(chars, str.Length, stackPtr, BufferSize);
+#endif
+
 				stackPtr[written] = 0; // zero-byte end
 				native = new(stackPtr, (nuint)written);
 				allocatedMemory = null;
@@ -118,7 +120,13 @@ namespace UltralightNet
 #endif
 			if (byteCount <= (nuint)int.MaxValue)
 			{
+#if NETCOREAPP2_1_OR_GREATER || NETSTANDARD2_1
 				nuint written = (nuint)Encoding.UTF8.GetBytes(str, new Span<byte>(allocatedMemory = (byte*)NativeMemory.Alloc((nuint)byteCount), (int)byteCount));
+#else
+				nuint written;
+				fixed(char* chars = str)
+					written = (nuint)Encoding.UTF8.GetBytes(chars, str.Length, allocatedMemory, (int)byteCount);
+#endif
 				allocatedMemory[written] = 0;
 				// 
 				// NativeMemory.Realloc(allocatedMemory, written);
@@ -135,7 +143,11 @@ namespace UltralightNet
 				{
 					nuint len = temp->length;
 					native.data = allocatedMemory = (byte*)NativeMemory.Alloc(len);
+#if NETCOREAPP1_0_OR_GREATER || NET46_OR_GREATER || NETSTANDARD1_3_OR_GREATER
 					Buffer.MemoryCopy(temp->data, allocatedMemory, len, len);
+#else
+					for(nuint i = 0; i < len ; i++) allocatedMemory[i] = temp->data[i];
+#endif
 					native.length = len;
 				}
 				finally { Methods.ulDestroyString(temp); }
@@ -149,7 +161,15 @@ namespace UltralightNet
 		}
 
 		public ULString* ToNativeValue() => (ULString*)Unsafe.AsPointer(ref native); // INTEROPTODO: C#VER
-		public int ToManagedValue(Span<char> span) => Encoding.UTF8.GetChars(new ReadOnlySpan<byte>(native.data, (int)native.length), span);
+		public int ToManagedValue(Span<char> span)
+#if NETCOREAPP2_1_OR_GREATER || NETSTANDARD2_1
+			=> Encoding.UTF8.GetChars(new ReadOnlySpan<byte>(native.data, (int)native.length), span);
+#else
+		{
+			fixed(char* chars = span)
+				return Encoding.UTF8.GetChars(native.data, (int)native.length, chars, span.Length);
+		}
+#endif
 		public string ToManagedValue()
 		{
 			Span<char> chars = new char[native.length];
@@ -193,7 +213,7 @@ namespace UltralightNet
 
 		public string ToManaged() =>
 #if NETFRAMEWORK || NETSTANDARD2_0
-			new((sbyte*)ulstringPtr->data, 0, (int)ulstringPtr->length, Encoding.UTF8);
+			new((sbyte*)Value->data, 0, (int)Value->length, Encoding.UTF8);
 #else
 			Marshal.PtrToStringUTF8((IntPtr)Value->data, (int)Value->length);
 #endif

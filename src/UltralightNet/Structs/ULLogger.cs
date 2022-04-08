@@ -24,8 +24,8 @@ namespace UltralightNet
 		{
 			set
 			{
-				if (value is null) ULPlatform.Handle<ULLoggerLogMessageCallback__PInvoke__>(ref this, this with { __LogMessage = null });
-				else ULPlatform.Handle<ULLoggerLogMessageCallback__PInvoke__>(ref this, this with { __LogMessage = (delegate* unmanaged[Cdecl]<ULLogLevel, ULString*, void>)Marshal.GetFunctionPointerForDelegate(value) }, value);
+				if (value is null) ULPlatform.Handle(ref this, this with { __LogMessage = null });
+				else ULPlatform.Handle(ref this, this with { __LogMessage = (delegate* unmanaged[Cdecl]<ULLogLevel, ULString*, void>)Marshal.GetFunctionPointerForDelegate(value) }, value);
 			}
 			get
 			{

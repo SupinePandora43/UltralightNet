@@ -50,6 +50,9 @@ public unsafe class ULStringTest
 		using ULStringToNativeMarshaller output_marshaller = new();
 		using ULStringToNativeMarshaller input_marshaller = new(str);
 
+		Assert.Equal((nuint)0, output_marshaller.Opaque.length);
+		Assert.Equal((nuint)0, output_marshaller.Opaque.data[0]);
+
 		byte* m = output_marshaller.Opaque.data;
 
 		Assert.NotEqual((nuint)output_marshaller.Opaque.data, (nuint)input_marshaller.Opaque.data);
