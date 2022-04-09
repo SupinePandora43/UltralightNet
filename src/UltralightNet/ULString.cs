@@ -41,7 +41,7 @@ namespace UltralightNet
 #if NETCOREAPP1_0_OR_GREATER || NET46_OR_GREATER || NETSTANDARD1_3_OR_GREATER
 				Buffer.MemoryCopy(str->data, ulString->data, str->length, str->length);
 #else
-				for(nuint i = 0; i < len ; i++) ulString->data[i] = str->data[i];
+				for(nuint i = 0; i < str->length; i++) ulString->data[i] = str->data[i];
 #endif
 			ulString->data[str->length] = 0;
 			ulString->length = str->length;
