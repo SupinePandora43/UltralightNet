@@ -14,6 +14,7 @@ jobs:
     steps:
       - run: echo "todo :3"
   Build:
+    needs: BuildCmake
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
@@ -65,6 +66,7 @@ jobs:
           dotnet pack src/UltralightNet.Resources -c Release
       - name: Test
         run: dotnet test src/UltralightNet.Test/UltralightNet.Test.csproj --collect:"XPlat Code Coverage" -- DataCollectionRunSettings.DataCollectors.DataCollector.Configuration.Format=cobertura,opencover -- DataCollectionRunSettings.DataCollectors.DataCollector.Configuration.UseSourceLink=true
+        continue-on-error: true
       - name: Upload coverage
         run: |
           curl -s https://codecov.io/bash > codecov
@@ -73,6 +75,8 @@ jobs:
       - name: Benchmark
         run: dotnet run -c Release --project src/Benchmarks/Benchmarks.csproj
         continue-on-error: true
+      - name: Test
+        run: dotnet test src/UltralightNet.Test/UltralightNet.Test.csproj --collect:"XPlat Code Coverage" -- DataCollectionRunSettings.DataCollectors.DataCollector.Configuration.Format=cobertura,opencover -- DataCollectionRunSettings.DataCollectors.DataCollector.Configuration.UseSourceLink=true
   Deploy:
     needs: Test
     runs-on: ubuntu-latest
