@@ -32,11 +32,17 @@ namespace UltralightNet
 		public static partial ULString* ulCreateStringUTF16(ushort* str, nuint len);
 
 		// <summary>Create string from copy of existing string.</summary>
-		public static ULString* ulCreateStringFromCopy(ULString* str){
-			var ulString = (ULString*) NativeMemory.Alloc((nuint)sizeof(ULString));
-			ulString->data = (byte*) NativeMemory.Alloc(str->length + 1);
-			if(str->length < (nuint)int.MaxValue) new ReadOnlySpan<byte>(str->data, (int)str->length).CopyTo(new Span<byte>(ulString->data, (int)ulString->length));
-			else for(nuint i = 0; i<str->length; i++)ulString->data[i] = str->data[i];
+		public static ULString* ulCreateStringFromCopy(ULString* str)
+		{
+			var ulString = (ULString*)NativeMemory.Alloc((nuint)sizeof(ULString));
+			ulString->data = (byte*)NativeMemory.Alloc(str->length + 1);
+			if (str->length < (nuint)int.MaxValue) new ReadOnlySpan<byte>(str->data, (int)str->length).CopyTo(new Span<byte>(ulString->data, (int)ulString->length));
+			else
+#if NETCOREAPP1_0_OR_GREATER || NET46_OR_GREATER || NETSTANDARD1_3_OR_GREATER
+				Buffer.MemoryCopy(str->data, ulString->data, str->length, str->length);
+#else
+				for(nuint i = 0; i < len ; i++) ulString->data[i] = str->data[i]
+#endif
 			ulString->length = str->length;
 			return ulString;
 		}
