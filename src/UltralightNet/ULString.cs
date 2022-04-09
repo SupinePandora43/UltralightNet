@@ -43,6 +43,7 @@ namespace UltralightNet
 #else
 				for(nuint i = 0; i < len ; i++) ulString->data[i] = str->data[i]
 #endif
+			ulString->data[str->length] = 0;
 			ulString->length = str->length;
 			return ulString;
 		}
@@ -154,12 +155,13 @@ namespace UltralightNet
 				try
 				{
 					nuint len = temp->length;
-					native.data = allocatedMemory = (byte*)NativeMemory.Alloc(len);
+					native.data = allocatedMemory = (byte*)NativeMemory.Alloc(len + 1);
 #if NETCOREAPP1_0_OR_GREATER || NET46_OR_GREATER || NETSTANDARD1_3_OR_GREATER
 					Buffer.MemoryCopy(temp->data, allocatedMemory, len, len);
 #else
 					for(nuint i = 0; i < len ; i++) allocatedMemory[i] = temp->data[i];
 #endif
+					native.data[len] = 0;
 					native.length = len;
 				}
 				finally { Methods.ulDestroyString(temp); }
@@ -289,13 +291,9 @@ namespace UltralightNet
 		{
 			ULStringGeneratedDllImportMarshaler marshaler = new(str);
 			ULString* marshalled = marshaler.Value;
-			byte* data =
-#if NET6_0_OR_GREATER
-				(byte*)NativeMemory.Alloc(marshalled->length);
-#else
-				(byte*)Marshal.AllocHGlobal((int)marshalled->length); // INTEROPTODO: INT64
-#endif
+			byte* data = (byte*)NativeMemory.Alloc(marshalled->length + 1);
 			new ReadOnlySpan<byte>(marshalled->data, (int)marshalled->length).CopyTo(new Span<byte>(data, (int)marshalled->length)); // INTEROPTODO: INT64
+			data[marshalled->length] = 0;
 			ULString ulString = new(data, marshalled->length);
 			marshaler.FreeNative();
 			return ulString;
