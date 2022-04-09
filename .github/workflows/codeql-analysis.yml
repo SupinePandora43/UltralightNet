@@ -47,10 +47,10 @@ jobs:
         dotnet-version: 6.0.100
     - name: Build
       run: |
-        dotnet pack UltralightNet.Binaries
-        dotnet pack UltralightNet
-        dotnet pack UltralightNet.AppCore
-        dotnet pack UltralightNet.Resources
+        dotnet pack src/UltralightNet.Binaries
+        dotnet pack src/UltralightNet
+        dotnet pack src/UltralightNet.AppCore
+        dotnet pack src/UltralightNet.Resources
     # Initializes the CodeQL tools for scanning.
     - name: Initialize CodeQL
       uses: github/codeql-action/init@v1
