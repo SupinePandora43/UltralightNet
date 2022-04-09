@@ -187,7 +187,7 @@ namespace UltralightNet
 			MaxUpdateTime = config.MaxUpdateTime;
 			BitmapAlignment = config.BitmapAlignment;
 		}
-		
+
 		public void FreeNative()
 		{
 			// INTEROPTODO: ZEROFREE
@@ -245,6 +245,8 @@ namespace UltralightNet
 
 		/// <inheritdoc cref="_ULConfig.BitmapAlignment" />
 		public uint BitmapAlignment = 16;
+
+		public ULConfig() { }
 
 		public override bool Equals([NotNullWhen(true)] object? obj) => obj is ULConfig ? Equals((ULConfig)obj) : false;
 		public bool Equals(ULConfig other) =>

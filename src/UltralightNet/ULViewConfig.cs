@@ -152,6 +152,8 @@ namespace UltralightNet
 		/// <inheritdoc cref="_ULViewConfig.UserAgent" />
 		public string UserAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/608.3.10 (KHTML, like Gecko) Ultralight/1.3.0 Safari/608.3.10";
 
+		public ULViewConfig() { }
+
 		public bool Equals(ULViewConfig other) =>
 			IsAccelerated == other.IsAccelerated &&
 			IsTransparent == other.IsTransparent &&
