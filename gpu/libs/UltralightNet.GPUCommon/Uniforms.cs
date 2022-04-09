@@ -1,10 +1,12 @@
 using System.Numerics;
+using System.Runtime.InteropServices;
 
 namespace UltralightNet.GPUCommon;
 
 /// <summary>
 /// Uniform Buffer data
 /// </summary>
+[StructLayout(LayoutKind.Sequential, Size = 768)]
 public struct Uniforms
 {
 	public Vector4 State;
@@ -28,7 +30,4 @@ public struct Uniforms
 	public Matrix4x4 Clip_6;
 	public Matrix4x4 Clip_7;
 	public uint ClipSize;
-	private float _alignment_0;
-	private float _alignment_1;
-	private float _alignment_2;
 }
