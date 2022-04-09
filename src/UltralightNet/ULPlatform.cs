@@ -37,6 +37,7 @@ namespace UltralightNet
 		private static readonly Dictionary<ULClipboard, List<GCHandle>> clipboardHandles = new(1);
 		private static readonly Dictionary<ULFileSystem, List<GCHandle>> filesystemHandles = new(1);
 		private static readonly Dictionary<ULGPUDriver, List<GCHandle>> gpudriverHandles = new(1);
+		private static readonly Dictionary<ULSurfaceDefinition, List<GCHandle>> surfaceHandles = new(1);
 
 		internal static void Handle(ref ULLogger originalLogger, in ULLogger newLogger, in Delegate? func = null)
 		{
@@ -58,9 +59,15 @@ namespace UltralightNet
 		}
 		internal static void Handle(ref ULGPUDriver originalGPUDriver, in ULGPUDriver newGPUDriver, in Delegate? func = null)
 		{
-			if (!gpudriverHandles.Remove(originalGPUDriver, out List<GCHandle>? handles)) handles = new(6);
+			if (!gpudriverHandles.Remove(originalGPUDriver, out List<GCHandle>? handles)) handles = new(14);
 			if (func is not null) handles!.Add(GCHandle.Alloc(func));
 			gpudriverHandles[originalGPUDriver = newGPUDriver] = handles!;
+		}
+		internal static void Handle(ref ULSurfaceDefinition originalSurface, in ULSurfaceDefinition newSurface, in Delegate? func = null)
+		{
+			if (!surfaceHandles.Remove(originalSurface, out List<GCHandle>? handles)) handles = new(9);
+			if (func is not null) handles!.Add(GCHandle.Alloc(func));
+			surfaceHandles[originalSurface = newSurface] = handles!;
 		}
 
 #if !(NETCOREAPP2_0_OR_GREATER || NETSTANDARD2_1)
@@ -79,6 +86,8 @@ namespace UltralightNet
 			}
 		}
 #endif
+
+		// use Dispose()
 
 		internal static void Free(in ULLogger logger)
 		{
@@ -100,6 +109,11 @@ namespace UltralightNet
 			if (gpudriverHandles.Remove(gpudriver, out List<GCHandle>? handles))
 				foreach (GCHandle handle in handles!) handle.Free();
 		}
+		internal static void Free(in ULSurfaceDefinition surface)
+		{
+			if (surfaceHandles.Remove(surface, out List<GCHandle>? handles))
+				foreach (GCHandle handle in handles!) handle.Free();
+		}
 
 		/// <summary>
 		/// Free structures passed to methods
@@ -110,9 +124,16 @@ namespace UltralightNet
 		public static void Free()
 		{
 			foreach (List<GCHandle> handles in loggerHandles.Values) foreach (GCHandle handle in handles) if (handle.IsAllocated) handle.Free();
+			foreach (List<GCHandle> handles in clipboardHandles.Values) foreach (GCHandle handle in handles) if (handle.IsAllocated) handle.Free();
 			foreach (List<GCHandle> handles in filesystemHandles.Values) foreach (GCHandle handle in handles) if (handle.IsAllocated) handle.Free();
 			foreach (List<GCHandle> handles in gpudriverHandles.Values) foreach (GCHandle handle in handles) if (handle.IsAllocated) handle.Free();
-			foreach (List<GCHandle> handles in clipboardHandles.Values) foreach (GCHandle handle in handles) if (handle.IsAllocated) handle.Free();
+			foreach (List<GCHandle> handles in surfaceHandles.Values) foreach (GCHandle handle in handles) if (handle.IsAllocated) handle.Free();
+			
+			loggerHandles.Clear();
+			clipboardHandles.Clear();
+			filesystemHandles.Clear();
+			gpudriverHandles.Clear();
+			surfaceHandles.Clear();
 		}
 
 		public static bool SetDefaultLogger { get; set; } = true;
