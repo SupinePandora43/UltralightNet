@@ -5,25 +5,45 @@ on:
   pull_request:
     branches: [ master ]
 jobs:
-  build-and-test:
+  BuildCmake:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: true
+      matrix:
+        os: ['windows-latest', 'ubuntu-latest', 'macos-latest']
+    steps:
+      - run: echo "todo :3"
+  Build:
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
       matrix:
         os : ['windows-latest', 'ubuntu-latest', 'macos-latest']
     steps:
-      - uses: actions/checkout@v2
+      - name: Checkout
+        uses: actions/checkout@v2
       - name: Setup .NET
         uses: actions/setup-dotnet@v1
         with:
           dotnet-version: 6.0.100
       - name: Pack
         run: |
-          dotnet pack UltralightNet.Binaries
-          dotnet pack UltralightNet
-          dotnet pack UltralightNet.AppCore
-          dotnet pack UltralightNet.Resources
-      - run: | # missing libraries workaround
+          dotnet pack src/UltralightNet.Binaries -c Release
+          dotnet pack src/UltralightNet -c Release
+          dotnet pack src/UltralightNet.AppCore -c Release
+          dotnet pack src/UltralightNet.Resources -c Release
+      #- name: Test Application
+      #  run: dotnet run --project UltralightNet.TestApplication
+  Test:
+    needs: Build
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os : ['windows-latest', 'ubuntu-latest', 'macos-latest']
+    steps:
+      - name: Install missing libraries
+        run: | # missing libraries workaround
           sudo add-apt-repository ppa:linuxuprising/libpng12
           sudo apt update
           sudo apt install libpng12-0
@@ -31,13 +51,24 @@ jobs:
           sudo ln -s  /usr/lib/x86_64-linux-gnu/libffi.so.7.1.0  /usr/lib/x86_64-linux-gnu/libffi.so.6
           sudo apt-get install libpulse0
         if: matrix.os=='ubuntu-latest'
-      #- name: Test Application
-      #  run: dotnet run --project UltralightNet.TestApplication
-      - name: Benchmark
-        run: dotnet run -c Release --project Benchmarks/Benchmarks.csproj
+      - name: Pack
+        run: |
+          dotnet pack src/UltralightNet.Binaries -c Release
+          dotnet pack src/UltralightNet -c Release
+          dotnet pack src/UltralightNet.AppCore -c Release
+          dotnet pack src/UltralightNet.Resources -c Release
       - name: Test
-        run: dotnet test UltralightNet.Test/UltralightNet.Test.csproj --collect:"XPlat Code Coverage" -- DataCollectionRunSettings.DataCollectors.DataCollector.Configuration.Format=cobertura,opencover -- DataCollectionRunSettings.DataCollectors.DataCollector.Configuration.UseSourceLink=true
-      - run: |
+        run: dotnet test src/UltralightNet.Test/UltralightNet.Test.csproj --collect:"XPlat Code Coverage" -- DataCollectionRunSettings.DataCollectors.DataCollector.Configuration.Format=cobertura,opencover -- DataCollectionRunSettings.DataCollectors.DataCollector.Configuration.UseSourceLink=true
+      - name: Upload coverage
+        run: |
           curl -s https://codecov.io/bash > codecov
           chmod +x codecov
-          ./codecov -f "UltralightNet.Test/TestResults/*/coverage.opencover.xml"
+          ./codecov -f "src/UltralightNet.Test/TestResults/*/coverage.opencover.xml"
+      - name: Benchmark
+        run: dotnet run -c Release --project src/Benchmarks/Benchmarks.csproj
+        continue-on-error: true
+  Deploy:
+    needs: Test
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo 1
