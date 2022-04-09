@@ -32,16 +32,22 @@ namespace UltralightNet
 		public static partial ULString* ulCreateStringUTF16(ushort* str, nuint len);
 
 		// <summary>Create string from copy of existing string.</summary>
-		[LibraryImport(LibUltralight)]
-		public static partial ULString* ulCreateStringFromCopy(ULString* str);
+		public static ULString* ulCreateStringFromCopy(ULString* str){
+			var ulString = (ULString*) NativeMemory.Alloc((nuint)sizeof(ULString));
+			ulString->data = (byte*) NativeMemory.Alloc(str->length + 1);
+			if(str->length < (nuint)int.MaxValue) new ReadOnlySpan<byte>(str->data, (int)str->length).CopyTo(new Span<byte>(ulString->data, (int)ulString->length));
+			else for(nuint i = 0; i<str->length; i++)ulString->data[i] = str->data[i];
+			ulString->length = str->length;
+			return ulString;
+		}
 
 		/// <summary>Destroy string (you should destroy any strings you explicitly Create).</summary>
 		[LibraryImport(LibUltralight)]
 		public static partial void ulDestroyString(ULString* str);
 
 		/// <summary>Get internal UTF-8 buffer data.</summary>
-		[LibraryImport(LibUltralight, EntryPoint = "ulStringGetData")]
-		public static partial byte* ulStringGetDataPtr(ULString* str);
+		[LibraryImport(LibUltralight)]
+		public static partial byte* ulStringGetData(ULString* str);
 
 		/// <summary>Get length in UTF-8 characters.</summary>
 		[LibraryImport(LibUltralight)]
@@ -128,7 +134,7 @@ namespace UltralightNet
 					written = (nuint)Encoding.UTF8.GetBytes(chars, str.Length, allocatedMemory, (int)byteCount);
 #endif
 				allocatedMemory[written] = 0;
-				// 
+				//
 				// NativeMemory.Realloc(allocatedMemory, written);
 				native = new(allocatedMemory, (nuint)written);
 			}
