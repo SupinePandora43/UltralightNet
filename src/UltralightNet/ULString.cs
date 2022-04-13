@@ -34,8 +34,11 @@ namespace UltralightNet
 		// <summary>Create string from copy of existing string.</summary>
 		public static ULString* ulCreateStringFromCopy(ULString* str)
 		{
-			var ulString = (ULString*)(RuntimeInformation.OSArchitecture is Architecture.Arm ?
+			var ulString = (ULString*)(
+#if NET6_0_OR_GREATER
+				RuntimeInformation.OSArchitecture is Architecture.Arm ?
 				NativeMemory.AlignedAlloc((nuint)sizeof(ULString), (nuint)sizeof(ULString)) : // INTEROPTODO: ARM32
+#endif
 				NativeMemory.Alloc((nuint)sizeof(ULString)));
 			ulString->data = (byte*)NativeMemory.Alloc(str->length + 1);
 			if (str->length < (nuint)int.MaxValue) new ReadOnlySpan<byte>(str->data, (int)str->length).CopyTo(new Span<byte>(ulString->data, (int)ulString->length));
