@@ -34,7 +34,9 @@ namespace UltralightNet
 		// <summary>Create string from copy of existing string.</summary>
 		public static ULString* ulCreateStringFromCopy(ULString* str)
 		{
-			var ulString = (ULString*)NativeMemory.Alloc((nuint)sizeof(ULString));
+			var ulString = (ULString*)(RuntimeInformation.OSArchitecture is Architecture.Arm ?
+				NativeMemory.AlignedAlloc((nuint)sizeof(ULString), (nuint)sizeof(ULString)) : // INTEROPTODO: ARM32
+				NativeMemory.Alloc((nuint)sizeof(ULString)));
 			ulString->data = (byte*)NativeMemory.Alloc(str->length + 1);
 			if (str->length < (nuint)int.MaxValue) new ReadOnlySpan<byte>(str->data, (int)str->length).CopyTo(new Span<byte>(ulString->data, (int)ulString->length));
 			else
@@ -148,7 +150,7 @@ namespace UltralightNet
 			else
 			{
 				// i can optimize it, but i will not, until you ask me to do so.
-				// (do not copy from temp and just use it instead)
+				// (do not copy from temp and just use it instead, or call Encoding.UTF8.GetBytes multiple times)
 				ULString* temp;
 				fixed (char* strPtr = str)
 					temp = Methods.ulCreateStringUTF16((ushort*)strPtr, (nuint)str.Length);
