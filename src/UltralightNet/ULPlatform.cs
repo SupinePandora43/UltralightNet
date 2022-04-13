@@ -123,17 +123,24 @@ namespace UltralightNet
 		/// <remarks/>
 		public static void Free()
 		{
-			foreach (List<GCHandle> handles in loggerHandles.Values) foreach (GCHandle handle in handles) if (handle.IsAllocated) handle.Free();
-			foreach (List<GCHandle> handles in clipboardHandles.Values) foreach (GCHandle handle in handles) if (handle.IsAllocated) handle.Free();
-			foreach (List<GCHandle> handles in filesystemHandles.Values) foreach (GCHandle handle in handles) if (handle.IsAllocated) handle.Free();
-			foreach (List<GCHandle> handles in gpudriverHandles.Values) foreach (GCHandle handle in handles) if (handle.IsAllocated) handle.Free();
-			foreach (List<GCHandle> handles in surfaceHandles.Values) foreach (GCHandle handle in handles) if (handle.IsAllocated) handle.Free();
-			
-			loggerHandles.Clear();
-			clipboardHandles.Clear();
-			filesystemHandles.Clear();
-			gpudriverHandles.Clear();
-			surfaceHandles.Clear();
+			lock (loggerHandles)
+				lock (clipboardHandles)
+					lock (filesystemHandles)
+						lock (gpudriverHandles)
+							lock (surfaceHandles)
+							{
+								foreach (List<GCHandle> handles in loggerHandles.Values) foreach (GCHandle handle in handles) if (handle.IsAllocated) handle.Free();
+								foreach (List<GCHandle> handles in clipboardHandles.Values) foreach (GCHandle handle in handles) if (handle.IsAllocated) handle.Free();
+								foreach (List<GCHandle> handles in filesystemHandles.Values) foreach (GCHandle handle in handles) if (handle.IsAllocated) handle.Free();
+								foreach (List<GCHandle> handles in gpudriverHandles.Values) foreach (GCHandle handle in handles) if (handle.IsAllocated) handle.Free();
+								foreach (List<GCHandle> handles in surfaceHandles.Values) foreach (GCHandle handle in handles) if (handle.IsAllocated) handle.Free();
+
+								loggerHandles.Clear();
+								clipboardHandles.Clear();
+								filesystemHandles.Clear();
+								gpudriverHandles.Clear();
+								surfaceHandles.Clear();
+							}
 		}
 
 		public static bool SetDefaultLogger { get; set; } = true;
