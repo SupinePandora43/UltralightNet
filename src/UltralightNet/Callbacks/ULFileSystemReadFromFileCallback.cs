@@ -1,4 +1,4 @@
-using System;
+using System.IO;
 using System.Runtime.InteropServices;
 
 namespace UltralightNet
@@ -11,6 +11,6 @@ namespace UltralightNet
 	);
 	public delegate long ULFileSystemReadFromFileCallback(
 		nuint handle,
-		Span<byte> data
+		in UnmanagedMemoryStream data
 	);
 }

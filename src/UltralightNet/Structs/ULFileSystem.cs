@@ -1,4 +1,5 @@
 using System;
+using System.IO;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
@@ -36,7 +37,7 @@ namespace UltralightNet
 				var c = _GetFileSize;
 				return c is null ? null : (nuint fileHandle, out long size) =>
 				{
-					fixed(long* sizePtr = &size)
+					fixed (long* sizePtr = &size)
 						return Unsafe.As<byte, bool>(ref Unsafe.AsRef(c(fileHandle, sizePtr)));
 				};
 			}
@@ -69,26 +70,26 @@ namespace UltralightNet
 		}
 		public ULFileSystemOpenFileCallback? OpenFile
 		{
-			set => _OpenFile = value is null ? null : (path, open_for_writing) => value(ULString.NativeToManaged(path), Unsafe.As<byte, bool>(ref Unsafe.AsRef<byte>(open_for_writing)));
+			set => _OpenFile = value is null ? null : (path, open_for_writing) => value(ULString.NativeToManaged(path), Unsafe.As<byte, bool>(ref open_for_writing));
 			get
 			{
 				var c = _OpenFile;
 				return c is null ? null : (in string path, bool openForWriting) =>
 				{
 					using ULStringDisposableStackToNativeMarshaller pathMarshaller = new(path);
-					return c(pathMarshaller.Native, Unsafe.As<bool, byte>(ref Unsafe.AsRef(openForWriting)));
+					return c(pathMarshaller.Native, Unsafe.As<bool, byte>(ref openForWriting));
 				};
 			}
 		}
 		public ULFileSystemReadFromFileCallback? ReadFromFile
 		{
-			set => _ReadFromFile = value is null ? null : (handle, data_native, len) => value(handle, new Span<byte>(data_native, (int)len)); // INTEROPTODO: INT64
+			set => _ReadFromFile = value is null ? null : (handle, data_native, len) => value(handle, new UnmanagedMemoryStream(data_native, len, len, FileAccess.Write));
 			get
 			{
 				var c = _ReadFromFile;
-				return c is null ? null : (handle, data) =>
+				return c is null ? null : (nuint handle, in UnmanagedMemoryStream data) =>
 				{
-					fixed (byte* bytes = data) return c(handle, bytes, data.Length);
+					return c(handle, data.PositionPointer, data.Length);
 				};
 			}
 		}

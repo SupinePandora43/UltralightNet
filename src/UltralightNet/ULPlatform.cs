@@ -307,18 +307,10 @@ namespace UltralightNet
 						size = files[(int)handle].Length;
 						return true;
 					},
-					ReadFromFile = (handle, data) =>
+					ReadFromFile = (nuint handle, in UnmanagedMemoryStream data) =>
 					{
-#if NET5_0_OR_GREATER || NETSTANDARD2_1_OR_GREATER
-						return files[(int)handle].Read(data);
-#else
-							fixed(byte* dataPtr = data)
-							{
-								UnmanagedMemoryStream unmanagedMemoryStream = new(dataPtr, data.Length, data.Length, FileAccess.Write);
-								files[(int)handle].CopyTo(unmanagedMemoryStream);
-							}
-							return files[(int)handle].Length;
-#endif
+						files[(int)handle].CopyTo(data);
+						return files[(int)handle].Length;
 					},
 					CloseFile = (handle) =>
 					{
