@@ -266,15 +266,15 @@ void main()
 
 	static void OnMouseDown(IMouse mouse, MouseButton button)
 	{
-		view.FireMouseEvent(new() { type = ULMouseEventType.MouseDown, button = button is MouseButton.Left ? ULMouseEventButton.Left : (button is MouseButton.Right ? ULMouseEventButton.Right : ULMouseEventButton.Middle), x = (int)mouse.Position.X, y = (int)mouse.Position.Y });
+		view.FireMouseEvent(new() { Type = ULMouseEventType.MouseDown, Button = button is MouseButton.Left ? ULMouseEventButton.Left : (button is MouseButton.Right ? ULMouseEventButton.Right : ULMouseEventButton.Middle), X = (int)mouse.Position.X, Y = (int)mouse.Position.Y });
 	}
 
 	static void OnMouseUp(IMouse mouse, MouseButton button)
 	{
-		view.FireMouseEvent(new() { type = ULMouseEventType.MouseUp, button = button is MouseButton.Left ? ULMouseEventButton.Left : (button is MouseButton.Right ? ULMouseEventButton.Right : ULMouseEventButton.Middle), x = (int)mouse.Position.X, y = (int)mouse.Position.Y });
+		view.FireMouseEvent(new() { Type = ULMouseEventType.MouseUp, Button = button is MouseButton.Left ? ULMouseEventButton.Left : (button is MouseButton.Right ? ULMouseEventButton.Right : ULMouseEventButton.Middle), X = (int)mouse.Position.X, Y = (int)mouse.Position.Y });
 	}
 	static void OnMouseMove(IMouse mouse, Vector2 position)
 	{
-		view.FireMouseEvent(new() { type = ULMouseEventType.MouseMoved, x = (int)position.X, y = (int)position.Y });
+		view.FireMouseEvent(new() { Type = ULMouseEventType.MouseMoved, X = (int)position.X, Y = (int)position.Y });
 	}
 }
