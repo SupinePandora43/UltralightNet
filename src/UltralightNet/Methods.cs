@@ -125,7 +125,6 @@ namespace UltralightNet
 #endif
 	}
 	// INTEROPTODO: CUSTOMTYPEMARSHALLER
-	[SkipLocalsInit]
 	internal unsafe ref struct UTF8Marshaller
 	{
 		public const int BufferSize = 0x100;
