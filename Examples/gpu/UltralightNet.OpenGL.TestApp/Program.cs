@@ -48,6 +48,7 @@ void main()
 	};
 
 	static IWindow window;
+	static ICursor? cursor;
 	static GL gl;
 
 	static uint vao = 0, vbo = 0, ebo = 0;
@@ -68,7 +69,7 @@ void main()
 		window = Window.Create(WindowOptions.Default with
 		{
 			Size = new Vector2D<int>(512, 512),
-			API = new GraphicsAPI(ContextAPI.OpenGL, ContextProfile.Core, 0/*ContextFlags.ForwardCompatible*/, new APIVersion(4,5)),
+			API = new GraphicsAPI(ContextAPI.OpenGL, ContextProfile.Core, 0/*ContextFlags.ForwardCompatible*/, new APIVersion(4, 5)),
 			Samples = 1,
 			FramesPerSecond = 0,
 			UpdatesPerSecond = 0,
@@ -107,6 +108,7 @@ void main()
 		input.Mice[0].MouseDown += OnMouseDown;
 		input.Mice[0].MouseUp += OnMouseUp;
 		input.Mice[0].MouseMove += OnMouseMove;
+		cursor = input.Mice[0].Cursor;
 
 		//Getting the opengl api for drawing to the screen.
 		gl = GL.GetApi(window);
@@ -220,6 +222,19 @@ void main()
 			System.Threading.Thread.Sleep(10);
 		}
 
+		view.OnChangeCursor += (ulcursor) =>
+		{
+			cursor!.StandardCursor = ulcursor switch
+			{
+				ULCursor.Cross => StandardCursor.Crosshair,
+				ULCursor.Hand => StandardCursor.Hand,
+				ULCursor.IBeam => StandardCursor.IBeam,
+				ULCursor.EastWestResize => StandardCursor.HResize,
+				ULCursor.NorthSouthResize => StandardCursor.VResize,
+				_ => StandardCursor.Default
+			};
+		};
+
 		window.SwapBuffers();
 
 		renderer.Render();
@@ -249,7 +264,8 @@ void main()
 			gl.DrawElements(PrimitiveType.Triangles, (uint)IndexBuffer.Length, DrawElementsType.UnsignedInt, null);
 			renderBuffer.dirty = false;
 			window.FramesPerSecond = 0;
-		}else
+		}
+		else
 			// lower fps
 			window.FramesPerSecond = 300;
 	}
