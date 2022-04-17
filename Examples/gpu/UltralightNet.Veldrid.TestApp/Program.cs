@@ -146,7 +146,7 @@ void main()
 			gpuDriver.CommandList = commandList;
 
 			AppCoreMethods.ulEnablePlatformFileSystem("./");
-			ULPlatform.Logger = new ULLogger() { LogMessage = (lvl, msg) => Console.WriteLine(msg) };
+			ULPlatform.Logger = new ULLogger() { LogMessage = (ULLogLevel lvl, in string msg) => Console.WriteLine(msg) };
 			AppCoreMethods.ulEnablePlatformFontLoader();
 			ULPlatform.GPUDriver = gpuDriver.GetGPUDriver();
 
@@ -209,10 +209,10 @@ void main()
 
 				ULMouseEvent mouseEvent = new()
 				{
-					type = ULMouseEventType.MouseMoved,
-					x = x,
-					y = y,
-					button = ULMouseEventButton.None
+					Type = ULMouseEventType.MouseMoved,
+					X = x,
+					Y = y,
+					Button = ULMouseEventButton.None
 				};
 
 				view.FireMouseEvent(mouseEvent);
@@ -234,10 +234,10 @@ void main()
 				}
 				ULMouseEvent mouseEvent = new()
 				{
-					type = ULMouseEventType.MouseDown,
-					x = x,
-					y = y,
-					button = md.MouseButton switch
+					Type = ULMouseEventType.MouseDown,
+					X = x,
+					Y = y,
+					Button = md.MouseButton switch
 					{
 						MouseButton.Left => ULMouseEventButton.Left,
 						MouseButton.Right => ULMouseEventButton.Right,
@@ -253,10 +253,10 @@ void main()
 				Console.WriteLine($"Mouse up {mu.Down} {mu.MouseButton}");
 				ULMouseEvent mouseEvent = new()
 				{
-					type = ULMouseEventType.MouseUp,
-					x = x,
-					y = y,
-					button = mu.MouseButton switch
+					Type = ULMouseEventType.MouseUp,
+					X = x,
+					Y = y,
+					Button = mu.MouseButton switch
 					{
 						MouseButton.Left => ULMouseEventButton.Left,
 						MouseButton.Right => ULMouseEventButton.Right,
