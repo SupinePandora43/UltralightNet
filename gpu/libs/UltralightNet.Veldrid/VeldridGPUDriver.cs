@@ -398,7 +398,7 @@ namespace UltralightNet.Veldrid
 						new ReadOnlySpan<Vector4>(&state.vector_0.W, 8).CopyTo(new Span<Vector4>(&uniforms.Vector_0.W, 8));
 						new ReadOnlySpan<Matrix4x4>(&state.clip_0.M11, 8).CopyTo(new Span<Matrix4x4>(&uniforms.Clip_0.M11, 8));
 						uniforms.ClipSize = (uint)state.clip_size;
-						uniformSpan[commandId++];
+						uniformSpan[commandId++] = uniforms;
 					}
 				}
 
