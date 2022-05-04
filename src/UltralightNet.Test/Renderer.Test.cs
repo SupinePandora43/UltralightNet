@@ -62,8 +62,8 @@ public class RendererTest
 
 
 		//File.WriteAllText("test.html", new StreamReader(response.GetResponseStream()).ReadToEnd(), Encoding.UTF8);
-
-		ULFileSystemGetFileSizeCallback get_file_size = getFileSize;
+		// TODO: adapt new buffer-like api
+		/*ULFileSystemGetFileSizeCallback get_file_size = getFileSize;
 		ULFileSystemGetFileMimeTypeCallback get_file_mime_type = getFileMimeType;
 		ULFileSystemReadFromFileCallback read_from_file = readFromFile;
 		ULPlatform.FileSystem = new ULFileSystem()
@@ -87,7 +87,7 @@ public class RendererTest
 				Console.WriteLine($"close_file({handle})");
 			},
 			ReadFromFile = read_from_file
-		};
+		};*/
 
 		ULConfig config = new();
 
