@@ -15,11 +15,11 @@ jobs:
       - run: echo "todo :3"
   Build:
     needs: BuildCmake
-    runs-on: ${{ matrix.os }}
+    runs-on: ${{ matrix.os }}-latest
     strategy:
       fail-fast: false
       matrix:
-        os : ['windows-latest', 'ubuntu-latest', 'macos-latest']
+        os : ['windows', 'ubuntu', 'macos']
     steps:
       - name: Checkout
         uses: actions/checkout@v2
