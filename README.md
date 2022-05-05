@@ -8,7 +8,7 @@ You can learn more about Ultralight on [Ultralight's official site](https://ultr
 
 * .Net >= `5.0`
 * .Net Framework >= `4.5`
-* .Net Standard >= `2.0`
+* .Net Standard >= `2.0` (Unity isn't tested, see [roadmap](https://github.com/SupinePandora43/UltralightNet/projects/3))
 
 ## Reporting issues
 
