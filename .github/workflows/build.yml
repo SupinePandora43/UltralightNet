@@ -53,7 +53,7 @@ jobs:
           find /usr/lib -name "libffi.so*"
           sudo ln -s  /usr/lib/x86_64-linux-gnu/libffi.so.7.1.0  /usr/lib/x86_64-linux-gnu/libffi.so.6
           sudo apt-get install libpulse0
-        if: matrix.os=='ubuntu-latest'
+        if: matrix.os=='ubuntu'
       - name: Pack
         run: |
           dotnet pack src/UltralightNet.Binaries -c Release
