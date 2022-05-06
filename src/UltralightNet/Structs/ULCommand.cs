@@ -5,14 +5,15 @@ namespace UltralightNet
 	[StructLayout(LayoutKind.Sequential)]
 	public struct ULCommand
 	{
-		public ULCommandType command_type;
-		public ULGPUState gpu_state;
+		private byte _CommandType;
+		public ULCommandType CommandType { get => Unsafe.As<byte, ULCommandType>(ref _CommandType); set => _CommandType = Unsafe.As<ULCommandType, byte>(ref value); }
+		public ULGPUState GPUState;
 
 		/// <remarks>Only used when <see cref="command_type"/> is <see cref="ULCommandType.DrawGeometry"/></remarks>
-		public uint geometry_id;
+		public uint GeometryId;
 		/// <remarks>Only used when <see cref="command_type"/> is <see cref="ULCommandType.DrawGeometry"/></remarks>
-		public uint indices_count;
+		public uint IndicesCount;
 		/// <remarks>Only used when <see cref="command_type"/> is <see cref="ULCommandType.DrawGeometry"/></remarks>
-		public uint indices_offset;
+		public uint IndicesOffset;
 	}
 }

@@ -12,8 +12,8 @@ namespace UltralightNet
 
 		public ULVertexBufferFormat Format
 		{
-			get => (ULVertexBufferFormat)format;
-			set => format = (byte)value;
+			get => Unsafe.As<byte, ULVertexBufferFormat>(ref format);
+			set => format = Unsafe.As<ULVertexBufferFormat, byte>(ref value);
 		}
 	}
 }

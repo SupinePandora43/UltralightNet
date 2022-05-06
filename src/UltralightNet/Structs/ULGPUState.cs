@@ -6,28 +6,28 @@ namespace UltralightNet
 	[StructLayout(LayoutKind.Sequential)]
 	public struct ULGPUState
 	{
-		public uint viewport_width;
+		public uint ViewportWidth;
 
-		public uint viewport_height;
+		public uint ViewportHeight;
 
-		public Matrix4x4 transform;
+		public Matrix4x4 Transform;
 
-		[MarshalAs(UnmanagedType.I1)]
-		public bool enable_texturing;
+		private byte _EnableTexturing;
+		public bool EnableTexturing { get => Unsafe.As<byte, bool>(ref _EnableTexturing); set => _EnableTexturing = Unsafe.As<bool, byte>(ref value); }
 
-		[MarshalAs(UnmanagedType.I1)]
-		public bool enable_blend;
+		private byte _EnableBlend;
+		public bool EnableBlend { get => Unsafe.As<byte, bool>(ref _EnableBlend); set => _EnableBlend = Unsafe.As<bool, byte>(ref value); }
 
-		[MarshalAs(UnmanagedType.U1)]
-		public ULShaderType shader_type;
+		private byte _ShaderType;
+		public ULShaderType ShaderType { get => Unsafe.As<byte, ULShaderType>(ref _ShaderType); set => _ShaderType = Unsafe.As<ULShaderType, byte>(ref value); }
 
-		public uint render_buffer_id;
+		public uint RenderBufferId;
 
-		public uint texture_1_id;
+		public uint Texture1Id;
 
-		public uint texture_2_id;
+		public uint Texture2Id;
 
-		public uint texture_3_id;
+		public uint Texture3Id;
 
 		public float scalar_0;
 		public float scalar_1;
@@ -47,7 +47,7 @@ namespace UltralightNet
 		public Vector4 vector_6;
 		public Vector4 vector_7;
 
-		public byte clip_size;
+		public byte ClipSize;
 
 		public Matrix4x4 clip_0;
 		public Matrix4x4 clip_1;
@@ -58,9 +58,9 @@ namespace UltralightNet
 		public Matrix4x4 clip_6;
 		public Matrix4x4 clip_7;
 
-		[MarshalAs(UnmanagedType.I1)]
-		public bool enable_scissor;
+		private byte _EnableScissor;
+		public bool EnableScissor { get => Unsafe.As<byte, bool>(ref _EnableScissor); set => _EnableScissor = Unsafe.As<bool, byte>(ref value); }
 
-		public ULIntRect scissor_rect;
+		public ULIntRect ScissorRect;
 	}
 }
