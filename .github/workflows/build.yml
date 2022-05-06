@@ -23,14 +23,22 @@ jobs:
         uses: actions/setup-dotnet@v1
         with:
           dotnet-version: 6.0.100
-      - name: Pack
+      - name: Build packages
         run: |
           dotnet pack src/UltralightNet.Binaries -c Release
           dotnet pack src/UltralightNet -c Release
           dotnet pack src/UltralightNet.AppCore -c Release
           dotnet pack src/UltralightNet.Resources -c Release
-      #- name: Test Application
-      #  run: dotnet run --project UltralightNet.TestApplication
+      - run: tree
+      - name: Upload nuget packages artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: nugets
+          path:
+          - *.nupkg
+          - *.snupkg
+          retention-days: 30
+          if-no-files-found: error
   Test:
     needs: Build
     runs-on: ${{ matrix.os }}-latest
@@ -54,12 +62,13 @@ jobs:
           sudo ln -s  /usr/lib/x86_64-linux-gnu/libffi.so.7.1.0  /usr/lib/x86_64-linux-gnu/libffi.so.6
           sudo apt-get install libpulse0
         if: matrix.os=='ubuntu'
-      - name: Pack
-        run: |
-          dotnet pack src/UltralightNet.Binaries -c Release
-          dotnet pack src/UltralightNet -c Release
-          dotnet pack src/UltralightNet.AppCore -c Release
-          dotnet pack src/UltralightNet.Resources -c Release
+      - name: Download packages
+        uses: actions/download-artifact@v3
+        with:
+          name: nugets
+          path: ./
+      - run: tree
+        if: matrix.os=='ubuntu'
       - name: Test
         run: dotnet test src/UltralightNet.Test/UltralightNet.Test.csproj --collect:"XPlat Code Coverage" -- DataCollectionRunSettings.DataCollectors.DataCollector.Configuration.Format=cobertura,opencover -- DataCollectionRunSettings.DataCollectors.DataCollector.Configuration.UseSourceLink=true
         continue-on-error: true
