@@ -34,9 +34,9 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: nugets
-          path:
-          - '*.nupkg'
-          - '*.snupkg'
+          path: |
+            '*.nupkg'
+            '*.snupkg'
           retention-days: 30
           if-no-files-found: error
   Test:
