@@ -35,8 +35,8 @@ jobs:
         with:
           name: nugets
           path: |
-            './**.nupkg'
-            './**.snupkg'
+            './UltralightNet.*.nupkg'
+            './UltralightNet.*.snupkg'
           retention-days: 30
           if-no-files-found: error
   Test:
