@@ -39,6 +39,22 @@ jobs:
             UltralightNet.*.snupkg
           retention-days: 30
           if-no-files-found: error
+  DevBuilds:
+    needs: Build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Add Github Packages to NuGet sources
+        run: dotnet nuget add source --username ${{ github.actor }} --password ${{ github.token }} --store-password-in-clear-text --name github "https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json"
+      - name: Define a version suffix
+        run: echo "version_suffix=dev-$(date -u +%Y%m%d%H%M%S)-$(git rev-parse --short ${{ github.sha }})" >> $GITHUB_ENV
+      - name: Pack
+        run: |
+          dotnet pack src/UltralightNet.Binaries -c Release --version-suffix ${{ env.version_suffix }}
+          dotnet pack src/UltralightNet -c Release --version-suffix ${{ env.version_suffix }}
+          dotnet pack src/UltralightNet.AppCore -c Release --version-suffix ${{ env.version_suffix }}
+          dotnet pack src/UltralightNet.Resources -c Release --version-suffix ${{ env.version_suffix }}
+      - name: Publish
+        run: dotnet nuget push *.nupkg --api-key ${{ github.token }} --source github
   Test:
     needs: Build
     runs-on: ${{ matrix.os }}-latest
