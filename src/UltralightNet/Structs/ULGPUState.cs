@@ -6,7 +6,7 @@ using System.Runtime.InteropServices;
 namespace UltralightNet
 {
 	[StructLayout(LayoutKind.Sequential)]
-	public struct ULGPUState
+	public unsafe struct ULGPUState
 	{
 		public uint ViewportWidth;
 
