@@ -6,9 +6,9 @@ namespace UltralightNet
 	[StructLayout(LayoutKind.Sequential)]
 	public struct ULRenderBuffer
 	{
-		public uint texture_id;
-		public uint width;
-		public uint height;
+		public uint TextureId;
+		public uint Width;
+		public uint Height;
 
 		private byte _HasStencilBuffer;
 		public bool HasStencilBuffer {
