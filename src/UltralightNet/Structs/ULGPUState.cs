@@ -1,3 +1,4 @@
+using System;
 using System.Numerics;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
@@ -57,12 +58,12 @@ namespace UltralightNet
 #if NETCOREAPP2_1_OR_GREATER || NETSTANDARD2_1
 			MemoryMarshal.CreateSpan<Vector4>(ref vector_0, 8);
 #else
-			new Span<Vector4>(Unsafe.AsPointer(ref vector_0);
+			new Span<Vector4>(Unsafe.AsPointer(ref vector_0), 8);
 #endif
 
 		private byte _ClipSize;
 		public byte ClipSize {
-			get => _ClipSize;
+			get => Math.Min(_ClipSize, (byte)8);
 			set {
 				static void Throw(){ throw new ArgumentOutOfRangeException(nameof(value), "ClipSize can't be bigger than 8"); }
 				if(value <= 8) _ClipSize = value;
