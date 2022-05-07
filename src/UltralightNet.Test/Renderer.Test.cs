@@ -230,7 +230,7 @@ public class RendererTest
 		Console.WriteLine("MouseEvent");
 		view.FireMouseEvent(new ULMouseEvent() { Type = ULMouseEventType.MouseDown, X = 100, Y = 100, Button = ULMouseEventButton.Left });
 		Console.WriteLine("ScrollEvent");
-		view.FireScrollEvent(new() { type = ULScrollEventType.ByPage, deltaX = 23, deltaY = 123 });
+		view.FireScrollEvent(new() { Type = ULScrollEventType.ByPage, DeltaX = 23, DeltaY = 123 });
 	}
 
 	private void MemoryTest()
