@@ -4,7 +4,7 @@ using System.Runtime.InteropServices;
 namespace UltralightNet
 {
 	[StructLayout(LayoutKind.Sequential)]
-	public ref struct ULCommand
+	public struct ULCommand
 	{
 		private byte _CommandType;
 		public ULCommandType CommandType { get => Unsafe.As<byte, ULCommandType>(ref _CommandType); set => _CommandType = Unsafe.As<ULCommandType, byte>(ref value); }
