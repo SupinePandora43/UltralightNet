@@ -69,7 +69,7 @@ namespace UltralightNet
 		}
 
 		public JSObject GlobalObject => new(Handle, JavaScriptMethods.JSContextGetGlobalObject(Handle));
-		public JSContextGroup Group => new(JavaScriptMethods.JSContextGetGroup(Handle));
+		public JSContextGroup Group => JSContextGroup.CreateFromPointer(JavaScriptMethods.JSContextGetGroup(Handle));
 		public JSContext GlobalContext => new() { isGlobalContext = true, handle = JavaScriptMethods.JSContextGetGlobalContext(Handle) };
 
 		public JSString Name
