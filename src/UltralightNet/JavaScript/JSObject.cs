@@ -43,7 +43,7 @@ namespace UltralightNet
 		public static extern void* JSObjectMakeRegExp(void* context, nuint argumentCount, void** arguments, void** exception);
 
 		[DllImport("WebCore")]
-		public static extern void* JSObjectMakeDeferredPromise(void* context, void* resolve, void* reject, void** exception);
+		public static extern void* JSObjectMakeDeferredPromise(void* context, void** resolve, void** reject, void** exception);
 
 		[DllImport("WebCore")]
 		public static extern void* JSObjectMakeFunction(void* context, void* name, uint parameterCount, void** parameterNames, void* body, void* sourceURL, int startingLineNumber, void** exception);

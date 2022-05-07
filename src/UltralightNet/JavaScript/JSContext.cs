@@ -56,8 +56,8 @@ namespace UltralightNet
 	{
 		public JSContext() { }
 
-		private void* handle;
-		private bool isGlobalContext = false;
+		internal void* handle;
+		internal bool isGlobalContext = false;
 		private bool isDisposed = false;
 		private bool dispose = true;
 
@@ -106,7 +106,6 @@ namespace UltralightNet
 
 		// INTEROPTODO: TEST
 		public static JSContext CreateGlobalContext(JSObject jsGlobalObject) => new() { isGlobalContext = true, handle = JavaScriptMethods.JSGlobalContextCreate(jsGlobalObject.Handle) };
-		public static JSContext CreateGlobalContextInGroup(JSContextGroup group, void* jsClass) => new() { isGlobalContext = true, handle = JavaScriptMethods.JSGlobalContextCreateInGroup(group.Handle, jsClass) };
 
 		public static JSContext Retain(JSContext context)
 		{

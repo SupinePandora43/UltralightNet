@@ -8,7 +8,7 @@ namespace UltralightNet
 		public JSContextGroup() {
 			handle = JavaScriptMethods.JSContextGroupCreate();
 		}
-		public JSContextGroup(void* handle){
+		private JSContextGroup(void* handle){
 			this.handle = handle;
 		}
 
@@ -18,7 +18,11 @@ namespace UltralightNet
 
 		public void* Handle => handle;
 
+		// public JSContext CreateGlobalContext(JSObject globalObject) => new() { isGlobalContext = true, handle = JavaScriptMethods.JSGlobalContextCreateInGroup(Handle, globalObject) };
+
 		public JSContextGroup Retain() => new(JavaScriptMethods.JSContextGroupRetain(Handle));
+
+		public static JSContextGroup CreateFromPointer(void* ptr) => new(ptr);
 
 		public void Dispose()
 		{
