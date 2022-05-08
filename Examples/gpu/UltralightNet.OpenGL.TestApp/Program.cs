@@ -247,7 +247,7 @@ void main()
 		renderer.Update();
 		renderer.Render();
 
-		var renderBuffer = gpuDriver.renderBuffers[view.RenderTarget.RenderBufferID];
+		var renderBuffer = gpuDriver.renderBuffers[view.RenderTarget.RenderBufferId];
 		var textureEntry = renderBuffer.textureEntry;
 
 		// redraw only when it has changed
@@ -277,7 +277,7 @@ void main()
 
 	static void OnScroll(IMouse _, ScrollWheel scroll)
 	{
-		view.FireScrollEvent(new ULScrollEvent { type = ULScrollEventType.ByPixel, deltaX = (int)scroll.X * 100, deltaY = (int)scroll.Y * 100 });
+		view.FireScrollEvent(new ULScrollEvent { Type = ULScrollEventType.ByPixel, DeltaX = (int)scroll.X * 100, DeltaY = (int)scroll.Y * 100 });
 	}
 
 	static void OnMouseDown(IMouse mouse, MouseButton button)

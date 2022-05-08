@@ -544,7 +544,7 @@ public unsafe partial class VulkanGPUDriver
 	private void CreateRenderBuffer(uint id, ULRenderBuffer renderBuffer)
 	{
 		RenderBufferEntry renderBufferEntry = renderBuffers[(int)id];
-		TextureEntry textureEntry = textures[(int)renderBuffer.texture_id];
+		TextureEntry textureEntry = textures[(int)renderBuffer.TextureId];
 		renderBufferEntry.textureEntry = textureEntry;
 
 		fixed (ImageView* attachmentsPtr = &textureEntry.imageView)
@@ -906,10 +906,10 @@ public unsafe partial class VulkanGPUDriver
 
 		foreach (var command in s)
 		{
-			ULGPUState state = command.gpu_state;
-			RenderBufferEntry renderBufferEntry = renderBuffers[(int)command.gpu_state.render_buffer_id];
+			ULGPUState state = command.GPUState;
+			RenderBufferEntry renderBufferEntry = renderBuffers[(int)command.GPUState.RenderBufferId];
 
-			if (command.command_type is ULCommandType.ClearRenderBuffer)
+			if (command.CommandType is ULCommandType.ClearRenderBuffer)
 			{
 				if (currentRenderBuffer is not uint.MaxValue)
 				{
@@ -930,12 +930,12 @@ public unsafe partial class VulkanGPUDriver
 				PipelineBarrier(commandBuffer, rt.image, ImageLayout.TransferDstOptimal, ImageLayout.ShaderReadOnlyOptimal);
 			}
 
-			if (command.command_type is ULCommandType.DrawGeometry) // TODO: clearrenderbuffer
+			if (command.CommandType is ULCommandType.DrawGeometry) // TODO: clearrenderbuffer
 			{
-				uniforms[uniformBufferId].Transform = state.transform.ApplyProjection(state.viewport_width, state.viewport_height, true);
-				uniforms[uniformBufferId].ClipSize = state.clip_size;
-				new ReadOnlySpan<Vector4>(&state.scalar_0, 10).CopyTo(new Span<Vector4>(&uniforms[uniformBufferId].Scalar4_0.W, 10));
-				new ReadOnlySpan<Matrix4x4>(&state.clip_0.M11, 8).CopyTo(new Span<Matrix4x4>(&uniforms[uniformBufferId].Clip_0.M11, 8));
+				uniforms[uniformBufferId].Transform = state.Transform.ApplyProjection(state.ViewportWidth, state.ViewportHeight, true);
+				uniforms[uniformBufferId].ClipSize = state.ClipSize;
+				state.Scalar.CopyTo(new Span<float>(&uniforms[uniformBufferId].Scalar4_0.W, state.Scalar.Length) );
+				state.Clip.CopyTo(new Span<Matrix4x4>(&uniforms[uniformBufferId].Clip_0.M11, 8));
 
 				RenderPassBeginInfo renderPassBeginInfo = new()
 				{
@@ -945,41 +945,41 @@ public unsafe partial class VulkanGPUDriver
 					RenderArea =
 					{
 						Offset = { X = 0, Y = 0 },
-						Extent = new(state.viewport_width, state.viewport_height),
+						Extent = new(state.ViewportWidth, state.ViewportHeight),
 					},
 					ClearValueCount = 0,
 					PClearValues = null,
 					PNext = null
 				};
-				if (currentRenderBuffer != state.render_buffer_id)
+				if (currentRenderBuffer != state.RenderBufferId)
 				{
 					if (currentRenderBuffer is not uint.MaxValue) vk.CmdEndRenderPass(commandBuffer);
-					currentRenderBuffer = state.render_buffer_id;
+					currentRenderBuffer = state.RenderBufferId;
 					vk.CmdBeginRenderPass(commandBuffer, &renderPassBeginInfo, SubpassContents.Inline);
 				}
 
-				vk.CmdBindPipeline(commandBuffer, PipelineBindPoint.Graphics, state.shader_type is ULShaderType.Fill ? fillPipeline : pathPipeline);
+				vk.CmdBindPipeline(commandBuffer, PipelineBindPoint.Graphics, state.ShaderType is ULShaderType.Fill ? fillPipeline : pathPipeline);
 
-				TextureEntry textureEntry1 = textures[(int)state.texture_1_id];
-				TextureEntry textureEntry2 = textures[(int)state.texture_2_id is 0 ? (int)state.texture_1_id : (int)state.texture_2_id];
+				TextureEntry textureEntry1 = textures[(int)state.Texture1Id];
+				TextureEntry textureEntry2 = textures[(int)state.Texture2Id is 0 ? (int)state.Texture1Id : (int)state.Texture2Id];
 
 				descriptorSets[1] = textureEntry1.descriptorSet;
 				descriptorSets[2] = textureEntry2.descriptorSet;
 
 				uint bufferOffset = (uint)UniformBufferSize * uniformBufferId;
 
-				vk.CmdBindDescriptorSets(commandBuffer, PipelineBindPoint.Graphics, fillPipelineLayout, 0, state.shader_type is ULShaderType.Fill ? 3u : 1u, descriptorSets, 1, &bufferOffset);
+				vk.CmdBindDescriptorSets(commandBuffer, PipelineBindPoint.Graphics, fillPipelineLayout, 0, state.ShaderType is ULShaderType.Fill ? 3u : 1u, descriptorSets, 1, &bufferOffset);
 
-				GeometryEntry geometryEntry = geometries[(int)command.geometry_id];
+				GeometryEntry geometryEntry = geometries[(int)command.GeometryId];
 
 				vk.CmdBindVertexBuffers(commandBuffer, 0, 1, geometryEntry.vertexBuffer, 0);
 				vk.CmdBindIndexBuffer(commandBuffer, geometryEntry.indexBuffer, 0, IndexType.Uint32);
 
-				Viewport viewport = new(0, 0, state.viewport_width, state.viewport_height, 0, 0);
+				Viewport viewport = new(0, 0, state.ViewportWidth, state.ViewportHeight, 0, 0);
 				vk.CmdSetViewport(commandBuffer, 0, 1, &viewport);
-				vk.CmdSetScissor(commandBuffer, 0, 1, state.enable_scissor ? (Rect2D*)&state.scissor_rect : &renderPassBeginInfo.RenderArea);
+				vk.CmdSetScissor(commandBuffer, 0, 1, state.EnableScissor ? (Rect2D*)&state.ScissorRect : &renderPassBeginInfo.RenderArea);
 
-				vk.CmdDrawIndexed(commandBuffer, command.indices_count, 1, command.indices_offset, 0, 0);
+				vk.CmdDrawIndexed(commandBuffer, command.IndicesCount, 1, command.IndicesOffset, 0, 0);
 
 				uniformBufferId++; // TODO reuse?
 			}

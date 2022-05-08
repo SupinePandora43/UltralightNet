@@ -391,7 +391,7 @@ public unsafe partial class OpenGLGPUDriver
 		{
 			var entry = renderBuffers[id];
 
-			entry.textureEntry = textures[renderBuffer.texture_id];
+			entry.textureEntry = textures[renderBuffer.TextureId];
 
 			uint framebuffer;
 			uint multisampledFramebuffer = 0;
@@ -654,8 +654,8 @@ public unsafe partial class OpenGLGPUDriver
 			Check();
 			foreach (var command in commandSpan)
 			{
-				var gpuState = command.gpu_state;
-				var renderBufferEntry = renderBuffers[gpuState.render_buffer_id];
+				var gpuState = command.GPUState;
+				var renderBufferEntry = renderBuffers[gpuState.RenderBufferId];
 				var rtTextureEntry = renderBufferEntry.textureEntry;
 
 				var framebufferToUse = rtTextureEntry.multisampledFramebuffer is not 0 ? rtTextureEntry.multisampledFramebuffer : rtTextureEntry.framebuffer;
@@ -666,29 +666,29 @@ public unsafe partial class OpenGLGPUDriver
 					renderBufferEntry.dirty = true;
 					if (rtTextureEntry.multisampledFramebuffer != rtTextureEntry.framebuffer) rtTextureEntry.needsConversion = true;
 				}
-				if (command.command_type is ULCommandType.DrawGeometry)
+				if (command.CommandType is ULCommandType.DrawGeometry)
 				{
-					if (glViewportWidth != gpuState.viewport_width || glViewportHeight != gpuState.viewport_height) // Set viewport
+					if (glViewportWidth != gpuState.ViewportWidth || glViewportHeight != gpuState.ViewportHeight) // Set viewport
 					{
-						gl.Viewport(0, 0, gpuState.viewport_width, gpuState.viewport_height);
-						glViewportWidth = gpuState.viewport_width;
-						glViewportHeight = gpuState.viewport_height;
+						gl.Viewport(0, 0, gpuState.ViewportWidth, gpuState.ViewportHeight);
+						glViewportWidth = gpuState.ViewportWidth;
+						glViewportHeight = gpuState.ViewportHeight;
 					}
 					uint program;
-					if (gpuState.shader_type is ULShaderType.FillPath) program = pathProgram;
+					if (gpuState.ShaderType is ULShaderType.FillPath) program = pathProgram;
 					else program = fillProgram;
 					if (glProgram != program) gl.UseProgram(program);
 
-					var geometryEntry = geometries[command.geometry_id];
+					var geometryEntry = geometries[command.GeometryId];
 
 					#region Uniforms
-					uniforms.State.X = gpuState.viewport_width;
-					uniforms.State.Y = gpuState.viewport_height;
-					uniforms.Transform = gpuState.transform.ApplyProjection(gpuState.viewport_width, gpuState.viewport_height, true);
-					new ReadOnlySpan<Vector4>(&gpuState.scalar_0, 2).CopyTo(new Span<Vector4>(&uniforms.Scalar4_0.W, 2));
-					new ReadOnlySpan<Vector4>(&gpuState.vector_0.W, 8).CopyTo(new Span<Vector4>(&uniforms.Vector_0.W, 8));
-					new ReadOnlySpan<Matrix4x4>(&gpuState.clip_0.M11, 8).CopyTo(new Span<Matrix4x4>(&uniforms.Clip_0.M11, 8));
-					uniforms.ClipSize = (uint)gpuState.clip_size;
+					uniforms.State.X = gpuState.ViewportWidth;
+					uniforms.State.Y = gpuState.ViewportHeight;
+					uniforms.Transform = gpuState.Transform.ApplyProjection(gpuState.ViewportWidth, gpuState.ViewportHeight, true);
+					gpuState.Scalar.CopyTo(new Span<float>(&uniforms.Scalar4_0.W, 8));
+					gpuState.Vector.CopyTo(new Span<Vector4>(&uniforms.Vector_0, 8));
+					gpuState.Clip.CopyTo(new Span<Matrix4x4>(&uniforms.Clip_0.M11, 8));
+					uniforms.ClipSize = (uint)gpuState.ClipSize;
 
 					if (DSA)
 						gl.NamedBufferData(UBO, 768, &uniforms, GLEnum.DynamicDraw);
@@ -698,11 +698,11 @@ public unsafe partial class OpenGLGPUDriver
 
 					gl.BindVertexArray(geometryEntry.vao);
 
-					if (gpuState.shader_type is ULShaderType.Fill)
+					if (gpuState.ShaderType is ULShaderType.Fill)
 					{
-						if (textures.ContainsKey(gpuState.texture_1_id))
+						if (textures.ContainsKey(gpuState.Texture2Id))
 						{
-							TextureEntry textureEntry = textures[gpuState.texture_1_id];
+							TextureEntry textureEntry = textures[gpuState.Texture2Id];
 							if (DSA)
 							{
 								if (textureEntry.needsConversion)
@@ -721,9 +721,9 @@ public unsafe partial class OpenGLGPUDriver
 								gl.BindTexture(GLEnum.Texture2D, textureEntry.textureId);
 							}
 						}
-						if (textures.ContainsKey(gpuState.texture_2_id))
+						if (textures.ContainsKey(gpuState.Texture2Id))
 						{
-							TextureEntry textureEntry = textures[gpuState.texture_2_id];
+							TextureEntry textureEntry = textures[gpuState.Texture2Id];
 							if (DSA)
 							{
 								if (textureEntry.needsConversion)
@@ -744,18 +744,18 @@ public unsafe partial class OpenGLGPUDriver
 						}
 					}
 
-					if (gpuState.enable_scissor)
+					if (gpuState.EnableScissor)
 					{
 						gl.Enable(EnableCap.ScissorTest);
-						gl.Scissor(gpuState.scissor_rect.left, gpuState.scissor_rect.top, (uint)(gpuState.scissor_rect.right - gpuState.scissor_rect.left), (uint)(gpuState.scissor_rect.bottom - gpuState.scissor_rect.top));
+						gl.Scissor(gpuState.ScissorRect.Left, gpuState.ScissorRect.Top, (uint)(gpuState.ScissorRect.Right - gpuState.ScissorRect.Left), (uint)(gpuState.ScissorRect.Bottom - gpuState.ScissorRect.Top));
 					}
 					else gl.Disable(EnableCap.ScissorTest);
 
-					if (gpuState.enable_blend) gl.Enable(EnableCap.Blend);
+					if (gpuState.EnableBlend) gl.Enable(EnableCap.Blend);
 					else gl.Disable(EnableCap.Blend);
-					gl.DrawElements(PrimitiveType.Triangles, command.indices_count, DrawElementsType.UnsignedInt, (void*)(command.indices_offset * sizeof(uint)));
+					gl.DrawElements(PrimitiveType.Triangles, command.IndicesCount, DrawElementsType.UnsignedInt, (void*)(command.IndicesOffset * sizeof(uint)));
 				}
-				else if (command.command_type is ULCommandType.ClearRenderBuffer)
+				else if (command.CommandType is ULCommandType.ClearRenderBuffer)
 				{
 					gl.Disable(GLEnum.ScissorTest);
 					gl.ClearColor(0, 0, 0, 0);

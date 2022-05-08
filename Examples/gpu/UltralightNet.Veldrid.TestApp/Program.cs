@@ -181,7 +181,7 @@ void main()
 			}
 			finally { }*/
 
-			view.HTML = "<html><body><p>123</p></body></html>";
+			//view.HTML = "<html><body><p>123</p></body></html>";
 
 			//view.HTML = htmlText;
 			//cpuView.HTML = htmlText;
@@ -271,8 +271,8 @@ void main()
 			{
 				ULScrollEvent scrollEvent = new()
 				{
-					type = ULScrollEventType.ByPixel,
-					deltaY = (int)mw.WheelDelta * 100
+					Type = ULScrollEventType.ByPixel,
+					DeltaY = (int)mw.WheelDelta * 100
 				};
 				view.FireScrollEvent(scrollEvent);
 				//cpuView.FireScrollEvent(scrollEvent);
@@ -321,7 +321,7 @@ void main()
 			{
 				Console.WriteLine("Dom is ready");
 
-				// view.EvaluateScript("window.location = \"https://heeeeeeeey.com/\"", out string exception);
+				//view.EvaluateScript("window.location = \"https://heeeeeeeey.com/\"", out string exception);
 			});
 
 			IntPtr rendererPtr = renderer.Ptr;

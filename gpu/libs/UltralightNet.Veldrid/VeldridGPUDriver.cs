@@ -13,6 +13,7 @@ namespace UltralightNet.Veldrid
 	{
 		private readonly GraphicsDevice graphicsDevice;
 		private readonly ResourceLayout textureResourceLayout;
+		private ResourceLayout uniformsResourceLayout;
 
 		public bool GenerateMipMaps = false;
 		public uint MipLevels = 1;
@@ -341,7 +342,7 @@ namespace UltralightNet.Veldrid
 			Console.WriteLine($"CreateRenderBuffer({render_buffer_id})");
 #endif
 			RenderBufferEntry entry = RenderBufferEntries[render_buffer_id];
-			TextureEntry textureEntry = TextureEntries[buffer.texture_id];
+			TextureEntry textureEntry = TextureEntries[buffer.TextureId];
 
 			entry.textureEntry = textureEntry;
 
@@ -372,10 +373,11 @@ namespace UltralightNet.Veldrid
 		{
 			if(list.size is 0) return;
 
-			uint commandId = 0;
+			int commandId = 0;
 
 			if(IsVulkan){
-				if(uniformBuffer is null || uniformResourceSet is null || UniformBufferCommandLength < list.size)){
+				if(uniformBuffer is null || uniformResourceSet is null || UniformBufferCommandLength < list.size){
+
 					if(uniformBuffer is not null) uniformBuffer.Dispose();
 					uniformBuffer = graphicsDevice.ResourceFactory.CreateBuffer(new BufferDescription((uint)768 * list.size, BufferUsage.UniformBuffer));
 					UniformBufferCommandLength = list.size;
@@ -388,22 +390,25 @@ namespace UltralightNet.Veldrid
 
 				Span<Uniforms> uniformSpan = FakeMappedUniformBuffer; // implicit conversion :)
 
-				foreach(ULCommand command in list.ToSpan()){
-					if(command.command_type is ULCommandType.DrawGeometry){
+				foreach(ULCommand command in list.ToSpan())
+				{
+
+					ULGPUState state = command.GPUState;
+					if (command.CommandType is ULCommandType.DrawGeometry){
 						Unsafe.SkipInit(out Uniforms uniforms);
-						uniforms.State.X = state.viewport_width;
-						uniforms.State.Y = state.viewport_height;
-						uniforms.Transform = state.transform.ApplyProjection(state.viewport_width, state.viewport_height, true);
-						new ReadOnlySpan<Vector4>(&state.scalar_0, 2).CopyTo(new Span<Vector4>(&uniforms.Scalar4_0.W, 2));
-						new ReadOnlySpan<Vector4>(&state.vector_0.W, 8).CopyTo(new Span<Vector4>(&uniforms.Vector_0.W, 8));
-						new ReadOnlySpan<Matrix4x4>(&state.clip_0.M11, 8).CopyTo(new Span<Matrix4x4>(&uniforms.Clip_0.M11, 8));
-						uniforms.ClipSize = (uint)state.clip_size;
+						uniforms.State.X = state.ViewportWidth;
+						uniforms.State.Y = state.ViewportHeight;
+						uniforms.Transform = state.Transform.ApplyProjection(state.ViewportWidth, state.ViewportHeight, true);
+						state.Scalar.CopyTo(new Span<float>( &uniforms.Scalar4_0, state.Scalar.Length));
+						state.Vector.CopyTo(new Span<Vector4>(&uniforms.Vector_0.W, 8));
+						state.Clip.CopyTo(new Span<Matrix4x4>(&uniforms.Clip_0, 8));
+						uniforms.ClipSize = (uint)state.ClipSize;
 						uniformSpan[commandId++] = uniforms;
 					}
 				}
 
 				fixed(Uniforms* uniformPtr = uniformSpan){
-					CommandList.UpdateBuffer(uniformBuffer, 0, (IntPtr) uniformPtr, (uint)768 * commandId);
+					CommandList.UpdateBuffer(uniformBuffer, 0, (IntPtr) uniformPtr, (uint)((uint)768 * commandId) );
 				}
 				
 				commandId = 0;
@@ -411,52 +416,52 @@ namespace UltralightNet.Veldrid
 
 			foreach (ULCommand command in list.ToSpan())
 			{
-				RenderBufferEntry renderBufferEntry = RenderBufferEntries[command.gpu_state.render_buffer_id];
+				RenderBufferEntry renderBufferEntry = RenderBufferEntries[command.GPUState.RenderBufferId];
 
 				CommandList.SetFramebuffer(renderBufferEntry.framebuffer);
 
-				if (command.command_type is ULCommandType.ClearRenderBuffer)
+				if (command.CommandType is ULCommandType.ClearRenderBuffer)
 				{
 					CommandList.SetFullScissorRect(0);
 					CommandList.ClearColorTarget(0, RgbaFloat.Clear);
 				}
 				else
 				{
-					ULGPUState state = command.gpu_state;
+					ULGPUState state = command.GPUState;
 
-					if (state.shader_type is ULShaderType.Fill)
+					if (state.ShaderType is ULShaderType.Fill)
 					{
-						if (state.enable_scissor)
+						if (state.EnableScissor)
 						{
-							if (state.enable_blend)
+							if (state.EnableBlend)
 								CommandList.SetPipeline(ul_scissor_blend);
 							else
 								CommandList.SetPipeline(ul_scissor);
-							CommandList.SetScissorRect(0, (uint)state.scissor_rect.left, (uint)state.scissor_rect.top, (uint)(state.scissor_rect.right - state.scissor_rect.left), (uint)(state.scissor_rect.bottom - state.scissor_rect.top));
+							CommandList.SetScissorRect(0, (uint)state.ScissorRect.Left, (uint)state.ScissorRect.Top, (uint)(state.ScissorRect.Right - state.ScissorRect.Left), (uint)(state.ScissorRect.Bottom - state.ScissorRect.Top));
 						}
 						else
 						{
-							if (state.enable_blend)
+							if (state.EnableBlend)
 								CommandList.SetPipeline(ul_blend);
 							else
 								CommandList.SetPipeline(ul);
 						}
-						CommandList.SetGraphicsResourceSet(1, TextureEntries[state.texture_1_id].resourceSet);
-						CommandList.SetGraphicsResourceSet(2, TextureEntries[state.texture_2_id].resourceSet);
+						CommandList.SetGraphicsResourceSet(1, TextureEntries[state.Texture1Id].resourceSet);
+						CommandList.SetGraphicsResourceSet(2, TextureEntries[state.Texture2Id].resourceSet);
 					}
 					else
 					{
-						if (state.enable_scissor)
+						if (state.EnableScissor)
 						{
-							if (state.enable_blend)
+							if (state.EnableBlend)
 								CommandList.SetPipeline(ulPath_scissor_blend);
 							else
 								CommandList.SetPipeline(ulPath_scissor);
-							CommandList.SetScissorRect(0, (uint)state.scissor_rect.left, (uint)state.scissor_rect.top, (uint)(state.scissor_rect.right - state.scissor_rect.left), (uint)(state.scissor_rect.bottom - state.scissor_rect.top));
+							CommandList.SetScissorRect(0, (uint)state.ScissorRect.Left, (uint)state.ScissorRect.Top, (uint)(state.ScissorRect.Right - state.ScissorRect.Left), (uint)(state.ScissorRect.Bottom - state.ScissorRect.Top));
 						}
 						else
 						{
-							if (state.enable_blend)
+							if (state.EnableBlend)
 								CommandList.SetPipeline(ulPath_blend);
 							else
 								CommandList.SetPipeline(ulPath);
@@ -465,35 +470,35 @@ namespace UltralightNet.Veldrid
 
 					#region Uniforms
 					if(IsVulkan){
-						uint offset = (uint) 768 * commandId++;
+						uint offset = (uint) (768 * commandId++);
 						CommandList.SetGraphicsResourceSet(0, uniformResourceSet, 1, ref offset); // dynamic offset my beloved
 					} else {
 						Unsafe.SkipInit(out Uniforms uniforms);
 
-						uniforms.State.X = state.viewport_width;
-						uniforms.State.Y = state.viewport_height;
-						uniforms.Transform = state.transform.ApplyProjection(state.viewport_width, state.viewport_height, true);
-						new ReadOnlySpan<Vector4>(&state.scalar_0, 2).CopyTo(new Span<Vector4>(&uniforms.Scalar4_0.W, 2));
-						new ReadOnlySpan<Vector4>(&state.vector_0.W, 8).CopyTo(new Span<Vector4>(&uniforms.Vector_0.W, 8));
-						new ReadOnlySpan<Matrix4x4>(&state.clip_0.M11, 8).CopyTo(new Span<Matrix4x4>(&uniforms.Clip_0.M11, 8));
-						uniforms.ClipSize = (uint)state.clip_size;
+						uniforms.State.X = state.ViewportWidth;
+						uniforms.State.Y = state.ViewportHeight;
+						uniforms.Transform = state.Transform.ApplyProjection(state.ViewportWidth, state.ViewportHeight, true);
+						state.Scalar.CopyTo(new Span<float>(&uniforms.Scalar4_0.W, 8));
+						state.Vector.CopyTo(new Span<Vector4>(&uniforms.Vector_0.W, 8));
+						state.Clip.CopyTo(new Span<Matrix4x4>(&uniforms.Clip_0.M11, 8));
+						uniforms.ClipSize = (uint)state.ClipSize;
 						CommandList.UpdateBuffer(uniformBuffer, 0, ref uniforms);
 
 						CommandList.SetGraphicsResourceSet(0, uniformResourceSet);
 					}
 					#endregion Uniforms
 
-					CommandList.SetViewport(0, new Viewport(0f, 0f, state.viewport_width, state.viewport_height, 0f, 1f));
+					CommandList.SetViewport(0, new Viewport(0f, 0f, state.ViewportWidth, state.ViewportHeight, 0f, 1f));
 
-					GeometryEntry geometryEntry = GeometryEntries[command.geometry_id];
+					GeometryEntry geometryEntry = GeometryEntries[command.GeometryId];
 
 					CommandList.SetVertexBuffer(0, geometryEntry.vertices);
 					CommandList.SetIndexBuffer(geometryEntry.indicies, IndexFormat.UInt32);
 
 					CommandList.DrawIndexed(
-						command.indices_count,
+						command.IndicesCount,
 						1,
-						command.indices_offset,
+						command.IndicesOffset,
 						0,
 						0
 					);
@@ -712,7 +717,7 @@ namespace UltralightNet.Veldrid
 		{
 			ShaderSetDescription fillShaderSetDescription = FillShaderSetDescription();
 
-			ResourceLayout uniformsResourceLayout = graphicsDevice.ResourceFactory.CreateResourceLayout(
+			uniformsResourceLayout = graphicsDevice.ResourceFactory.CreateResourceLayout(
 				new ResourceLayoutDescription(
 					new ResourceLayoutElementDescription(
 						"Uniforms",
