@@ -33,11 +33,13 @@ namespace UltralightNet.AppCore.TestApp
 
 			view.HTML = "<html><body><p>123</p></body></html>";
 			//view.URL = "https://vk.com/supinepandora43";
-			//overlay1.View.URL = "https://youtube.com";
+			//view.URL = "https://youtube.com";
 			//view.URL = "https://twitter.com/@supinepandora43";
 			while(!l) {app.Renderer.Update();Thread.Sleep(20);}
 
 			app.Run();
+
+	
 		}
 	}
 }

@@ -700,9 +700,9 @@ public unsafe partial class OpenGLGPUDriver
 
 					if (gpuState.ShaderType is ULShaderType.Fill)
 					{
-						if (textures.ContainsKey(gpuState.Texture2Id))
+						if (textures.ContainsKey(gpuState.Texture1Id))
 						{
-							TextureEntry textureEntry = textures[gpuState.Texture2Id];
+							TextureEntry textureEntry = textures[gpuState.Texture1Id];
 							if (DSA)
 							{
 								if (textureEntry.needsConversion)

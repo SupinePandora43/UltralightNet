@@ -373,7 +373,7 @@ namespace UltralightNet.Veldrid
 		{
 			if(list.size is 0) return;
 
-			int commandId = 0;
+			uint commandId = 0;
 
 			if(IsVulkan){
 				if(uniformBuffer is null || uniformResourceSet is null || UniformBufferCommandLength < list.size){
@@ -387,33 +387,9 @@ namespace UltralightNet.Veldrid
 					
 					FakeMappedUniformBuffer = new Uniforms[list.size]; // TODO: use GC.AllocateUninitializedArray, if it improves performance
 				}
-
-				Span<Uniforms> uniformSpan = FakeMappedUniformBuffer; // implicit conversion :)
-
-				foreach(ULCommand command in list.ToSpan())
-				{
-
-					ULGPUState state = command.GPUState;
-					if (command.CommandType is ULCommandType.DrawGeometry){
-						Unsafe.SkipInit(out Uniforms uniforms);
-						uniforms.State.X = state.ViewportWidth;
-						uniforms.State.Y = state.ViewportHeight;
-						uniforms.Transform = state.Transform.ApplyProjection(state.ViewportWidth, state.ViewportHeight, true);
-						state.Scalar.CopyTo(new Span<float>( &uniforms.Scalar4_0, state.Scalar.Length));
-						state.Vector.CopyTo(new Span<Vector4>(&uniforms.Vector_0.W, 8));
-						state.Clip.CopyTo(new Span<Matrix4x4>(&uniforms.Clip_0, 8));
-						uniforms.ClipSize = (uint)state.ClipSize;
-						uniformSpan[commandId++] = uniforms;
-					}
-				}
-
-				fixed(Uniforms* uniformPtr = uniformSpan){
-					CommandList.UpdateBuffer(uniformBuffer, 0, (IntPtr) uniformPtr, (uint)((uint)768 * commandId) );
-				}
-				
-				commandId = 0;
 			}
 
+			Span<Uniforms> uniformSpan = FakeMappedUniformBuffer; // implicit conversion :)
 			foreach (ULCommand command in list.ToSpan())
 			{
 				RenderBufferEntry renderBufferEntry = RenderBufferEntries[command.GPUState.RenderBufferId];
@@ -449,6 +425,20 @@ namespace UltralightNet.Veldrid
 						CommandList.SetGraphicsResourceSet(1, TextureEntries[state.Texture1Id].resourceSet);
 						CommandList.SetGraphicsResourceSet(2, TextureEntries[state.Texture2Id].resourceSet);
 					}
+					else if ( command.CommandType is ULCommandType.DrawGeometry )
+					{
+						Unsafe.SkipInit( out Uniforms uniforms );
+						uniforms.State.X = state.ViewportWidth;
+						uniforms.State.Y = state.ViewportHeight;
+						uniforms.Transform = state.Transform.ApplyProjection( state.ViewportWidth, state.ViewportHeight, true );
+						state.Scalar.CopyTo( new Span<float>( &uniforms.Scalar4_0, state.Scalar.Length ) );
+						state.Vector.CopyTo( new Span<Vector4>( &uniforms.Vector_0.W, 8 ) );
+						state.Clip.CopyTo( new Span<Matrix4x4>( &uniforms.Clip_0, 8 ) );
+						uniforms.ClipSize = (uint)state.ClipSize;
+
+
+						uniformSpan[(int)commandId++] = uniforms;
+					}
 					else
 					{
 						if (state.EnableScissor)
@@ -466,10 +456,10 @@ namespace UltralightNet.Veldrid
 							else
 								CommandList.SetPipeline(ulPath);
 						}
-					}
+					};
 
 					#region Uniforms
-					if(IsVulkan){
+					if (IsVulkan){
 						uint offset = (uint) (768 * commandId++);
 						CommandList.SetGraphicsResourceSet(0, uniformResourceSet, 1, ref offset); // dynamic offset my beloved
 					} else {
@@ -504,6 +494,11 @@ namespace UltralightNet.Veldrid
 					);
 				}
 			}
+			fixed ( Uniforms* uniformPtr = uniformSpan )
+			{
+				CommandList.UpdateBuffer( uniformBuffer, 0, (IntPtr)uniformPtr, 768u * commandId );
+			}
+			commandId = 0;
 		}
 
 		/// <remarks>will throw exception when view doesn't have RenderTarget</remarks>

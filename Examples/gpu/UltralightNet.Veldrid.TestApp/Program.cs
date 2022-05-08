@@ -18,7 +18,7 @@ namespace UltralightNet.Veldrid.TestApp
 {
 	class Program
 	{
-		private const GraphicsBackend BACKEND = GraphicsBackend.OpenGL;
+		private const GraphicsBackend BACKEND = GraphicsBackend.Vulkan;
 		private const bool TRANSPARENT = false;
 
 		private const uint Width = 1024;
@@ -163,11 +163,14 @@ void main()
 				IsAccelerated = true,
 				IsTransparent = false,
 			});
+
 			//View cpuView = new(renderer, Width, Height, TRANSPARENT, Session.DefaultSession(renderer), true);
 
 			const string url = /*"https://en.key-test.ru/";*/"https://github.com/SupinePandora43";
 
-			view.URL = url;
+			//view.URL = url;
+
+			view.HTML = "<html><body><p>123</p></body></html>";
 			//cpuView.URL = url;
 
 			/*try

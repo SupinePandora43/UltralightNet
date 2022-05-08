@@ -205,12 +205,13 @@ void main()
 
 		ULPlatform.GPUDriver = gpuDriver.GetGPUDriver();
 
-		renderer = ULPlatform.CreateRenderer(new ULConfig { FaceWinding = ULFaceWinding.Clockwise, ForceRepaint = false });
+		renderer = ULPlatform.CreateRenderer(new ULConfig { FaceWinding = ULFaceWinding.Clockwise, ForceRepaint = true });
 
 		view = renderer.CreateView(512, 512, new ULViewConfig { IsAccelerated = true, IsTransparent = false });
+		
 		//view.URL = "https://vk.com/supinepandora43";
-		//view.URL = "https://twitter.com/@supinepandora43";
-		view.URL = "https://youtube.com";
+		view.URL = "https://twitter.com/@supinepandora43";
+		//view.URL = "https://youtube.com";
 		//view.HTML = "<html><body><p>123</p></body></html>";
 		bool loaded = false;
 
