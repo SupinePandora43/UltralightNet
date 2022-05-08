@@ -434,9 +434,7 @@ namespace UltralightNet.Veldrid
 						state.Scalar.CopyTo( new Span<float>( &uniforms.Scalar4_0, state.Scalar.Length ) );
 						state.Vector.CopyTo( new Span<Vector4>( &uniforms.Vector_0.W, 8 ) );
 						state.Clip.CopyTo( new Span<Matrix4x4>( &uniforms.Clip_0, 8 ) );
-						uniforms.ClipSize = (uint)state.ClipSize;
-
-
+						uniforms.ClipSize = state.ClipSize;
 						uniformSpan[(int)commandId++] = uniforms;
 					}
 					else
