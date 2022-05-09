@@ -259,7 +259,7 @@ namespace UltralightNet
 				List<Stream> files = new();
 				Stack<nuint> freeFileIds = new();
 
-				FileSystem = new()
+				/*FileSystem = new()
 				{
 					FileExists = (in string file) =>
 					{
@@ -319,7 +319,7 @@ namespace UltralightNet
 						files[(int)handle] = null!;
 						freeFileIds.Push(handle);
 					}
-				};
+				};*/
 			}
 			else
 			{
