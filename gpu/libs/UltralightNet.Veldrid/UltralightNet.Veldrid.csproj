@@ -20,7 +20,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<PackageReference Include="Veldrid" Version="4.9.0-ga769c2971c" />
+		<PackageReference Include="Veldrid" Version="4.9.0-beta1" />
 		<PackageReference Include="Veldrid.SPIRV" Version="1.0.14" />
 	</ItemGroup>
 
