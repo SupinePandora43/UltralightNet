@@ -71,10 +71,10 @@ void main()
 		{
 			Size = new Vector2D<int>(512, 512),
 			API = new GraphicsAPI(ContextAPI.OpenGL, ContextProfile.Core, 0/*ContextFlags.ForwardCompatible*/, new APIVersion(4, 5)),
-			Samples = 1,
-			FramesPerSecond = 60,
-			UpdatesPerSecond = 60,
-			VSync = true
+			Samples = -1,
+			FramesPerSecond = 120,
+			UpdatesPerSecond = 240,
+			VSync = false
 		});
 
 		window.Load += OnLoad;
@@ -213,7 +213,7 @@ void main()
 
 		ULPlatform.GPUDriver = gpuDriver.GetGPUDriver();
 
-		renderer = ULPlatform.CreateRenderer(new ULConfig { FaceWinding = ULFaceWinding.Clockwise, ForceRepaint = true, MaxUpdateTime = (double)1/(double)(60+10) });
+		renderer = ULPlatform.CreateRenderer(new ULConfig { FaceWinding = ULFaceWinding.Clockwise, ForceRepaint = false,MaxUpdateTime = (double)1/(double)120 });
 
 		view = renderer.CreateView(512, 512, new ULViewConfig { IsAccelerated = true, IsTransparent = false });
 
@@ -253,10 +253,8 @@ void main()
 
 	static unsafe void OnRender(double obj)
 	{
-		renderer.Update();
 		renderer.Render();
-
-		var renderBuffer = gpuDriver.renderBuffers[view.RenderTarget.RenderBufferId];
+		var renderBuffer = gpuDriver.renderBuffers[(int)view.RenderTarget.RenderBufferId];
 		var textureEntry = renderBuffer.textureEntry;
 
 		// redraw only when it has changed
@@ -289,7 +287,7 @@ void main()
 
 	static void OnUpdate(double obj)
 	{
-		//renderer.Update();
+		renderer.Update();
 	}
 
 	static void OnScroll(IMouse _, ScrollWheel scroll)
