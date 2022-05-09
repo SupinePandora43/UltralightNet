@@ -678,6 +678,7 @@ public unsafe partial class OpenGLGPUDriver
 					if (gpuState.ShaderType is ULShaderType.FillPath) program = pathProgram;
 					else program = fillProgram;
 					if (glProgram != program) gl.UseProgram(program);
+					glProgram = program;
 
 					var geometryEntry = geometries[command.GeometryId];
 
@@ -698,6 +699,8 @@ public unsafe partial class OpenGLGPUDriver
 
 					gl.BindVertexArray(geometryEntry.vao);
 
+					bool rebindFramebuffer = false;
+
 					if (gpuState.ShaderType is ULShaderType.Fill)
 					{
 						if (textures.ContainsKey(gpuState.Texture1Id))
@@ -705,8 +708,18 @@ public unsafe partial class OpenGLGPUDriver
 							TextureEntry textureEntry = textures[gpuState.Texture1Id];
 							if (DSA)
 							{
+								#if false
 								if (textureEntry.needsConversion)
 									gl.BlitNamedFramebuffer(textureEntry.multisampledFramebuffer, textureEntry.framebuffer, 0, 0, (int)textureEntry.width, (int)textureEntry.height, 0, 0, (int)textureEntry.width, (int)textureEntry.height, ClearBufferMask.ColorBufferBit, BlitFramebufferFilter.Linear);
+								#else
+								if (textureEntry.needsConversion)
+								{
+									gl.BindFramebuffer(FramebufferTarget.ReadFramebuffer, textureEntry.multisampledFramebuffer);
+									gl.BindFramebuffer(FramebufferTarget.DrawFramebuffer, textureEntry.framebuffer);
+									gl.BlitFramebuffer(0, 0, (int)textureEntry.width, (int)textureEntry.height, 0, 0, (int)textureEntry.width, (int)textureEntry.height, ClearBufferMask.ColorBufferBit, BlitFramebufferFilter.Linear);
+									rebindFramebuffer = true;
+								}
+								#endif
 								gl.BindTextureUnit(0, textureEntry.textureId);
 							}
 							else
@@ -716,6 +729,7 @@ public unsafe partial class OpenGLGPUDriver
 									gl.BindFramebuffer(FramebufferTarget.ReadFramebuffer, textureEntry.multisampledFramebuffer);
 									gl.BindFramebuffer(FramebufferTarget.DrawFramebuffer, textureEntry.framebuffer);
 									gl.BlitFramebuffer(0, 0, (int)textureEntry.width, (int)textureEntry.height, 0, 0, (int)textureEntry.width, (int)textureEntry.height, ClearBufferMask.ColorBufferBit, BlitFramebufferFilter.Linear);
+									rebindFramebuffer = true;
 								}
 								gl.ActiveTexture(GLEnum.Texture0);
 								gl.BindTexture(GLEnum.Texture2D, textureEntry.textureId);
@@ -726,8 +740,18 @@ public unsafe partial class OpenGLGPUDriver
 							TextureEntry textureEntry = textures[gpuState.Texture2Id];
 							if (DSA)
 							{
+								#if false
 								if (textureEntry.needsConversion)
 									gl.BlitNamedFramebuffer(textureEntry.multisampledFramebuffer, textureEntry.framebuffer, 0, 0, (int)textureEntry.width, (int)textureEntry.height, 0, 0, (int)textureEntry.width, (int)textureEntry.height, ClearBufferMask.ColorBufferBit, BlitFramebufferFilter.Linear);
+								#else
+								if (textureEntry.needsConversion)
+								{
+									gl.BindFramebuffer(FramebufferTarget.ReadFramebuffer, textureEntry.multisampledFramebuffer);
+									gl.BindFramebuffer(FramebufferTarget.DrawFramebuffer, textureEntry.framebuffer);
+									gl.BlitFramebuffer(0, 0, (int)textureEntry.width, (int)textureEntry.height, 0, 0, (int)textureEntry.width, (int)textureEntry.height, ClearBufferMask.ColorBufferBit, BlitFramebufferFilter.Linear);
+									rebindFramebuffer = true;
+								}
+								#endif
 								gl.BindTextureUnit(1, textureEntry.textureId);
 							}
 							else
@@ -737,12 +761,16 @@ public unsafe partial class OpenGLGPUDriver
 									gl.BindFramebuffer(FramebufferTarget.ReadFramebuffer, textureEntry.multisampledFramebuffer);
 									gl.BindFramebuffer(FramebufferTarget.DrawFramebuffer, textureEntry.framebuffer);
 									gl.BlitFramebuffer(0, 0, (int)textureEntry.width, (int)textureEntry.height, 0, 0, (int)textureEntry.width, (int)textureEntry.height, ClearBufferMask.ColorBufferBit, BlitFramebufferFilter.Linear);
+									rebindFramebuffer = true;
 								}
 								gl.ActiveTexture(GLEnum.Texture1);
 								gl.BindTexture(GLEnum.Texture2D, textureEntry.textureId);
 							}
 						}
 					}
+
+					if(rebindFramebuffer)
+						gl.BindFramebuffer(FramebufferTarget.Framebuffer, currentFramebuffer);
 
 					if (gpuState.EnableScissor)
 					{
