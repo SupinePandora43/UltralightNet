@@ -47,7 +47,7 @@
 			"type": "process",
 			"args": [
 				"build",
-				"${workspaceFolder}/UltralightNet.AppCore.TestApp/UltralightNet.AppCore.TestApp.csproj",
+				"${workspaceFolder}/Examples/AppCore/UltralightNet.AppCore.TestApp/UltralightNet.AppCore.TestApp.csproj",
 				"/property:GenerateFullPaths=true",
 				"/consoleloggerparameters:NoSummary"
 			],
