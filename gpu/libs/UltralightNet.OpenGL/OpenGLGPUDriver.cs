@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Numerics;
+using System.Diagnostics;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Text;
@@ -20,15 +21,20 @@ public unsafe partial class OpenGLGPUDriver
 	private readonly uint UBO;
 
 	// TODO: use Lists
-	public readonly Dictionary<uint, TextureEntry> textures = new();
-	private readonly Dictionary<uint, GeometryEntry> geometries = new();
-	public readonly Dictionary<uint, RenderBufferEntry> renderBuffers = new();
+	public readonly List<TextureEntry> textures = new();
+	private readonly List<GeometryEntry> geometries = new();
+	public readonly List<RenderBufferEntry> renderBuffers = new();
+
+	private readonly Stack<int> freeTextures = new();
+	private readonly Stack<int> freeGeometry = new();
+	private readonly Stack<int> freeRenderBuffers = new();
 
 	public void Check([CallerLineNumber] int line = default)
 	{
 #if DEBUG
 		var error = gl.GetError();
-		if (error is not 0) Console.WriteLine($"{line}: {error}");
+		if (error is not 0)
+			Console.WriteLine($"{line}: {error}");
 #endif
 	}
 
@@ -44,7 +50,9 @@ public unsafe partial class OpenGLGPUDriver
 		// MSAAx4
 		this.samples = samples is 0 ? (4 <= gl.GetInteger(GLEnum.MaxSamples) ? 4u : 1u) : samples;
 
-		Check();
+		textures.Add(new());
+		geometries.Add(new());
+		renderBuffers.Add(new());
 
 		// Save state
 		uint glProgram;
@@ -188,35 +196,32 @@ public unsafe partial class OpenGLGPUDriver
 		EndSynchronize = null,
 		NextTextureId = () =>
 		{
-			for (uint i = 1; ; i++)
-			{
-				if (!textures.ContainsKey(i))
-				{
-					textures.Add(i, new());
-					return i;
-				}
+			if(freeTextures.TryPop(out int freeId)){
+				textures[freeId] = new();
+				return (uint)freeId;
+			}else{
+				textures.Add(new());
+				return (uint)textures.Count -1;
 			}
 		},
 		NextGeometryId = () =>
 		{
-			for (uint i = 1; ; i++)
-			{
-				if (!geometries.ContainsKey(i))
-				{
-					geometries.Add(i, new());
-					return i;
-				}
+			if(freeGeometry.TryPop(out int freeId)){
+				geometries[freeId] = new();
+				return (uint)freeId;
+			}else{
+				geometries.Add(new());
+				return (uint)geometries.Count -1;
 			}
 		},
 		NextRenderBufferId = () =>
 		{
-			for (uint i = 1; ; i++)
-			{
-				if (!renderBuffers.ContainsKey(i))
-				{
-					renderBuffers.Add(i, new());
-					return i;
-				}
+			if(freeRenderBuffers.TryPop(out int freeId)){
+				renderBuffers[freeId] = new();
+				return (uint)freeId;
+			}else{
+				renderBuffers.Add(new());
+				return (uint)renderBuffers.Count -1;
 			}
 		},
 		CreateTexture = (entryId, bitmap) =>
@@ -269,18 +274,15 @@ public unsafe partial class OpenGLGPUDriver
 
 					bitmap.UnlockPixels();
 
-					Check();
 					gl.TextureParameterI(textureId, TextureParameterName.TextureMinFilter, (int)GLEnum.Linear);
 					gl.TextureParameterI(textureId, TextureParameterName.TextureMagFilter, (int)GLEnum.Linear);
 
-					Check();
 					gl.TextureParameterI(textureId, TextureParameterName.TextureWrapS, (int)GLEnum.ClampToEdge);
 					gl.TextureParameterI(textureId, TextureParameterName.TextureWrapT, (int)GLEnum.ClampToEdge);
 					gl.TextureParameterI(textureId, TextureParameterName.TextureWrapR, (int)GLEnum.Repeat);
 
 					//gl.GenerateTextureMipmap(textureId);
 				}
-				Check();
 			}
 			else
 			{
@@ -327,15 +329,15 @@ public unsafe partial class OpenGLGPUDriver
 				//gl.GenerateMipmap(TextureTarget.Texture2D);
 			}
 
-			textures[entryId].textureId = textureId;
-			textures[entryId].multisampledTextureId = multisampledTextureId;
-			textures[entryId].width = width;
-			textures[entryId].height = height;
+			textures[(int)entryId].textureId = textureId;
+			textures[(int)entryId].multisampledTextureId = multisampledTextureId;
+			textures[(int)entryId].width = width;
+			textures[(int)entryId].height = height;
 		},
 		UpdateTexture = (entryId, bitmap) =>
 		{
 			Check();
-			uint textureId = textures[entryId].textureId;
+			uint textureId = textures[(int)entryId].textureId;
 
 			uint width = bitmap.Width;
 			uint height = bitmap.Height;
@@ -395,18 +397,18 @@ public unsafe partial class OpenGLGPUDriver
 		},
 		DestroyTexture = (id) =>
 		{
-			var entry = textures[id];
+			var entry = textures[(int)id];
 
 			gl.DeleteTexture(entry.textureId);
 			if (entry.multisampledTextureId is not 0) gl.DeleteTexture(entry.multisampledTextureId);
 
-			textures.Remove(id);
+			freeTextures.Push((int)id);
 		},
 		CreateRenderBuffer = (id, renderBuffer) =>
 		{
-			var entry = renderBuffers[id];
+			var entry = renderBuffers[(int)id];
 
-			entry.textureEntry = textures[renderBuffer.TextureId];
+			entry.textureEntry = textures[(int)renderBuffer.TextureId];
 
 			uint framebuffer;
 			uint multisampledFramebuffer = 0;
@@ -465,14 +467,14 @@ public unsafe partial class OpenGLGPUDriver
 		},
 		DestroyRenderBuffer = (id) =>
 		{
-			var entry = renderBuffers[id];
+			var entry = renderBuffers[(int)id];
 			gl.DeleteFramebuffer(entry.textureEntry.framebuffer);
 			gl.DeleteFramebuffer(entry.textureEntry.multisampledFramebuffer);
-			renderBuffers.Remove(id);
+			freeRenderBuffers.Push((int)id);
 		},
 		CreateGeometry = (id, vb, ib) =>
 		{
-			var entry = geometries[id];
+			var entry = geometries[(int)id];
 
 			uint vao, vbo, ebo;
 
@@ -606,7 +608,7 @@ public unsafe partial class OpenGLGPUDriver
 		},
 		UpdateGeometry = (id, vb, ib) =>
 		{
-			var entry = geometries[id];
+			var entry = geometries[(int)id];
 
 			if (DSA)
 			{
@@ -626,13 +628,13 @@ public unsafe partial class OpenGLGPUDriver
 		},
 		DestroyGeometry = (id) =>
 		{
-			var entry = geometries[id];
+			var entry = geometries[(int)id];
 
 			gl.DeleteBuffer(entry.ebo);
 			gl.DeleteBuffer(entry.vbo);
 			gl.DeleteVertexArray(entry.vao);
 
-			geometries.Remove(id);
+			freeGeometry.Push((int)id);
 		},
 
 		UpdateCommandList = [SkipLocalsInit](commandList) =>
@@ -664,11 +666,10 @@ public unsafe partial class OpenGLGPUDriver
 			Uniforms uniforms = default;
 
 			var commandSpan = commandList.ToSpan();
-			Check();
 			foreach (var command in commandSpan)
 			{
 				var gpuState = command.GPUState;
-				var renderBufferEntry = renderBuffers[gpuState.RenderBufferId];
+				var renderBufferEntry = renderBuffers[(int)gpuState.RenderBufferId];
 				var rtTextureEntry = renderBufferEntry.textureEntry;
 
 				var framebufferToUse = rtTextureEntry.multisampledFramebuffer is not 0 ? rtTextureEntry.multisampledFramebuffer : rtTextureEntry.framebuffer;
@@ -695,7 +696,7 @@ public unsafe partial class OpenGLGPUDriver
 						glProgram = program;
 					}
 
-					var geometryEntry = geometries[command.GeometryId];
+					var geometryEntry = geometries[(int)command.GeometryId];
 
 					#region Uniforms
 					uniforms.State.X = gpuState.ViewportWidth;
@@ -718,9 +719,10 @@ public unsafe partial class OpenGLGPUDriver
 
 					if (gpuState.ShaderType is ULShaderType.Fill)
 					{
-						if (textures.ContainsKey(gpuState.Texture1Id))
+						Debug.Assert(gpuState.Texture1Id != 0);
+						if ((uint)textures.Count > gpuState.Texture1Id)
 						{
-							TextureEntry textureEntry = textures[gpuState.Texture1Id];
+							TextureEntry textureEntry = textures[(int)gpuState.Texture1Id];
 							if (DSA)
 							{
 								#if false
@@ -750,9 +752,9 @@ public unsafe partial class OpenGLGPUDriver
 								gl.BindTexture(GLEnum.Texture2D, textureEntry.textureId);
 							}
 						}
-						if (textures.ContainsKey(gpuState.Texture2Id))
+						if (textures.Count > gpuState.Texture2Id && gpuState.Texture2Id is not 0)
 						{
-							TextureEntry textureEntry = textures[gpuState.Texture2Id];
+							TextureEntry textureEntry = textures[(int)gpuState.Texture2Id];
 							if (DSA)
 							{
 								#if false
@@ -787,7 +789,7 @@ public unsafe partial class OpenGLGPUDriver
 					if(rebindFramebuffer)
 						gl.BindFramebuffer(FramebufferTarget.Framebuffer, currentFramebuffer);
 
-					if(currentScissors != gpuState.ScissorRect){
+					if(currentScissors is not null != gpuState.EnableScissor){
 						if(gpuState.EnableScissor){
 							if(currentScissors is null) gl.Enable(EnableCap.ScissorTest);
 							gl.Scissor(gpuState.ScissorRect.Left, gpuState.ScissorRect.Top, (uint)(gpuState.ScissorRect.Right - gpuState.ScissorRect.Left), (uint)(gpuState.ScissorRect.Bottom - gpuState.ScissorRect.Top));
