@@ -9,9 +9,9 @@
             "type": "coreclr",
             "request": "launch",
             "preLaunchTask": "buildOpenGL",
-            "program": "${workspaceFolder}/UltralightNet.OpenGL.TestApp/bin/Debug/net6.0/UltralightNet.OpenGL.TestApp.dll",
+            "program": "${workspaceFolder}/Examples/gpu/UltralightNet.OpenGL.TestApp/bin/Debug/net6.0/UltralightNet.OpenGL.TestApp.dll",
             "args": [],
-            "cwd": "${workspaceFolder}/UltralightNet.OpenGL.TestApp/bin/Debug/net6.0",
+            "cwd": "${workspaceFolder}/Examples/gpu/UltralightNet.OpenGL.TestApp/bin/Debug/net6.0",
             "console": "internalConsole",
             "stopAtEntry": false,
             "env": {
