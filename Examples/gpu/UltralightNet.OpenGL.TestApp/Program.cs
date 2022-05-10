@@ -58,8 +58,6 @@ void main()
 	static Renderer renderer;
 	static View view;
 
-	static OpenGLGPUDriver gpuDriver;
-
 	public static void Main()
 	{
 		AppContext.SetSwitch("Switch.System.Reflection.Assembly.SimulatedLocationInBaseDirectory", true);
@@ -205,13 +203,13 @@ void main()
 
 		window.SwapBuffers();
 
-		gpuDriver = new(gl, 16);
+		OpenGLGPUDriver.Initialize(gl, 1);
 
-		gpuDriver.Check();
+		OpenGLGPUDriver.Check();
 
 		window.SwapBuffers();
 
-		ULPlatform.GPUDriver = gpuDriver.GetGPUDriver();
+		ULPlatform.GPUDriver = OpenGLGPUDriver.GetGPUDriver();
 
 		renderer = ULPlatform.CreateRenderer(new ULConfig { FaceWinding = ULFaceWinding.Clockwise, ForceRepaint = false,MaxUpdateTime = (double)1/(double)120 });
 
@@ -254,15 +252,15 @@ void main()
 	static unsafe void OnRender(double obj)
 	{
 		renderer.Render();
-		var renderBuffer = gpuDriver.renderBuffers[(int)view.RenderTarget.RenderBufferId];
+		var renderBuffer = OpenGLGPUDriver.renderBuffers[(int)view.RenderTarget.RenderBufferId];
 		var textureEntry = renderBuffer.textureEntry;
 
 		// redraw only when it has changed
 		if (renderBuffer.dirty)
 		{
-			gl.BindFramebuffer(FramebufferTarget.ReadFramebuffer, textureEntry.multisampledFramebuffer);
-			gl.BindFramebuffer(FramebufferTarget.DrawFramebuffer, textureEntry.framebuffer);
-			gl.BlitFramebuffer(0,0, (int)textureEntry.width, (int)textureEntry.height, 0,0, (int)textureEntry.width, (int)textureEntry.height, ClearBufferMask.ColorBufferBit, GLEnum.Linear);
+			//gl.BindFramebuffer(FramebufferTarget.ReadFramebuffer, textureEntry.multisampledFramebuffer);
+			//gl.BindFramebuffer(FramebufferTarget.DrawFramebuffer, textureEntry.framebuffer);
+			//gl.BlitFramebuffer(0,0, (int)textureEntry.width, (int)textureEntry.height, 0,0, (int)textureEntry.width, (int)textureEntry.height, ClearBufferMask.ColorBufferBit, GLEnum.Linear);
 
 			//gl.BlitNamedFramebuffer(textureEntry.multisampledFramebuffer, textureEntry.framebuffer, 0, 0, (int)textureEntry.width, (int)textureEntry.height, 0, 0, (int)textureEntry.width, (int)textureEntry.height, ClearBufferMask.ColorBufferBit, BlitFramebufferFilter.Linear);
 			gl.BindFramebuffer(FramebufferTarget.Framebuffer, 0);
