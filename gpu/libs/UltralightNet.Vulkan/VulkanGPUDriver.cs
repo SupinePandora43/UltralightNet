@@ -174,7 +174,7 @@ public unsafe partial class VulkanGPUDriver
 				StencilLoadOp = AttachmentLoadOp.DontCare,
 				StencilStoreOp = AttachmentStoreOp.DontCare,
 				InitialLayout = ImageLayout.ShaderReadOnlyOptimal,
-				FinalLayout = ImageLayout.ColorAttachmentOptimal, // ShaderReadOnlyOptimal
+				FinalLayout = ImageLayout.ShaderReadOnlyOptimal
 			};
 
 			AttachmentReference colorAttachmentRef = new()
@@ -187,18 +187,28 @@ public unsafe partial class VulkanGPUDriver
 			{
 				PipelineBindPoint = PipelineBindPoint.Graphics,
 				ColorAttachmentCount = 1,
-				PColorAttachments = &colorAttachmentRef,
+				PColorAttachments = &colorAttachmentRef
 				//PResolveAttachments = &colorAttachmentRef
 			};
 
-			SubpassDependency dependency = new()
-			{
-				SrcSubpass = Vk.SubpassExternal,
-				DstSubpass = 0,
-				SrcStageMask = PipelineStageFlags.PipelineStageFragmentShaderBit,
-				DstStageMask = PipelineStageFlags.PipelineStageColorAttachmentOutputBit,
-				SrcAccessMask = AccessFlags.AccessShaderReadBit,
-				DstAccessMask = AccessFlags.AccessColorAttachmentWriteBit
+			SubpassDependency* dependencies = stackalloc SubpassDependency[2]{
+				new()
+				{
+					SrcSubpass = Vk.SubpassExternal,
+					DstSubpass = 0,
+					SrcStageMask = PipelineStageFlags.PipelineStageFragmentShaderBit,
+					DstStageMask = PipelineStageFlags.PipelineStageColorAttachmentOutputBit,
+					SrcAccessMask = AccessFlags.AccessShaderReadBit,
+					DstAccessMask = AccessFlags.AccessColorAttachmentWriteBit
+				},
+				new(){
+					SrcSubpass = 0,
+					DstSubpass = Vk.SubpassExternal,
+					SrcStageMask = PipelineStageFlags.PipelineStageColorAttachmentOutputBit,
+					DstStageMask = PipelineStageFlags.PipelineStageFragmentShaderBit,
+					SrcAccessMask = AccessFlags.AccessColorAttachmentWriteBit,
+					DstAccessMask = AccessFlags.AccessShaderReadBit
+				}
 			};
 
 			RenderPassCreateInfo renderPassInfo = new()
@@ -208,8 +218,8 @@ public unsafe partial class VulkanGPUDriver
 				PAttachments = &colorAttachment,
 				SubpassCount = 1,
 				PSubpasses = &subpass,
-				DependencyCount = 1,
-				PDependencies = &dependency
+				DependencyCount = 2,
+				PDependencies = dependencies
 			};
 
 			if (vk.CreateRenderPass(device, renderPassInfo, null, out pipelineRenderPass) is not Result.Success)
@@ -448,7 +458,7 @@ public unsafe partial class VulkanGPUDriver
 		#region DescriptorPool
 		var poolSize = new DescriptorPoolSize()
 		{
-			Type = DescriptorType.UniformBuffer,
+			Type = DescriptorType.UniformBufferDynamic,
 			DescriptorCount = 1,
 		};
 		DescriptorPool uniformDescriptorPool;
@@ -991,6 +1001,7 @@ public unsafe partial class VulkanGPUDriver
 	#region Rendering
 
 	private void IDK(Image image){
+		return;
 		ImageMemoryBarrier imageMemoryBarrier = new(
 			srcAccessMask: AccessFlags.AccessColorAttachmentWriteBit,
 			dstAccessMask: AccessFlags.AccessShaderReadBit,
