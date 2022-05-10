@@ -1,5 +1,3 @@
-namespace UltralightNet.OpenGL;
-
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -12,6 +10,10 @@ using Silk.NET.OpenGL;
 using UltralightNet;
 using UltralightNet.GPUCommon;
 using System.Runtime.InteropServices;
+
+[module: SkipLocalsInit]
+
+namespace UltralightNet.OpenGL;
 
 public static unsafe partial class OpenGLGPUDriver
 {
