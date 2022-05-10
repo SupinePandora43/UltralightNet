@@ -497,7 +497,7 @@ public static unsafe partial class OpenGLGPUDriver
 	private static void DestroyRenderBuffer(uint id){
 		var entry = renderBuffers[(int)id];
 		gl.DeleteFramebuffer(entry.textureEntry.framebuffer);
-		gl.DeleteFramebuffer(entry.textureEntry.multisampledFramebuffer);
+		if(entry.textureEntry.multisampledFramebuffer is not 0) gl.DeleteFramebuffer(entry.textureEntry.multisampledFramebuffer);
 		freeRenderBuffers.Push((int)id);
 	}
 
