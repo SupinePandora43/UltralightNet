@@ -1,6 +1,8 @@
 using System;
 using System.Runtime.InteropServices;
+#if NETCOREAPP3_0_OR_GREATER
 using System.Runtime.Intrinsics;
+#endif
 
 namespace UltralightNet
 {
@@ -14,8 +16,11 @@ namespace UltralightNet
 
 		public readonly bool IsEmpty => (Left == Right) || (Top == Bottom);
 
+#if NETCOREAPP3_0_OR_GREATER
 		public readonly bool Equals(ULIntRect other) => Vector128.Create(Left, Top, Right, Bottom).Equals(Vector128.Create(other.Left, other.Top, other.Right, other.Bottom));
-		//public readonly bool Equals(ULIntRect other) => Left == other.Left && Top == other.Top && Right == other.Right && Bottom == other.Bottom;
+#else
+		public readonly bool Equals(ULIntRect other) => Left == other.Left && Top == other.Top && Right == other.Right && Bottom == other.Bottom;
+#endif
 		public readonly override bool Equals(object? other) => other is ULIntRect rect ? Equals(rect) : false;
 		public static bool operator ==(ULIntRect? left, ULIntRect? right) => left is not null ? (right is not null ? left.Equals(right) : false) : right is null;
 		public static bool operator !=(ULIntRect? left, ULIntRect? right) => !(left == right);
