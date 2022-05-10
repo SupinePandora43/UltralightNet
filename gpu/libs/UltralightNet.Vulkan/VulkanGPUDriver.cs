@@ -1,5 +1,3 @@
-namespace UltralightNet.Vulkan;
-
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -16,6 +14,10 @@ using UltralightNet;
 using UltralightNet.GPUCommon;
 using Buffer = Silk.NET.Vulkan.Buffer;
 
+[module: SkipLocalsInit]
+
+namespace UltralightNet.Vulkan;
+
 // https://github.com/SaschaWillems/Vulkan/blob/master/examples/offscreen/offscreen.cpp for reference
 
 public class RenderBufferEntry
@@ -23,7 +25,7 @@ public class RenderBufferEntry
 	public Framebuffer framebuffer;
 
 	public TextureEntry textureEntry;
-	
+
 	public Image resolveImage;
 	internal DeviceMemory resolveImageMemory;
 }
@@ -167,12 +169,12 @@ public unsafe partial class VulkanGPUDriver
 			{
 				Format = Format.B8G8R8A8Unorm,
 				Samples = SampleCountFlags.SampleCount1Bit,
-				LoadOp = AttachmentLoadOp.Load,
+				LoadOp = AttachmentLoadOp.DontCare, // Load
 				StoreOp = AttachmentStoreOp.Store,
 				StencilLoadOp = AttachmentLoadOp.DontCare,
 				StencilStoreOp = AttachmentStoreOp.DontCare,
 				InitialLayout = ImageLayout.ShaderReadOnlyOptimal,
-				FinalLayout = ImageLayout.ShaderReadOnlyOptimal,
+				FinalLayout = ImageLayout.ColorAttachmentOptimal, // ShaderReadOnlyOptimal
 			};
 
 			AttachmentReference colorAttachmentRef = new()
@@ -194,8 +196,8 @@ public unsafe partial class VulkanGPUDriver
 				SrcSubpass = Vk.SubpassExternal,
 				DstSubpass = 0,
 				SrcStageMask = PipelineStageFlags.PipelineStageFragmentShaderBit,
-				SrcAccessMask = AccessFlags.AccessShaderReadBit,
 				DstStageMask = PipelineStageFlags.PipelineStageColorAttachmentOutputBit,
+				SrcAccessMask = AccessFlags.AccessShaderReadBit,
 				DstAccessMask = AccessFlags.AccessColorAttachmentWriteBit
 			};
 
@@ -832,8 +834,64 @@ public unsafe partial class VulkanGPUDriver
 		new ReadOnlySpan<byte>(ib.data, (int)ib.size).CopyTo(new Span<byte>(indexStaging, (int)ib.size));
 		vk.UnmapMemory(device, indexStagingMemory);
 
+		BufferMemoryBarrier* barriers = stackalloc BufferMemoryBarrier[4]{
+			new(srcAccessMask: AccessFlags.AccessNoneKhr,
+				dstAccessMask: AccessFlags.AccessTransferWriteBit,
+				srcQueueFamilyIndex: Vk.QueueFamilyIgnored,
+				dstQueueFamilyIndex: Vk.QueueFamilyIgnored,
+				buffer: vertexBuffer,
+				offset: 0,
+				size: vb.size),
+			new(srcAccessMask: AccessFlags.AccessNoneKhr,
+				dstAccessMask: AccessFlags.AccessTransferWriteBit,
+				srcQueueFamilyIndex: Vk.QueueFamilyIgnored,
+				dstQueueFamilyIndex: Vk.QueueFamilyIgnored,
+				buffer: indexBuffer,
+				offset: 0,
+				size: ib.size),
+			new(srcAccessMask: AccessFlags.AccessNoneKhr,
+				dstAccessMask: AccessFlags.AccessTransferReadBit,
+				srcQueueFamilyIndex: Vk.QueueFamilyIgnored,
+				dstQueueFamilyIndex: Vk.QueueFamilyIgnored,
+				buffer: vertexStagingBuffer,
+				offset: 0,
+				size: vb.size),
+			new(srcAccessMask: AccessFlags.AccessNoneKhr,
+				dstAccessMask: AccessFlags.AccessTransferReadBit,
+				srcQueueFamilyIndex: Vk.QueueFamilyIgnored,
+				dstQueueFamilyIndex: Vk.QueueFamilyIgnored,
+				buffer: indexStagingBuffer,
+				offset: 0,
+				size: ib.size)
+		};
+
+		vk.CmdPipelineBarrier(commandBuffer,
+			PipelineStageFlags.PipelineStageBottomOfPipeBit,
+			PipelineStageFlags.PipelineStageTransferBit,
+			0,
+			0, null,
+			4, barriers,
+			0, null);
+
 		CopyBuffer(commandBuffer, vertexStagingBuffer, vertexBuffer, vb.size);
 		CopyBuffer(commandBuffer, indexStagingBuffer, indexBuffer, ib.size);
+
+		barriers[0] = barriers[0] with {
+			SrcAccessMask= AccessFlags.AccessTransferWriteBit,
+			DstAccessMask = AccessFlags.AccessVertexAttributeReadBit
+		};
+		barriers[1] = barriers[1] with {
+			SrcAccessMask= AccessFlags.AccessTransferWriteBit,
+			DstAccessMask = AccessFlags.AccessIndexReadBit
+		};
+
+		vk.CmdPipelineBarrier(commandBuffer,
+			PipelineStageFlags.PipelineStageTransferBit,
+			PipelineStageFlags.PipelineStageVertexInputBit,
+			0,
+			0, null,
+			2, barriers,
+			0, null);
 
 		geometries[(int)id] = new GeometryEntry()
 		{
@@ -866,8 +924,50 @@ public unsafe partial class VulkanGPUDriver
 		new ReadOnlySpan<byte>(ib.data, (int)ib.size).CopyTo(new Span<byte>(indexStaging, (int)ib.size));
 		vk.UnmapMemory(device, geometryEntry.indexStagingMemory);
 
+		BufferMemoryBarrier* barriers = stackalloc BufferMemoryBarrier[2]{
+			new(srcAccessMask: AccessFlags.AccessVertexAttributeReadBit,
+				dstAccessMask: AccessFlags.AccessTransferWriteBit,
+				srcQueueFamilyIndex: Vk.QueueFamilyIgnored,
+				dstQueueFamilyIndex: Vk.QueueFamilyIgnored,
+				buffer: geometryEntry.vertexBuffer,
+				offset: 0,
+				size: vb.size),
+			new(srcAccessMask: AccessFlags.AccessIndexReadBit,
+				dstAccessMask: AccessFlags.AccessTransferWriteBit,
+				srcQueueFamilyIndex: Vk.QueueFamilyIgnored,
+				dstQueueFamilyIndex: Vk.QueueFamilyIgnored,
+				buffer: geometryEntry.indexBuffer,
+				offset: 0,
+				size: ib.size)
+		};
+
+		vk.CmdPipelineBarrier(commandBuffer,
+			PipelineStageFlags.PipelineStageVertexInputBit,
+			PipelineStageFlags.PipelineStageTransferBit,
+			0,
+			0, null,
+			2, barriers,
+			0, null);
+
 		CopyBuffer(commandBuffer, geometryEntry.vertexStagingBuffer, geometryEntry.vertexBuffer, vb.size);
 		CopyBuffer(commandBuffer, geometryEntry.indexStagingBuffer, geometryEntry.indexBuffer, ib.size);
+
+		barriers[0] = barriers[0] with {
+			SrcAccessMask = AccessFlags.AccessTransferWriteBit,
+			DstAccessMask = AccessFlags.AccessVertexAttributeReadBit
+		};
+		barriers[1] = barriers[1] with {
+			SrcAccessMask = AccessFlags.AccessTransferWriteBit,
+			DstAccessMask = AccessFlags.AccessIndexReadBit
+		};
+
+		vk.CmdPipelineBarrier(commandBuffer,
+			PipelineStageFlags.PipelineStageTransferBit,
+			PipelineStageFlags.PipelineStageVertexInputBit,
+			0,
+			0, null,
+			2, barriers,
+			0, null);
 	}
 	[SkipLocalsInit]
 	private void DestroyGeometry(uint id)
@@ -889,6 +989,28 @@ public unsafe partial class VulkanGPUDriver
 	}
 
 	#region Rendering
+
+	private void IDK(Image image){
+		ImageMemoryBarrier imageMemoryBarrier = new(
+			srcAccessMask: AccessFlags.AccessColorAttachmentWriteBit,
+			dstAccessMask: AccessFlags.AccessShaderReadBit,
+			oldLayout: ImageLayout.ColorAttachmentOptimal, // or just attachment
+			newLayout: ImageLayout.ShaderReadOnlyOptimal, // or just readonly
+			srcQueueFamilyIndex: Vk.QueueFamilyIgnored,
+			dstQueueFamilyIndex: Vk.QueueFamilyIgnored,
+			image: image,
+			subresourceRange: new(ImageAspectFlags.ImageAspectColorBit, 0, 1, 0, 1)
+		);
+		vk.CmdPipelineBarrier(
+			commandBuffer,
+			PipelineStageFlags.PipelineStageColorAttachmentOutputBit,
+			PipelineStageFlags.PipelineStageFragmentShaderBit,
+			0,
+			0, null,
+			0, null,
+			1, &imageMemoryBarrier);
+	}
+
 	public bool RequiresResubmission = false;
 	[SkipLocalsInit]
 	private void UpdateCommandList(ULCommandList list)
@@ -914,6 +1036,7 @@ public unsafe partial class VulkanGPUDriver
 				if (currentRenderBuffer is not uint.MaxValue)
 				{
 					vk.CmdEndRenderPass(commandBuffer);
+					IDK(renderBuffers[(int)currentRenderBuffer].textureEntry.image);
 					currentRenderBuffer = uint.MaxValue;
 				}
 				TextureEntry rt = renderBufferEntry.textureEntry;
@@ -930,7 +1053,7 @@ public unsafe partial class VulkanGPUDriver
 				PipelineBarrier(commandBuffer, rt.image, ImageLayout.TransferDstOptimal, ImageLayout.ShaderReadOnlyOptimal);
 			}
 
-			if (command.CommandType is ULCommandType.DrawGeometry) // TODO: clearrenderbuffer
+			if (command.CommandType is ULCommandType.DrawGeometry)
 			{
 				uniforms[uniformBufferId].Transform = state.Transform.ApplyProjection(state.ViewportWidth, state.ViewportHeight, true);
 				uniforms[uniformBufferId].ClipSize = state.ClipSize;
@@ -953,7 +1076,10 @@ public unsafe partial class VulkanGPUDriver
 				};
 				if (currentRenderBuffer != state.RenderBufferId)
 				{
-					if (currentRenderBuffer is not uint.MaxValue) vk.CmdEndRenderPass(commandBuffer);
+					if (currentRenderBuffer is not uint.MaxValue){
+						vk.CmdEndRenderPass(commandBuffer);
+						IDK(renderBuffers[(int)currentRenderBuffer].textureEntry.image);
+					}
 					currentRenderBuffer = state.RenderBufferId;
 					vk.CmdBeginRenderPass(commandBuffer, &renderPassBeginInfo, SubpassContents.Inline);
 				}
@@ -985,7 +1111,10 @@ public unsafe partial class VulkanGPUDriver
 			}
 		}
 
-		if (currentRenderBuffer is not uint.MaxValue) vk.CmdEndRenderPass(commandBuffer);
+		if (currentRenderBuffer is not uint.MaxValue){
+			vk.CmdEndRenderPass(commandBuffer);
+			IDK(renderBuffers[(int)currentRenderBuffer].textureEntry.image);
+		}
 
 		stat_CreateGeometry = 0;
 		stat_UpdateGeometry = 0;
