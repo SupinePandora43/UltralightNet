@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Numerics;
 using System.Runtime.CompilerServices;
 using UltralightNet.GPUCommon;
@@ -13,12 +12,14 @@ namespace UltralightNet.Veldrid
 	{
 		private readonly GraphicsDevice graphicsDevice;
 		private readonly ResourceLayout textureResourceLayout;
+		private readonly ResourceLayout samplerResourceLayout;
+
+		private readonly Sampler sampler;
+		private readonly ResourceSet samplerResourceSet;
+
 		private ResourceLayout uniformsResourceLayout;
 
-		public bool GenerateMipMaps = false;
-		public uint MipLevels = 1;
 		public TextureSampleCount SampleCount = TextureSampleCount.Count1;
-		public bool Debug = false;
 
 		/// <summary>
 		/// public only for <see cref="GetRenderTarget(View)"/> inlining
@@ -50,10 +51,14 @@ namespace UltralightNet.Veldrid
 					new ResourceLayoutElementDescription("texture", ResourceKind.TextureReadOnly, ShaderStages.Fragment)
 				)
 			);
+			samplerResourceLayout = graphicsDevice.ResourceFactory.CreateResourceLayout(
+				new(new ResourceLayoutElementDescription("Sampler", ResourceKind.Sampler, ShaderStages.Fragment))
+			);
 
 			_commandList = graphicsDevice.ResourceFactory.CreateCommandList();
 
 			IsVulkan = graphicsDevice.BackendType is GraphicsBackend.Vulkan;
+			//IsVulkan = false;
 
 			InitializeBuffers();
 			InitShaders();
@@ -80,6 +85,22 @@ namespace UltralightNet.Veldrid
 			);
 
 			TextureEntries.Add(0, new() { texture = emptyTexture, resourceSet = emptyResourceSet });
+
+			{
+				sampler = graphicsDevice.ResourceFactory.CreateSampler(new(
+					SamplerAddressMode.Clamp,
+					SamplerAddressMode.Clamp,
+					SamplerAddressMode.Clamp,
+					SamplerFilter.MinLinear_MagLinear_MipLinear,
+					ComparisonKind.Never,
+					1,
+					0,
+					1,
+					0,
+					SamplerBorderColor.TransparentBlack
+				));
+				samplerResourceSet = graphicsDevice.ResourceFactory.CreateResourceSet(new(samplerResourceLayout, sampler));
+			}
 		}
 		public ULGPUDriver GetGPUDriver() => new()
 		{
@@ -233,7 +254,7 @@ namespace UltralightNet.Veldrid
 				Usage = TextureUsage.Sampled,
 				Width = width,
 				Height = height,
-				MipLevels = isRT ? 1 : MipLevels,
+				MipLevels = 1,
 				SampleCount = isRT ? SampleCount : TextureSampleCount.Count1,
 				ArrayLayers = 1,
 				Depth = 1
@@ -245,7 +266,6 @@ namespace UltralightNet.Veldrid
 			{
 				textureDescription.Usage |= TextureUsage.RenderTarget;
 			}
-			if (GenerateMipMaps) textureDescription.Usage |= TextureUsage.GenerateMipmaps;
 
 			entry.texture = graphicsDevice.ResourceFactory.CreateTexture(textureDescription);
 
@@ -272,16 +292,6 @@ namespace UltralightNet.Veldrid
 			uint bpp = Methods.ulBitmapGetBpp(bitmapPTR);
 
 			UploadTexture(entry.texture, bitmapPTR, width, height, bpp);
-
-			if (GenerateMipMaps)
-			{
-				var cl = graphicsDevice.ResourceFactory.CreateCommandList();
-				cl.Begin();
-				cl.GenerateMipmaps(entry.texture);
-				cl.End();
-				graphicsDevice.SubmitCommands(cl);
-				cl.Dispose();
-			}
 		}
 		[SkipLocalsInit]
 		private void DestroyTexture(uint texture_id)
@@ -379,17 +389,37 @@ namespace UltralightNet.Veldrid
 				if(uniformBuffer is null || uniformResourceSet is null || UniformBufferCommandLength < list.size){
 
 					if(uniformBuffer is not null) uniformBuffer.Dispose();
-					uniformBuffer = graphicsDevice.ResourceFactory.CreateBuffer(new BufferDescription((uint)768 * list.size, BufferUsage.UniformBuffer));
+					uniformBuffer = graphicsDevice.ResourceFactory.CreateBuffer(new BufferDescription((uint)768 * list.size, BufferUsage.UniformBuffer | BufferUsage.Dynamic));
 					UniformBufferCommandLength = list.size;
-					
+
 					if(uniformResourceSet is not null) uniformResourceSet.Dispose();
 					uniformResourceSet = graphicsDevice.ResourceFactory.CreateResourceSet(new(uniformsResourceLayout, uniformBuffer));
-					
-					FakeMappedUniformBuffer = new Uniforms[list.size]; // TODO: use GC.AllocateUninitializedArray, if it improves performance
+
+					FakeMappedUniformBuffer = GC.AllocateUninitializedArray<Uniforms>((int)list.size);
 				}
+
+				Span<Uniforms> uniformSpan = FakeMappedUniformBuffer; // implicit conversion :)
+
+				foreach(ULCommand command in list.ToSpan()){
+					if(command.CommandType is ULCommandType.DrawGeometry){
+						ULGPUState state = command.GPUState;
+						Unsafe.SkipInit(out Uniforms uniforms);
+						uniforms.State.X = state.ViewportWidth;
+						uniforms.State.Y = state.ViewportHeight;
+						uniforms.Transform = state.Transform.ApplyProjection(state.ViewportWidth, state.ViewportHeight, true);
+						state.Scalar.CopyTo(new Span<float>(&uniforms.Scalar4_0.W, 8));
+						state.Vector.CopyTo(new Span<Vector4>(&uniforms.Vector_0.W, 8));
+						state.Clip.CopyTo(new Span<Matrix4x4>(&uniforms.Clip_0.M11, 8));
+						uniforms.ClipSize = state.ClipSize;
+						uniformSpan[(int)commandId++] = uniforms;
+					}
+				}
+
+				CommandList.UpdateBuffer(uniformBuffer, 0, (ReadOnlySpan<Uniforms>)uniformSpan);
+
+				commandId = 0;
 			}
 
-			Span<Uniforms> uniformSpan = FakeMappedUniformBuffer; // implicit conversion :)
 			foreach (ULCommand command in list.ToSpan())
 			{
 				RenderBufferEntry renderBufferEntry = RenderBufferEntries[command.GPUState.RenderBufferId];
@@ -401,10 +431,9 @@ namespace UltralightNet.Veldrid
 					CommandList.SetFullScissorRect(0);
 					CommandList.ClearColorTarget(0, RgbaFloat.Clear);
 				}
-				else
+				else if ( command.CommandType is ULCommandType.DrawGeometry )
 				{
 					ULGPUState state = command.GPUState;
-
 					if (state.ShaderType is ULShaderType.Fill)
 					{
 						if (state.EnableScissor)
@@ -418,24 +447,14 @@ namespace UltralightNet.Veldrid
 						else
 						{
 							if (state.EnableBlend)
-								CommandList.SetPipeline(ul_blend);
+								CommandList.SetPipeline(ul_scissor_blend);
 							else
-								CommandList.SetPipeline(ul);
+								CommandList.SetPipeline(ul_scissor);
+							CommandList.SetFullScissorRect(0);
 						}
 						CommandList.SetGraphicsResourceSet(1, TextureEntries[state.Texture1Id].resourceSet);
 						CommandList.SetGraphicsResourceSet(2, TextureEntries[state.Texture2Id].resourceSet);
-					}
-					else if ( command.CommandType is ULCommandType.DrawGeometry )
-					{
-						Unsafe.SkipInit( out Uniforms uniforms );
-						uniforms.State.X = state.ViewportWidth;
-						uniforms.State.Y = state.ViewportHeight;
-						uniforms.Transform = state.Transform.ApplyProjection( state.ViewportWidth, state.ViewportHeight, true );
-						state.Scalar.CopyTo( new Span<float>( &uniforms.Scalar4_0, state.Scalar.Length ) );
-						state.Vector.CopyTo( new Span<Vector4>( &uniforms.Vector_0.W, 8 ) );
-						state.Clip.CopyTo( new Span<Matrix4x4>( &uniforms.Clip_0, 8 ) );
-						uniforms.ClipSize = state.ClipSize;
-						uniformSpan[(int)commandId++] = uniforms;
+						CommandList.SetGraphicsResourceSet(3, samplerResourceSet);
 					}
 					else
 					{
@@ -450,11 +469,12 @@ namespace UltralightNet.Veldrid
 						else
 						{
 							if (state.EnableBlend)
-								CommandList.SetPipeline(ulPath_blend);
+								CommandList.SetPipeline(ulPath_scissor_blend);
 							else
-								CommandList.SetPipeline(ulPath);
+								CommandList.SetPipeline(ulPath_scissor);
+							CommandList.SetFullScissorRect(0);
 						}
-					};
+					}
 
 					#region Uniforms
 					if (IsVulkan){
@@ -462,7 +482,6 @@ namespace UltralightNet.Veldrid
 						CommandList.SetGraphicsResourceSet(0, uniformResourceSet, 1, ref offset); // dynamic offset my beloved
 					} else {
 						Unsafe.SkipInit(out Uniforms uniforms);
-
 						uniforms.State.X = state.ViewportWidth;
 						uniforms.State.Y = state.ViewportHeight;
 						uniforms.Transform = state.Transform.ApplyProjection(state.ViewportWidth, state.ViewportHeight, true);
@@ -492,11 +511,6 @@ namespace UltralightNet.Veldrid
 					);
 				}
 			}
-			fixed ( Uniforms* uniformPtr = uniformSpan )
-			{
-				CommandList.UpdateBuffer( uniformBuffer, 0, (IntPtr)uniformPtr, 768u * commandId );
-			}
-			commandId = 0;
 		}
 
 		/// <remarks>will throw exception when view doesn't have RenderTarget</remarks>
@@ -530,14 +544,10 @@ namespace UltralightNet.Veldrid
 		private readonly ResourceSet emptyResourceSet;
 
 		private Pipeline ul_scissor_blend;
-		private Pipeline ul_blend;
 		private Pipeline ul_scissor;
-		private Pipeline ul;
 
 		private Pipeline ulPath_scissor_blend;
-		private Pipeline ulPath_blend;
 		private Pipeline ulPath_scissor;
-		private Pipeline ulPath;
 
 		private DeviceBuffer uniformBuffer;
 
@@ -683,14 +693,6 @@ namespace UltralightNet.Veldrid
 				}
 			);
 		}
-		private static void EnableScissors(ref GraphicsPipelineDescription pipa)
-		{
-			pipa.RasterizerState.ScissorTestEnabled = true;
-		}
-		private static void DisableScissors(ref GraphicsPipelineDescription pipa)
-		{
-			pipa.RasterizerState.ScissorTestEnabled = false;
-		}
 		private static void DisableBlend(ref GraphicsPipelineDescription pipa)
 		{
 			pipa.BlendState.AttachmentStates = new[]
@@ -756,10 +758,10 @@ namespace UltralightNet.Veldrid
 				RasterizerState = new()
 				{
 					CullMode = FaceCullMode.None,
-					FrontFace = FrontFace.Clockwise,
+					FrontFace = FrontFace.CounterClockwise,
 					FillMode = PolygonFillMode.Solid,
-					ScissorTestEnabled = false,
-					DepthClipEnabled = false // true
+					ScissorTestEnabled = true,
+					DepthClipEnabled = false
 				},
 				PrimitiveTopology = PrimitiveTopology.TriangleList,
 				ResourceBindingModel = ResourceBindingModel.Default,
@@ -769,34 +771,18 @@ namespace UltralightNet.Veldrid
 					uniformsResourceLayout,
 					textureResourceLayout,
 					textureResourceLayout,
-					// textureResourceLayout // unused
+					samplerResourceLayout
 				},
 				Outputs = pipelineOutputFramebuffer.OutputDescription
 			};
 
 			GraphicsPipelineDescription ultralight_pd__SCISSOR_TRUE__ENALBE_BLEND = _ultralightPipelineDescription;
 
-			EnableScissors(ref ultralight_pd__SCISSOR_TRUE__ENALBE_BLEND);
-
-			GraphicsPipelineDescription ultralight_pd__SCISSOR_FALSE__ENALBE_BLEND = _ultralightPipelineDescription;
-
-			DisableScissors(ref ultralight_pd__SCISSOR_FALSE__ENALBE_BLEND);
-
 			GraphicsPipelineDescription ultralight_pd__SCISSOR_TRUE__DISALBE_BLEND = _ultralightPipelineDescription;
-
-			EnableScissors(ref ultralight_pd__SCISSOR_TRUE__DISALBE_BLEND);
 			DisableBlend(ref ultralight_pd__SCISSOR_TRUE__DISALBE_BLEND);
 
-			GraphicsPipelineDescription ultralight_pd__SCISSOR_FALSE__DISALBE_BLEND = _ultralightPipelineDescription;
-
-			DisableScissors(ref ultralight_pd__SCISSOR_FALSE__DISALBE_BLEND);
-			DisableBlend(ref ultralight_pd__SCISSOR_FALSE__DISALBE_BLEND);
-
-
 			ul_scissor_blend = graphicsDevice.ResourceFactory.CreateGraphicsPipeline(ref ultralight_pd__SCISSOR_TRUE__ENALBE_BLEND);
-			ul_blend = graphicsDevice.ResourceFactory.CreateGraphicsPipeline(ref ultralight_pd__SCISSOR_FALSE__ENALBE_BLEND);
 			ul_scissor = graphicsDevice.ResourceFactory.CreateGraphicsPipeline(ref ultralight_pd__SCISSOR_TRUE__DISALBE_BLEND);
-			ul = graphicsDevice.ResourceFactory.CreateGraphicsPipeline(ref ultralight_pd__SCISSOR_FALSE__DISALBE_BLEND);
 
 
 			GraphicsPipelineDescription _ultralightPathPipelineDescription = _ultralightPipelineDescription;
@@ -805,26 +791,11 @@ namespace UltralightNet.Veldrid
 
 			GraphicsPipelineDescription ultralightPath_pd__SCISSOR_TRUE__ENALBE_BLEND = _ultralightPathPipelineDescription;
 
-			EnableScissors(ref ultralightPath_pd__SCISSOR_TRUE__ENALBE_BLEND);
-
-			GraphicsPipelineDescription ultralightPath_pd__SCISSOR_FALSE__ENALBE_BLEND = _ultralightPathPipelineDescription;
-
-			DisableScissors(ref ultralightPath_pd__SCISSOR_FALSE__ENALBE_BLEND);
-
 			GraphicsPipelineDescription ultralightPath_pd__SCISSOR_TRUE__DISABLE_BLEND = _ultralightPathPipelineDescription;
-
-			EnableScissors(ref ultralightPath_pd__SCISSOR_TRUE__DISABLE_BLEND);
 			DisableBlend(ref ultralightPath_pd__SCISSOR_TRUE__DISABLE_BLEND);
 
-			GraphicsPipelineDescription ultralightPath_pd__SCISSOR_FALSE__DISABLE_BLEND = _ultralightPathPipelineDescription;
-
-			DisableScissors(ref ultralightPath_pd__SCISSOR_FALSE__DISABLE_BLEND);
-			DisableBlend(ref ultralightPath_pd__SCISSOR_FALSE__DISABLE_BLEND);
-
 			ulPath_scissor_blend = graphicsDevice.ResourceFactory.CreateGraphicsPipeline(ref ultralightPath_pd__SCISSOR_TRUE__ENALBE_BLEND);
-			ulPath_blend = graphicsDevice.ResourceFactory.CreateGraphicsPipeline(ref ultralightPath_pd__SCISSOR_FALSE__ENALBE_BLEND);
 			ulPath_scissor = graphicsDevice.ResourceFactory.CreateGraphicsPipeline(ref ultralightPath_pd__SCISSOR_TRUE__DISABLE_BLEND);
-			ulPath = graphicsDevice.ResourceFactory.CreateGraphicsPipeline(ref ultralightPath_pd__SCISSOR_FALSE__DISABLE_BLEND);
 		}
 	}
 }
