@@ -100,6 +100,9 @@ public unsafe partial class VulkanGPUDriver
 	private uint stat_UpdateTexture = 0;
 	private uint stat_DestroyTexture = 0;
 
+	public SampleCountFlags SampleCount = SampleCountFlags.SampleCount1Bit; // TODO: Use 4
+	private bool UseMS => SampleCount != SampleCountFlags.SampleCount1Bit;
+
 	public VulkanGPUDriver(Vk vk, PhysicalDevice physicalDevice, Device device)
 	{
 		this.vk = vk;
@@ -110,31 +113,6 @@ public unsafe partial class VulkanGPUDriver
 		textures.Add(new()); // id => 1 workaround
 		renderBuffers.Add(new()); // id => 1 workaround
 
-		#region TextureSetLayout
-		DescriptorSetLayoutBinding samplerLayoutBinding = new()
-		{
-			Binding = 0,
-			DescriptorCount = 1,
-			DescriptorType = DescriptorType.CombinedImageSampler,
-			PImmutableSamplers = null,
-			StageFlags = ShaderStageFlags.ShaderStageFragmentBit,
-		};
-
-		fixed (DescriptorSetLayout* textureSetLayoutPtr = &textureSetLayout)
-		{
-			DescriptorSetLayoutCreateInfo layoutInfo = new()
-			{
-				SType = StructureType.DescriptorSetLayoutCreateInfo,
-				BindingCount = 1,
-				PBindings = &samplerLayoutBinding,
-			};
-
-			if (vk.CreateDescriptorSetLayout(device, layoutInfo, null, textureSetLayoutPtr) != Result.Success)
-			{
-				throw new Exception("failed to create descriptor set layout!");
-			}
-		}
-		#endregion TextureSetLayout
 		#region TextureSampler
 		SamplerCreateInfo samplerInfo = new()
 		{
@@ -164,6 +142,32 @@ public unsafe partial class VulkanGPUDriver
 			}
 		}
 		#endregion TextureSampler
+		#region TextureSetLayout
+		Sampler* immutableSamplers = stackalloc Sampler[2]{ textureSampler, default };
+		DescriptorSetLayoutBinding samplerLayoutBinding = new()
+		{
+			Binding = 0,
+			DescriptorCount = 1,
+			DescriptorType = DescriptorType.CombinedImageSampler,
+			PImmutableSamplers = immutableSamplers,
+			StageFlags = ShaderStageFlags.ShaderStageFragmentBit,
+		};
+
+		fixed (DescriptorSetLayout* textureSetLayoutPtr = &textureSetLayout)
+		{
+			DescriptorSetLayoutCreateInfo layoutInfo = new()
+			{
+				SType = StructureType.DescriptorSetLayoutCreateInfo,
+				BindingCount = 1,
+				PBindings = &samplerLayoutBinding
+			};
+
+			if (vk.CreateDescriptorSetLayout(device, layoutInfo, null, textureSetLayoutPtr) != Result.Success)
+			{
+				throw new Exception("failed to create descriptor set layout!");
+			}
+		}
+		#endregion TextureSetLayout
 		#region RenderPass
 		{
 			AttachmentDescription colorAttachment = new()
@@ -184,12 +188,20 @@ public unsafe partial class VulkanGPUDriver
 				Layout = ImageLayout.ColorAttachmentOptimal,
 			};
 
+
+			uint one = 1;
 			SubpassDescription subpass = new()
 			{
+				Flags = 0,
 				PipelineBindPoint = PipelineBindPoint.Graphics,
+				InputAttachmentCount = 0,
+				PInputAttachments = null,
 				ColorAttachmentCount = 1,
-				PColorAttachments = &colorAttachmentRef
-				//PResolveAttachments = &colorAttachmentRef
+				PColorAttachments = &colorAttachmentRef,
+				PResolveAttachments = UseMS ? throw new NotImplementedException("MSAA isn't implemented yet") : null,
+				PDepthStencilAttachment = null, // no depth is used in ultralight yet
+				PreserveAttachmentCount = UseMS ? 1u : 0u,
+				PPreserveAttachments = UseMS ? &one : null
 			};
 
 			SubpassDependency* dependencies = stackalloc SubpassDependency[2]{
