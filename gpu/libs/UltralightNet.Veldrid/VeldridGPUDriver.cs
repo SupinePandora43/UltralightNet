@@ -1,4 +1,5 @@
 using System;
+using System.Buffers;
 using System.Collections.Generic;
 using System.Numerics;
 using System.Runtime.CompilerServices;
@@ -111,8 +112,8 @@ namespace UltralightNet.Veldrid
 			NextGeometryId = NextGeometryId,
 			NextRenderBufferId = NextRenderBufferId,
 
-			_CreateTexture = CreateTexture,
-			_UpdateTexture = UpdateTexture,
+			CreateTexture = CreateTexture,
+			UpdateTexture = UpdateTexture,
 			DestroyTexture = DestroyTexture,
 
 			CreateGeometry = CreateGeometry,
@@ -168,85 +169,38 @@ namespace UltralightNet.Veldrid
 		}
 		#endregion NextId
 		#region Texture
-		/// <summary>
-		/// Thx https://github.com/TechnologicalPizza
-		/// </summary>
-		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		private unsafe void Set2DTextureData(ReadOnlySpan<byte> pixels, uint width, uint height, int stride, uint bpp, Texture dst, uint dstX, uint dstY, uint dstZ, uint dstMipLevel, uint dstArrayLayer)
+		private void UploadTexture(TextureEntry texture, ULBitmap bitmap, uint width, uint height, uint bpp, uint rowBytes)
 		{
-			_commandList.Begin();
+			IntPtr pixelsPTR = bitmap.LockPixels();
+			ReadOnlySpan<byte> pixels = new ReadOnlySpan<byte>((void*)pixelsPTR, (int)(rowBytes * height));
 
-			TextureDescription stagingDesc = new(width, height, 1, 1, 1, dst.Format, TextureUsage.Staging, TextureType.Texture2D);
-			using Texture staging = graphicsDevice.ResourceFactory.CreateTexture(ref stagingDesc);
-
-			MappedResource mappedStaging = graphicsDevice.Map(staging, MapMode.Write);
-			try
+			if (rowBytes == width * bpp)
 			{
-				Span<byte> stagingSpan = new((void*)mappedStaging.Data, (int)mappedStaging.SizeInBytes);
-
-				int rowPitch = (int)(width * bpp);
-				int mappedRowPitch = (int)mappedStaging.RowPitch;
-
-				for (int y = 0; y < height; y++)
-				{
-					ReadOnlySpan<byte> sourceRow = pixels.Slice(y * stride, rowPitch);
-					Span<byte> stagingRow = stagingSpan.Slice(y * mappedRowPitch, mappedRowPitch);
-					sourceRow.CopyTo(stagingRow);
-				}
-			}
-#if DEBUG
-			catch (Exception e)
-			{
-				Console.WriteLine(e);
-			}
-#endif
-			finally
-			{
-				graphicsDevice.Unmap(staging);
-			}
-
-			_commandList.CopyTexture(
-				staging, 0, 0, 0, 0, 0,
-				dst, dstX, dstY, dstZ, dstMipLevel, dstArrayLayer, width, height, 1, 1);
-			_commandList.End();
-			graphicsDevice.SubmitCommands(_commandList);
-		}
-		[SkipLocalsInit]
-		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		private void UploadTexture(Texture texture, IntPtr bitmap, uint width, uint height, uint bpp)
-		{
-			IntPtr pixels = Methods.ulBitmapLockPixels(bitmap);
-
-			uint rowBytes = Methods.ulBitmapGetRowBytes(bitmap);
-			uint offset = rowBytes - (width * bpp);
-
-			if (offset is 0)
-			{
-				graphicsDevice.UpdateTexture(texture, pixels, width * height * bpp, 0, 0, 0, width, height, 1, 0, 0);
+				graphicsDevice.UpdateTexture(texture.texture, pixelsPTR, width * height * bpp, 0, 0, 0, width, height, 1, 0, 0);
 			}
 			else
 			{
-				unsafe
-				{
-					Set2DTextureData(new ReadOnlySpan<byte>((void*)pixels, (int)(rowBytes * height)), width, height, (int)rowBytes, bpp, texture, 0, 0, 0, 0, 0);
+				Span<byte> unstridedPixels = texture.unstride;
+				int widthXbpp = (int)(width * bpp);
+				for(uint y = 0; y < height; y++){
+					ReadOnlySpan<byte> row = pixels.Slice((int)(rowBytes * y), widthXbpp);
+					row.CopyTo(unstridedPixels.Slice(widthXbpp*(int)y, widthXbpp));
 				}
 			}
-
-			Methods.ulBitmapUnlockPixels(bitmap);
+			bitmap.UnlockPixels();
 		}
 		[SkipLocalsInit]
-		private unsafe void CreateTexture(uint texture_id, void* bitmapPTRV)
+		private unsafe void CreateTexture(uint texture_id, ULBitmap bitmap)
 		{
 #if DEBUG
 			Console.WriteLine($"CreateTexture({texture_id})");
 #endif
-			IntPtr bitmapPTR = (IntPtr)bitmapPTRV;
-			bool isRT = Methods.ulBitmapIsEmpty(bitmapPTR);
+			bool isRT = bitmap.IsEmpty;
 			TextureEntry entry = TextureEntries[texture_id];
 
-			uint width = Methods.ulBitmapGetWidth(bitmapPTR);
-			uint height = Methods.ulBitmapGetHeight(bitmapPTR);
-			uint bpp = Methods.ulBitmapGetBpp(bitmapPTR);
+			uint width = bitmap.Width;
+			uint height = bitmap.Height;
+			uint bpp = bitmap.Bpp;
 
 			TextureDescription textureDescription = new()
 			{
@@ -271,7 +225,11 @@ namespace UltralightNet.Veldrid
 
 			if (!isRT)
 			{
-				UploadTexture(entry.texture, bitmapPTR, width, height, bpp);
+				uint rowBytes = bitmap.RowBytes;
+				if(bpp * width != rowBytes){
+					entry.unstride = ArrayPool<byte>.Shared.Rent((int)(width * height * bpp));
+				}
+				UploadTexture(entry, bitmap, width, height, bpp, rowBytes);
 			}
 
 			entry.resourceSet = graphicsDevice.ResourceFactory.CreateResourceSet(
@@ -282,16 +240,15 @@ namespace UltralightNet.Veldrid
 			);
 		}
 		[SkipLocalsInit]
-		private void UpdateTexture(uint texture_id, void* bitmapPTRV)
+		private void UpdateTexture(uint texture_id, ULBitmap bitmap)
 		{
-			IntPtr bitmapPTR = (IntPtr)bitmapPTRV;
 			TextureEntry entry = TextureEntries[texture_id];
 
-			uint height = Methods.ulBitmapGetHeight(bitmapPTR);
-			uint width = Methods.ulBitmapGetWidth(bitmapPTR);
-			uint bpp = Methods.ulBitmapGetBpp(bitmapPTR);
+			uint height = bitmap.Height;
+			uint width = bitmap.Width;
+			uint bpp = bitmap.Bpp;
 
-			UploadTexture(entry.texture, bitmapPTR, width, height, bpp);
+			UploadTexture(entry, bitmap, width, height, bpp, bitmap.RowBytes);
 		}
 		[SkipLocalsInit]
 		private void DestroyTexture(uint texture_id)
@@ -304,6 +261,7 @@ namespace UltralightNet.Veldrid
 			entry.resourceSet = null;
 			entry.texture.Dispose();
 			entry.texture = null;
+			if(entry.unstride is not null) ArrayPool<byte>.Shared.Return(entry.unstride);
 		}
 		#endregion Texture
 		#region Geometry
@@ -522,6 +480,7 @@ namespace UltralightNet.Veldrid
 		public class TextureEntry
 		{
 			public Texture texture;
+			public byte[]? unstride;
 			public ResourceSet resourceSet;
 		}
 		private class GeometryEntry

@@ -57,4 +57,7 @@ void main(void)
   ex_Data4 = in_Data4;
   ex_Data5 = in_Data5;
   ex_Data6 = in_Data6;
+  #if VELDRID
+	gl_Position.y = -gl_Position.y;
+	#endif
 }
