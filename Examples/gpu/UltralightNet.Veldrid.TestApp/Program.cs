@@ -18,11 +18,24 @@ namespace UltralightNet.Veldrid.TestApp
 {
 	class Program
 	{
-		private const GraphicsBackend BACKEND = GraphicsBackend.Vulkan;
-		private const bool TRANSPARENT = false;
+		private const GraphicsBackend BACKEND = GraphicsBackend.Direct3D11;
+		private const bool WaitForLoad = false;
 
 		private const uint Width = 1024;
 		private const uint Height = 512;
+
+		private static readonly ULConfig config = new()
+		{
+			ForceRepaint = false,
+			CachePath = "./cache/",
+			//BitmapAlignment = 0 // improves performance
+			FaceWinding = ULFaceWinding.Clockwise
+		};
+		private static readonly ULViewConfig viewConfig = new()
+		{
+			IsAccelerated = true,
+			IsTransparent = false
+		};
 
 		[DllImport("Ultralight", EntryPoint = "?GetKeyIdentifierFromVirtualKeyCode@ultralight@@YAXHAEAVString@1@@Z")]
 		private static extern void GetKey(int i, IntPtr id);
@@ -77,22 +90,22 @@ namespace UltralightNet.Veldrid.TestApp
 					depthWriteEnabled: false,
 					comparisonKind: ComparisonKind.Never),
 				new RasterizerStateDescription(
-					cullMode: FaceCullMode.Back,
+					cullMode: FaceCullMode.None,
 					fillMode: PolygonFillMode.Solid,
 					frontFace: FrontFace.Clockwise,
-					depthClipEnabled: true,
+					depthClipEnabled: false,
 					scissorTestEnabled: false),
-				PrimitiveTopology.TriangleStrip,
+				PrimitiveTopology.TriangleList,
 				new ShaderSetDescription(
 					new VertexLayoutDescription[] {
 						new VertexLayoutDescription(
 							new VertexElementDescription(
-								"vPos",
+								"in_pos",
 								VertexElementSemantic.TextureCoordinate,
 								VertexElementFormat.Float2
 							),
 							new VertexElementDescription(
-								"fUv",
+								"in_uv",
 								VertexElementSemantic.TextureCoordinate,
 								VertexElementFormat.Float2
 							)
@@ -109,7 +122,7 @@ layout(location = 0) out vec2 out_uv;
 void main()
 {
     //gl_Position = vec4(vPos.x, vPos.y, vPos.z, 1.0);
-    gl_Position = vec4(in_pos, 0, 1);
+	gl_Position = vec4(in_pos, 0, 1);
 	//fUv = 0.5 * vPos.xy + vec2(0.5,0.5);
 	out_uv = in_uv;
 }
@@ -150,27 +163,19 @@ void main()
 			AppCoreMethods.ulEnablePlatformFontLoader();
 			ULPlatform.GPUDriver = gpuDriver.GetGPUDriver();
 
-			var c = new ULConfig()
-			{
-				ForceRepaint = true,
-				CachePath = "./cache/"
-			};
-			Console.WriteLine(c.CachePath);
-			Renderer renderer = ULPlatform.CreateRenderer(c);
-
-			View view = renderer.CreateView(Width, Height, new ULViewConfig()
-			{
-				IsAccelerated = true,
-				IsTransparent = false,
-			});
+			Renderer renderer = ULPlatform.CreateRenderer(config);
+			Session session = renderer.CreateSession(true, "Cookies_please");
+			View view = renderer.CreateView(Width, Height, viewConfig, session);
 
 			//View cpuView = new(renderer, Width, Height, TRANSPARENT, Session.DefaultSession(renderer), true);
 
-			const string url = /*"https://en.key-test.ru/";*/"https://github.com/SupinePandora43";
+			const string url = "https://en.key-test.ru/";//*/"https://github.com/SupinePandora43";
 
 			//view.URL = url;
 
-			view.HTML = "<html><body><p>123</p></body></html>";
+			//view.HTML = "<html><body><p>123</p></body></html>";
+			//view.URL = "https://github.com";
+			view.URL = "https://youtu.be/YNL692WN6EE";
 			//cpuView.URL = url;
 
 			/*try
@@ -313,8 +318,8 @@ void main()
 				new(1, -1, 1, 1 ),
 			});
 
-			DeviceBuffer quadI = factory.CreateBuffer(new(sizeof(short) * 4, BufferUsage.IndexBuffer));
-			graphicsDevice.UpdateBuffer(quadI, 0, new short[] { 0, 1, 2, 3 });
+			DeviceBuffer quadI = factory.CreateBuffer(new(sizeof(short) * 6, BufferUsage.IndexBuffer));
+			graphicsDevice.UpdateBuffer(quadI, 0, new short[] { 0, 1, 2, 3, 2, 1 });
 
 			Stopwatch stopwatch = new();
 			stopwatch.Start();
@@ -350,7 +355,6 @@ void main()
 				Methods.ulUpdate(rendererPtr);
 				gpuDriver.time = stopwatch.ElapsedTicks / 1000f;
 				//Console.WriteLine("Render");
-				Methods.ulRender(rendererPtr);
 				renderer.Render();
 				//Console.WriteLine("Done");
 
@@ -386,7 +390,7 @@ void main()
 				//commandList.ClearColorTarget(0, new RgbaFloat(MathF.Sin(stopwatch.Elapsed.Milliseconds / 100f), 255, 0, 255));
 				//commandList.ClearColorTarget(0, RgbaFloat.Blue);
 
-				if (TRANSPARENT) commandList.ClearColorTarget(0, RgbaFloat.Clear);
+				/*if (TRANSPARENT)*/ //commandList.ClearColorTarget(0, RgbaFloat.Orange);
 
 				commandList.SetVertexBuffer(0, quadV);
 				commandList.SetIndexBuffer(quadI, IndexFormat.UInt16);
@@ -399,7 +403,7 @@ void main()
 				commandList.SetGraphicsResourceSet(0, gpuDriver.GetRenderTarget(view));
 
 				commandList.DrawIndexed(
-					4,
+					6,
 					1,
 					0,
 					0,
@@ -417,6 +421,7 @@ void main()
 				// Thread.Sleep(1000 / 60 / 10); // ~600 fps
 			}
 
+			GC.KeepAlive(session);
 			renderer.Dispose();
 		}
 	}

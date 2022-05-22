@@ -35,6 +35,20 @@ namespace UltralightNet
 		[DllImport(LibUltralight)]
 		public static extern uint ulViewGetHeight(IntPtr view);
 
+		[DllImport(LibUltralight)]
+		public static extern double ulViewGetDeviceScale(IntPtr view);
+
+		[DllImport(LibUltralight)]
+		public static extern void ulViewSetDeviceScale(IntPtr view, double scale);
+
+		[GeneratedDllImport(LibUltralight)]
+		[return: MarshalAs(UnmanagedType.I1)]
+		public static partial bool ulViewIsAccelerated(IntPtr view);
+
+		[GeneratedDllImport(LibUltralight)]
+		[return: MarshalAs(UnmanagedType.I1)]
+		public static partial bool ulViewIsTransparent(IntPtr view);
+
 		[GeneratedDllImport(LibUltralight)]
 		[return: MarshalAs(UnmanagedType.I1)]
 		public static partial bool ulViewIsLoading(IntPtr view);
@@ -229,6 +243,10 @@ namespace UltralightNet
 
 		public uint Width => Methods.ulViewGetWidth(Ptr);
 		public uint Height => Methods.ulViewGetHeight(Ptr);
+		public double DeviceScale { get => Methods.ulViewGetDeviceScale(Ptr); set => Methods.ulViewSetDeviceScale(Ptr, value); }
+
+		public bool IsAccelerated => Methods.ulViewIsAccelerated(Ptr);
+		public bool IsTransparent => Methods.ulViewIsTransparent(Ptr);
 
 		public bool IsLoading => Methods.ulViewIsLoading(Ptr);
 
