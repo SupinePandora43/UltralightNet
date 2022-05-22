@@ -186,6 +186,7 @@ namespace UltralightNet.Veldrid
 					ReadOnlySpan<byte> row = pixels.Slice((int)(rowBytes * y), widthXbpp);
 					row.CopyTo(unstridedPixels.Slice(widthXbpp*(int)y, widthXbpp));
 				}
+				graphicsDevice.UpdateTexture(texture.texture, unstridedPixels, 0, 0, 0, width, height, 1, 0, 0);
 			}
 			bitmap.UnlockPixels();
 		}
