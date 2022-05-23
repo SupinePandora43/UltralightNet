@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio Version 16
-VisualStudioVersion = 16.0.30803.129
+# Visual Studio Version 17
+VisualStudioVersion = 17.0.32014.148
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Common", "Common", "{B71A2B2C-ED1C-4DC8-8ECC-408B15FF6661}"
 	ProjectSection(SolutionItems) = preProject
@@ -37,7 +37,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UltralightNet.Veldrid", "gp
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UltralightNet.Veldrid.TestApp", "Examples\gpu\UltralightNet.Veldrid.TestApp\UltralightNet.Veldrid.TestApp.csproj", "{F6F0F247-9E1D-469C-81D1-4FAAD701933C}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Examples.GettingStarted", "Examples\Headless\GettingStarted\GettingStarted.csproj", "{483B033B-63EF-4AB1-A27E-2AAD4C2D2FF3}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GettingStarted", "Examples\Headless\GettingStarted\GettingStarted.csproj", "{483B033B-63EF-4AB1-A27E-2AAD4C2D2FF3}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UltralightNet.AppCore.TestApp", "Examples\AppCore\UltralightNet.AppCore.TestApp\UltralightNet.AppCore.TestApp.csproj", "{6066A6F2-EE9A-4F71-9CC0-8D6D068ED97F}"
 EndProject
@@ -47,13 +47,15 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UltralightNet.Veldrid.SDL2"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Benchmarks", "src\Benchmarks\Benchmarks.csproj", "{166A9C81-274E-4ECA-A057-07C5067D7DE6}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UltralightNet.OpenGL.TestApp", "Examples\gpu\UltralightNet.OpenGL.TestApp\UltralightNet.OpenGL.TestApp.csproj", "{12E884F6-0828-4451-9B17-97A3E945D6D8}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UltralightNet.OpenGL.TestApp", "Examples\gpu\UltralightNet.OpenGL.TestApp\UltralightNet.OpenGL.TestApp.csproj", "{12E884F6-0828-4451-9B17-97A3E945D6D8}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UltralightNet.OpenGL", "gpu\libs\UltralightNet.OpenGL\UltralightNet.OpenGL.csproj", "{1CD5E12E-E31F-444F-8287-23CDA55A4D10}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UltralightNet.OpenGL", "gpu\libs\UltralightNet.OpenGL\UltralightNet.OpenGL.csproj", "{1CD5E12E-E31F-444F-8287-23CDA55A4D10}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UltralightNet.Vulkan.TestApp", "Examples\gpu\UltralightNet.Vulkan.TestApp\UltralightNet.Vulkan.TestApp.csproj", "{9EEB642C-B091-4E80-AED1-B24C06F2C820}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UltralightNet.Vulkan.TestApp", "Examples\gpu\UltralightNet.Vulkan.TestApp\UltralightNet.Vulkan.TestApp.csproj", "{9EEB642C-B091-4E80-AED1-B24C06F2C820}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UltralightNet.Vulkan", "gpu\libs\UltralightNet.Vulkan\UltralightNet.Vulkan.csproj", "{5533F4FD-2126-4506-80EA-20CF5F533DDD}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UltralightNet.Vulkan", "gpu\libs\UltralightNet.Vulkan\UltralightNet.Vulkan.csproj", "{5533F4FD-2126-4506-80EA-20CF5F533DDD}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UltralightNet.GPUCommon", "gpu\libs\UltralightNet.GPUCommon\UltralightNet.GPUCommon.csproj", "{AAFC2484-A6BF-4E57-8AC5-9F85452B7D56}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -129,6 +131,10 @@ Global
 		{5533F4FD-2126-4506-80EA-20CF5F533DDD}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5533F4FD-2126-4506-80EA-20CF5F533DDD}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5533F4FD-2126-4506-80EA-20CF5F533DDD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{AAFC2484-A6BF-4E57-8AC5-9F85452B7D56}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{AAFC2484-A6BF-4E57-8AC5-9F85452B7D56}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{AAFC2484-A6BF-4E57-8AC5-9F85452B7D56}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{AAFC2484-A6BF-4E57-8AC5-9F85452B7D56}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

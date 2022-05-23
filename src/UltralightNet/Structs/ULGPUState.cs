@@ -63,7 +63,7 @@ namespace UltralightNet
 
 		private byte _ClipSize;
 		public byte ClipSize {
-			get => Math.Min(_ClipSize, (byte)8);
+			get => _ClipSize;
 			set {
 				static void Throw(){ throw new ArgumentOutOfRangeException(nameof(value), "ClipSize can't be bigger than 8"); }
 				if(value <= 8) _ClipSize = value;
@@ -81,7 +81,7 @@ namespace UltralightNet
 		private Matrix4x4 clip_7;
 		public Span<Matrix4x4> Clip =>
 #if NETCOREAPP2_1_OR_GREATER || NETSTANDARD2_1
-			MemoryMarshal.CreateSpan<Matrix4x4>(ref clip_0, (int)ClipSize);
+			MemoryMarshal.CreateSpan<Matrix4x4>(ref clip_0, 8).Slice(0, (int)_ClipSize);
 #else
 			new Span<Matrix4x4>(Unsafe.AsPointer(ref clip_0), (int)ClipSize);
 #endif

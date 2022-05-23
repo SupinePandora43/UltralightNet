@@ -1,5 +1,3 @@
-namespace UltralightNet.Vulkan;
-
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -16,6 +14,10 @@ using UltralightNet;
 using UltralightNet.GPUCommon;
 using Buffer = Silk.NET.Vulkan.Buffer;
 
+[module: SkipLocalsInit]
+
+namespace UltralightNet.Vulkan;
+
 // https://github.com/SaschaWillems/Vulkan/blob/master/examples/offscreen/offscreen.cpp for reference
 
 public class RenderBufferEntry
@@ -23,7 +25,7 @@ public class RenderBufferEntry
 	public Framebuffer framebuffer;
 
 	public TextureEntry textureEntry;
-	
+
 	public Image resolveImage;
 	internal DeviceMemory resolveImageMemory;
 }
@@ -72,6 +74,7 @@ public unsafe partial class VulkanGPUDriver
 	private readonly PipelineLayout fillPipelineLayout;
 	private readonly PipelineLayout pathPipelineLayout;
 	private readonly Pipeline fillPipeline;
+	private readonly Pipeline fillPipeline_NoBlend;
 	private readonly Pipeline pathPipeline;
 	private readonly DescriptorSetLayout uniformSetLayout;
 	private readonly DescriptorPool uniformDescriptorPool;
@@ -84,11 +87,11 @@ public unsafe partial class VulkanGPUDriver
 	private const SampleCountFlags msaaSamples = SampleCountFlags.SampleCount4Bit;
 
 	private readonly List<TextureEntry> textures = new();
-	private readonly Queue<uint> texturesFreeIds = new();
+	private readonly Stack<uint> texturesFreeIds = new();
 	private readonly List<GeometryEntry> geometries = new();
-	private readonly Queue<uint> geometriesFreeIds = new();
+	private readonly Stack<uint> geometriesFreeIds = new();
 	private readonly List<RenderBufferEntry> renderBuffers = new();
-	private readonly Queue<uint> renderBuffersFreeIds = new();
+	private readonly Stack<uint> renderBuffersFreeIds = new();
 
 	private uint stat_CreateGeometry = 0;
 	private uint stat_UpdateGeometry = 0;
@@ -96,6 +99,9 @@ public unsafe partial class VulkanGPUDriver
 	private uint stat_CreateTexture = 0;
 	private uint stat_UpdateTexture = 0;
 	private uint stat_DestroyTexture = 0;
+
+	public SampleCountFlags SampleCount = SampleCountFlags.SampleCount1Bit; // TODO: Use 4
+	private bool UseMS => SampleCount != SampleCountFlags.SampleCount1Bit;
 
 	public VulkanGPUDriver(Vk vk, PhysicalDevice physicalDevice, Device device)
 	{
@@ -107,31 +113,6 @@ public unsafe partial class VulkanGPUDriver
 		textures.Add(new()); // id => 1 workaround
 		renderBuffers.Add(new()); // id => 1 workaround
 
-		#region TextureSetLayout
-		DescriptorSetLayoutBinding samplerLayoutBinding = new()
-		{
-			Binding = 0,
-			DescriptorCount = 1,
-			DescriptorType = DescriptorType.CombinedImageSampler,
-			PImmutableSamplers = null,
-			StageFlags = ShaderStageFlags.ShaderStageFragmentBit,
-		};
-
-		fixed (DescriptorSetLayout* textureSetLayoutPtr = &textureSetLayout)
-		{
-			DescriptorSetLayoutCreateInfo layoutInfo = new()
-			{
-				SType = StructureType.DescriptorSetLayoutCreateInfo,
-				BindingCount = 1,
-				PBindings = &samplerLayoutBinding,
-			};
-
-			if (vk.CreateDescriptorSetLayout(device, layoutInfo, null, textureSetLayoutPtr) != Result.Success)
-			{
-				throw new Exception("failed to create descriptor set layout!");
-			}
-		}
-		#endregion TextureSetLayout
 		#region TextureSampler
 		SamplerCreateInfo samplerInfo = new()
 		{
@@ -161,18 +142,44 @@ public unsafe partial class VulkanGPUDriver
 			}
 		}
 		#endregion TextureSampler
+		#region TextureSetLayout
+		Sampler* immutableSamplers = stackalloc Sampler[2]{ textureSampler, default };
+		DescriptorSetLayoutBinding samplerLayoutBinding = new()
+		{
+			Binding = 0,
+			DescriptorCount = 1,
+			DescriptorType = DescriptorType.CombinedImageSampler,
+			PImmutableSamplers = immutableSamplers,
+			StageFlags = ShaderStageFlags.ShaderStageFragmentBit,
+		};
+
+		fixed (DescriptorSetLayout* textureSetLayoutPtr = &textureSetLayout)
+		{
+			DescriptorSetLayoutCreateInfo layoutInfo = new()
+			{
+				SType = StructureType.DescriptorSetLayoutCreateInfo,
+				BindingCount = 1,
+				PBindings = &samplerLayoutBinding
+			};
+
+			if (vk.CreateDescriptorSetLayout(device, layoutInfo, null, textureSetLayoutPtr) != Result.Success)
+			{
+				throw new Exception("failed to create descriptor set layout!");
+			}
+		}
+		#endregion TextureSetLayout
 		#region RenderPass
 		{
 			AttachmentDescription colorAttachment = new()
 			{
 				Format = Format.B8G8R8A8Unorm,
 				Samples = SampleCountFlags.SampleCount1Bit,
-				LoadOp = AttachmentLoadOp.Load,
+				LoadOp = AttachmentLoadOp.DontCare, // Load
 				StoreOp = AttachmentStoreOp.Store,
 				StencilLoadOp = AttachmentLoadOp.DontCare,
 				StencilStoreOp = AttachmentStoreOp.DontCare,
 				InitialLayout = ImageLayout.ShaderReadOnlyOptimal,
-				FinalLayout = ImageLayout.ShaderReadOnlyOptimal,
+				FinalLayout = ImageLayout.ShaderReadOnlyOptimal
 			};
 
 			AttachmentReference colorAttachmentRef = new()
@@ -181,22 +188,40 @@ public unsafe partial class VulkanGPUDriver
 				Layout = ImageLayout.ColorAttachmentOptimal,
 			};
 
+
+			uint one = 1;
 			SubpassDescription subpass = new()
 			{
+				Flags = 0,
 				PipelineBindPoint = PipelineBindPoint.Graphics,
+				InputAttachmentCount = 0,
+				PInputAttachments = null,
 				ColorAttachmentCount = 1,
 				PColorAttachments = &colorAttachmentRef,
-				//PResolveAttachments = &colorAttachmentRef
+				PResolveAttachments = UseMS ? throw new NotImplementedException("MSAA isn't implemented yet") : null,
+				PDepthStencilAttachment = null, // no depth is used in ultralight yet
+				PreserveAttachmentCount = UseMS ? 1u : 0u,
+				PPreserveAttachments = UseMS ? &one : null
 			};
 
-			SubpassDependency dependency = new()
-			{
-				SrcSubpass = Vk.SubpassExternal,
-				DstSubpass = 0,
-				SrcStageMask = PipelineStageFlags.PipelineStageFragmentShaderBit,
-				SrcAccessMask = AccessFlags.AccessShaderReadBit,
-				DstStageMask = PipelineStageFlags.PipelineStageColorAttachmentOutputBit,
-				DstAccessMask = AccessFlags.AccessColorAttachmentWriteBit
+			SubpassDependency* dependencies = stackalloc SubpassDependency[2]{
+				new()
+				{
+					SrcSubpass = Vk.SubpassExternal,
+					DstSubpass = 0,
+					SrcStageMask = PipelineStageFlags.PipelineStageFragmentShaderBit,
+					DstStageMask = PipelineStageFlags.PipelineStageColorAttachmentOutputBit,
+					SrcAccessMask = AccessFlags.AccessShaderReadBit,
+					DstAccessMask = AccessFlags.AccessColorAttachmentWriteBit | AccessFlags.AccessColorAttachmentReadBit
+				},
+				new(){
+					SrcSubpass = 0,
+					DstSubpass = Vk.SubpassExternal,
+					SrcStageMask = PipelineStageFlags.PipelineStageColorAttachmentOutputBit,
+					DstStageMask = PipelineStageFlags.PipelineStageFragmentShaderBit,
+					SrcAccessMask = AccessFlags.AccessColorAttachmentWriteBit | AccessFlags.AccessColorAttachmentReadBit,
+					DstAccessMask = AccessFlags.AccessShaderReadBit
+				}
 			};
 
 			RenderPassCreateInfo renderPassInfo = new()
@@ -206,8 +231,8 @@ public unsafe partial class VulkanGPUDriver
 				PAttachments = &colorAttachment,
 				SubpassCount = 1,
 				PSubpasses = &subpass,
-				DependencyCount = 1,
-				PDependencies = &dependency
+				DependencyCount = 2,
+				PDependencies = dependencies
 			};
 
 			if (vk.CreateRenderPass(device, renderPassInfo, null, out pipelineRenderPass) is not Result.Success)
@@ -354,7 +379,7 @@ public unsafe partial class VulkanGPUDriver
 					SType = StructureType.PipelineDepthStencilStateCreateInfo,
 					DepthTestEnable = false,
 					DepthWriteEnable = false,
-					DepthCompareOp = CompareOp.Less,
+					DepthCompareOp = CompareOp.Never,
 					DepthBoundsTestEnable = false,
 					StencilTestEnable = false,
 				};
@@ -423,6 +448,31 @@ public unsafe partial class VulkanGPUDriver
 					throw new Exception("failed to create graphics pipeline!");
 				}
 
+				{
+					PipelineColorBlendAttachmentState colorBlendAttachmentNoBlend = new()
+					{
+						ColorWriteMask = ColorComponentFlags.ColorComponentRBit | ColorComponentFlags.ColorComponentGBit | ColorComponentFlags.ColorComponentBBit | ColorComponentFlags.ColorComponentABit,
+						BlendEnable = false,
+						ColorBlendOp = BlendOp.Add,
+						AlphaBlendOp = BlendOp.Add,
+						SrcAlphaBlendFactor = BlendFactor.One,
+						DstAlphaBlendFactor = BlendFactor.One,
+						SrcColorBlendFactor = BlendFactor.One,
+						DstColorBlendFactor = BlendFactor.One
+					};
+					PipelineColorBlendStateCreateInfo colorBlendingNoBlend = new()
+					{
+						SType = StructureType.PipelineColorBlendStateCreateInfo,
+						LogicOpEnable = false,
+						LogicOp = LogicOp.Clear,
+						AttachmentCount = 1,
+						PAttachments = &colorBlendAttachmentNoBlend,
+					};
+					vk.CreateGraphicsPipelines(device, default, 1, pipelineInfo with {PColorBlendState = &colorBlendingNoBlend}, null, out fillPipeline_NoBlend);
+				}
+
+				//vk.DestroyShaderModule(device, shaderStages[0].Module, null);
+				//vk.DestroyShaderModule(device, shaderStages[1].Module, null);
 
 				vertexInputBindingDescription.Stride = 20;
 				pipelineVertexInputStateCreateInfo.VertexAttributeDescriptionCount = 3;
@@ -433,10 +483,14 @@ public unsafe partial class VulkanGPUDriver
 				}
 				shaderStages[0] = LoadShader("UltralightNet.Vulkan.shader_fill_path.vert.spv", ShaderStageFlags.ShaderStageVertexBit);
 				shaderStages[1] = LoadShader("UltralightNet.Vulkan.shader_fill_path.frag.spv", ShaderStageFlags.ShaderStageFragmentBit);
+				pipelineInfo.Layout = pathPipelineLayout;
 				if (vk.CreateGraphicsPipelines(device, default, 1, pipelineInfo, null, out pathPipeline) is not Result.Success)
 				{
 					throw new Exception("failed to create graphics pipeline!");
 				}
+
+				//vk.DestroyShaderModule(device, shaderStages[0].Module, null);
+				//vk.DestroyShaderModule(device, shaderStages[1].Module, null);
 
 				SilkMarshal.Free((nint)_shader_main);
 			}
@@ -446,7 +500,7 @@ public unsafe partial class VulkanGPUDriver
 		#region DescriptorPool
 		var poolSize = new DescriptorPoolSize()
 		{
-			Type = DescriptorType.UniformBuffer,
+			Type = DescriptorType.UniformBufferDynamic,
 			DescriptorCount = 1,
 		};
 		DescriptorPool uniformDescriptorPool;
@@ -513,7 +567,7 @@ public unsafe partial class VulkanGPUDriver
 	#region ID
 	private uint NextGeometryId()
 	{
-		if (geometriesFreeIds.Count is not 0) return geometriesFreeIds.Dequeue();
+		if (geometriesFreeIds.Count is not 0) return geometriesFreeIds.Pop();
 		else
 		{
 			geometries.Add(new());
@@ -522,7 +576,7 @@ public unsafe partial class VulkanGPUDriver
 	}
 	private uint NextTextureId()
 	{
-		if (texturesFreeIds.Count is not 0) return texturesFreeIds.Dequeue();
+		if (texturesFreeIds.Count is not 0) return texturesFreeIds.Pop();
 		else
 		{
 			textures.Add(new());
@@ -531,7 +585,7 @@ public unsafe partial class VulkanGPUDriver
 	}
 	private uint NextRenderBufferId()
 	{
-		if (renderBuffersFreeIds.Count is not 0) return renderBuffersFreeIds.Dequeue();
+		if (renderBuffersFreeIds.Count is not 0) return renderBuffersFreeIds.Pop();
 		else
 		{
 			renderBuffers.Add(new());
@@ -544,7 +598,7 @@ public unsafe partial class VulkanGPUDriver
 	private void CreateRenderBuffer(uint id, ULRenderBuffer renderBuffer)
 	{
 		RenderBufferEntry renderBufferEntry = renderBuffers[(int)id];
-		TextureEntry textureEntry = textures[(int)renderBuffer.texture_id];
+		TextureEntry textureEntry = textures[(int)renderBuffer.TextureId];
 		renderBufferEntry.textureEntry = textureEntry;
 
 		fixed (ImageView* attachmentsPtr = &textureEntry.imageView)
@@ -570,7 +624,7 @@ public unsafe partial class VulkanGPUDriver
 	{
 		RenderBufferEntry renderBufferEntry = renderBuffers[(int)id];
 		vk.DestroyFramebuffer(device, renderBufferEntry.framebuffer, null);
-		renderBuffersFreeIds.Enqueue(id);
+		renderBuffersFreeIds.Push(id);
 	}
 
 	//[SkipLocalsInit]
@@ -601,7 +655,7 @@ public unsafe partial class VulkanGPUDriver
 			Format = isBgra ? Format.B8G8R8A8Unorm : Format.R8Unorm,
 			Tiling = ImageTiling.Optimal,
 			InitialLayout = ImageLayout.Undefined,
-			Usage = isRt ? ImageUsageFlags.ImageUsageTransferDstBit | ImageUsageFlags.ImageUsageColorAttachmentBit | ImageUsageFlags.ImageUsageSampledBit : ImageUsageFlags.ImageUsageTransferDstBit | ImageUsageFlags.ImageUsageSampledBit,
+			Usage = (isRt ? ImageUsageFlags.ImageUsageColorAttachmentBit : 0) | ImageUsageFlags.ImageUsageTransferDstBit | ImageUsageFlags.ImageUsageSampledBit,
 			Samples = isRt ? SampleCountFlags.SampleCount1Bit : SampleCountFlags.SampleCount1Bit,
 			SharingMode = SharingMode.Exclusive
 		};
@@ -636,7 +690,17 @@ public unsafe partial class VulkanGPUDriver
 
 		if (isRt)
 		{
-			PipelineBarrier(commandBuffer, image, ImageLayout.Undefined, ImageLayout.ShaderReadOnlyOptimal);
+			ImageMemoryBarrier imageMemoryBarrier = new(
+				srcAccessMask: AccessFlags.AccessNoneKhr,
+				dstAccessMask: AccessFlags.AccessShaderReadBit,
+				oldLayout: ImageLayout.Undefined,
+				newLayout: ImageLayout.ShaderReadOnlyOptimal,
+				srcQueueFamilyIndex: Vk.QueueFamilyIgnored,
+				dstQueueFamilyIndex: Vk.QueueFamilyIgnored,
+				image: image,
+				subresourceRange: new(ImageAspectFlags.ImageAspectColorBit, 0, 1, 0, 1)
+			);
+			vk.CmdPipelineBarrier(commandBuffer, PipelineStageFlags.PipelineStageTopOfPipeBit, PipelineStageFlags.PipelineStageFragmentShaderBit, 0, 0, null, 0, null, 1, &imageMemoryBarrier);
 		}
 		else
 		{
@@ -796,7 +860,7 @@ public unsafe partial class VulkanGPUDriver
 		vk.DestroyImage(device, textureEntry.image, null);
 		vk.FreeMemory(device, textureEntry.imageMemory, null);
 
-		texturesFreeIds.Enqueue(id);
+		texturesFreeIds.Push(id);
 	}
 
 	[SkipLocalsInit]
@@ -832,8 +896,64 @@ public unsafe partial class VulkanGPUDriver
 		new ReadOnlySpan<byte>(ib.data, (int)ib.size).CopyTo(new Span<byte>(indexStaging, (int)ib.size));
 		vk.UnmapMemory(device, indexStagingMemory);
 
+		BufferMemoryBarrier* barriers = stackalloc BufferMemoryBarrier[4]{
+			new(srcAccessMask: AccessFlags.AccessNoneKhr,
+				dstAccessMask: AccessFlags.AccessTransferWriteBit,
+				srcQueueFamilyIndex: Vk.QueueFamilyIgnored,
+				dstQueueFamilyIndex: Vk.QueueFamilyIgnored,
+				buffer: vertexBuffer,
+				offset: 0,
+				size: vb.size),
+			new(srcAccessMask: AccessFlags.AccessNoneKhr,
+				dstAccessMask: AccessFlags.AccessTransferWriteBit,
+				srcQueueFamilyIndex: Vk.QueueFamilyIgnored,
+				dstQueueFamilyIndex: Vk.QueueFamilyIgnored,
+				buffer: indexBuffer,
+				offset: 0,
+				size: ib.size),
+			new(srcAccessMask: AccessFlags.AccessNoneKhr,
+				dstAccessMask: AccessFlags.AccessTransferReadBit,
+				srcQueueFamilyIndex: Vk.QueueFamilyIgnored,
+				dstQueueFamilyIndex: Vk.QueueFamilyIgnored,
+				buffer: vertexStagingBuffer,
+				offset: 0,
+				size: vb.size),
+			new(srcAccessMask: AccessFlags.AccessNoneKhr,
+				dstAccessMask: AccessFlags.AccessTransferReadBit,
+				srcQueueFamilyIndex: Vk.QueueFamilyIgnored,
+				dstQueueFamilyIndex: Vk.QueueFamilyIgnored,
+				buffer: indexStagingBuffer,
+				offset: 0,
+				size: ib.size)
+		};
+
+		vk.CmdPipelineBarrier(commandBuffer,
+			PipelineStageFlags.PipelineStageBottomOfPipeBit,
+			PipelineStageFlags.PipelineStageTransferBit,
+			0,
+			0, null,
+			4, barriers,
+			0, null);
+
 		CopyBuffer(commandBuffer, vertexStagingBuffer, vertexBuffer, vb.size);
 		CopyBuffer(commandBuffer, indexStagingBuffer, indexBuffer, ib.size);
+
+		barriers[0] = barriers[0] with {
+			SrcAccessMask= AccessFlags.AccessTransferWriteBit,
+			DstAccessMask = AccessFlags.AccessVertexAttributeReadBit
+		};
+		barriers[1] = barriers[1] with {
+			SrcAccessMask= AccessFlags.AccessTransferWriteBit,
+			DstAccessMask = AccessFlags.AccessIndexReadBit
+		};
+
+		vk.CmdPipelineBarrier(commandBuffer,
+			PipelineStageFlags.PipelineStageTransferBit,
+			PipelineStageFlags.PipelineStageVertexInputBit,
+			0,
+			0, null,
+			2, barriers,
+			0, null);
 
 		geometries[(int)id] = new GeometryEntry()
 		{
@@ -866,8 +986,50 @@ public unsafe partial class VulkanGPUDriver
 		new ReadOnlySpan<byte>(ib.data, (int)ib.size).CopyTo(new Span<byte>(indexStaging, (int)ib.size));
 		vk.UnmapMemory(device, geometryEntry.indexStagingMemory);
 
+		BufferMemoryBarrier* barriers = stackalloc BufferMemoryBarrier[2]{
+			new(srcAccessMask: AccessFlags.AccessVertexAttributeReadBit,
+				dstAccessMask: AccessFlags.AccessTransferWriteBit,
+				srcQueueFamilyIndex: Vk.QueueFamilyIgnored,
+				dstQueueFamilyIndex: Vk.QueueFamilyIgnored,
+				buffer: geometryEntry.vertexBuffer,
+				offset: 0,
+				size: vb.size),
+			new(srcAccessMask: AccessFlags.AccessIndexReadBit,
+				dstAccessMask: AccessFlags.AccessTransferWriteBit,
+				srcQueueFamilyIndex: Vk.QueueFamilyIgnored,
+				dstQueueFamilyIndex: Vk.QueueFamilyIgnored,
+				buffer: geometryEntry.indexBuffer,
+				offset: 0,
+				size: ib.size)
+		};
+
+		vk.CmdPipelineBarrier(commandBuffer,
+			PipelineStageFlags.PipelineStageVertexInputBit,
+			PipelineStageFlags.PipelineStageTransferBit,
+			0,
+			0, null,
+			2, barriers,
+			0, null);
+
 		CopyBuffer(commandBuffer, geometryEntry.vertexStagingBuffer, geometryEntry.vertexBuffer, vb.size);
 		CopyBuffer(commandBuffer, geometryEntry.indexStagingBuffer, geometryEntry.indexBuffer, ib.size);
+
+		barriers[0] = barriers[0] with {
+			SrcAccessMask = AccessFlags.AccessTransferWriteBit,
+			DstAccessMask = AccessFlags.AccessVertexAttributeReadBit
+		};
+		barriers[1] = barriers[1] with {
+			SrcAccessMask = AccessFlags.AccessTransferWriteBit,
+			DstAccessMask = AccessFlags.AccessIndexReadBit
+		};
+
+		vk.CmdPipelineBarrier(commandBuffer,
+			PipelineStageFlags.PipelineStageTransferBit,
+			PipelineStageFlags.PipelineStageVertexInputBit,
+			0,
+			0, null,
+			2, barriers,
+			0, null);
 	}
 	[SkipLocalsInit]
 	private void DestroyGeometry(uint id)
@@ -885,7 +1047,7 @@ public unsafe partial class VulkanGPUDriver
 		vk.FreeMemory(device, geometryEntry.indexStagingMemory, null);
 		vk.FreeMemory(device, geometryEntry.indexMemory, null);
 
-		geometriesFreeIds.Enqueue(id);
+		geometriesFreeIds.Push(id);
 	}
 
 	#region Rendering
@@ -906,10 +1068,10 @@ public unsafe partial class VulkanGPUDriver
 
 		foreach (var command in s)
 		{
-			ULGPUState state = command.gpu_state;
-			RenderBufferEntry renderBufferEntry = renderBuffers[(int)command.gpu_state.render_buffer_id];
+			ULGPUState state = command.GPUState;
+			RenderBufferEntry renderBufferEntry = renderBuffers[(int)command.GPUState.RenderBufferId];
 
-			if (command.command_type is ULCommandType.ClearRenderBuffer)
+			if (command.CommandType is ULCommandType.ClearRenderBuffer)
 			{
 				if (currentRenderBuffer is not uint.MaxValue)
 				{
@@ -920,22 +1082,22 @@ public unsafe partial class VulkanGPUDriver
 				PipelineBarrier(commandBuffer, rt.image, ImageLayout.ShaderReadOnlyOptimal, ImageLayout.TransferDstOptimal);
 				ClearColorValue clearColorValue = new()
 				{
-					Float32_0 = 0,
-					Float32_1 = 0,
-					Float32_2 = 0,
-					Float32_3 = 0
+					Float32_0 = 0f,
+					Float32_1 = 0f,
+					Float32_2 = 0f,
+					Float32_3 = 0f
 				};
 				ImageSubresourceRange imageSubresourceRange = new(ImageAspectFlags.ImageAspectColorBit, 0, 1, 0, 1);
 				vk.CmdClearColorImage(commandBuffer, rt.image, ImageLayout.TransferDstOptimal, &clearColorValue, 1, &imageSubresourceRange);
 				PipelineBarrier(commandBuffer, rt.image, ImageLayout.TransferDstOptimal, ImageLayout.ShaderReadOnlyOptimal);
 			}
 
-			if (command.command_type is ULCommandType.DrawGeometry) // TODO: clearrenderbuffer
+			if (command.CommandType is ULCommandType.DrawGeometry)
 			{
-				uniforms[uniformBufferId].Transform = state.transform.ApplyProjection(state.viewport_width, state.viewport_height, true);
-				uniforms[uniformBufferId].ClipSize = state.clip_size;
-				new ReadOnlySpan<Vector4>(&state.scalar_0, 10).CopyTo(new Span<Vector4>(&uniforms[uniformBufferId].Scalar4_0.W, 10));
-				new ReadOnlySpan<Matrix4x4>(&state.clip_0.M11, 8).CopyTo(new Span<Matrix4x4>(&uniforms[uniformBufferId].Clip_0.M11, 8));
+				uniforms[uniformBufferId].Transform = state.Transform.ApplyProjection(state.ViewportWidth, state.ViewportHeight, true);
+				uniforms[uniformBufferId].ClipSize = state.ClipSize;
+				state.Scalar.CopyTo(new Span<float>(&uniforms[uniformBufferId].Scalar4_0.W, state.Scalar.Length) );
+				state.Clip.CopyTo(new Span<Matrix4x4>(&uniforms[uniformBufferId].Clip_0.M11, 8));
 
 				RenderPassBeginInfo renderPassBeginInfo = new()
 				{
@@ -945,47 +1107,57 @@ public unsafe partial class VulkanGPUDriver
 					RenderArea =
 					{
 						Offset = { X = 0, Y = 0 },
-						Extent = new(state.viewport_width, state.viewport_height),
+						Extent = new(state.ViewportWidth, state.ViewportHeight),
 					},
 					ClearValueCount = 0,
 					PClearValues = null,
 					PNext = null
 				};
-				if (currentRenderBuffer != state.render_buffer_id)
+				if (currentRenderBuffer != state.RenderBufferId)
 				{
-					if (currentRenderBuffer is not uint.MaxValue) vk.CmdEndRenderPass(commandBuffer);
-					currentRenderBuffer = state.render_buffer_id;
+					if (currentRenderBuffer is not uint.MaxValue){
+						vk.CmdEndRenderPass(commandBuffer);
+					}
+					currentRenderBuffer = state.RenderBufferId;
 					vk.CmdBeginRenderPass(commandBuffer, &renderPassBeginInfo, SubpassContents.Inline);
 				}
 
-				vk.CmdBindPipeline(commandBuffer, PipelineBindPoint.Graphics, state.shader_type is ULShaderType.Fill ? fillPipeline : pathPipeline);
+				Debug.Assert((!state.EnableBlend) ? state.ShaderType is ULShaderType.Fill : true);
 
-				TextureEntry textureEntry1 = textures[(int)state.texture_1_id];
-				TextureEntry textureEntry2 = textures[(int)state.texture_2_id is 0 ? (int)state.texture_1_id : (int)state.texture_2_id];
-
-				descriptorSets[1] = textureEntry1.descriptorSet;
-				descriptorSets[2] = textureEntry2.descriptorSet;
+				vk.CmdBindPipeline(commandBuffer, PipelineBindPoint.Graphics, state.ShaderType is ULShaderType.Fill ? (state.EnableBlend ? fillPipeline : fillPipeline_NoBlend) : pathPipeline);
 
 				uint bufferOffset = (uint)UniformBufferSize * uniformBufferId;
 
-				vk.CmdBindDescriptorSets(commandBuffer, PipelineBindPoint.Graphics, fillPipelineLayout, 0, state.shader_type is ULShaderType.Fill ? 3u : 1u, descriptorSets, 1, &bufferOffset);
+				if(state.ShaderType is ULShaderType.Fill){
+					TextureEntry textureEntry1 = textures[(int)state.Texture1Id];
+					TextureEntry textureEntry2 = textures[(int)state.Texture2Id is 0 ? (int)state.Texture1Id : (int)state.Texture2Id];
 
-				GeometryEntry geometryEntry = geometries[(int)command.geometry_id];
+					descriptorSets[1] = textureEntry1.descriptorSet;
+					descriptorSets[2] = textureEntry2.descriptorSet;
+
+					vk.CmdBindDescriptorSets(commandBuffer, PipelineBindPoint.Graphics, fillPipelineLayout, 0, 3u, descriptorSets, 1, &bufferOffset);
+				}else
+					vk.CmdBindDescriptorSets(commandBuffer, PipelineBindPoint.Graphics, pathPipelineLayout, 0, 1u, descriptorSets, 1, &bufferOffset);
+
+
+				GeometryEntry geometryEntry = geometries[(int)command.GeometryId];
 
 				vk.CmdBindVertexBuffers(commandBuffer, 0, 1, geometryEntry.vertexBuffer, 0);
 				vk.CmdBindIndexBuffer(commandBuffer, geometryEntry.indexBuffer, 0, IndexType.Uint32);
 
-				Viewport viewport = new(0, 0, state.viewport_width, state.viewport_height, 0, 0);
+				Viewport viewport = new(0, 0, state.ViewportWidth, state.ViewportHeight, 0, 0);
 				vk.CmdSetViewport(commandBuffer, 0, 1, &viewport);
-				vk.CmdSetScissor(commandBuffer, 0, 1, state.enable_scissor ? (Rect2D*)&state.scissor_rect : &renderPassBeginInfo.RenderArea);
+				vk.CmdSetScissor(commandBuffer, 0, 1, state.EnableScissor ? (Rect2D*)&state.ScissorRect : &renderPassBeginInfo.RenderArea);
 
-				vk.CmdDrawIndexed(commandBuffer, command.indices_count, 1, command.indices_offset, 0, 0);
+				vk.CmdDrawIndexed(commandBuffer, command.IndicesCount, 1, command.IndicesOffset, 0, 0);
 
 				uniformBufferId++; // TODO reuse?
 			}
 		}
 
-		if (currentRenderBuffer is not uint.MaxValue) vk.CmdEndRenderPass(commandBuffer);
+		if (currentRenderBuffer is not uint.MaxValue){
+			vk.CmdEndRenderPass(commandBuffer);
+		}
 
 		stat_CreateGeometry = 0;
 		stat_UpdateGeometry = 0;

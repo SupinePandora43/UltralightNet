@@ -7,7 +7,8 @@
 			"type": "process",
 			"args": [
 				"build",
-				"${workspaceFolder}/UltralightNet.OpenGL.TestApp/UltralightNet.OpenGL.TestApp.csproj",
+				"-c", "Release",
+				"${workspaceFolder}/Examples/gpu/UltralightNet.OpenGL.TestApp/UltralightNet.OpenGL.TestApp.csproj",
 				"/property:GenerateFullPaths=true",
 				"/consoleloggerparameters:NoSummary"
 			],
@@ -47,7 +48,7 @@
 			"type": "process",
 			"args": [
 				"build",
-				"${workspaceFolder}/UltralightNet.AppCore.TestApp/UltralightNet.AppCore.TestApp.csproj",
+				"${workspaceFolder}/Examples/AppCore/UltralightNet.AppCore.TestApp/UltralightNet.AppCore.TestApp.csproj",
 				"/property:GenerateFullPaths=true",
 				"/consoleloggerparameters:NoSummary"
 			],

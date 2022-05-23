@@ -1,6 +1,7 @@
 using System;
 using System.Numerics;
 using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
 using Silk.NET.Input;
 using Silk.NET.Maths;
 using Silk.NET.OpenGL;
@@ -57,8 +58,6 @@ void main()
 	static Renderer renderer;
 	static View view;
 
-	static OpenGLGPUDriver gpuDriver;
-
 	public static void Main()
 	{
 		AppContext.SetSwitch("Switch.System.Reflection.Assembly.SimulatedLocationInBaseDirectory", true);
@@ -70,9 +69,9 @@ void main()
 		{
 			Size = new Vector2D<int>(512, 512),
 			API = new GraphicsAPI(ContextAPI.OpenGL, ContextProfile.Core, 0/*ContextFlags.ForwardCompatible*/, new APIVersion(4, 5)),
-			Samples = 1,
-			FramesPerSecond = 0,
-			UpdatesPerSecond = 0,
+			Samples = -1,
+			FramesPerSecond = 120,
+			UpdatesPerSecond = 240,
 			VSync = false
 		});
 
@@ -89,6 +88,10 @@ void main()
 		window.Run();
 	}
 
+	// [UnmanagedCallersOnly(CallConvs = new Type[]{typeof(CallConvCdecl)})]
+	private static unsafe void DebugCallback(GLEnum source, GLEnum type, int id, GLEnum severity, int length, nint chars, nint userData){
+		Console.WriteLine(Marshal.PtrToStringUni((IntPtr)chars, (int)length));
+	}
 	private static void Check([CallerLineNumber] int line = default)
 	{
 #if DEBUG
@@ -112,6 +115,9 @@ void main()
 
 		//Getting the opengl api for drawing to the screen.
 		gl = GL.GetApi(window);
+
+		gl.DebugMessageCallback(DebugCallback, null);
+
 		Check();
 		//gl.Enable(GLEnum.FramebufferSrgb);
 
@@ -120,7 +126,7 @@ void main()
 		gl.FrontFace(GLEnum.Ccw);
 		gl.Disable(EnableCap.DepthTest);
 		gl.DepthFunc(DepthFunction.Never);
-		gl.Enable(GLEnum.Multisample);
+		//gl.Enable(GLEnum.Multisample);
 		//gl.Disable(GLEnum.StencilTest);
 
 		//Creating a vertex array.
@@ -197,20 +203,21 @@ void main()
 
 		window.SwapBuffers();
 
-		gpuDriver = new(gl, 16);
+		OpenGLGPUDriver.Initialize(gl, 1);
 
-		gpuDriver.Check();
+		OpenGLGPUDriver.Check();
 
 		window.SwapBuffers();
 
-		ULPlatform.GPUDriver = gpuDriver.GetGPUDriver();
+		ULPlatform.GPUDriver = OpenGLGPUDriver.GetGPUDriver();
 
-		renderer = ULPlatform.CreateRenderer(new ULConfig { FaceWinding = ULFaceWinding.Clockwise, ForceRepaint = false });
+		renderer = ULPlatform.CreateRenderer(new ULConfig { FaceWinding = ULFaceWinding.Clockwise, ForceRepaint = false,MaxUpdateTime = (double)1/(double)120 });
 
 		view = renderer.CreateView(512, 512, new ULViewConfig { IsAccelerated = true, IsTransparent = false });
-		//view.URL = "https://vk.com/supinepandora43";
+
+		view.URL = "https://vk.com/supinepandora43";
 		//view.URL = "https://twitter.com/@supinepandora43";
-		view.URL = "https://youtube.com";
+		//view.URL = "https://youtube.com";
 		//view.HTML = "<html><body><p>123</p></body></html>";
 		bool loaded = false;
 
@@ -244,40 +251,46 @@ void main()
 
 	static unsafe void OnRender(double obj)
 	{
-		renderer.Update();
 		renderer.Render();
-
-		var renderBuffer = gpuDriver.renderBuffers[view.RenderTarget.RenderBufferID];
+		var renderBuffer = OpenGLGPUDriver.renderBuffers[(int)view.RenderTarget.RenderBufferId];
 		var textureEntry = renderBuffer.textureEntry;
 
 		// redraw only when it has changed
 		if (renderBuffer.dirty)
 		{
-			gl.BlitNamedFramebuffer(textureEntry.multisampledFramebuffer, textureEntry.framebuffer, 0, 0, (int)textureEntry.width, (int)textureEntry.height, 0, 0, (int)textureEntry.width, (int)textureEntry.height, ClearBufferMask.ColorBufferBit, BlitFramebufferFilter.Nearest);
-			//window.ClearContext();
-			gl.Clear((uint)ClearBufferMask.ColorBufferBit);
+			//gl.BindFramebuffer(FramebufferTarget.ReadFramebuffer, textureEntry.multisampledFramebuffer);
+			//gl.BindFramebuffer(FramebufferTarget.DrawFramebuffer, textureEntry.framebuffer);
+			//gl.BlitFramebuffer(0,0, (int)textureEntry.width, (int)textureEntry.height, 0,0, (int)textureEntry.width, (int)textureEntry.height, ClearBufferMask.ColorBufferBit, GLEnum.Linear);
 
-			gl.BindTextureUnit(0, textureEntry.textureId);
+			//gl.BlitNamedFramebuffer(textureEntry.multisampledFramebuffer, textureEntry.framebuffer, 0, 0, (int)textureEntry.width, (int)textureEntry.height, 0, 0, (int)textureEntry.width, (int)textureEntry.height, ClearBufferMask.ColorBufferBit, BlitFramebufferFilter.Linear);
+			gl.BindFramebuffer(FramebufferTarget.Framebuffer, 0);
+			//window.ClearContext();
+			gl.ClearColor(0,1,0,0);
+			gl.Clear((uint)(ClearBufferMask.ColorBufferBit));
+			gl.Disable(GLEnum.DepthTest);
+			gl.Disable(EnableCap.Blend);
+
 
 			gl.BindVertexArray(vao);
 			gl.UseProgram(quadProgram);
+			gl.BindTextureUnit(0, textureEntry.textureId);
 			gl.DrawElements(PrimitiveType.Triangles, (uint)IndexBuffer.Length, DrawElementsType.UnsignedInt, null);
-			renderBuffer.dirty = false;
-			window.FramesPerSecond = 0;
+			// renderBuffer.dirty = false;
+			// window.FramesPerSecond = 0;
 		}
-		else
+		// else
 			// lower fps
-			window.FramesPerSecond = 300;
+			// window.FramesPerSecond = 300;
 	}
 
 	static void OnUpdate(double obj)
 	{
-		//renderer.Update();
+		renderer.Update();
 	}
 
 	static void OnScroll(IMouse _, ScrollWheel scroll)
 	{
-		view.FireScrollEvent(new ULScrollEvent { type = ULScrollEventType.ByPixel, deltaX = (int)scroll.X * 100, deltaY = (int)scroll.Y * 100 });
+		view.FireScrollEvent(new ULScrollEvent { Type = ULScrollEventType.ByPixel, DeltaX = (int)scroll.X * 100, DeltaY = (int)scroll.Y * 100 });
 	}
 
 	static void OnMouseDown(IMouse mouse, MouseButton button)

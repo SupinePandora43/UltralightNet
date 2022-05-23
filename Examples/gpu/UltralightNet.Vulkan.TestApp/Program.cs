@@ -1,4 +1,4 @@
-﻿using System.Numerics;
+using System.Numerics;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using Silk.NET.Core;
@@ -211,7 +211,7 @@ unsafe class HelloTriangleApplication
 
 	void OnScroll(IMouse _, ScrollWheel scroll)
 	{
-		view.FireScrollEvent(new ULScrollEvent { type = ULScrollEventType.ByPixel, deltaX = (int)scroll.X * 100, deltaY = (int)scroll.Y * 100 });
+		view.FireScrollEvent(new ULScrollEvent { Type = ULScrollEventType.ByPixel, DeltaX = (int)scroll.X * 100, DeltaY = (int)scroll.Y * 100 });
 	}
 
 	void OnMouseDown(IMouse mouse, MouseButton button)
@@ -275,12 +275,13 @@ unsafe class HelloTriangleApplication
 		dr.commandBuffer = BeginSingleTimeCommands();
 		dr.graphicsQueue = graphicsQueue;
 		ULPlatform.GPUDriver = dr.GPUDriver;
-		renderer = ULPlatform.CreateRenderer(new ULConfig() { ForceRepaint = true, FaceWinding = ULFaceWinding.CounterClockwise });
+		renderer = ULPlatform.CreateRenderer(new ULConfig() { ForceRepaint = true, FaceWinding = ULFaceWinding.CounterClockwise, MaxUpdateTime = (double)1/(double)61 });
 		view = renderer.CreateView((uint)window!.Size.X, (uint)window!.Size.Y, new() { IsAccelerated = true, IsTransparent = false });
 		bool loaded = false;
 		view.OnFinishLoading += (frameId, isMain, url) => loaded = true;
-		view.HTML = "<html><body><p>123</p></body></html>";
-		//view.URL = "https://youtube.com";
+		//view.HTML = "<html><body><p>123</p></body></html>";
+		view.URL = "https://github.com";
+		//view.URL = "https://www.youtube.com/watch?v=N1v4TjntTJI";
 		while (!loaded) { renderer.Update(); Thread.Sleep(10); }
 
 		renderer.Render();
@@ -717,8 +718,8 @@ unsafe class HelloTriangleApplication
 		{
 			Format = swapChainImageFormat,
 			Samples = msaaSamples,
-			LoadOp = AttachmentLoadOp.Clear,
-			StoreOp = AttachmentStoreOp.Store,
+			LoadOp = AttachmentLoadOp.DontCare,
+			StoreOp = AttachmentStoreOp.DontCare,
 			StencilLoadOp = AttachmentLoadOp.DontCare,
 			InitialLayout = ImageLayout.Undefined,
 			FinalLayout = ImageLayout.ColorAttachmentOptimal,
@@ -2134,6 +2135,7 @@ unsafe class HelloTriangleApplication
 		if (result is Result.ErrorOutOfDateKhr || result is Result.SuboptimalKhr || frameBufferResized)
 		{
 			frameBufferResized = false;
+			//view.Resize((uint)window!.Size.X, (uint)window!.Size.Y);
 			RecreateSwapChain();
 		}
 		else if (result is not Result.Success)
@@ -2359,11 +2361,15 @@ unsafe class HelloTriangleApplication
 	{
 		static void N() { }; // linux debugger workaround
 		var message = Marshal.PtrToStringAnsi((nint)pCallbackData->PMessage);
+		System.Diagnostics.Debug.WriteLine(message);
+
 		if (message!.StartsWith("Validation Warning:"))
 			N();
 		if (message!.StartsWith("Validation Error:"))
 			N();
-		System.Diagnostics.Debug.WriteLine($"validation layer:" + message);
+		if(message!.StartsWith("Validation Performance Warning:"))
+			N();
+
 
 		return Vk.False;
 	}

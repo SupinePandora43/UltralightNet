@@ -14,8 +14,14 @@ layout(set=0, binding=0) uniform Uniforms {
 float Scalar(uint i) { if (i < 4u) return Scalar4[0][i]; else return Scalar4[1][i - 4u]; }
 
 // Texture Units
+#if VELDRID
+layout(set = 1, binding = 0) uniform texture2D Texture1;
+layout(set = 2, binding = 0) uniform texture2D Texture2;
+layout(set = 3, binding = 0) uniform sampler Sampler;
+#else
 layout(set = 1, binding = 0) uniform sampler2D Texture1;
 layout(set = 2, binding = 0) uniform sampler2D Texture2;
+#endif
 
 // Vertex Attributes
 layout(location = 0)in vec4 ex_Color;
@@ -177,7 +183,13 @@ void fillSolid() {
 }
 
 void fillImage(vec2 uv) {
-  out_Color = texture(Texture1, uv) * ex_Color;
+  out_Color = texture(
+#if VELDRID
+		sampler2D(Texture1, Sampler)
+#else
+		Texture1
+#endif
+		, uv) * ex_Color;
 }
 
 vec2 transformAffine(vec2 val, vec2 a, vec2 b, vec2 c) {
@@ -468,7 +480,13 @@ vec4 calcBlend() {
 
   fillImage(ex_TexCoord);
   vec4 src = out_Color;
-  vec4 dest = texture(Texture2, ex_ObjectCoord);
+  vec4 dest = texture(
+#if VELDRID
+		sampler2D(Texture2, Sampler)
+#else
+		Texture2
+#endif
+		, ex_ObjectCoord);
 
   switch(uint(ex_Data0.y + 0.5))
   {
@@ -510,15 +528,33 @@ void fillBlend() {
 
 void fillMask() {
   fillImage(ex_TexCoord);
-  float alpha = texture(Texture2, ex_ObjectCoord).a;
+  float alpha = texture(
+#if VELDRID
+		sampler2D(Texture2, Sampler)
+#else
+		Texture2
+#endif
+		, ex_ObjectCoord).a;
   out_Color *= alpha;
 }
 
 void fillGlyph(vec2 uv) {
-  float alpha = texture(Texture1, uv).r * ex_Color.a;
+  float alpha = texture(
+#if VELDRID
+		sampler2D(Texture1, Sampler)
+#else
+		Texture1
+#endif
+		, uv).r * ex_Color.a;
   alpha = clamp(alpha, 0.0, 1.0);
   float fill_color_luma = ex_Data0.y;
-  float corrected_alpha = texture(Texture2, vec2(alpha, fill_color_luma)).r;
+  float corrected_alpha = texture(
+#if VELDRID
+		sampler2D(Texture2, Sampler)
+#else
+		Texture2
+#endif
+		, vec2(alpha, fill_color_luma)).r;
   //float corrected_alpha = alpha;
   out_Color = vec4(ex_Color.rgb * corrected_alpha, corrected_alpha);
 }

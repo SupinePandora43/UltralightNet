@@ -10,9 +10,9 @@
 		<PackageReference Include="UltralightNet.Binaries" Version="$(Version)" />
 		<PackageReference Include="UltralightNet.AppCore" Version="$(Version)" />
 		<PackageReference Include="UltralightNet.Resources" Version="$(Version)" />
-		<PackageReference Include="Veldrid" Version="4.9.0-ga769c2971c" />
-		<PackageReference Include="Veldrid.SDL2" Version="4.8.0" />
-		<PackageReference Include="Veldrid.StartupUtilities" Version="4.8.0" />
+		<PackageReference Include="Veldrid" Version="4.9.0-beta1" />
+		<PackageReference Include="Veldrid.SDL2" Version="4.9.0-beta1" />
+		<PackageReference Include="Veldrid.StartupUtilities" Version="4.9.0-beta1" />
 		<!--<PackageReference Include="Microsoft.DotNet.ILCompiler" Version="6.0.0-*" />-->
 	</ItemGroup>
 
