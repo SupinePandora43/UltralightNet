@@ -1,12 +1,10 @@
 using System;
-using System.Runtime.InteropServices;
 #if NETCOREAPP3_0_OR_GREATER
 using System.Runtime.Intrinsics;
 #endif
 
 namespace UltralightNet;
 
-[BlittableType]
 public unsafe struct ULRect
 {
 	public float Left;
@@ -34,13 +32,10 @@ public unsafe struct ULRect
 	public static explicit operator ULRect(ULIntRect rect)
 	{
 #if NET7_0_OR_GREATER
-			TODO: opposite in ULIntRect
 			Vector128<int> int4 = Vector128.Create(rect.Left, rect.Top, rect.Right, rect.Bottom);
 			Vector128<float> float4 = Vector128.ConvertToSingle(int4);
 			Vector4 vec = float4.AsVector4();
-			Vector4* vecPtr = &vec;
-			ULRect* rectPtr = (ULRect*)vecPtr;
-			return *rectPtr;
+			return Unsafe.As<Vector4, ULRect>(ref vec);
 #else
 		return new() { Left = (float)rect.Left, Top = (float)rect.Top, Right = (float)rect.Right, Bottom = (float)rect.Bottom };
 #endif
