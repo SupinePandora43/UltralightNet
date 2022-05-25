@@ -1,9 +1,11 @@
+using System;
+
 namespace UltralightNet;
 
 /// <summary>
 /// type of <see cref="ULKeyEvent"/>
 /// </summary>
-public enum ULKeyEventType : int
+public enum ULKeyEventType : int // CAPI_Defines.h - no type, KeyEvent.h - no type
 {
 	/// <summary>
 	/// Key-Down event type. (Does not trigger accelerator commands in WebCore)
@@ -11,6 +13,7 @@ public enum ULKeyEventType : int
 	/// <remarks>
 	/// You should probably use RawKeyDown instead when a physical key is pressed. This member is only here for historic compatibility with WebCore's key event types.
 	/// </remarks>
+	[Obsolete]
 	KeyDown,
 	/// <summary>
 	/// Key-Up event type. Use this when a physical key is released.

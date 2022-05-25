@@ -9,37 +9,37 @@ namespace UltralightNet
 {
 	unsafe partial class JavaScriptMethods
 	{
-		[DllImport("WebCore")]
+		[DllImport(LibWebCore)]
 		public static extern void* JSStringCreateWithCharacters(ushort* characters, nuint length);
 
-		[DllImport("WebCore")]
+		[DllImport(LibWebCore)]
 		public static extern void* JSStringCreateWithUTF8CString(byte* characters);
 
 		/// <summary>Increases ref count</summary>
-		[DllImport("WebCore")]
+		[DllImport(LibWebCore)]
 		public static extern void* JSStringRetain(void* @string);
 
 		/// <summary>Decreases ref count</summary>
-		[DllImport("WebCore")]
+		[DllImport(LibWebCore)]
 		public static extern void JSStringRelease(void* @string);
 
-		[DllImport("WebCore")]
+		[DllImport(LibWebCore)]
 		public static extern nuint JSStringGetLength(void* @string);
 
-		[DllImport("WebCore")]
+		[DllImport(LibWebCore)]
 		public static extern ushort* JSStringGetCharactersPtr(void* @string);
 
-		[DllImport("WebCore")]
+		[DllImport(LibWebCore)]
 		public static extern nuint JSStringGetMaximumUTF8CStringSize(void* @string);
 
-		[DllImport("WebCore")]
+		[DllImport(LibWebCore)]
 		public static extern nuint JSStringGetUTF8CString(void* @string, byte* buffer, nuint bufferSize);
 
-		[GeneratedDllImport("WebCore")]
+		[GeneratedDllImport(LibWebCore)]
 		[return: MarshalAs(UnmanagedType.I1)]
 		public static partial bool JSStringIsEqual(void* a, void* b);
 
-		[GeneratedDllImport("WebCore")]
+		[GeneratedDllImport(LibWebCore)]
 		[return: MarshalAs(UnmanagedType.I1)]
 		public static partial bool JSStringIsEqualToUTF8CString(void* str, byte* characters);
 	}
@@ -80,8 +80,8 @@ namespace UltralightNet
 
 		public nuint Length => JavaScriptMethods.JSStringGetLength(Handle);
 
-		public ReadOnlySpan<ushort> UTF16Data => new(JavaScriptMethods.JSStringGetCharactersPtr(Handle), (int)Length); // INTEROPTODO: INT64
-		public ushort* UTF16DataRaw => JavaScriptMethods.JSStringGetCharactersPtr(Handle);
+		public ReadOnlySpan<char> UTF16Data => new(JavaScriptMethods.JSStringGetCharactersPtr(Handle), (int)Length); // INTEROPTODO: INT64
+		public char* UTF16DataRaw => (char*)JavaScriptMethods.JSStringGetCharactersPtr(Handle);
 		// do not implement GetPinnableReference because there are UTF16DataRaw
 
 		public nuint MaximumUTF8CStringSize => JavaScriptMethods.JSStringGetMaximumUTF8CStringSize(Handle);

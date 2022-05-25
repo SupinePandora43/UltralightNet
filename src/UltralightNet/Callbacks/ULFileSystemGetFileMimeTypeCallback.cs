@@ -1,17 +1,7 @@
-using System;
 using System.Runtime.InteropServices;
 
-namespace UltralightNet
-{
-	// todo: test result
-	[UnmanagedFunctionPointer(CallingConvention.Cdecl)]
-	[return: MarshalAs(UnmanagedType.I1)]
-	public unsafe delegate byte ULFileSystemGetFileMimeTypeCallback__PInvoke__(
-		ULString* path,
-		ULString* result
-	);
-	public delegate bool ULFileSystemGetFileMimeTypeCallback(
-		in string path,
-		out string result
-	);
-}
+namespace UltralightNet;
+
+[UnmanagedFunctionPointer(CallingConvention.Cdecl)]
+public unsafe delegate ULString* ULFileSystemGetFileMimeTypeCallback__PInvoke__(ULString* path);
+public delegate string ULFileSystemGetFileMimeTypeCallback(in string path);

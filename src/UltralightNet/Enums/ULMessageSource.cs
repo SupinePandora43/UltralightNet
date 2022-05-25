@@ -1,6 +1,6 @@
 namespace UltralightNet
 {
-	public enum ULMessageSource
+	public enum ULMessageSource : int // CAPI_Defines.h - no type
 	{
 		XML,
 		JS,

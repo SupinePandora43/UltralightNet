@@ -5,7 +5,7 @@ using System.Runtime.Intrinsics;
 
 namespace UltralightNet;
 
-public struct ULIntRect
+public struct ULIntRect : IEquatable<ULIntRect>
 {
 	public int Left;
 	public int Top;

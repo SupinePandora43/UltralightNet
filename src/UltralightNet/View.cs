@@ -14,19 +14,19 @@ namespace UltralightNet
 		{
 			_ULViewConfig nativeConfig = new(viewConfig);
 			var ret = ulCreateView((void*)renderer, width, height, &nativeConfig, (void*)session);
-			nativeConfig.FreeNative();
+			nativeConfig.Dispose();
 			return (IntPtr)ret;
 		}
 
 		[DllImport(LibUltralight)]
 		public static extern void ulDestroyView(IntPtr view);
 
-		[GeneratedDllImport(LibUltralight, CharSet = CharSet.Unicode)]
-		[return: MarshalUsing(typeof(ULStringGeneratedDllImportMarshaler))]
+		[GeneratedDllImport(LibUltralight)]
+		[return: MarshalUsing(typeof(ULString.ToManaged_))]
 		public static partial string ulViewGetURL(IntPtr view);
 
 		[GeneratedDllImport(LibUltralight)]
-		[return: MarshalUsing(typeof(ULStringGeneratedDllImportMarshaler))]
+		[return: MarshalUsing(typeof(ULString.ToManaged_))]
 		public static partial string ulViewGetTitle(IntPtr view);
 
 		[DllImport(LibUltralight)]
@@ -60,10 +60,10 @@ namespace UltralightNet
 		public static extern IntPtr ulViewGetSurface(IntPtr view);
 
 		[GeneratedDllImport(LibUltralight)]
-		public static partial void ulViewLoadHTML(IntPtr view, [MarshalUsing(typeof(ULStringGeneratedDllImportMarshaler))] string html_string);
+		public static partial void ulViewLoadHTML(IntPtr view, [MarshalUsing(typeof(ULString.ToNative))] string html_string);
 
 		[GeneratedDllImport(LibUltralight)]
-		public static partial void ulViewLoadURL(IntPtr view, [MarshalUsing(typeof(ULStringGeneratedDllImportMarshaler))] string url_string);
+		public static partial void ulViewLoadURL(IntPtr view, [MarshalUsing(typeof(ULString.ToNative))] string url_string);
 
 		[DllImport(LibUltralight)]
 		public static extern void ulViewResize(IntPtr view, uint width, uint height);
@@ -76,8 +76,8 @@ namespace UltralightNet
 		public static extern void ulViewUnlockJSContext(IntPtr view);
 
 		[GeneratedDllImport(LibUltralight)]
-		[return: MarshalUsing(typeof(ULStringGeneratedDllImportMarshaler))]
-		public static partial string ulViewEvaluateScript(IntPtr view, [MarshalUsing(typeof(ULStringGeneratedDllImportMarshaler))] string js_string, [MarshalUsing(typeof(ULStringGeneratedDllImportMarshaler))] out string exception);
+		[return: MarshalUsing(typeof(ULString.ToManaged_))]
+		public static partial string ulViewEvaluateScript(IntPtr view, [MarshalUsing(typeof(ULString.ToNative))] string js, [MarshalUsing(typeof(ULString.ToManaged_))] out string exception);
 
 		/// <summary>Check if can navigate backwards in history.</summary>
 		[GeneratedDllImport(LibUltralight)]
@@ -794,7 +794,7 @@ namespace UltralightNet
 
 			Methods.ulDestroyView(Ptr);
 			IsDisposed = true;
-			Renderer = null;
+			GC.KeepAlive(Renderer);
 
 			GC.SuppressFinalize(this);
 		}

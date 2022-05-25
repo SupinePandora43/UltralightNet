@@ -4,7 +4,7 @@ namespace UltralightNet;
 
 /// <summary>An enumeration of the different keyboard modifiers.</summary>
 [Flags]
-public enum ULKeyEventModifiers : uint
+public enum ULKeyEventModifiers : byte // KeyEvent.h - uint8_t, CAPI_KeyEvent.h - unsigned int
 {
 	/// <summary>Whether or not an ALT key is down</summary>
 	AltKey = 1 << 0,

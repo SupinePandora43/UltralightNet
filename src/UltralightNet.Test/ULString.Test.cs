@@ -1,71 +1,123 @@
 using System;
 using System.Collections.Generic;
-using System.Runtime.CompilerServices;
-using System.Runtime.InteropServices;
-using System.Text;
 using Xunit;
 
 namespace UltralightNet.Test;
 
 public unsafe class ULStringTest
 {
-	public const string Str = "abc123абв@.";
-
 	public static IEnumerable<object[]> GetTestStrings()
 	{
 		yield return new object[] { string.Empty };
-		yield return new object[] { new string('Ж', 340) }; // Stack
-		yield return new object[] { new string('Ж', 341) }; // Heap
-		yield return new object[] { new string('Ж', 8192) }; // Heap stress
+		yield return new object[] { "я тесто я тесто aаaаaаaа!!!123!!!" };
 	}
 
 	[Theory]
 	[MemberData(nameof(GetTestStrings))]
 	public void SameAsNative(string str)
 	{
-		using ULStringToNativeMarshaller marshaller = new(str);
-		var ulString = Methods.ulCreateStringUTF16(str, (nuint)str.Length);
+		var reference = Methods.ulCreateStringUTF16(str, (nuint)str.Length);
+		using ULString managed = new(str);
 
-		Assert.Equal(ulString->length, marshaller.Value->length);
-		for (uint i = 0; i < (uint)ulString->length; i++)
+		Assert.Equal(reference->length, managed.length);
+
+		for (nuint i = 0; i < reference->length; i++)
 		{
-			Assert.Equal(ulString->data[i], marshaller.Value->data[i]);
+			Assert.Equal(reference->data[i], managed.data[i]);
 		}
 
-		Methods.ulDestroyString(ulString);
+		Methods.ulDestroyString(reference);
 	}
 
 	[Theory]
 	[MemberData(nameof(GetTestStrings))]
-	public void ByteCount(string str)
+	public void NullTerminator(string str)
 	{
-		Assert.True(((str.Length + 1) * 3 + 1) >= Encoding.UTF8.GetByteCount(str) + 1);
-		Assert.True(((str.Length + 1) * 3 + 1) >= Encoding.UTF8.GetMaxByteCount(str.Length) + 1);
+		var reference = Methods.ulCreateStringUTF16(str, (nuint)str.Length);
+		if (reference->data[reference->length] is not 0) throw new InvalidProgramException("data[length] != 0");
+
+		using ULString managed = new(str);
+
+		Assert.Equal(0, managed.data[managed.length]);
+
+		Methods.ulDestroyString(reference);
 	}
 
+	#region ASSIGN
 	[Theory]
 	[MemberData(nameof(GetTestStrings))]
-	public void Assignment(string str)
+	public void ManagedAssignManagedToNative(string str)
 	{
-		using ULStringToNativeMarshaller output_marshaller = new();
-		using ULStringToNativeMarshaller input_marshaller = new(str);
+		using ULString managed = new(str);
+		var native = Methods.ulCreateStringUTF16("", 0);
 
-		Assert.Equal((nuint)0, output_marshaller.Opaque.length);
-		Assert.Equal((nuint)0, output_marshaller.Opaque.data[0]);
+		native->Assign(managed);
+		native->Assign(&managed);
 
-		byte* m = output_marshaller.Opaque.data;
+		Assert.Equal((ulong)managed.length, (ulong)native->length);
 
-		Assert.NotEqual((nuint)output_marshaller.Opaque.data, (nuint)input_marshaller.Opaque.data);
+		for (nuint i = 0; i < managed.length; i++)
+		{
+			Assert.Equal(managed.data[i], native->data[i]);
+		}
 
-		Methods.ulStringAssignString(output_marshaller.Value, input_marshaller.Value);
-
-		Assert.NotEqual((nuint)output_marshaller.Opaque.data, (nuint)input_marshaller.Opaque.data);
-
-		Assert.Equal(input_marshaller.Opaque.length, output_marshaller.Opaque.length);
-		for (nuint i = 0; i < output_marshaller.Opaque.length; i++) Assert.Equal(input_marshaller.Opaque.data[i], output_marshaller.Opaque.data[i]);
-
-		Assert.Equal(0, output_marshaller.Opaque.data[output_marshaller.Opaque.length]);
-
-		if (str is not "") Assert.NotEqual((nuint)m, (nuint)output_marshaller.Opaque.data);
+		Methods.ulDestroyString(native);
 	}
+	[Theory]
+	[MemberData(nameof(GetTestStrings))]
+	public void ManagedAssignNativeToManaged(string str)
+	{
+		var native = Methods.ulCreateStringUTF16(str, 0);
+		using ULString managed = new("");
+
+		managed.Assign(native);
+		managed.Assign(*native);
+
+		Assert.Equal((ulong)native->length, (ulong)managed.length);
+
+		for (nuint i = 0; i < native->length; i++)
+		{
+			Assert.Equal(native->data[i], managed.data[i]);
+		}
+
+		Methods.ulDestroyString(native);
+	}
+	[Theory]
+	[MemberData(nameof(GetTestStrings))]
+	public void UNManagedAssignManagedToNative(string str)
+	{
+		using ULString managed = new(str);
+		var native = Methods.ulCreateStringUTF16("", 0);
+
+		Methods.ulStringAssignString(native, &managed);
+
+		Assert.Equal((ulong)managed.length, (ulong)native->length);
+
+		for (nuint i = 0; i < managed.length; i++)
+		{
+			Assert.Equal(managed.data[i], native->data[i]);
+		}
+
+		Methods.ulDestroyString(native);
+	}
+	[Theory]
+	[MemberData(nameof(GetTestStrings))]
+	public void UNManagedAssignNativeToManaged(string str)
+	{
+		var native = Methods.ulCreateStringUTF16(str, 0);
+		using ULString managed = new("");
+
+		Methods.ulStringAssignString(&managed, native);
+
+		Assert.Equal((ulong)native->length, (ulong)managed.length);
+
+		for (nuint i = 0; i < native->length; i++)
+		{
+			Assert.Equal(native->data[i], managed.data[i]);
+		}
+
+		Methods.ulDestroyString(native);
+	}
+	#endregion ASSIGN
+
 }

@@ -1,6 +1,6 @@
 namespace UltralightNet
 {
-	public enum ULMessageLevel
+	public enum ULMessageLevel : int // CAPI_Defines.h - no type
 	{
 		Log = 1,
 		Warning = 2,

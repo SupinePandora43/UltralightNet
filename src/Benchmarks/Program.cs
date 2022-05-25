@@ -1,45 +1,52 @@
-using System;
-using System.Runtime.CompilerServices;
+using System.Collections.Generic;
 using System.Runtime.InteropServices;
-using System.Text;
-using System.Threading;
 using BenchmarkDotNet.Attributes;
-using BenchmarkDotNet.Configs;
-using BenchmarkDotNet.Engines;
 using BenchmarkDotNet.Running;
 using UltralightNet;
-using UltralightNet.AppCore;
 
-namespace Benchmarks
+namespace Benchmarks;
+
+public class Program
 {
-	public class Program
+	static void Main()
 	{
-		static void Main()
+		BenchmarkRunner.Run<StringBenchmark>();
+		//BenchmarkSwitcher.FromAssembly(typeof(Program).Assembly).Run(null, new DebugInProcessConfig());
+	}
+}
+
+public unsafe class StringBenchmark
+{
+	public StringBenchmark() { }
+
+	private const int Step = 1024;
+	private const int Steps = 10;
+
+	public static IEnumerable<string> GetTestStrings()
+	{
+		for (int step = 0; step < Steps; step++)
 		{
-			BenchmarkRunner.Run<MyBenchmark>();
-			//BenchmarkSwitcher.FromAssembly(typeof(Program).Assembly).Run(null, new DebugInProcessConfig());
+			yield return new('Ё', step * Step);
 		}
 	}
-	public unsafe class MyBenchmark
+
+	[Benchmark]
+	[ArgumentsSource(nameof(GetTestStrings))]
+	public void ulCreateStringUTF16(string str)
 	{
-		private ULString str;
-		public MyBenchmark(){
-			str = ULString.CreateOpaque(new string('б',1000000));
-		}
-		~MyBenchmark(){
-			ULString.FreeOpaque(str);
-		}
-		[Benchmark]
-		public string UsingMarshal(){
-			return Marshal.PtrToStringUTF8((IntPtr)str.data, (int)str.length);
-		}
-		[Benchmark]
-		public string UsingCtor(){
-			return new string((sbyte*)str.data, 0, (int)str.length);
-		}
-		[Benchmark]
-		public string UsingEncoding(){
-			return Encoding.UTF8.GetString(str.data, (int)str.length);
-		}
+		ULString* n = Methods.ulCreateStringUTF16(str, (nuint)str.Length);
+		Methods.ulDestroyString(n);
+	}
+	[Benchmark]
+	[ArgumentsSource(nameof(GetTestStrings))]
+	public void Managed(string str)
+	{
+		ULString* n = (ULString*)NativeMemory.Alloc((nuint)sizeof(ULString));
+
+		*n = new(str);
+
+		n->Dispose();
+
+		NativeMemory.Free(n);
 	}
 }

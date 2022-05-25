@@ -1,6 +1,6 @@
 namespace UltralightNet
 {
-	public enum ULCursor
+	public enum ULCursor : int // CAPI_Defines.h - no type
 	{
 		Pointer,
 		Cross,

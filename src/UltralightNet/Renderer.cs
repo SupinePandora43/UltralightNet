@@ -6,36 +6,36 @@ namespace UltralightNet
 {
 	public static unsafe partial class Methods
 	{
-		[DllImport("Ultralight")]
+		[DllImport(LibUltralight)]
 		public static extern IntPtr ulCreateRenderer(_ULConfig* config);
 
 		// INTEROPTODO: NATIVEMARSHALLING
-		//[GeneratedDllImport("Ultralight")]
+		//[GeneratedDllImport(LibUltralight)]
 		public static IntPtr ulCreateRenderer(in ULConfig config)
 		{
 			_ULConfig nativeConfig = new(config);
 			var ret = ulCreateRenderer(&nativeConfig);
-			nativeConfig.FreeNative();
+			nativeConfig.Dispose();
 			return ret;
 		}
 
 		/// <summary>Destroy the renderer.</summary>
-		[DllImport("Ultralight")]
+		[DllImport(LibUltralight)]
 		public static extern void ulDestroyRenderer(IntPtr renderer);
 
 		/// <summary>Update timers and dispatch internal callbacks (JavaScript and network).</summary>
-		[DllImport("Ultralight")]
+		[DllImport(LibUltralight)]
 		public static extern void ulUpdate(IntPtr renderer);
 
 		/// <summary>Render all active Views.</summary>
-		[DllImport("Ultralight")]
+		[DllImport(LibUltralight)]
 		public static extern void ulRender(IntPtr renderer);
 
 		/// <summary>Attempt to release as much memory as possible. Don't call this from any callbacks or driver code.</summary>
-		[DllImport("Ultralight")]
+		[DllImport(LibUltralight)]
 		public static extern void ulPurgeMemory(IntPtr renderer);
 
-		[DllImport("Ultralight")]
+		[DllImport(LibUltralight)]
 		public static extern void ulLogMemoryUsage(IntPtr renderer);
 	}
 

@@ -1,6 +1,6 @@
 namespace UltralightNet
 {
-	public enum ULFontHinting: byte
+	public enum ULFontHinting: byte // CAPI_Defines.h - no type, platform/Config.h - uint8_t
 	{
 		/// <summary>Lighter hinting algorithm-- glyphs are slightly fuzzier but better resemble their original shape. This is achieved by snapping glyphs to the pixel grid only vertically which better preserves inter-glyph spacing.</summary>
 		Smooth,

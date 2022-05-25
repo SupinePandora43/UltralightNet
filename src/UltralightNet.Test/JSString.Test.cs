@@ -7,9 +7,10 @@ public unsafe class JSStringTest
 {
 	public static IEnumerable<object[]> GetTestStrings()
 	{
-		yield return (object[])new JSString[] { "TEST" };
-		yield return (object[])new JSString[] { "ТЕСТ" };
-		yield return (object[])new JSString[] { "" };
+		yield return new object[] { (JSString)"TEST" };
+		yield return new object[] { (JSString)"ТЕСТ" };
+		yield return new object[] { (JSString)"" };
+		yield return new object[] { (JSString)"" };
 	}
 
 	[Theory]
@@ -35,9 +36,12 @@ public unsafe class JSStringTest
 		Assert.True(s1.Equals((object)s2));
 		Assert.True(s1 == s2);
 		Assert.False(s1 != s2);
+		Assert.False(s1 == null);
+		Assert.False(s1!.Equals((JSString?)null));
+		Assert.False(s1!.Equals((object?)null));
 		Assert.Equal(s1, s2);
-		Assert.Equal((object)s1, (object)s2);
-		Assert.False(JSString.ReferenceEquals(s1, s2));
+		Assert.Equal((object)s1!, (object)s2);
+		Assert.False(JSString.ReferenceEquals(s1!, s2));
 		Assert.False(s1 == null);
 	}
 }

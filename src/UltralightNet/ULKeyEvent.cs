@@ -8,9 +8,9 @@ public static unsafe partial class Methods
 	[GeneratedDllImport(LibUltralight)]
 	public static partial IntPtr ulCreateKeyEvent(
 		ULKeyEventType type,
-		ULKeyEventModifiers modifiers,
+		[MarshalAs(UnmanagedType.U4)]ULKeyEventModifiers modifiers,
 		int virtual_key_code, int native_key_code,
-		[MarshalUsing(typeof(ULStringGeneratedDllImportMarshaler))] string text, [MarshalUsing(typeof(ULStringGeneratedDllImportMarshaler))] string unmodified_text,
+		[MarshalUsing(typeof(ULString.ToNative))] string text, [MarshalUsing(typeof(ULString.ToNative))] string unmodified_text,
 		[MarshalAs(UnmanagedType.I1)] bool is_keypad,
 		[MarshalAs(UnmanagedType.I1)] bool is_auto_repeat,
 		[MarshalAs(UnmanagedType.I1)] bool is_system_key);

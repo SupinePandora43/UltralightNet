@@ -5,14 +5,14 @@ using System.Runtime.Intrinsics;
 
 namespace UltralightNet;
 
-public unsafe struct ULRect
+public unsafe struct ULRect : IEquatable<ULRect>
 {
 	public float Left;
 	public float Top;
 	public float Right;
 	public float Bottom;
 
-	public bool IsEmpty => (Left == Right) || (Top == Bottom);
+	public readonly bool IsEmpty => (Left == Right) || (Top == Bottom);
 
 #if NETCOREAPP3_0_OR_GREATER
 	public readonly bool Equals(ULRect other) => Vector128.Create(Left, Top, Right, Bottom).Equals(Vector128.Create(other.Left, other.Top, other.Right, other.Bottom));
