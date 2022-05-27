@@ -8,7 +8,7 @@ public static unsafe partial class Methods
 	[GeneratedDllImport(LibUltralight)]
 	public static partial IntPtr ulCreateKeyEvent(
 		ULKeyEventType type,
-		[MarshalAs(UnmanagedType.U4)]ULKeyEventModifiers modifiers,
+		uint modifiers,
 		int virtual_key_code, int native_key_code,
 		[MarshalUsing(typeof(ULString.ToNative))] string text, [MarshalUsing(typeof(ULString.ToNative))] string unmodified_text,
 		[MarshalAs(UnmanagedType.I1)] bool is_keypad,
@@ -83,7 +83,7 @@ public class ULKeyEvent : IDisposable
 		// prevent AccessViolationException
 		if (text is null) throw new ArgumentNullException(nameof(text));
 
-		Ptr = Methods.ulCreateKeyEvent(type, modifiers, virtual_key_code, native_key_code, text, unmodified_text, is_keypad, is_auto_repeat, is_system_key);
+		Ptr = Methods.ulCreateKeyEvent(type, (uint)(byte)modifiers, virtual_key_code, native_key_code, text, unmodified_text, is_keypad, is_auto_repeat, is_system_key);
 	}
 
 	/// <summary>

@@ -10,6 +10,9 @@ namespace System.Runtime.InteropServices
 
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		public static void Free(void* memory) => Marshal.FreeHGlobal((IntPtr)memory);
+
+		[MethodImpl(MethodImplOptions.AggressiveInlining)]
+		public static void* Realloc(void* memory, nuint size) => (void*)Marshal.ReAllocHGlobal((IntPtr)memory, new((void*)size));
 	}
 }
 #endif

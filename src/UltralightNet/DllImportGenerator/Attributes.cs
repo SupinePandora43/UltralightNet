@@ -22,6 +22,7 @@ namespace System.Runtime.InteropServices
 
 		public string Value { get; private set; }
 	}
+#if !NET7_0_OR_GREATER
 	[AttributeUsage(AttributeTargets.Class | AttributeTargets.Struct)]
 	internal class GeneratedMarshallingAttribute : Attribute
 	{
@@ -42,7 +43,8 @@ namespace System.Runtime.InteropServices
 
 		public Type NativeType { get; }
 	}
-
+#endif
+#if !NET7_0_OR_GREATER
 	[AttributeUsage(AttributeTargets.Parameter | AttributeTargets.ReturnValue)]
 	internal class MarshalUsingAttribute : Attribute
 	{
@@ -61,6 +63,7 @@ namespace System.Runtime.InteropServices
 		public int ElementIndirectionDepth { get; set; }
 		public const string ReturnsCountValue = "return-value";
 	}
+#endif
 
 #if !NET7_0_OR_GREATER
 
