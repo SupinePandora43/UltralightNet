@@ -31,7 +31,12 @@ public struct ULIntRect : IEquatable<ULIntRect>
 
 	public static explicit operator ULIntRect(ULRect rect)
 #if NET7_0_OR_GREATER
-	TODO: USE SIMD as in ULRect
-#endif
+	{
+		Vector128<float> float4 = Vector128.Create(rect.Left, rect.Top, rect.Right, rect.Bottom);
+		Vector128<int> int4 = Vector128.ConvertToInt32(float4); // thx Tanner Gooding and TrumpMcDonaldz
+		return System.Runtime.CompilerServices.Unsafe.As<Vector128<int>, ULIntRect>(ref int4); // thx rickbrew
+	}
+#else
 	=> new() { Left = (int)rect.Left, Top = (int)rect.Top, Right = (int)rect.Right, Bottom = (int)rect.Bottom };
+#endif
 }

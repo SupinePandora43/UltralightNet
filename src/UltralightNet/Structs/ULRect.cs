@@ -30,14 +30,13 @@ public unsafe struct ULRect : IEquatable<ULRect>
 #endif
 
 	public static explicit operator ULRect(ULIntRect rect)
-	{
 #if NET7_0_OR_GREATER
-			Vector128<int> int4 = Vector128.Create(rect.Left, rect.Top, rect.Right, rect.Bottom);
-			Vector128<float> float4 = Vector128.ConvertToSingle(int4);
-			Vector4 vec = float4.AsVector4();
-			return Unsafe.As<Vector4, ULRect>(ref vec);
-#else
-		return new() { Left = (float)rect.Left, Top = (float)rect.Top, Right = (float)rect.Right, Bottom = (float)rect.Bottom };
-#endif
+	{
+		Vector128<int> int4 = Vector128.Create(rect.Left, rect.Top, rect.Right, rect.Bottom);
+		Vector128<float> float4 = Vector128.ConvertToSingle(int4); // thx Tanner Gooding and TrumpMcDonaldz
+		return System.Runtime.CompilerServices.Unsafe.As<Vector128<float>, ULRect>(ref float4); // thx rickbrew
 	}
+#else
+		=> new() { Left = (float)rect.Left, Top = (float)rect.Top, Right = (float)rect.Right, Bottom = (float)rect.Bottom };
+#endif
 }
