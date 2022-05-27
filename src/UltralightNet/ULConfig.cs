@@ -115,7 +115,6 @@ public static unsafe partial class Methods
 }
 
 /// <summary>Configuration settings for Ultralight.</summary>
-[BlittableType]
 [StructLayout(LayoutKind.Sequential)]
 [CustomTypeMarshaller(typeof(ULConfig), CustomTypeMarshallerKind.Value, Direction = CustomTypeMarshallerDirection.In, Features = CustomTypeMarshallerFeatures.TwoStageMarshalling)]
 public unsafe struct _ULConfig : IDisposable
@@ -200,12 +199,12 @@ public unsafe struct _ULConfig : IDisposable
 #if NET5_0_OR_GREATER
 		Unsafe.SkipInit(out this);
 #endif
-		CachePath = new(config.CachePath);
-		ResourcePathPrefix = new ULString(config.ResourcePathPrefix);
+		CachePath = new(config.CachePath.AsSpan());
+		ResourcePathPrefix = new ULString(config.ResourcePathPrefix.AsSpan());
 		_FaceWinding = Unsafe.As<ULFaceWinding, byte>(ref config.FaceWinding);
 		_FontHinting = Unsafe.As<ULFontHinting, byte>(ref config.FontHinting);
 		FontGamma = config.FontGamma;
-		UserStylesheet = new(config.UserStylesheet);
+		UserStylesheet = new(config.UserStylesheet.AsSpan());
 		_ForceRepaint = Unsafe.As<bool, byte>(ref config.ForceRepaint);
 		AnimationTimerDelay = config.AnimationTimerDelay;
 		ScrollTimerDelay = config.ScrollTimerDelay;

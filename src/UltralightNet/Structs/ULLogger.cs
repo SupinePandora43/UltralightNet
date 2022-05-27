@@ -14,7 +14,7 @@ public unsafe struct ULLogger : IDisposable, IEquatable<ULLogger>
 			var c = _LogMessage;
 			return c is null ? null : (ULLogLevel level, in string message) =>
 			{
-				using ULString str = new(message);
+				using ULString str = new(message.AsSpan());
 				c(level, &str);
 			};
 		}

@@ -19,7 +19,7 @@ public unsafe struct ULClipboard : IDisposable, IEquatable<ULClipboard>
 			{
 				value(out string managedResult);
 
-				using ULString managedResultUL = new(managedResult);
+				using ULString managedResultUL = new(managedResult.AsSpan());
 				result->Assign(managedResultUL);
 			};
 		readonly get
@@ -27,7 +27,7 @@ public unsafe struct ULClipboard : IDisposable, IEquatable<ULClipboard>
 			var c = _ReadPlainText;
 			return c is null ? null : (out string managedResult) =>
 			{
-				using ULString resultUL = new("");
+				using ULString resultUL = new();
 				c(&resultUL);
 				managedResult = (string)resultUL;
 			};
@@ -50,7 +50,7 @@ public unsafe struct ULClipboard : IDisposable, IEquatable<ULClipboard>
 			var c = _WritePlainText;
 			return c is null ? null : (in string text) =>
 			{
-				using ULString textUL = new(text);
+				using ULString textUL = new(text.AsSpan());
 				c(&textUL);
 			};
 		}

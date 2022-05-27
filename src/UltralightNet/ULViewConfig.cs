@@ -60,7 +60,6 @@ public static unsafe partial class Methods
 	public static partial void ulViewConfigSetUserAgent(_ULViewConfig* viewConfig, [MarshalUsing(typeof(ULString.ToNative))] string agent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/608.3.10 (KHTML, like Gecko) Ultralight/1.3.0 Safari/608.3.10");
 }
 
-[BlittableType]
 public struct _ULViewConfig : IDisposable
 {
 	private byte _IsAccelerated = 0;
@@ -114,11 +113,11 @@ public struct _ULViewConfig : IDisposable
 		_InitialFocus = Unsafe.As<bool, byte>(ref config.InitialFocus);
 		_EnableImages = Unsafe.As<bool, byte>(ref config.EnableImages);
 		_EnableJavaScript = Unsafe.As<bool, byte>(ref config.EnableJavaScript);
-		FontFamilyStandard = new(config.FontFamilyStandard);
-		FontFamilyFixed = new(config.FontFamilyFixed);
-		FontFamilySerif = new(config.FontFamilySerif);
-		FontFamilySansSerif = new(config.FontFamilySansSerif);
-		UserAgent = new(config.UserAgent);
+		FontFamilyStandard = new(config.FontFamilyStandard.AsSpan());
+		FontFamilyFixed = new(config.FontFamilyFixed.AsSpan());
+		FontFamilySerif = new(config.FontFamilySerif.AsSpan());
+		FontFamilySansSerif = new(config.FontFamilySansSerif.AsSpan());
+		UserAgent = new(config.UserAgent.AsSpan());
 	}
 	public void Dispose()
 	{

@@ -23,20 +23,20 @@ public unsafe struct ULFileSystem : IDisposable, IEquatable<ULFileSystem>
 			var c = _FileExists;
 			return c is null ? null : (in string path) =>
 			{
-				using ULString pathNative = new(path);
+				using ULString pathNative = new(path.AsSpan());
 				return Unsafe.As<byte, bool>(ref Unsafe.AsRef(c(&pathNative)));
 			};
 		}
 	}
 	public ULFileSystemGetFileMimeTypeCallback? GetFileMimeType
 	{
-		set => _GetFileMimeType = value is null ? null : (path) => new ULString(value(ULString.NativeToManaged(path))).Allocate();
+		set => _GetFileMimeType = value is null ? null : (path) => new ULString(value(ULString.NativeToManaged(path)).AsSpan()).Allocate();
 		readonly get
 		{
 			var c = _GetFileMimeType;
 			return c is null ? null : (in string path) =>
 			{
-				using ULString uPath = new ULString(path);
+				using ULString uPath = new ULString(path.AsSpan());
 				ULString* mime = c(&uPath);
 				string retVal = ULString.NativeToManaged(mime);
 				mime->Deallocate();
@@ -46,13 +46,13 @@ public unsafe struct ULFileSystem : IDisposable, IEquatable<ULFileSystem>
 	}
 	public ULFileSystemGetFileCharsetCallback? GetFileCharset
 	{
-		set => _GetFileCharset = value is null ? null : (path) => new ULString(value(ULString.NativeToManaged(path))).Allocate();
+		set => _GetFileCharset = value is null ? null : (path) => new ULString(value(ULString.NativeToManaged(path)).AsSpan()).Allocate();
 		readonly get
 		{
 			var c = _GetFileCharset;
 			return c is null ? null : (in string path) =>
 			{
-				using ULString uPath = new ULString(path);
+				using ULString uPath = new ULString(path.AsSpan());
 				ULString* mime = c(&uPath);
 				string retVal = ULString.NativeToManaged(mime);
 				mime->Deallocate();
@@ -73,11 +73,16 @@ public unsafe struct ULFileSystem : IDisposable, IEquatable<ULFileSystem>
 			var c = _OpenFile;
 			return c is null ? null : (in string path) =>
 			{
-				using ULString pathNative = new(path);
+				using ULString pathNative = new(path.AsSpan());
 				ULBuffer* buffer = c(&pathNative);
 				try
 				{
-					byte[] bytes = GC.AllocateUninitializedArray<byte>(checked((int)buffer->Size));
+					byte[] bytes =
+#if NET5_0_OR_GREATER
+						GC.AllocateUninitializedArray<byte>(checked((int)buffer->Size));
+#else
+						new byte[checked((int)buffer->Size)];
+#endif
 					new ReadOnlySpan<byte>(buffer->Data, checked((int)buffer->Size)).CopyTo(bytes);
 					return bytes;
 				}
@@ -139,5 +144,7 @@ public unsafe struct ULFileSystem : IDisposable, IEquatable<ULFileSystem>
 #pragma warning restore CS8909
 	public readonly override bool Equals(object? other) => other is ULFileSystem fileSystem ? Equals(fileSystem) : false;
 
+#if NETSTANDARD2_1 || NETCOREAPP2_1_OR_GREATER
 	public readonly override int GetHashCode() => HashCode.Combine((nuint)__FileExists, (nuint)__GetFileMimeType, (nuint)__GetFileCharset, (nuint)__OpenFile);
+#endif
 }

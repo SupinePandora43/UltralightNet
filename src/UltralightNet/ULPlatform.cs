@@ -214,7 +214,7 @@ public static unsafe class ULPlatform
 			Current = default;
 		}
 
-		public LineEnumerator GetEnumerator() => this;
+		public readonly LineEnumerator GetEnumerator() => this;
 
 		public bool MoveNext()
 		{
@@ -231,7 +231,7 @@ public static unsafe class ULPlatform
 			return true;
 		}
 
-		public LineEntry Current { get; private set; }
+		public LineEntry Current { readonly get; private set; }
 
 		public ref struct LineEntry
 		{
@@ -306,7 +306,7 @@ public static unsafe class ULPlatform
 		}
 		else
 		{
-			using ULString m = new("resources/icudt67l.dat");
+			using ULString m = new("resources/icudt67l.dat".AsSpan()); // C#VER: utf8 (u8)
 
 			if (ErrorMissingResources && _filesystem.__FileExists(&m) is 0)
 			{
