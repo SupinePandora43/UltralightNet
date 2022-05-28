@@ -18,18 +18,18 @@ namespace UltralightNet.Veldrid.TestApp
 {
 	class Program
 	{
-		private const GraphicsBackend BACKEND = GraphicsBackend.Direct3D11;
+		private const GraphicsBackend BACKEND = GraphicsBackend.Vulkan;
 		private const bool WaitForLoad = false;
 
-		private const uint Width = 1024;
+		private const uint Width = 512;
 		private const uint Height = 512;
 
 		private static readonly ULConfig config = new()
 		{
 			ForceRepaint = false,
 			CachePath = "./cache/",
-			//BitmapAlignment = 0 // improves performance
-			FaceWinding = ULFaceWinding.Clockwise
+			BitmapAlignment = 1, // improves performance (veldrid only)
+			FaceWinding = ULFaceWinding.CounterClockwise
 		};
 		private static readonly ULViewConfig viewConfig = new()
 		{
@@ -52,6 +52,8 @@ namespace UltralightNet.Veldrid.TestApp
 				X = 100,
 				Y = 100
 			};
+
+			if(OperatingSystem.IsWindowsVersionAtLeast(8, 1, 0)) TerraFX.Interop.Windows.Windows.SetProcessDpiAwareness(TerraFX.Interop.Windows.PROCESS_DPI_AWARENESS.PROCESS_SYSTEM_DPI_AWARE);
 
 			Sdl2Window window = VeldridStartup.CreateWindow(ref windowCI);
 
@@ -173,9 +175,9 @@ void main()
 
 			//view.URL = url;
 
-			//view.HTML = "<html><body><p>123</p></body></html>";
+			view.HTML = "<html><body><p>123</p></body></html>";
 			//view.URL = "https://github.com";
-			view.URL = "https://youtu.be/YNL692WN6EE";
+			//view.URL = "https://youtu.be/YNL692WN6EE";
 			//cpuView.URL = url;
 
 			/*try
