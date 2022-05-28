@@ -1,45 +1,45 @@
 using System;
 using System.IO;
-using System.Threading;
 
-namespace UltralightNet.AppCore.TestApp
+namespace UltralightNet.AppCore.TestApp;
+
+class Program
 {
-	class Program
+	static void Main()
 	{
-		static void Main()
-		{
-			AppCoreMethods.ulEnableDefaultLogger("./log.txt");
-			AppCoreMethods.ulEnablePlatformFileSystem(Path.GetDirectoryName(typeof(Program).Assembly.Location));
+		AppCoreMethods.ulEnableDefaultLogger("./log.txt");
+		AppCoreMethods.ulEnablePlatformFileSystem(Path.GetDirectoryName(typeof(Program).Assembly.Location));
 
-			ULApp app = new(new ULSettings(), new ULConfig(){});
-			ULWindow window = new(app.MainMonitor, 512, 512, false, ULWindowFlags.Titled | ULWindowFlags.Resizable);
-			//ULWindow window1 = new(app.MainMonitor, 512, 512, false, ULWindowFlags.Titled | ULWindowFlags.Resizable);
+		ULApp app = new(new ULSettings() { ForceCPURenderer = true }, new ULConfig() { });
+		ULWindow window = new(app.MainMonitor, 512, 512, false, ULWindowFlags.Titled | ULWindowFlags.Resizable | ULWindowFlags.Maximizable);
+		//ULWindow window1 = new(app.MainMonitor, 512, 512, false, ULWindowFlags.Titled | ULWindowFlags.Resizable);
 
-			window.Title = "test title";
+		window.Title = "test title";
 
-			ULOverlay overlay = new(window, 512, 512, 0, 0);
-			//ULOverlay overlay1 = new(window1, 512, 512, 0, 0);
+		ULOverlay overlay = new(window, window.Width, window.Height, 0, 0);
 
-			//overlay1.View.HTML = "<html><body><p>123</p></body></html>";
+		window.SetResizeCallback((IntPtr user_data, ULWindow window, uint width, uint height) => overlay.Resize(width, height));
+		window.SetCloseCallback((_, _) => app.Quit());
 
-			View view = overlay.View;
-			view.URL = "https://github.com/SupinePandora43/UltralightNet";
+		//ULOverlay overlay1 = new(window1, 512, 512, 0, 0);
 
-			view.OnFailLoading += (frame_id, is_main_frame, url, description, error_domain, error_code) => throw new Exception("Failed loading");
+		//overlay1.View.HTML = "<html><body><p>123</p></body></html>";
 
-			bool l = false;
+		View view = overlay.View;
+		//view.URL = "https://github.com/SupinePandora43/UltralightNet";
 
-			view.OnFinishLoading += (frame_id, is_main_frame, url) => l = true;
+		view.OnFailLoading += (frame_id, is_main_frame, url, description, error_domain, error_code) => throw new Exception("Failed loading");
 
-			view.HTML = "<html><body><p>123</p></body></html>";
-			//view.URL = "https://vk.com/supinepandora43";
-			//view.URL = "https://youtube.com";
-			//view.URL = "https://twitter.com/@supinepandora43";
-			while(!l) {app.Renderer.Update();Thread.Sleep(20);}
+		bool l = false;
 
-			app.Run();
+		view.OnFinishLoading += (frame_id, is_main_frame, url) => l = true;
 
-	
-		}
+		//view.HTML = "<html><body><p>123</p></body></html>";
+		//view.URL = "https://vk.com/supinepandora43";
+		view.URL = "https://www.youtube.com/watch?v=N1v4TjntTJI";
+		//view.URL = "https://twitter.com/@supinepandora43";
+		//while (!l) { app.Renderer.Update(); Thread.Sleep(20); }
+
+		app.Run();
 	}
 }
