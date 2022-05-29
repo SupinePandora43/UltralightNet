@@ -13,6 +13,7 @@ using Veldrid;
 using Veldrid.Sdl2;
 using Veldrid.SPIRV;
 using Veldrid.StartupUtilities;
+using TerraFX.Interop.Windows;
 
 namespace UltralightNet.Veldrid.TestApp
 {
@@ -31,29 +32,66 @@ namespace UltralightNet.Veldrid.TestApp
 			BitmapAlignment = 1, // improves performance (veldrid only)
 			FaceWinding = ULFaceWinding.CounterClockwise
 		};
-		private static readonly ULViewConfig viewConfig = new()
+		private static ULViewConfig viewConfig = new()
 		{
 			IsAccelerated = true,
 			IsTransparent = false
 		};
 
+		private static float scale = 1;
+
 		[DllImport("Ultralight", EntryPoint = "?GetKeyIdentifierFromVirtualKeyCode@ultralight@@YAXHAEAVString@1@@Z")]
 		private static extern void GetKey(int i, IntPtr id);
 
 		[MethodImpl(MethodImplOptions.AggressiveOptimization)]
-		public static void Main()
+		public unsafe static void Main()
 		{
 			Stopwatch framerateStopwatch = new();
+
+			static bool EnableDPIAwareness()
+			{
+				if(OperatingSystem.IsWindowsVersionAtLeast(8, 1))
+					Windows.SetProcessDpiAwareness(PROCESS_DPI_AWARENESS.PROCESS_PER_MONITOR_DPI_AWARE);
+				else if(OperatingSystem.IsWindowsVersionAtLeast(6))
+					Windows.SetProcessDPIAware();
+				else return false;
+				return true;
+			}
+
+			if(EnableDPIAwareness())
+			{
+				HMONITOR monitor = Windows.MonitorFromPoint(new TerraFX.Interop.Windows.POINT(1, 1), MONITOR.MONITOR_DEFAULTTONEAREST);
+				if(OperatingSystem.IsWindowsVersionAtLeast(8, 1))
+				{
+					try {
+						DEVICE_SCALE_FACTOR factor;
+						Windows.GetScaleFactorForMonitor(monitor, &factor);
+						scale = (float)factor / 100f;
+					} catch {
+						uint dpiX, dpiY;
+						Windows.GetDpiForMonitor(monitor, MONITOR_DPI_TYPE.MDT_EFFECTIVE_DPI, &dpiX, &dpiY);
+						scale = ((float)(dpiX + dpiY)/2)/96f;
+					}
+				}
+				else if(OperatingSystem.IsWindows())
+				{
+					HDC dc = Windows.GetDC(HWND.NULL);
+					int dpiX = Windows.GetDeviceCaps(dc, Windows.LOGPIXELSX), dpiY = Windows.GetDeviceCaps(dc, Windows.LOGPIXELSY);
+					scale = ((float)(dpiX + dpiY)/2)/96f;
+					Windows.ReleaseDC(HWND.NULL, dc);
+				}
+			}
+
+			viewConfig.InitialDeviceScale = scale;
+
 			WindowCreateInfo windowCI = new()
 			{
-				WindowWidth = (int)Width,
-				WindowHeight = (int)Height,
+				WindowWidth = (int)(Width * scale),
+				WindowHeight = (int)(Height * scale),
 				WindowTitle = "UltralightNet.Veldrid.TestApp",
 				X = 100,
 				Y = 100
 			};
-
-			if(OperatingSystem.IsWindowsVersionAtLeast(8, 1, 0)) TerraFX.Interop.Windows.Windows.SetProcessDpiAwareness(TerraFX.Interop.Windows.PROCESS_DPI_AWARENESS.PROCESS_SYSTEM_DPI_AWARE);
 
 			Sdl2Window window = VeldridStartup.CreateWindow(ref windowCI);
 
@@ -166,8 +204,7 @@ void main()
 			ULPlatform.GPUDriver = gpuDriver.GetGPUDriver();
 
 			Renderer renderer = ULPlatform.CreateRenderer(config);
-			Session session = renderer.CreateSession(true, "Cookies_please");
-			View view = renderer.CreateView(Width, Height, viewConfig, session);
+			View view = renderer.CreateView((uint)(Width * scale), (uint)(Height * scale), viewConfig, renderer.CreateSession(true, "Cookies_please"));
 
 			//View cpuView = new(renderer, Width, Height, TRANSPARENT, Session.DefaultSession(renderer), true);
 
@@ -220,8 +257,8 @@ void main()
 				ULMouseEvent mouseEvent = new()
 				{
 					Type = ULMouseEventType.MouseMoved,
-					X = x,
-					Y = y,
+					X = (int)(x/scale),
+					Y = (int)(y/scale),
 					Button = ULMouseEventButton.None
 				};
 
@@ -245,8 +282,8 @@ void main()
 				ULMouseEvent mouseEvent = new()
 				{
 					Type = ULMouseEventType.MouseDown,
-					X = x,
-					Y = y,
+					X = (int)(x/scale),
+					Y = (int)(y/scale),
 					Button = md.MouseButton switch
 					{
 						MouseButton.Left => ULMouseEventButton.Left,
@@ -264,8 +301,8 @@ void main()
 				ULMouseEvent mouseEvent = new()
 				{
 					Type = ULMouseEventType.MouseUp,
-					X = x,
-					Y = y,
+					X = (int)(x/scale),
+					Y = (int)(y/scale),
 					Button = mu.MouseButton switch
 					{
 						MouseButton.Left => ULMouseEventButton.Left,
@@ -423,7 +460,6 @@ void main()
 				// Thread.Sleep(1000 / 60 / 10); // ~600 fps
 			}
 
-			GC.KeepAlive(session);
 			renderer.Dispose();
 		}
 	}

@@ -1,4 +1,5 @@
 using System;
+using System.Diagnostics;
 using System.Numerics;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
@@ -58,21 +59,29 @@ void main()
 	static Renderer renderer;
 	static View view;
 
-	public static void Main()
+	static float scale = 1.0f;
+
+	public unsafe static void Main()
 	{
 		AppContext.SetSwitch("Switch.System.Reflection.Assembly.SimulatedLocationInBaseDirectory", true);
 		AppCoreMethods.ulEnablePlatformFontLoader();
 		AppCoreMethods.ulEnablePlatformFileSystem("./");
 		AppCoreMethods.ulEnableDefaultLogger("./log123as.txt");
 
+		try {
+			Silk.NET.GLFW.GlfwProvider.GLFW.Value.GetMonitorContentScale(Silk.NET.GLFW.GlfwProvider.GLFW.Value.GetPrimaryMonitor(), out float xscale, out float yscale);
+			scale = (xscale + yscale) / 2; // account for *possible* different x y scale
+			if(scale <= 0) throw new Exception("invalid scale");
+ 		} catch(Exception e) { Console.WriteLine($"Failed to account for display scale: {e}"); }
+
 		window = Window.Create(WindowOptions.Default with
 		{
-			Size = new Vector2D<int>(512, 512),
+			Size = new Vector2D<int>((int)(512 * scale), (int)(512 * scale)),
 			API = new GraphicsAPI(ContextAPI.OpenGL, ContextProfile.Core, 0/*ContextFlags.ForwardCompatible*/, new APIVersion(4, 5)),
 			Samples = -1,
 			FramesPerSecond = 120,
 			UpdatesPerSecond = 240,
-			VSync = false
+			VSync = true
 		});
 
 		window.Load += OnLoad;
@@ -213,12 +222,12 @@ void main()
 
 		renderer = ULPlatform.CreateRenderer(new ULConfig { FaceWinding = ULFaceWinding.Clockwise, ForceRepaint = false,MaxUpdateTime = (double)1/(double)120 });
 
-		view = renderer.CreateView(512, 512, new ULViewConfig { IsAccelerated = true, IsTransparent = false });
+		view = renderer.CreateView((uint)(512 * scale), (uint)(512 * scale), new ULViewConfig { IsAccelerated = true, IsTransparent = false, InitialDeviceScale = scale });
 
-		view.URL = "https://vk.com/supinepandora43";
+		//view.URL = "https://vk.com/supinepandora43";
 		//view.URL = "https://twitter.com/@supinepandora43";
 		//view.URL = "https://youtube.com";
-		//view.HTML = "<html><body><p>123</p></body></html>";
+		view.HTML = "<html><body><p>123</p></body></html>";
 		bool loaded = false;
 
 		view.OnFinishLoading += (_, _, _) => loaded = true;
@@ -295,15 +304,15 @@ void main()
 
 	static void OnMouseDown(IMouse mouse, MouseButton button)
 	{
-		view.FireMouseEvent(new() { Type = ULMouseEventType.MouseDown, Button = button is MouseButton.Left ? ULMouseEventButton.Left : (button is MouseButton.Right ? ULMouseEventButton.Right : ULMouseEventButton.Middle), X = (int)mouse.Position.X, Y = (int)mouse.Position.Y });
+		view.FireMouseEvent(new() { Type = ULMouseEventType.MouseDown, Button = button is MouseButton.Left ? ULMouseEventButton.Left : (button is MouseButton.Right ? ULMouseEventButton.Right : ULMouseEventButton.Middle), X = (int)(mouse.Position.X/scale), Y = (int)(mouse.Position.Y/scale) });
 	}
 
 	static void OnMouseUp(IMouse mouse, MouseButton button)
 	{
-		view.FireMouseEvent(new() { Type = ULMouseEventType.MouseUp, Button = button is MouseButton.Left ? ULMouseEventButton.Left : (button is MouseButton.Right ? ULMouseEventButton.Right : ULMouseEventButton.Middle), X = (int)mouse.Position.X, Y = (int)mouse.Position.Y });
+		view.FireMouseEvent(new() { Type = ULMouseEventType.MouseUp, Button = button is MouseButton.Left ? ULMouseEventButton.Left : (button is MouseButton.Right ? ULMouseEventButton.Right : ULMouseEventButton.Middle), X = (int)(mouse.Position.X/scale), Y = (int)(mouse.Position.Y/scale) });
 	}
 	static void OnMouseMove(IMouse mouse, Vector2 position)
 	{
-		view.FireMouseEvent(new() { Type = ULMouseEventType.MouseMoved, X = (int)position.X, Y = (int)position.Y });
+		view.FireMouseEvent(new() { Type = ULMouseEventType.MouseMoved, X = (int)(mouse.Position.X/scale), Y = (int)(mouse.Position.Y/scale) });
 	}
 }
