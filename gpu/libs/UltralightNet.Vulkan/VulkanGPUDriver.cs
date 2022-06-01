@@ -1,17 +1,16 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
-using System.IO;
 using System.Numerics;
-using System.Reflection;
 using System.Runtime.CompilerServices;
-using System.Text;
+using System.Runtime.InteropServices;
 using Silk.NET.Core.Native;
 using Silk.NET.Vulkan;
 using Silk.NET.Vulkan.Extensions.EXT;
 using Silk.NET.Vulkan.Extensions.KHR;
 using UltralightNet;
 using UltralightNet.GPUCommon;
+using UltralightNet.Vulkan.Memory;
 using Buffer = Silk.NET.Vulkan.Buffer;
 
 [module: SkipLocalsInit]
@@ -20,17 +19,17 @@ namespace UltralightNet.Vulkan;
 
 // https://github.com/SaschaWillems/Vulkan/blob/master/examples/offscreen/offscreen.cpp for reference
 
-public class RenderBufferEntry
+public struct RenderBufferEntry
 {
 	public Framebuffer framebuffer;
 
-	public TextureEntry textureEntry;
+	public uint textureEntryId;
 
 	public Image resolveImage;
 	internal DeviceMemory resolveImageMemory;
 }
 
-public class TextureEntry
+public unsafe struct TextureEntry
 {
 	public uint width;
 	public uint height;
@@ -41,22 +40,44 @@ public class TextureEntry
 
 	public Buffer stagingBuffer;
 	public DeviceMemory stagingMemory;
+	public void* mapped;
 
 	public DescriptorPool descriptorPool;
 	public DescriptorSet descriptorSet;
 }
 
-internal class GeometryEntry
+internal unsafe struct GeometryEntry
 {
-	public Buffer vertexStagingBuffer;
-	public Buffer vertexBuffer;
-	public Buffer indexStagingBuffer;
-	public Buffer indexBuffer;
+	public AllocationTuple Vertex { readonly get; init; }
 
-	public DeviceMemory vertexStagingMemory;
-	public DeviceMemory vertexMemory;
-	public DeviceMemory indexStagingMemory;
-	public DeviceMemory indexMemory;
+	public AllocationTuple Index { readonly get; init; }
+
+	public uint FrameToDestroy;
+
+	public struct AllocationTuple
+	{
+		/// <summary>
+		/// Desktop <br />
+		/// 0 - DEVICE_LOCAL bind<br />
+		/// 1 - STAGING frame_id <br />
+		/// 2 - STAGING frame_id <br />
+		/// Unified memory <br />
+		/// 0 - UNIFIED frame_id <br />
+		/// 1 - UNIFIED frame_id <br />
+		/// </summary>
+		/// <remarks>Single DEVICE_LOCAL because frames are executed sequentially and synchronized by a semaphore</remarks>
+		internal readonly BufferResource[] buffers;
+		private int mostRecent = -1;
+
+		public BufferResource ToWrite => VulkanGPUDriver.UnifiedMemory ? buffers[mostRecent = (int)VulkanGPUDriver.CurrentFrame + 1] : buffers[(int)VulkanGPUDriver.CurrentFrame];
+		public readonly BufferResource ToUse => VulkanGPUDriver.UnifiedMemory ? buffers[mostRecent] : buffers[0];
+
+		public AllocationTuple(BufferResource[] buffers!!)
+		{
+			Debug.Assert(buffers.Length > 0);
+			this.buffers = buffers;
+		}
+	}
 }
 
 public unsafe partial class VulkanGPUDriver
@@ -83,15 +104,18 @@ public unsafe partial class VulkanGPUDriver
 	private DeviceMemory uniformBufferMemory;
 	private Buffer uniformBuffer;
 	private readonly Sampler textureSampler;
-	// TODO: implement MSAA
-	private const SampleCountFlags msaaSamples = SampleCountFlags.SampleCount4Bit;
 
 	private readonly List<TextureEntry> textures = new();
 	private readonly Stack<uint> texturesFreeIds = new();
 	private readonly List<GeometryEntry> geometries = new();
+	private readonly Queue<ValueTuple<uint, int>> geometryDestroyQueue = new();
 	private readonly Stack<uint> geometriesFreeIds = new();
 	private readonly List<RenderBufferEntry> renderBuffers = new();
 	private readonly Stack<uint> renderBuffersFreeIds = new();
+
+	public static uint MaxFramesInFlight = 1;
+	public static uint CurrentFrame = 0;
+	public static bool UnifiedMemory = false;
 
 	private uint stat_CreateGeometry = 0;
 	private uint stat_UpdateGeometry = 0;
@@ -143,7 +167,7 @@ public unsafe partial class VulkanGPUDriver
 		}
 		#endregion TextureSampler
 		#region TextureSetLayout
-		Sampler* immutableSamplers = stackalloc Sampler[2]{ textureSampler, default };
+		Sampler* immutableSamplers = stackalloc Sampler[2] { textureSampler, default };
 		DescriptorSetLayoutBinding samplerLayoutBinding = new()
 		{
 			Binding = 0,
@@ -204,7 +228,7 @@ public unsafe partial class VulkanGPUDriver
 				PPreserveAttachments = UseMS ? &one : null
 			};
 
-			SubpassDependency* dependencies = stackalloc SubpassDependency[2]{
+			SubpassDependency* dependencies = stackalloc SubpassDependency[2] {
 				new()
 				{
 					SrcSubpass = Vk.SubpassExternal,
@@ -214,7 +238,8 @@ public unsafe partial class VulkanGPUDriver
 					SrcAccessMask = AccessFlags.AccessShaderReadBit,
 					DstAccessMask = AccessFlags.AccessColorAttachmentWriteBit | AccessFlags.AccessColorAttachmentReadBit
 				},
-				new(){
+				new()
+				{
 					SrcSubpass = 0,
 					DstSubpass = Vk.SubpassExternal,
 					SrcStageMask = PipelineStageFlags.PipelineStageColorAttachmentOutputBit,
@@ -468,7 +493,7 @@ public unsafe partial class VulkanGPUDriver
 						AttachmentCount = 1,
 						PAttachments = &colorBlendAttachmentNoBlend,
 					};
-					vk.CreateGraphicsPipelines(device, default, 1, pipelineInfo with {PColorBlendState = &colorBlendingNoBlend}, null, out fillPipeline_NoBlend);
+					vk.CreateGraphicsPipelines(device, default, 1, pipelineInfo with { PColorBlendState = &colorBlendingNoBlend }, null, out fillPipeline_NoBlend);
 				}
 
 				//vk.DestroyShaderModule(device, shaderStages[0].Module, null);
@@ -535,7 +560,7 @@ public unsafe partial class VulkanGPUDriver
 		this.uniformSet = uniformSet;
 		#endregion DescriptorSet
 		#endregion UniformSet
-		_gpuDriver = new()
+		GPUDriver = new()
 		{
 			NextTextureId = NextTextureId,
 			CreateTexture = CreateTexture,
@@ -552,8 +577,7 @@ public unsafe partial class VulkanGPUDriver
 		};
 	}
 
-	private ULGPUDriver _gpuDriver;
-	public ULGPUDriver GPUDriver => _gpuDriver;
+	public ULGPUDriver GPUDriver { get; }
 
 	public RenderBufferEntry GetRenderBuffer(uint id)
 	{
@@ -594,21 +618,20 @@ public unsafe partial class VulkanGPUDriver
 	}
 	#endregion ID
 
-	//[SkipLocalsInit]
 	private void CreateRenderBuffer(uint id, ULRenderBuffer renderBuffer)
 	{
-		RenderBufferEntry renderBufferEntry = renderBuffers[(int)id];
-		TextureEntry textureEntry = textures[(int)renderBuffer.TextureId];
-		renderBufferEntry.textureEntry = textureEntry;
+		ref RenderBufferEntry renderBufferEntry = ref CollectionsMarshal.AsSpan(renderBuffers)[(int)id];
+		ref TextureEntry textureEntry = ref CollectionsMarshal.AsSpan(textures)[(int)renderBuffer.TextureId];
+		renderBufferEntry.textureEntryId = renderBuffer.TextureId;
 
-		fixed (ImageView* attachmentsPtr = &textureEntry.imageView)
+		fixed (ImageView* imageViewPtr = &textureEntry.imageView)
 		{
 			FramebufferCreateInfo framebufferInfo = new()
 			{
 				SType = StructureType.FramebufferCreateInfo,
 				RenderPass = pipelineRenderPass,
 				AttachmentCount = 1,
-				PAttachments = attachmentsPtr,
+				PAttachments = imageViewPtr,
 				Width = textureEntry.width,
 				Height = textureEntry.height,
 				Layers = 1,
@@ -632,7 +655,7 @@ public unsafe partial class VulkanGPUDriver
 	{
 		stat_CreateTexture++;
 
-		TextureEntry textureEntry = textures[(int)id];
+		ref TextureEntry textureEntry = ref CollectionsMarshal.AsSpan(textures)[(int)id];
 
 		uint width = textureEntry.width = bitmap.Width;
 		uint height = textureEntry.height = bitmap.Height;
@@ -715,7 +738,6 @@ public unsafe partial class VulkanGPUDriver
 			vk.MapMemory(device, stagingBufferMemory, 0, bitmapSize, 0, &mappedStagingBufferMemory);
 			new ReadOnlySpan<byte>((void*)bitmap.LockPixels(), (int)bitmapSize).CopyTo(new Span<byte>(mappedStagingBufferMemory, (int)bitmapSize));
 			bitmap.UnlockPixels();
-			vk.UnmapMemory(device, stagingBufferMemory);
 
 			PipelineBarrier(commandBuffer, image, ImageLayout.Undefined, ImageLayout.TransferDstOptimal);
 
@@ -741,6 +763,7 @@ public unsafe partial class VulkanGPUDriver
 
 			textureEntry.stagingBuffer = stagingBuffer;
 			textureEntry.stagingMemory = stagingBufferMemory;
+			textureEntry.mapped = mappedStagingBufferMemory;
 		}
 		ImageView imageView = CreateImageView(image, imageInfo.Format);
 		textureEntry.imageView = imageView;
@@ -815,11 +838,8 @@ public unsafe partial class VulkanGPUDriver
 		nuint bitmapSize = bitmap.Size;
 		if (bitmapSize >= int.MaxValue) throw error;
 
-		void* mappedStagingBufferMemory;
-		vk.MapMemory(device, textureEntry.stagingMemory, 0, bitmapSize, 0, &mappedStagingBufferMemory);
-		new ReadOnlySpan<byte>((void*)bitmap.LockPixels(), (int)bitmapSize).CopyTo(new Span<byte>(mappedStagingBufferMemory, (int)bitmapSize));
+		new ReadOnlySpan<byte>((void*)bitmap.LockPixels(), (int)bitmapSize).CopyTo(new Span<byte>(textureEntry.mapped, (int)bitmapSize));
 		bitmap.UnlockPixels();
-		vk.UnmapMemory(device, textureEntry.stagingMemory);
 
 		PipelineBarrier(commandBuffer, textureEntry.image, ImageLayout.ShaderReadOnlyOptimal, ImageLayout.TransferDstOptimal);
 		BufferImageCopy region = new()
@@ -849,8 +869,10 @@ public unsafe partial class VulkanGPUDriver
 		vk.FreeDescriptorSets(device, textureEntry.descriptorPool, 1, textureEntry.descriptorSet);
 		vk.DestroyDescriptorPool(device, textureEntry.descriptorPool, null);
 
-		if(textureEntry.stagingBuffer.Handle is not 0){
+		if (textureEntry.stagingBuffer.Handle is not 0)
+		{
 			vk.DestroyBuffer(device, textureEntry.stagingBuffer, null);
+			vk.UnmapMemory(device, textureEntry.stagingMemory);
 			vk.FreeMemory(device, textureEntry.stagingMemory, null);
 			textureEntry.stagingBuffer = default;
 			textureEntry.stagingMemory = default;
@@ -863,10 +885,10 @@ public unsafe partial class VulkanGPUDriver
 		texturesFreeIds.Push(id);
 	}
 
-	[SkipLocalsInit]
 	private void CreateGeometry(uint id, ULVertexBuffer vb, ULIndexBuffer ib)
 	{
-		stat_CreateGeometry++;
+		RequiresResubmission = true;
+		/*stat_CreateGeometry++;
 		Buffer vertexStagingBuffer;
 		Buffer vertexBuffer;
 		Buffer indexStagingBuffer;
@@ -887,16 +909,15 @@ public unsafe partial class VulkanGPUDriver
 		if (Math.Max(vb.size, ib.size) >= int.MaxValue) throw error;
 
 		void* vertexStaging;
-		vk.MapMemory(device, vertexStagingMemory, 0, vb.size, 0, &vertexStaging);
-		new ReadOnlySpan<byte>(vb.data, (int)vb.size).CopyTo(new Span<byte>(vertexStaging, (int)vb.size));
-		vk.UnmapMemory(device, vertexStagingMemory);
-
 		void* indexStaging;
-		vk.MapMemory(device, indexStagingMemory, 0, ib.size, 0, &indexStaging);
-		new ReadOnlySpan<byte>(ib.data, (int)ib.size).CopyTo(new Span<byte>(indexStaging, (int)ib.size));
-		vk.UnmapMemory(device, indexStagingMemory);
 
-		BufferMemoryBarrier* barriers = stackalloc BufferMemoryBarrier[4]{
+		vk.MapMemory(device, vertexStagingMemory, 0, vb.size, 0, &vertexStaging);
+		vk.MapMemory(device, indexStagingMemory, 0, ib.size, 0, &indexStaging);
+
+		new ReadOnlySpan<byte>(vb.data, (int)vb.size).CopyTo(new Span<byte>(vertexStaging, (int)vb.size));
+		new ReadOnlySpan<byte>(ib.data, (int)ib.size).CopyTo(new Span<byte>(indexStaging, (int)ib.size));
+
+		BufferMemoryBarrier* barriers = stackalloc BufferMemoryBarrier[4] {
 			new(srcAccessMask: AccessFlags.AccessNoneKhr,
 				dstAccessMask: AccessFlags.AccessTransferWriteBit,
 				srcQueueFamilyIndex: Vk.QueueFamilyIgnored,
@@ -938,12 +959,14 @@ public unsafe partial class VulkanGPUDriver
 		CopyBuffer(commandBuffer, vertexStagingBuffer, vertexBuffer, vb.size);
 		CopyBuffer(commandBuffer, indexStagingBuffer, indexBuffer, ib.size);
 
-		barriers[0] = barriers[0] with {
-			SrcAccessMask= AccessFlags.AccessTransferWriteBit,
+		barriers[0] = barriers[0] with
+		{
+			SrcAccessMask = AccessFlags.AccessTransferWriteBit,
 			DstAccessMask = AccessFlags.AccessVertexAttributeReadBit
 		};
-		barriers[1] = barriers[1] with {
-			SrcAccessMask= AccessFlags.AccessTransferWriteBit,
+		barriers[1] = barriers[1] with
+		{
+			SrcAccessMask = AccessFlags.AccessTransferWriteBit,
 			DstAccessMask = AccessFlags.AccessIndexReadBit
 		};
 
@@ -957,68 +980,151 @@ public unsafe partial class VulkanGPUDriver
 
 		geometries[(int)id] = new GeometryEntry()
 		{
-			vertexStagingBuffer = vertexStagingBuffer,
-			vertexBuffer = vertexBuffer,
-			indexStagingBuffer = indexStagingBuffer,
-			indexBuffer = indexBuffer,
-			vertexStagingMemory = vertexStagingMemory,
-			vertexMemory = vertexMemory,
-			indexStagingMemory = indexStagingMemory,
-			indexMemory = indexMemory
+			Vertex = new(new[] { new GeometryEntry.Allocation() { Buffer = vertexBuffer }, new GeometryEntry.Allocation() { Buffer = vertexStagingBuffer, Mapped = vertexStaging } }),
+			Index = new(new[] { new GeometryEntry.Allocation() { Buffer = indexBuffer }, new GeometryEntry.Allocation() { Buffer = indexStagingBuffer, Mapped = indexStaging } })
+		};*/
+		Span<GeometryCreateInfo> createInfos = stackalloc GeometryCreateInfo[(int)(UnifiedMemory ? MaxFramesInFlight * 2 : MaxFramesInFlight * 2 + 2)];
+
+		int i;
+		if (!UnifiedMemory)
+		{
+			createInfos[0] = new()
+			{
+				Id = (int)id,
+				Size = vb.size,
+				BufferFlags = BufferUsageFlags.BufferUsageTransferDstBit | BufferUsageFlags.BufferUsageVertexBufferBit,
+				MemoryFlags = MemoryPropertyFlags.MemoryPropertyDeviceLocalBit
+			};
+			createInfos[1] = new()
+			{
+				Id = (int)id,
+				Size = ib.size,
+				BufferFlags = BufferUsageFlags.BufferUsageTransferDstBit | BufferUsageFlags.BufferUsageIndexBufferBit,
+				MemoryFlags = MemoryPropertyFlags.MemoryPropertyDeviceLocalBit
+			};
+			i = 2;
+		}
+		else i = 0;
+
+		for (uint frame = 0; frame < MaxFramesInFlight; frame++)
+		{
+			createInfos[i++] = new()
+			{
+				Id = (int)id,
+				Size = vb.size,
+				BufferFlags = BufferUsageFlags.BufferUsageTransferSrcBit | BufferUsageFlags.BufferUsageVertexBufferBit,
+				MemoryFlags = MemoryPropertyFlags.MemoryPropertyHostVisibleBit | MemoryPropertyFlags.MemoryPropertyHostCoherentBit
+			};
+			createInfos[i++] = new()
+			{
+				Id = (int)id,
+				Size = ib.size,
+				BufferFlags = BufferUsageFlags.BufferUsageTransferSrcBit | BufferUsageFlags.BufferUsageIndexBufferBit,
+				MemoryFlags = MemoryPropertyFlags.MemoryPropertyHostVisibleBit | MemoryPropertyFlags.MemoryPropertyHostCoherentBit
+			};
+		}
+
+		void Allocate(Span<GeometryCreateInfo> createInfos)
+		{
+
+		}
+
+		Allocate(createInfos);
+
+		BufferResource[] vertexBuffers = GC.AllocateUninitializedArray<BufferResource>((int)(UnifiedMemory ? MaxFramesInFlight : MaxFramesInFlight + 1));
+		BufferResource[] indexBuffers = GC.AllocateUninitializedArray<BufferResource>((int)(UnifiedMemory ? MaxFramesInFlight : MaxFramesInFlight + 1));
+
+		if (!UnifiedMemory)
+		{
+			vertexBuffers[0] = createInfos[0].BufferResource;
+			indexBuffers[0] = createInfos[1].BufferResource;
+			i = 2;
+			// assert they contain data
+			Debug.Assert(createInfos[i - 2].BufferResource.Buffer.Handle is not 0);
+			Debug.Assert(createInfos[i - 1].BufferResource.Buffer.Handle is not 0);
+		}
+		else i = 0;
+
+		for (uint frame = 0; frame < MaxFramesInFlight; frame++)
+		{
+			vertexBuffers[frame] = createInfos[i++].BufferResource;
+			indexBuffers[frame] = createInfos[i++].BufferResource;
+
+			// assert they match
+			Debug.Assert(createInfos[i - 2].BufferFlags.HasFlag(BufferUsageFlags.BufferUsageVertexBufferBit));
+			Debug.Assert(createInfos[i - 2].MemoryFlags.HasFlag(MemoryPropertyFlags.MemoryPropertyHostVisibleBit | MemoryPropertyFlags.MemoryPropertyHostCoherentBit));
+			Debug.Assert(createInfos[i - 1].BufferFlags.HasFlag(BufferUsageFlags.BufferUsageIndexBufferBit));
+			Debug.Assert(createInfos[i - 1].MemoryFlags.HasFlag(MemoryPropertyFlags.MemoryPropertyHostVisibleBit | MemoryPropertyFlags.MemoryPropertyHostCoherentBit));
+			// assert they contain data
+			Debug.Assert(createInfos[i - 2].BufferResource.Buffer.Handle is not 0);
+			Debug.Assert(createInfos[i - 1].BufferResource.Buffer.Handle is not 0);
+		}
+
+		ref GeometryEntry geometryEntry = ref CollectionsMarshal.AsSpan(geometries)[(int)id];
+
+		geometryEntry = new()
+		{
+			Vertex = new(vertexBuffers),
+			Index = new(indexBuffers)
 		};
-	}
-	[SkipLocalsInit]
-	private void UpdateGeometry(uint id, ULVertexBuffer vb, ULIndexBuffer ib)
-	{
-		stat_UpdateGeometry++;
-		GeometryEntry geometryEntry = geometries[(int)id];
 
-		// TODO: nuint.MaxValue > int.MaxValue
-		if (Math.Max(vb.size, ib.size) >= int.MaxValue) throw error;
+		new ReadOnlySpan<byte>(vb.data, (int)vb.size).CopyTo(new Span<byte>(geometryEntry.Vertex.ToWrite.Mapped, (int)vb.size));
+		new ReadOnlySpan<byte>(ib.data, (int)ib.size).CopyTo(new Span<byte>(geometryEntry.Index.ToWrite.Mapped, (int)ib.size));
 
-		void* vertexStaging;
-		vk.MapMemory(device, geometryEntry.vertexStagingMemory, 0, vb.size, 0, &vertexStaging);
-		new ReadOnlySpan<byte>(vb.data, (int)vb.size).CopyTo(new Span<byte>(vertexStaging, (int)vb.size));
-		vk.UnmapMemory(device, geometryEntry.vertexStagingMemory);
-
-		void* indexStaging;
-		vk.MapMemory(device, geometryEntry.indexStagingMemory, 0, ib.size, 0, &indexStaging);
-		new ReadOnlySpan<byte>(ib.data, (int)ib.size).CopyTo(new Span<byte>(indexStaging, (int)ib.size));
-		vk.UnmapMemory(device, geometryEntry.indexStagingMemory);
-
-		BufferMemoryBarrier* barriers = stackalloc BufferMemoryBarrier[2]{
-			new(srcAccessMask: AccessFlags.AccessVertexAttributeReadBit,
+		BufferMemoryBarrier* barriers = stackalloc BufferMemoryBarrier[2] {
+			new(srcAccessMask: AccessFlags.AccessNoneKhr,
 				dstAccessMask: AccessFlags.AccessTransferWriteBit,
 				srcQueueFamilyIndex: Vk.QueueFamilyIgnored,
 				dstQueueFamilyIndex: Vk.QueueFamilyIgnored,
-				buffer: geometryEntry.vertexBuffer,
-				offset: 0,
+				buffer: geometryEntry.Vertex.ToUse.Buffer,
+				offset: geometryEntry.Vertex.ToUse.Offset,
 				size: vb.size),
-			new(srcAccessMask: AccessFlags.AccessIndexReadBit,
+			new(srcAccessMask: AccessFlags.AccessNoneKhr,
 				dstAccessMask: AccessFlags.AccessTransferWriteBit,
 				srcQueueFamilyIndex: Vk.QueueFamilyIgnored,
 				dstQueueFamilyIndex: Vk.QueueFamilyIgnored,
-				buffer: geometryEntry.indexBuffer,
-				offset: 0,
+				buffer: geometryEntry.Index.ToUse.Buffer,
+				offset: geometryEntry.Index.ToUse.Offset,
 				size: ib.size)
 		};
 
 		vk.CmdPipelineBarrier(commandBuffer,
-			PipelineStageFlags.PipelineStageVertexInputBit,
+			PipelineStageFlags.PipelineStageBottomOfPipeBit,
 			PipelineStageFlags.PipelineStageTransferBit,
 			0,
 			0, null,
 			2, barriers,
 			0, null);
 
-		CopyBuffer(commandBuffer, geometryEntry.vertexStagingBuffer, geometryEntry.vertexBuffer, vb.size);
-		CopyBuffer(commandBuffer, geometryEntry.indexStagingBuffer, geometryEntry.indexBuffer, ib.size);
+		Debug.Assert(geometryEntry.Vertex.ToWrite.Size == vb.size);
+		Debug.Assert(geometryEntry.Vertex.ToUse.Size == vb.size);
 
-		barriers[0] = barriers[0] with {
+		Debug.Assert(geometryEntry.Index.ToWrite.Size == ib.size);
+		Debug.Assert(geometryEntry.Index.ToUse.Size == ib.size);
+
+		BufferCopy* bufferCopies = stackalloc BufferCopy[2] {
+			new(geometryEntry.Vertex.ToWrite.Offset, geometryEntry.Vertex.ToUse.Offset, vb.size),
+			new(geometryEntry.Index.ToWrite.Offset, geometryEntry.Index.ToUse.Offset, vb.size),
+		};
+
+		if (geometryEntry.Vertex.ToWrite.Buffer.Handle == geometryEntry.Index.ToWrite.Buffer.Handle && // in case if source and destination buffers are same
+			geometryEntry.Vertex.ToUse.Buffer.Handle == geometryEntry.Index.ToUse.Buffer.Handle)
+		{
+			vk.CmdCopyBuffer(commandBuffer, geometryEntry.Vertex.ToWrite.Buffer, geometryEntry.Vertex.ToUse.Buffer, 2, bufferCopies);
+		}
+		else
+		{
+			vk.CmdCopyBuffer(commandBuffer, geometryEntry.Vertex.ToWrite.Buffer, geometryEntry.Vertex.ToUse.Buffer, 1, bufferCopies);
+			vk.CmdCopyBuffer(commandBuffer, geometryEntry.Index.ToWrite.Buffer, geometryEntry.Index.ToUse.Buffer, 1, bufferCopies + 1);
+		}
+
+		barriers[0] = barriers[0] with
+		{
 			SrcAccessMask = AccessFlags.AccessTransferWriteBit,
 			DstAccessMask = AccessFlags.AccessVertexAttributeReadBit
 		};
-		barriers[1] = barriers[1] with {
+		barriers[1] = barriers[1] with
+		{
 			SrcAccessMask = AccessFlags.AccessTransferWriteBit,
 			DstAccessMask = AccessFlags.AccessIndexReadBit
 		};
@@ -1031,28 +1137,175 @@ public unsafe partial class VulkanGPUDriver
 			2, barriers,
 			0, null);
 	}
-	[SkipLocalsInit]
+	private void UpdateGeometry(uint id, ULVertexBuffer vb, ULIndexBuffer ib)
+	{
+		RequiresResubmission = true;
+		Debug.Assert(!UnifiedMemory); // TODO
+
+		ref GeometryEntry geometryEntry = ref CollectionsMarshal.AsSpan(geometries)[(int)id];
+
+		// TODO: nuint.MaxValue > int.MaxValue
+		if (Math.Max(vb.size, ib.size) >= (uint)int.MaxValue) throw error;
+
+		new ReadOnlySpan<byte>(vb.data, (int)vb.size).CopyTo(new Span<byte>(geometryEntry.Vertex.ToWrite.Mapped, (int)vb.size));
+		new ReadOnlySpan<byte>(ib.data, (int)ib.size).CopyTo(new Span<byte>(geometryEntry.Index.ToWrite.Mapped, (int)ib.size));
+
+		BufferMemoryBarrier* barriers = stackalloc BufferMemoryBarrier[2] {
+			new(srcAccessMask: AccessFlags.AccessVertexAttributeReadBit,
+				dstAccessMask: AccessFlags.AccessTransferWriteBit,
+				srcQueueFamilyIndex: Vk.QueueFamilyIgnored,
+				dstQueueFamilyIndex: Vk.QueueFamilyIgnored,
+				buffer: geometryEntry.Vertex.ToUse.Buffer,
+				offset: geometryEntry.Vertex.ToUse.Offset,
+				size: vb.size),
+			new(srcAccessMask: AccessFlags.AccessIndexReadBit,
+				dstAccessMask: AccessFlags.AccessTransferWriteBit,
+				srcQueueFamilyIndex: Vk.QueueFamilyIgnored,
+				dstQueueFamilyIndex: Vk.QueueFamilyIgnored,
+				buffer: geometryEntry.Index.ToUse.Buffer,
+				offset: geometryEntry.Index.ToUse.Offset,
+				size: ib.size)
+		};
+
+		vk.CmdPipelineBarrier(commandBuffer,
+			PipelineStageFlags.PipelineStageVertexInputBit,
+			PipelineStageFlags.PipelineStageTransferBit,
+			0,
+			0, null,
+			2, barriers,
+			0, null);
+
+		Debug.Assert(geometryEntry.Vertex.ToWrite.Size == vb.size);
+		Debug.Assert(geometryEntry.Vertex.ToUse.Size == vb.size);
+
+		Debug.Assert(geometryEntry.Index.ToWrite.Size == ib.size);
+		Debug.Assert(geometryEntry.Index.ToUse.Size == ib.size);
+
+		BufferCopy* bufferCopies = stackalloc BufferCopy[2] {
+			new(geometryEntry.Vertex.ToWrite.Offset, geometryEntry.Vertex.ToUse.Offset, vb.size),
+			new(geometryEntry.Index.ToWrite.Offset, geometryEntry.Index.ToUse.Offset, vb.size),
+		};
+
+		if (geometryEntry.Vertex.ToWrite.Buffer.Handle == geometryEntry.Index.ToWrite.Buffer.Handle && // in case if source and destination buffers are same
+			geometryEntry.Vertex.ToUse.Buffer.Handle == geometryEntry.Index.ToUse.Buffer.Handle)
+		{
+			vk.CmdCopyBuffer(commandBuffer, geometryEntry.Vertex.ToWrite.Buffer, geometryEntry.Vertex.ToUse.Buffer, 2, bufferCopies);
+		}
+		else
+		{
+			vk.CmdCopyBuffer(commandBuffer, geometryEntry.Vertex.ToWrite.Buffer, geometryEntry.Vertex.ToUse.Buffer, 1, bufferCopies);
+			vk.CmdCopyBuffer(commandBuffer, geometryEntry.Index.ToWrite.Buffer, geometryEntry.Index.ToUse.Buffer, 1, bufferCopies + 1);
+		}
+
+		barriers[0] = barriers[0] with
+		{
+			SrcAccessMask = AccessFlags.AccessTransferWriteBit,
+			DstAccessMask = AccessFlags.AccessVertexAttributeReadBit
+		};
+		barriers[1] = barriers[1] with
+		{
+			SrcAccessMask = AccessFlags.AccessTransferWriteBit,
+			DstAccessMask = AccessFlags.AccessIndexReadBit
+		};
+
+		vk.CmdPipelineBarrier(commandBuffer,
+			PipelineStageFlags.PipelineStageTransferBit,
+			PipelineStageFlags.PipelineStageVertexInputBit,
+			0,
+			0, null,
+			2, barriers,
+			0, null);
+	}
 	private void DestroyGeometry(uint id)
 	{
 		stat_DestroyGeometry++;
-		GeometryEntry geometryEntry = geometries[(int)id];
+		ref GeometryEntry geometryEntry = ref CollectionsMarshal.AsSpan(geometries)[(int)id];
+		geometryDestroyQueue.Enqueue((CurrentFrame, (int)id));
+		/*
+				vk.DestroyBuffer(device, geometryEntry.vertexStagingBuffer, null);
+				vk.DestroyBuffer(device, geometryEntry.vertexBuffer, null);
+				vk.DestroyBuffer(device, geometryEntry.indexStagingBuffer, null);
+				vk.DestroyBuffer(device, geometryEntry.indexBuffer, null);
 
-		vk.DestroyBuffer(device, geometryEntry.vertexStagingBuffer, null);
-		vk.DestroyBuffer(device, geometryEntry.vertexBuffer, null);
-		vk.DestroyBuffer(device, geometryEntry.indexStagingBuffer, null);
-		vk.DestroyBuffer(device, geometryEntry.indexBuffer, null);
+				vk.UnmapMemory(device, geometryEntry.indexStagingMemory);
+				vk.UnmapMemory(device, geometryEntry.vertexStagingMemory);
 
-		vk.FreeMemory(device, geometryEntry.vertexStagingMemory, null);
-		vk.FreeMemory(device, geometryEntry.vertexMemory, null);
-		vk.FreeMemory(device, geometryEntry.indexStagingMemory, null);
-		vk.FreeMemory(device, geometryEntry.indexMemory, null);
+				vk.FreeMemory(device, geometryEntry.vertexStagingMemory, null);
+				vk.FreeMemory(device, geometryEntry.vertexMemory, null);
+				vk.FreeMemory(device, geometryEntry.indexStagingMemory, null);
+				vk.FreeMemory(device, geometryEntry.indexMemory, null);
 
-		geometriesFreeIds.Push(id);
+				geometriesFreeIds.Push(id);
+		*/
+	}
+
+	/// <remarks>Should be executed before <see cref="Renderer.Render" /></remarks>
+	public void ExecuteDestroyQueue()
+	{
+		var geos = CollectionsMarshal.AsSpan(geometries);
+
+		if (geometryDestroyQueue.Count is 0) return;
+
+		int[] ids = GC.AllocateUninitializedArray<int>(geometryDestroyQueue.Count);
+
+		int id = 0;
+
+		while (true)
+		{
+			if (geometryDestroyQueue.Peek().Item1 == CurrentFrame)
+			{
+				ids[id++] = geometryDestroyQueue.Dequeue().Item2;
+			}
+			else break;
+		}
+
+		Span<GeometryDestroyInfo> destroyInfos = stackalloc GeometryDestroyInfo[(int)(UnifiedMemory ? MaxFramesInFlight * 2 : MaxFramesInFlight * 2 + 2)];
+
+		int destroyInfoI = 0;
+
+		for (int i = 0; i < id; i++)
+		{
+			destroyInfos[destroyInfoI++] = new()
+			{
+				Id = ids[i],
+				BufferResource = geos[ids[i]].Vertex.buffers[0]
+			};
+			destroyInfos[destroyInfoI++] = new()
+			{
+				Id = ids[i],
+				BufferResource = geos[ids[i]].Index.buffers[0]
+			};
+
+			for (uint frameId = 1; frameId < MaxFramesInFlight + 1; frameId++)
+			{
+				destroyInfos[destroyInfoI++] = new()
+				{
+					Id = ids[i],
+					BufferResource = geos[ids[i]].Vertex.buffers[frameId]
+				};
+				destroyInfos[destroyInfoI++] = new()
+				{
+					Id = ids[i],
+					BufferResource = geos[ids[i]].Index.buffers[frameId]
+				};
+			}
+
+			geos[ids[i]] = default;
+		}
+		/*
+		public void Destroy(
+    ReadOnlySpan<GeometryDestroyInfo> geometryDestroys,
+    ReadOnlySpan<TextureDestroyInfo> textureDestroys,
+    ReadOnlySpan<RenderBuffer> renderBufferDestroys){
+    foreach(var destroy in geometryDestroys){
+
+    }
+}
+*/
 	}
 
 	#region Rendering
 	public bool RequiresResubmission = false;
-	[SkipLocalsInit]
 	private void UpdateCommandList(ULCommandList list)
 	{
 		RequiresResubmission = true;
@@ -1078,7 +1331,7 @@ public unsafe partial class VulkanGPUDriver
 					vk.CmdEndRenderPass(commandBuffer);
 					currentRenderBuffer = uint.MaxValue;
 				}
-				TextureEntry rt = renderBufferEntry.textureEntry;
+				TextureEntry rt = textures[(int)renderBufferEntry.textureEntryId];
 				PipelineBarrier(commandBuffer, rt.image, ImageLayout.ShaderReadOnlyOptimal, ImageLayout.TransferDstOptimal);
 				ClearColorValue clearColorValue = new()
 				{
@@ -1096,7 +1349,7 @@ public unsafe partial class VulkanGPUDriver
 			{
 				uniforms[uniformBufferId].Transform = state.Transform.ApplyProjection(state.ViewportWidth, state.ViewportHeight, true);
 				uniforms[uniformBufferId].ClipSize = state.ClipSize;
-				state.Scalar.CopyTo(new Span<float>(&uniforms[uniformBufferId].Scalar4_0.W, state.Scalar.Length) );
+				state.Scalar.CopyTo(new Span<float>(&uniforms[uniformBufferId].Scalar4_0.W, state.Scalar.Length));
 				state.Clip.CopyTo(new Span<Matrix4x4>(&uniforms[uniformBufferId].Clip_0.M11, 8));
 
 				RenderPassBeginInfo renderPassBeginInfo = new()
@@ -1115,7 +1368,8 @@ public unsafe partial class VulkanGPUDriver
 				};
 				if (currentRenderBuffer != state.RenderBufferId)
 				{
-					if (currentRenderBuffer is not uint.MaxValue){
+					if (currentRenderBuffer is not uint.MaxValue)
+					{
 						vk.CmdEndRenderPass(commandBuffer);
 					}
 					currentRenderBuffer = state.RenderBufferId;
@@ -1128,7 +1382,8 @@ public unsafe partial class VulkanGPUDriver
 
 				uint bufferOffset = (uint)UniformBufferSize * uniformBufferId;
 
-				if(state.ShaderType is ULShaderType.Fill){
+				if (state.ShaderType is ULShaderType.Fill)
+				{
 					TextureEntry textureEntry1 = textures[(int)state.Texture1Id];
 					TextureEntry textureEntry2 = textures[(int)state.Texture2Id is 0 ? (int)state.Texture1Id : (int)state.Texture2Id];
 
@@ -1136,14 +1391,15 @@ public unsafe partial class VulkanGPUDriver
 					descriptorSets[2] = textureEntry2.descriptorSet;
 
 					vk.CmdBindDescriptorSets(commandBuffer, PipelineBindPoint.Graphics, fillPipelineLayout, 0, 3u, descriptorSets, 1, &bufferOffset);
-				}else
+				}
+				else
 					vk.CmdBindDescriptorSets(commandBuffer, PipelineBindPoint.Graphics, pathPipelineLayout, 0, 1u, descriptorSets, 1, &bufferOffset);
 
 
-				GeometryEntry geometryEntry = geometries[(int)command.GeometryId];
+				ref GeometryEntry geometryEntry = ref CollectionsMarshal.AsSpan(geometries)[(int)command.GeometryId];
 
-				vk.CmdBindVertexBuffers(commandBuffer, 0, 1, geometryEntry.vertexBuffer, 0);
-				vk.CmdBindIndexBuffer(commandBuffer, geometryEntry.indexBuffer, 0, IndexType.Uint32);
+				vk.CmdBindVertexBuffers(commandBuffer, 0, 1, geometryEntry.Vertex.ToUse.Buffer, geometryEntry.Vertex.ToUse.Offset);
+				vk.CmdBindIndexBuffer(commandBuffer, geometryEntry.Index.ToUse.Buffer, geometryEntry.Index.ToUse.Offset, IndexType.Uint32);
 
 				Viewport viewport = new(0, 0, state.ViewportWidth, state.ViewportHeight, 0, 0);
 				vk.CmdSetViewport(commandBuffer, 0, 1, &viewport);
@@ -1155,7 +1411,8 @@ public unsafe partial class VulkanGPUDriver
 			}
 		}
 
-		if (currentRenderBuffer is not uint.MaxValue){
+		if (currentRenderBuffer is not uint.MaxValue)
+		{
 			vk.CmdEndRenderPass(commandBuffer);
 		}
 

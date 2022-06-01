@@ -278,19 +278,23 @@ unsafe class HelloTriangleApplication
 		AppCoreMethods.ulEnablePlatformFontLoader();
 		AppCoreMethods.ulEnablePlatformFileSystem("./");
 		AppCoreMethods.ulEnableDefaultLogger("./log123as.txt");
+		VulkanGPUDriver.MaxFramesInFlight = 1;
 		dr = new(vk!, physicalDevice!, device!);
 		dr.commandPool = commandPool;
 		dr.commandBuffer = BeginSingleTimeCommands();
 		dr.graphicsQueue = graphicsQueue;
 		ULPlatform.GPUDriver = dr.GPUDriver;
-		renderer = ULPlatform.CreateRenderer(new ULConfig() { ForceRepaint = true, FaceWinding = ULFaceWinding.CounterClockwise, MaxUpdateTime = (double)1/(double)120,ScrollTimerDelay = 1f/120f });
+<<<<<<< HEAD
+		renderer = ULPlatform.CreateRenderer(new ULConfig() { ForceRepaint = true, FaceWinding = ULFaceWinding.CounterClockwise });
 		view = renderer.CreateView((uint)window!.Size.X, (uint)window!.Size.Y, new() { IsAccelerated = true, IsTransparent = false });
 		bool loaded = false;
 		view.OnFinishLoading += (frameId, isMain, url) => loaded = true;
-		//view.HTML = "<html><body><p>123</p></body></html>";
+=======
+		view.HTML = "<html><body><p>123</p></body></html>";
+		//view.URL = "https://en.key-test.ru/";
 		//view.URL = "https://github.com";
-		view.URL = "https://en.key-test.ru/";
-		//view.URL = "https://www.youtube.com/watch?v=N1v4TjntTJI";
+		//view.URL = "https://youtu.be/30jrmzzgHLc";
+>>>>>>> bd4e5a3 (save changes)
 		while (!loaded) { renderer.Update(); Thread.Sleep(10); }
 
 		renderer.Render();
@@ -2026,6 +2030,64 @@ unsafe class HelloTriangleApplication
 
 	}
 
+	private void UltralightRenderThread()
+	{
+		int FramesInFlight = 2;
+		SemaphoreCreateInfo semaphoreCreateInfo = new();
+		CommandBufferAllocateInfo commandBufferAllocateInfo = new(commandPool: commandPool, level: CommandBufferLevel.Primary, commandBufferCount: (uint)FramesInFlight);
+		CommandBufferBeginInfo commandBufferBeginInfo = new(flags: CommandBufferUsageFlags.CommandBufferUsageOneTimeSubmitBit);
+
+		Semaphore* semaphores = stackalloc Semaphore[FramesInFlight];
+		Fence* fences = stackalloc Fence[FramesInFlight];
+		CommandBuffer* commandBuffers = stackalloc CommandBuffer[FramesInFlight];
+
+		PipelineStageFlags waitStageMasks = PipelineStageFlags.PipelineStageColorAttachmentOutputBit;
+
+		for (int i = 0; i < FramesInFlight; i++)
+		{
+			vk!.CreateSemaphore(device, &semaphoreCreateInfo, null, semaphores + i);
+			vk.CreateFence(device, new FenceCreateInfo(flags: FenceCreateFlags.FenceCreateSignaledBit), null, fences + i);
+		}
+		vk!.AllocateCommandBuffers(device, &commandBufferAllocateInfo, commandBuffers);
+
+		VulkanGPUDriver.MaxFramesInFlight = (uint)FramesInFlight;
+
+		uint CurrentFrame = 0;
+
+		while (true)
+		{
+			dr.ExecuteDestroyQueue();
+
+			vk.WaitForFences(device, 1, fences + CurrentFrame, true, ulong.MaxValue);
+
+			//vk.ResetCommandBuffer(commandBuffers[CurrentFrame], CommandBufferResetFlags.CommandBufferResetReleaseResourcesBit);
+			vk.BeginCommandBuffer(commandBuffers[CurrentFrame], &commandBufferBeginInfo);
+
+			dr.commandBuffer = commandBuffers[CurrentFrame];
+
+			renderer.Update();
+			renderer.Render();
+
+			vk.EndCommandBuffer(commandBuffers[CurrentFrame]);
+
+			SubmitInfo submitInfo = new(//waitSemaphoreCount: 0,
+										//pWaitSemaphores: CurrentFrame is 0 ? semaphores + (FramesInFlight - 1) : semaphores + (CurrentFrame - 1),
+										//pWaitDstStageMask: &waitStageMasks,
+									commandBufferCount: 1,
+									pCommandBuffers: commandBuffers + CurrentFrame
+									//signalSemaphoreCount: 0,
+									//pSignalSemaphores: semaphores + CurrentFrame
+									);
+
+			vk.QueueSubmit(graphicsQueue, 1, &submitInfo, fences[CurrentFrame]);
+
+			vk.WaitForFences(device, 1, fences + CurrentFrame, true, ulong.MaxValue);
+
+			CurrentFrame++;
+			if (CurrentFrame == FramesInFlight) CurrentFrame = 0;
+		}
+	}
+
 	private bool BeganULCB = false;
 
 	private void DrawFrame(double delta)
@@ -2042,6 +2104,8 @@ unsafe class HelloTriangleApplication
 				vk!.BeginCommandBuffer(dr.commandBuffer, beginInfo);
 				BeganULCB = true;
 			}
+
+			VulkanGPUDriver.CurrentFrame = 0;
 
 			renderer.Render();
 
@@ -2075,6 +2139,7 @@ unsafe class HelloTriangleApplication
 
 		if (result is Result.ErrorOutOfDateKhr)
 		{
+			vk!.WaitForFences(device, 1, ultralightFence, true, ulong.MaxValue);
 			RecreateSwapChain();
 			return;
 		}
@@ -2144,7 +2209,9 @@ unsafe class HelloTriangleApplication
 		if (result is Result.ErrorOutOfDateKhr || result is Result.SuboptimalKhr || frameBufferResized)
 		{
 			frameBufferResized = false;
-			//view.Resize((uint)window!.Size.X, (uint)window!.Size.Y);
+			vk!.WaitForFences(device, 1, imagesInFlight[imageIndex], true, ulong.MaxValue);
+			vk!.WaitForFences(device, 1, ultralightFence, true, ulong.MaxValue);
+			view.Resize((uint)window!.Size.X, (uint)window!.Size.Y);
 			RecreateSwapChain();
 		}
 		else if (result is not Result.Success)
@@ -2377,7 +2444,7 @@ unsafe class HelloTriangleApplication
 			N();
 		if (message!.StartsWith("Validation Error:"))
 			N();
-		if(message!.StartsWith("Validation Performance Warning:"))
+		if (message!.StartsWith("Validation Performance Warning:"))
 			N();
 
 
