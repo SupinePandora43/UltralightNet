@@ -49,9 +49,9 @@ public struct _ULSettings : IDisposable, IEquatable<_ULSettings>
 	}
 	public _ULSettings(ULSettings settings)
 	{
-		DeveloperName = new(settings.DeveloperName);
-		AppName = new(settings.AppName);
-		FileSystemPath = new(settings.FileSystemPath);
+		DeveloperName = new(settings.DeveloperName.AsSpan());
+		AppName = new(settings.AppName.AsSpan());
+		FileSystemPath = new(settings.FileSystemPath.AsSpan());
 		LoadShadersFromFileSystem = settings.LoadShadersFromFileSystem;
 		ForceCPURenderer = settings.ForceCPURenderer;
 	}
