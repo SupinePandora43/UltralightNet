@@ -17,6 +17,7 @@
 		<LangVersion>preview</LangVersion>
 
 		<NoWarn>1006</NoWarn>
+		<AnalysisModeReliability>all</AnalysisModeReliability>
 	</PropertyGroup>
 
 	<ItemGroup>
