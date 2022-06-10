@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.IO;
 using System.Runtime.InteropServices;
 using System.Threading;
@@ -35,6 +36,7 @@ public static unsafe class ULPlatform
 	private static readonly Dictionary<ULLogger, List<GCHandle>> loggerHandles = new(1);
 	private static readonly Dictionary<ULClipboard, List<GCHandle>> clipboardHandles = new(1);
 	private static readonly Dictionary<ULFileSystem, List<GCHandle>> filesystemHandles = new(1);
+	private static readonly Dictionary<ULFontLoader, List<GCHandle>> fontloaderHandles = new(1);
 	private static readonly Dictionary<ULGPUDriver, List<GCHandle>> gpudriverHandles = new(1);
 	private static readonly Dictionary<ULSurfaceDefinition, List<GCHandle>> surfaceHandles = new(1);
 
@@ -55,6 +57,11 @@ public static unsafe class ULPlatform
 		if (!filesystemHandles.Remove(originalFileSystem, out List<GCHandle>? handles)) handles = new(6);
 		if (func is not null) handles!.Add(GCHandle.Alloc(func));
 		filesystemHandles[originalFileSystem = newFileSystem] = handles!;
+	}
+	internal static void Handle(ref ULFontLoader fontLoader, in ULFontLoader newFontLoader, Delegate? func = null){
+		if(!fontloaderHandles.Remove(fontLoader, out List<GCHandle>? handles)) handles = new(3);
+        if(func is not null) handles!.Add(GCHandle.Alloc(func));
+		fontloaderHandles[fontLoader = newFontLoader] = handles;
 	}
 	internal static void Handle(ref ULGPUDriver originalGPUDriver, in ULGPUDriver newGPUDriver, in Delegate? func = null)
 	{
