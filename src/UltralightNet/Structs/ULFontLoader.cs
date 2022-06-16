@@ -5,6 +5,12 @@ namespace UltralightNet;
 public delegate string ULFontLoaderGetFallbackFont();
 public unsafe delegate ULString* _ULFontLoaderGetFallbackFont();
 
+public delegate string ULFontLoaderGetFallbackFontForCharactersCallback(string characters, int weight, bool italic);
+public unsafe delegate ULString* _ULFontLoaderGetFallbackFontForCharactersCallback(ULString* characters, int weight, bool italic);
+
+public delegate ULFontFile ULFontLoaderLoadCallback(string font, int weight, bool italic);
+public unsafe delegate ULFontFile _ULFontLoaderLoadCallback(ULString* font, int weight, bool italic);
+
 public unsafe struct ULFontLoader
 {
 	public ULFontLoaderGetFallbackFont? GetFallbackFont
