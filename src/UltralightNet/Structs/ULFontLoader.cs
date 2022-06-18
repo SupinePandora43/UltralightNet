@@ -64,6 +64,28 @@ public unsafe struct ULFontLoader
 		}
 	}
 
+	public ULFontLoaderLoadCallback? Load
+	{
+		set => _Load = value is not null ? (fontNameUL, weight, italic) => value(fontNameUL->ToString(), weight, italic) : null;
+		readonly get
+		{
+			var c = _Load;
+			return c is not null ? (fontName, weight, italic) => {
+				using ULString fontNameUL = new(fontName.AsSpan());
+				return c(&fontNameUL, weight, italic);
+			} : null;
+		}
+	}
+	public _ULFontLoaderLoadCallback? _Load
+	{
+		set => ULPlatform.Handle(ref this, this with { __Load = value is not null ? (delegate* unmanaged[Cdecl]<ULString*, int, bool, ULFontFile>)Marshal.GetFunctionPointerForDelegate(value) : null }, value);
+		readonly get
+		{
+			var p = __Load;
+			return p is not null ? (fontNameUL, weight, italic) => p(fontNameUL, weight, italic) : null;
+		}
+	}
+
 	public delegate* unmanaged[Cdecl]<ULString*> __GetFallbackFont;
 	public delegate* unmanaged[Cdecl]<ULString*, int, bool, ULString*> __GetFallbackFontForCharacters;
 	public delegate* unmanaged[Cdecl]<ULString*, int, bool, ULFontFile> __Load;
