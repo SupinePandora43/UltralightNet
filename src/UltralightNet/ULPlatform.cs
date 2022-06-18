@@ -266,6 +266,7 @@ public static unsafe class ULPlatform
 			{
 				FileExists = (in string file) =>
 				{
+					Console.WriteLine(file);
 					return file switch
 					{
 						"resources/cacert.pem" => true,

@@ -16,7 +16,6 @@ public class Program
 }
 
 [MemoryDiagnoser]
-[NativeMemoryProfiler]
 public unsafe class StringBenchmark
 {
 	public StringBenchmark() { }
