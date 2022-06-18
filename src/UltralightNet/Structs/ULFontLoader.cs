@@ -39,6 +39,31 @@ public unsafe struct ULFontLoader
 		}
 	}
 
+	public ULFontLoaderGetFallbackFontForCharactersCallback? GetFallbackFontForCharacters
+	{
+		set => _GetFallbackFontForCharacters = value is not null ? (charsUL, weight, italic) => new ULString(value(charsUL->ToString(), weight, italic).AsSpan()).Allocate() : null;
+		readonly get
+		{
+			var c = _GetFallbackFontForCharacters;
+			return c is not null ? (characters, weight, italic) => {
+				using ULString charactersUL = new(characters.AsSpan());
+				ULString* resultUL = c(&charactersUL, weight, italic);
+				string result = resultUL->ToString();
+				resultUL->Deallocate();
+				return result;
+			} : null;
+		}
+	}
+	public _ULFontLoaderGetFallbackFontForCharactersCallback? _GetFallbackFontForCharacters
+	{
+		set => ULPlatform.Handle(ref this, this with { __GetFallbackFontForCharacters = value is not null ? (delegate* unmanaged[Cdecl]<ULString*, int, bool, ULString*>)Marshal.GetFunctionPointerForDelegate(value) : null }, value);
+		readonly get
+		{
+			var p = __GetFallbackFontForCharacters;
+			return p is not null ? (charactersUL, weight, italic) => p(charactersUL, weight, italic) : null;
+		}
+	}
+
 	public delegate* unmanaged[Cdecl]<ULString*> __GetFallbackFont;
 	public delegate* unmanaged[Cdecl]<ULString*, int, bool, ULString*> __GetFallbackFontForCharacters;
 	public delegate* unmanaged[Cdecl]<ULString*, int, bool, ULFontFile> __Load;
