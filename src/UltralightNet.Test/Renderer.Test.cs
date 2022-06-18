@@ -45,7 +45,7 @@ public class RendererTest
 	public void TestRenderer()
 	{
 		AppCoreMethods.ulEnablePlatformFontLoader();
-		AppCoreMethods.ulEnablePlatformFileSystem("./");
+		//AppCoreMethods.ulEnablePlatformFileSystem("./");
 		/*ULPlatform.Logger = new ULLogger()
 		{
 			LogMessage = (ULLogLevel level, in string message) =>
