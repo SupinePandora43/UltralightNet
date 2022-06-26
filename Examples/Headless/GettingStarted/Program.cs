@@ -40,7 +40,7 @@ namespace GettingStarted
 			{
 				renderer.Update();
 				// give time to process network etc.
-				Thread.Sleep(1000);
+				Thread.Sleep(10);
 			}
 
 			// Render
