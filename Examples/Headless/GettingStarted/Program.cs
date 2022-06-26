@@ -14,13 +14,15 @@ namespace GettingStarted
 			AppCoreMethods.ulEnablePlatformFontLoader();
 
 			// Set filesystem (Ultralight requires "resources/icudt67l.dat")
-			AppCoreMethods.ulEnablePlatformFileSystem(Path.GetDirectoryName(typeof(Program).Assembly.Location));
+			var path = Path.GetDirectoryName(typeof(Program).Assembly.Location);
+			AppCoreMethods.ulEnablePlatformFileSystem(path);
 
 			// Create Renderer
-			Renderer renderer = ULPlatform.CreateRenderer();
+			var cfg = new ULConfig();
+			Renderer renderer = ULPlatform.CreateRenderer(cfg);
 
 			// Create View
-			View view = renderer.CreateView(1980, 1024);
+			View view = renderer.CreateView(800, 600);
 
 			// Load URL
 
@@ -38,7 +40,7 @@ namespace GettingStarted
 			{
 				renderer.Update();
 				// give time to process network etc.
-				Thread.Sleep(10);
+				Thread.Sleep(1000);
 			}
 
 			// Render
@@ -50,11 +52,8 @@ namespace GettingStarted
 			// Get Bitmap
 			ULBitmap bitmap = surface.Bitmap;
 
-			// Swap Red and Blue channels
-			bitmap.SwapRedBlueChannels();
-
 			// Save bitmap to png file
-			bitmap.WritePng("./ultralight.png");
+			bitmap.WritePng(path + "/OUTPUT.png");
 		}
 	}
 }
