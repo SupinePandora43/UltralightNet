@@ -53,7 +53,7 @@ namespace GettingStarted
 			ULBitmap bitmap = surface.Bitmap;
 
 			// Save bitmap to png file
-			bitmap.WritePng(path + "/OUTPUT.png");
+			bitmap.WritePng(Path.Combine(path, "OUTPUT.png"));
 		}
 	}
 }
