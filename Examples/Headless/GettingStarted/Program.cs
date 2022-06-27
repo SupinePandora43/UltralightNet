@@ -22,7 +22,7 @@ namespace GettingStarted
 			Renderer renderer = ULPlatform.CreateRenderer(cfg);
 
 			// Create View
-			View view = renderer.CreateView(800, 600);
+			View view = renderer.CreateView(1980, 1024);
 
 			// Load URL
 
