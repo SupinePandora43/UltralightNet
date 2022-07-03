@@ -1,9 +1,9 @@
 using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.IO;
 using System.Runtime.InteropServices;
 using System.Threading;
+using UltralightNet.LowStuff;
 
 namespace UltralightNet;
 
@@ -248,17 +248,10 @@ public static unsafe class ULPlatform
 		}
 	}
 
+	public static Renderer CreateRenderer() => CreateRenderer(new());
 	public static Renderer CreateRenderer(ULConfig config, bool dispose = true)
 	{
-		thread = Thread.CurrentThread;
-		if (SetDefaultLogger && _logger.__LogMessage is null)
-		{
-			Console.WriteLine("UltralightNet: no logger set, console logger will be used.");
-			Logger = new()
-			{
-				LogMessage = (ULLogLevel level, string message) => { foreach (ReadOnlySpan<char> line in new LineEnumerator(message.AsSpan())) { Console.WriteLine($"(UL) {level}: {line.ToString()}"); } }
-			};
-		}
+		if (config == default(ULConfig)) throw new ArgumentException($"You passed default({nameof(ULConfig)}). It's invalid. Use at least \"new {nameof(ULConfig)}()\"", nameof(config));
 		if (SetDefaultFileSystem && !fileSystemSet) // TODO
 		{
 			Console.WriteLine("UltralightNet: no filesystem set, default (with access only to required files) will be used.");
@@ -322,6 +315,15 @@ public static unsafe class ULPlatform
 				throw new FileNotFoundException($"{typeof(ULFileSystem)} doesn't provide icudt67l.dat from resources/ folder. (Disable error by setting ULPlatform.ErrorMissingResources to false.)");
 			}
 		}
-		return new Renderer(config, dispose);
+		if (SetDefaultLogger && _logger.__LogMessage is null)
+		{
+			Console.WriteLine("UltralightNet: no logger set, console logger will be used.");
+			Logger = new()
+			{
+				LogMessage = (ULLogLevel level, string message) => { foreach (ReadOnlySpan<char> line in new LineEnumerator(message.AsSpan())) { Console.WriteLine($"(UL) {level}: {line.ToString()}"); } }
+			};
+		}
+		thread = Thread.CurrentThread;
+		return Renderer.FromHandle((Handle<Renderer>)Methods.ulCreateRenderer(config), true);
 	}
 }

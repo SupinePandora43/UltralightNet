@@ -4,6 +4,7 @@ using System;
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
+using UltralightNet.LowStuff;
 
 namespace UltralightNet
 {
@@ -45,7 +46,7 @@ namespace UltralightNet
 	}
 
 	[DebuggerDisplay("{ToString(),raw}")]
-	public unsafe sealed class JSString : INativeContainer<JSString>, IEquatable<JSString>, ICloneable
+	public unsafe sealed class JSString : INativeContainer<JSString>, INativeContainerInterface<JSString>, IEquatable<JSString>, ICloneable
 	{
 		private readonly void* handle;
 		public void* Handle
@@ -132,11 +133,9 @@ namespace UltralightNet
 		: obj.AsSpan());
 		public static explicit operator string(JSString str) => str.ToString()!;
 
-		public JSString FromPointer(void* ptr) => new(ptr);
+		public static JSString FromHandle(Handle<JSString> handle, bool dispose) => new((void*)handle, dispose);
 
-		~JSString() => Dispose();
-
-		public void Dispose()
+		public override void Dispose()
 		{
 			if (IsDisposed) return;
 

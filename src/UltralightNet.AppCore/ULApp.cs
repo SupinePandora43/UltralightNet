@@ -1,12 +1,15 @@
 using System;
 using System.Runtime.InteropServices;
 using System.Threading;
+using UltralightNet.LowStuff;
 
 namespace UltralightNet.AppCore;
 
 public static unsafe partial class AppCoreMethods
 {
-	[DllImport("AppCore")]
+	public const string LibAppCore = "AppCore";
+
+	[DllImport(LibAppCore)]
 	public static extern void* ulCreateApp(_ULSettings* settings, _ULConfig* config);
 
 	// INTEROPTODO: NATIVEMARSHALLING
@@ -19,26 +22,26 @@ public static unsafe partial class AppCoreMethods
 		return (IntPtr)ret;
 	}
 
-	[DllImport("AppCore")]
+	[DllImport(LibAppCore)]
 	public static extern void ulDestroyApp(IntPtr app);
 
-	[DllImport("AppCore")]
+	[DllImport(LibAppCore)]
 	public static extern unsafe void ulAppSetUpdateCallback(IntPtr app, delegate* unmanaged[Cdecl]<void*, void> callback, void* user_data);
 
-	[GeneratedDllImport("AppCore")]
+	[GeneratedDllImport(LibAppCore)]
 	[return: MarshalAs(UnmanagedType.I1)]
 	public static partial bool ulAppIsRunning(IntPtr app);
 
-	[DllImport("AppCore")]
+	[DllImport(LibAppCore)]
 	public static extern IntPtr ulAppGetMainMonitor(IntPtr app);
 
-	[DllImport("AppCore")]
-	public static extern IntPtr ulAppGetRenderer(IntPtr app);
+	[DllImport(LibAppCore)]
+	public static extern Handle<Renderer> ulAppGetRenderer(IntPtr app);
 
-	[DllImport("AppCore")]
+	[DllImport(LibAppCore)]
 	public static extern void ulAppRun(IntPtr app);
 
-	[DllImport("AppCore")]
+	[DllImport(LibAppCore)]
 	public static extern void ulAppQuit(IntPtr app);
 }
 public class ULApp : IDisposable
@@ -79,7 +82,7 @@ public class ULApp : IDisposable
 
 	public ULMonitor MainMonitor => new(AppCoreMethods.ulAppGetMainMonitor(Ptr));
 
-	public Renderer Renderer => Renderer.FromIntPtr(AppCoreMethods.ulAppGetRenderer(Ptr));
+	public Renderer Renderer => Renderer.FromHandle(AppCoreMethods.ulAppGetRenderer(Ptr), false);
 
 	public void Run() => AppCoreMethods.ulAppRun(Ptr);
 	public void Quit() => AppCoreMethods.ulAppQuit(Ptr);
