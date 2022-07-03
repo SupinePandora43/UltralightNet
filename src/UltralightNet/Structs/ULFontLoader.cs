@@ -31,7 +31,7 @@ public unsafe struct ULFontLoader
 	}
 	public _ULFontLoaderGetFallbackFont? _GetFallbackFont
 	{
-		set => ULPlatform.Handle(ref this, this with { __GetFallbackFont = value is not null ? (delegate* unmanaged[Cdecl]<ULString*>)Marshal.GetFunctionPointerForDelegate(value) : null}, value);
+		set => ULPlatform.Handle(ref this, this with { __GetFallbackFont = value is not null ? (delegate* unmanaged[Cdecl]<ULString*>)Marshal.GetFunctionPointerForDelegate(value) : null }, value);
 		readonly get
 		{
 			var p = __GetFallbackFont;
@@ -45,13 +45,15 @@ public unsafe struct ULFontLoader
 		readonly get
 		{
 			var c = _GetFallbackFontForCharacters;
-			return c is not null ? (characters, weight, italic) => {
+			return c is not null ? (characters, weight, italic) =>
+			{
 				using ULString charactersUL = new(characters.AsSpan());
 				ULString* resultUL = c(&charactersUL, weight, italic);
 				string result = resultUL->ToString();
 				resultUL->Deallocate();
 				return result;
-			} : null;
+			}
+			: null;
 		}
 	}
 	public _ULFontLoaderGetFallbackFontForCharactersCallback? _GetFallbackFontForCharacters
@@ -70,10 +72,12 @@ public unsafe struct ULFontLoader
 		readonly get
 		{
 			var c = _Load;
-			return c is not null ? (fontName, weight, italic) => {
+			return c is not null ? (fontName, weight, italic) =>
+			{
 				using ULString fontNameUL = new(fontName.AsSpan());
 				return c(&fontNameUL, weight, italic);
-			} : null;
+			}
+			: null;
 		}
 	}
 	public _ULFontLoaderLoadCallback? _Load
