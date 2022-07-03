@@ -11,14 +11,14 @@ public unsafe class ULBufferTests
 	public void TestCopy()
 	{
 		Span<byte> stack = stackalloc byte[128];
-		var buffer = ULBuffer.CreateFrom(stack);
+		var buffer = ULBuffer.CreateFromSpan<byte>(stack);
 
-		Assert.NotEqual((nuint)Unsafe.AsPointer(ref MemoryMarshal.GetReference(stack)), (nuint)buffer->Data);
-		Assert.Equal(stack.Length, (int)buffer->Size);
-		Assert.Equal((nuint)0, (nuint)buffer->UserData);
-		Assert.True(buffer->OwnsData);
+		Assert.NotEqual((nuint)Unsafe.AsPointer(ref MemoryMarshal.GetReference(stack)), (nuint)buffer.Data);
+		Assert.Equal(stack.Length, (int)buffer.Size);
+		Assert.Equal((nuint)0, (nuint)buffer.UserData);
+		Assert.True(buffer.OwnsData);
 
-		buffer->Destroy();
+		buffer.Dispose();
 	}
 
 	[Fact]
@@ -35,14 +35,14 @@ public unsafe class ULBufferTests
 			called = true;
 		}
 
-		var buffer = ULBuffer.Create(allocated, 128, Callback, (void*)228);
+		var buffer = new ULBuffer(allocated, 128, Callback, (void*)228);
 
-		Assert.Equal((nuint)allocated, (nuint)buffer->Data);
-		Assert.Equal((nuint)128, (nuint)buffer->Size);
-		Assert.Equal((nuint)228, (nuint)buffer->UserData);
-		Assert.False(buffer->OwnsData);
+		Assert.Equal((nuint)allocated, (nuint)buffer.Data);
+		Assert.Equal((nuint)128, (nuint)buffer.Size);
+		Assert.Equal((nuint)228, (nuint)buffer.UserData);
+		Assert.False(buffer.OwnsData);
 
-		buffer->Destroy();
+		buffer.Dispose();
 
 		Assert.True(called);
 	}
@@ -51,14 +51,14 @@ public unsafe class ULBufferTests
 	{
 		byte something = 228;
 
-		var buffer = ULBuffer.Create(&something, 0, userData: (void*)228);
+		var buffer = new ULBuffer(&something, 0, userData: (void*)228);
 
-		Assert.Equal((nuint)(byte*)&something, (nuint)buffer->Data);
-		Assert.Equal((nuint)0, (nuint)buffer->Size);
-		Assert.Equal((nuint)228, (nuint)buffer->UserData);
-		Assert.False(buffer->OwnsData);
+		Assert.Equal((nuint)(byte*)&something, (nuint)buffer.Data);
+		Assert.Equal((nuint)0, (nuint)buffer.Size);
+		Assert.Equal((nuint)228, (nuint)buffer.UserData);
+		Assert.False(buffer.OwnsData);
 
-		buffer->Destroy();
+		buffer.Dispose();
 	}
 	[Fact]
 	public void ZeroLengthCallback()
@@ -75,14 +75,14 @@ public unsafe class ULBufferTests
 			called = true;
 		}
 
-		var buffer = ULBuffer.Create(somethingPtr, 0, Callback, (void*)228);
+		var buffer = new ULBuffer(somethingPtr, 0, Callback, (void*)228);
 
-		Assert.Equal((nuint)somethingPtr, (nuint)buffer->Data);
-		Assert.Equal((nuint)0, (nuint)buffer->Size);
-		Assert.Equal((nuint)228, (nuint)buffer->UserData);
-		Assert.False(buffer->OwnsData);
+		Assert.Equal((nuint)somethingPtr, (nuint)buffer.Data);
+		Assert.Equal((nuint)0, (nuint)buffer.Size);
+		Assert.Equal((nuint)228, (nuint)buffer.UserData);
+		Assert.False(buffer.OwnsData);
 
-		buffer->Destroy();
+		buffer.Dispose();
 
 		Assert.True(called);
 	}
@@ -91,19 +91,19 @@ public unsafe class ULBufferTests
 	{
 		byte something = 228;
 
-		var buffer = ULBuffer.CreateFrom(&something, 0);
+		var buffer = new ULBuffer(&something, 0);
 
-		Assert.Equal((nuint)0, (nuint)buffer->Data);
-		Assert.Equal((nuint)0, (nuint)buffer->Size);
-		Assert.Equal((nuint)0, (nuint)buffer->UserData);
-		Assert.False(buffer->OwnsData); // ok.
+		Assert.Equal((nuint)0, (nuint)buffer.Data);
+		Assert.Equal((nuint)0, (nuint)buffer.Size);
+		Assert.Equal((nuint)0, (nuint)buffer.UserData);
+		Assert.False(buffer.OwnsData); // ok.
 
-		buffer->Destroy();
+		buffer.Dispose();
 	}
 	[Fact]
 	public void Throws()
 	{
-		Assert.Throws<ArgumentException>(() => ULBuffer.Create(null, 0, destroyCallback: (userData, data) => { }));
-		Assert.Throws<ArgumentException>(() => ULBuffer.Create(null, 0, destroyCallback: (delegate*<void*, void*, void>)1));
+		Assert.Throws<ArgumentException>(() => new ULBuffer(null, 0, destroyCallback: (userData, data) => { }));
+		Assert.Throws<ArgumentException>(() => new ULBuffer(null, 0, destroyCallback: (delegate*<void*, void*, void>)1));
 	}
 }

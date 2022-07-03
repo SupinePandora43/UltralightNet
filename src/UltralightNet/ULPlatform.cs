@@ -40,36 +40,37 @@ public static unsafe class ULPlatform
 	private static readonly Dictionary<ULGPUDriver, List<GCHandle>> gpudriverHandles = new(1);
 	private static readonly Dictionary<ULSurfaceDefinition, List<GCHandle>> surfaceHandles = new(1);
 
-	internal static void Handle(ref ULLogger originalLogger, in ULLogger newLogger, in Delegate? func = null)
+	internal static void Handle(ref ULLogger originalLogger, in ULLogger newLogger, Delegate? func = null)
 	{
 		if (!loggerHandles.Remove(originalLogger, out List<GCHandle>? handles)) handles = new(1);
 		if (func is not null) handles!.Add(GCHandle.Alloc(func));
 		loggerHandles[originalLogger = newLogger] = handles!;
 	}
-	internal static void Handle(ref ULClipboard originalClipboard, in ULClipboard newClipboard, in Delegate? func = null)
+	internal static void Handle(ref ULClipboard originalClipboard, in ULClipboard newClipboard, Delegate? func = null)
 	{
 		if (!clipboardHandles.Remove(originalClipboard, out List<GCHandle>? handles)) handles = new(3);
 		if (func is not null) handles!.Add(GCHandle.Alloc(func));
 		clipboardHandles[originalClipboard = newClipboard] = handles!;
 	}
-	internal static void Handle(ref ULFileSystem originalFileSystem, in ULFileSystem newFileSystem, in Delegate? func = null)
+	internal static void Handle(ref ULFileSystem originalFileSystem, in ULFileSystem newFileSystem, Delegate? func = null)
 	{
 		if (!filesystemHandles.Remove(originalFileSystem, out List<GCHandle>? handles)) handles = new(6);
 		if (func is not null) handles!.Add(GCHandle.Alloc(func));
 		filesystemHandles[originalFileSystem = newFileSystem] = handles!;
 	}
-	internal static void Handle(ref ULFontLoader fontLoader, in ULFontLoader newFontLoader, Delegate? func = null){
-		if(!fontloaderHandles.Remove(fontLoader, out List<GCHandle>? handles)) handles = new(3);
-        if(func is not null) handles!.Add(GCHandle.Alloc(func));
+	internal static void Handle(ref ULFontLoader fontLoader, in ULFontLoader newFontLoader, Delegate? func = null)
+	{
+		if (!fontloaderHandles.Remove(fontLoader, out List<GCHandle>? handles)) handles = new(3);
+		if (func is not null) handles!.Add(GCHandle.Alloc(func));
 		fontloaderHandles[fontLoader = newFontLoader] = handles;
 	}
-	internal static void Handle(ref ULGPUDriver originalGPUDriver, in ULGPUDriver newGPUDriver, in Delegate? func = null)
+	internal static void Handle(ref ULGPUDriver originalGPUDriver, in ULGPUDriver newGPUDriver, Delegate? func = null)
 	{
 		if (!gpudriverHandles.Remove(originalGPUDriver, out List<GCHandle>? handles)) handles = new(14);
 		if (func is not null) handles!.Add(GCHandle.Alloc(func));
 		gpudriverHandles[originalGPUDriver = newGPUDriver] = handles!;
 	}
-	internal static void Handle(ref ULSurfaceDefinition originalSurface, in ULSurfaceDefinition newSurface, in Delegate? func = null)
+	internal static void Handle(ref ULSurfaceDefinition originalSurface, in ULSurfaceDefinition newSurface, Delegate? func = null)
 	{
 		if (!surfaceHandles.Remove(originalSurface, out List<GCHandle>? handles)) handles = new(9);
 		if (func is not null) handles!.Add(GCHandle.Alloc(func));
@@ -255,7 +256,7 @@ public static unsafe class ULPlatform
 			Console.WriteLine("UltralightNet: no logger set, console logger will be used.");
 			Logger = new()
 			{
-				LogMessage = (ULLogLevel level, in string message) => { foreach (ReadOnlySpan<char> line in new LineEnumerator(message.AsSpan())) { Console.WriteLine($"(UL) {level}: {line.ToString()}"); } }
+				LogMessage = (ULLogLevel level, string message) => { foreach (ReadOnlySpan<char> line in new LineEnumerator(message.AsSpan())) { Console.WriteLine($"(UL) {level}: {line.ToString()}"); } }
 			};
 		}
 		if (SetDefaultFileSystem && !fileSystemSet) // TODO
@@ -264,7 +265,7 @@ public static unsafe class ULPlatform
 
 			FileSystem = new()
 			{
-				FileExists = (in string file) =>
+				FileExists = (string file) =>
 				{
 					Console.WriteLine(file);
 					return file switch
@@ -277,7 +278,7 @@ public static unsafe class ULPlatform
 						_ => false
 					};
 				},
-				GetFileMimeType = (in string file) =>
+				GetFileMimeType = (string file) =>
 				{
 					return file switch
 					{
@@ -287,7 +288,7 @@ public static unsafe class ULPlatform
 						_ => "application/octet-stream" // or "application/unknown"
 					};
 				},
-				GetFileCharset = (in string file) => "utf-8",
+				GetFileCharset = (string file) => "utf-8",
 				_OpenFile = (ULString* file) =>
 				{
 					Stream? s = ULString.NativeToManaged(file) switch
@@ -304,11 +305,11 @@ public static unsafe class ULPlatform
 					{
 						void* data = NativeMemory.Alloc((nuint)s.Length);
 						s.CopyTo(new UnmanagedMemoryStream((byte*)data, s.Length, s.Length, FileAccess.Write));
-						ULBuffer* buffer = ULBuffer.CreateFrom(data, (nuint)s.Length);
+						ULBuffer buffer = new(data, (nuint)s.Length);
 						NativeMemory.Free(data);
 						return buffer;
 					}
-					else return null;
+					else return default;
 				}
 			};
 		}

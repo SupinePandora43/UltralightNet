@@ -19,12 +19,19 @@ public unsafe class ULStringTest
 		var reference = Methods.ulCreateStringUTF16(str, (nuint)str.Length);
 		using ULString managed = new(str);
 
+		Assert.NotEqual((nuint)0, (nuint)reference);
 		Assert.Equal(reference->length, managed.length);
+
+		Assert.NotEqual((nuint)0, (nuint)reference->data);
+		Assert.NotEqual((nuint)0, (nuint)managed.data);
 
 		for (nuint i = 0; i < reference->length; i++)
 		{
 			Assert.Equal(reference->data[i], managed.data[i]);
 		}
+
+		Assert.Equal(0, reference->data[reference->length]);
+		Assert.Equal(0, managed.data[managed.length]);
 
 		Methods.ulDestroyString(reference);
 	}
@@ -34,11 +41,12 @@ public unsafe class ULStringTest
 	public void NullTerminator(string str)
 	{
 		var reference = Methods.ulCreateStringUTF16(str, (nuint)str.Length);
-		if (reference->data[reference->length] is not 0) throw new InvalidProgramException("data[length] != 0");
+		if (reference->data is not null ? reference->data[reference->length] is not 0 : true) throw new InvalidProgramException("data[length] != 0");
 
 		using ULString managed = new(str);
 
 		Assert.Equal(0, managed.data[managed.length]);
+		Assert.NotEqual((nuint)0, (nuint)reference->data);
 
 		Methods.ulDestroyString(reference);
 	}
@@ -46,10 +54,22 @@ public unsafe class ULStringTest
 	#region ASSIGN
 	[Theory]
 	[MemberData(nameof(GetTestStrings))]
+	public void ManagedAssignString(string str){
+		using ULString s = new();
+		s.Assign(str);
+		Assert.Equal(str, (string)s);
+	}
+	[Theory]
+	[MemberData(nameof(GetTestStrings))]
 	public void ManagedAssignManagedToNative(string str)
 	{
 		using ULString managed = new(str);
 		var native = Methods.ulCreateStringUTF16("", 0);
+
+		Assert.NotEqual((nuint)0, (nuint)native);
+		Assert.NotEqual((nuint)0, (nuint)native->data);
+		Assert.Equal((nuint)0, native->length);
+		Assert.Equal(0, native->data[0]);
 
 		native->Assign(managed);
 		native->Assign(&managed);
@@ -68,7 +88,7 @@ public unsafe class ULStringTest
 	public void ManagedAssignNativeToManaged(string str)
 	{
 		var native = Methods.ulCreateStringUTF16(str, 0);
-		using ULString managed = new("");
+		using ULString managed = new();
 
 		managed.Assign(native);
 		managed.Assign(*native);
@@ -104,12 +124,15 @@ public unsafe class ULStringTest
 	[MemberData(nameof(GetTestStrings))]
 	public void UNManagedAssignNativeToManaged(string str)
 	{
-		var native = Methods.ulCreateStringUTF16(str, 0);
-		using ULString managed = new("");
+		var native = Methods.ulCreateStringUTF16(str, (nuint)str.Length);
+		using ULString managed = new();
+
+		Assert.Equal((nuint)0, managed.length);
+		Assert.NotEqual((nuint)0, (nuint)managed.data);
 
 		Methods.ulStringAssignString(&managed, native);
 
-		Assert.Equal((ulong)native->length, (ulong)managed.length);
+		Assert.Equal((nuint)native->length, (nuint)managed.length);
 
 		for (nuint i = 0; i < native->length; i++)
 		{
@@ -120,4 +143,24 @@ public unsafe class ULStringTest
 	}
 	#endregion ASSIGN
 
+	[Theory]
+	[MemberData(nameof(GetTestStrings))]
+	public void AllocationTest(string inStr){
+		static void Test(in string str, bool managedAllocation, bool managedDeallocation){
+			ULString* u;
+			if(managedAllocation) u = new ULString(str).Allocate();
+			else u = Methods.ulCreateStringUTF16(str, (nuint)str.Length);
+
+			Assert.NotEqual((nuint)0, (nuint)u);
+			Assert.NotEqual((nuint)0, (nuint)u->data);
+
+			if(managedDeallocation) u->Deallocate();
+			else Methods.ulDestroyString(u);
+		}
+
+		Test(inStr, false, false);
+		Test(inStr, false, true);
+		Test(inStr, true, false);
+		Test(inStr, true, true);
+	}
 }

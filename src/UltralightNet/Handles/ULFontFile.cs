@@ -3,7 +3,7 @@ using System.Runtime.InteropServices;
 
 namespace UltralightNet;
 
-public unsafe struct ULFontFile : IDisposable
+public unsafe struct ULFontFile : IDisposable // TODO: INativeContainer
 {
 	private nuint handle;
 
@@ -13,10 +13,10 @@ public unsafe struct ULFontFile : IDisposable
 		static extern nuint ulFontFileCreateFromFilePath(ULString* path);
 		handle = ulFontFileCreateFromFilePath(path);
 	}
-	public ULFontFile(ULBuffer* buffer)
+	public ULFontFile(ULBuffer buffer)
 	{
 		[DllImport(Methods.LibUltralight)]
-		static extern nuint ulFontFileCreateFromBuffer(ULBuffer* buffer);
+		static extern nuint ulFontFileCreateFromBuffer(ULBuffer buffer);
 		handle = ulFontFileCreateFromBuffer(buffer);
 	}
 

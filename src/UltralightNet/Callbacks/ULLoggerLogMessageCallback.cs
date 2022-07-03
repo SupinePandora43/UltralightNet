@@ -10,6 +10,6 @@ namespace UltralightNet
 	);
 	public delegate void ULLoggerLogMessageCallback(
 		ULLogLevel logLevel,
-		in string message
+		string message
 	);
 }

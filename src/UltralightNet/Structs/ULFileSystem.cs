@@ -21,7 +21,7 @@ public unsafe struct ULFileSystem : IDisposable, IEquatable<ULFileSystem>
 		readonly get
 		{
 			var c = _FileExists;
-			return c is null ? null : (in string path) =>
+			return c is null ? null : (string path) =>
 			{
 				using ULString pathNative = new(path.AsSpan());
 				return Unsafe.As<byte, bool>(ref Unsafe.AsRef(c(&pathNative)));
@@ -34,7 +34,7 @@ public unsafe struct ULFileSystem : IDisposable, IEquatable<ULFileSystem>
 		readonly get
 		{
 			var c = _GetFileMimeType;
-			return c is null ? null : (in string path) =>
+			return c is null ? null : (string path) =>
 			{
 				using ULString uPath = new ULString(path.AsSpan());
 				ULString* mime = c(&uPath);
@@ -50,7 +50,7 @@ public unsafe struct ULFileSystem : IDisposable, IEquatable<ULFileSystem>
 		readonly get
 		{
 			var c = _GetFileCharset;
-			return c is null ? null : (in string path) =>
+			return c is null ? null : (string path) =>
 			{
 				using ULString uPath = new ULString(path.AsSpan());
 				ULString* mime = c(&uPath);
@@ -65,30 +65,31 @@ public unsafe struct ULFileSystem : IDisposable, IEquatable<ULFileSystem>
 		set => _OpenFile = value is null ? null : (path) =>
 		{
 			byte[]? result = value(ULString.NativeToManaged(path));
-			if (result is not null) return ULBuffer.CreateFrom<byte>(result);
-			else return null;
+			if (result is not null) return ULBuffer.CreateFromSpan<byte>(result);
+			else return default;
 		};
 		readonly get
 		{
 			var c = _OpenFile;
-			return c is null ? null : (in string path) =>
+			return c is null ? null : (string path) =>
 			{
 				using ULString pathNative = new(path.AsSpan());
-				ULBuffer* buffer = c(&pathNative);
+				ULBuffer buffer = c(&pathNative);
+				if (buffer.Equals(default)) return null;
 				try
 				{
 					byte[] bytes =
 #if NET5_0_OR_GREATER
-						GC.AllocateUninitializedArray<byte>(checked((int)buffer->Size));
+						GC.AllocateUninitializedArray<byte>(checked((int)buffer.Size));
 #else
-						new byte[checked((int)buffer->Size)];
+						new byte[checked((int)buffer.Size)];
 #endif
-					new ReadOnlySpan<byte>(buffer->Data, checked((int)buffer->Size)).CopyTo(bytes);
+					buffer.DataSpan.CopyTo(bytes);
 					return bytes;
 				}
 				finally
 				{
-					buffer->Destroy();
+					buffer.Dispose();
 				}
 			};
 		}
@@ -122,7 +123,7 @@ public unsafe struct ULFileSystem : IDisposable, IEquatable<ULFileSystem>
 	}
 	public ULFileSystemOpenFileCallback__PInvoke__? _OpenFile
 	{
-		set => ULPlatform.Handle(ref this, this with { __OpenFile = value is null ? null : (delegate* unmanaged[Cdecl]<ULString*, ULBuffer*>)Marshal.GetFunctionPointerForDelegate(value) }, value);
+		set => ULPlatform.Handle(ref this, this with { __OpenFile = value is null ? null : (delegate* unmanaged[Cdecl]<ULString*, ULBuffer>)Marshal.GetFunctionPointerForDelegate(value) }, value);
 		readonly get
 		{
 			var p = __OpenFile;
@@ -133,7 +134,7 @@ public unsafe struct ULFileSystem : IDisposable, IEquatable<ULFileSystem>
 	public delegate* unmanaged[Cdecl]<ULString*, byte> __FileExists;
 	public delegate* unmanaged[Cdecl]<ULString*, ULString*> __GetFileMimeType;
 	public delegate* unmanaged[Cdecl]<ULString*, ULString*> __GetFileCharset;
-	public delegate* unmanaged[Cdecl]<ULString*, ULBuffer*> __OpenFile;
+	public delegate* unmanaged[Cdecl]<ULString*, ULBuffer> __OpenFile;
 
 	public void Dispose()
 	{

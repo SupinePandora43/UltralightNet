@@ -10,7 +10,6 @@ public unsafe class JSStringTest
 		yield return new object[] { (JSString)"TEST" };
 		yield return new object[] { (JSString)"ТЕСТ" };
 		yield return new object[] { (JSString)"" };
-		yield return new object[] { (JSString)"" };
 	}
 
 	[Theory]

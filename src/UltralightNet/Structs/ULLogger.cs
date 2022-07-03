@@ -12,7 +12,7 @@ public unsafe struct ULLogger : IDisposable, IEquatable<ULLogger>
 		readonly get
 		{
 			var c = _LogMessage;
-			return c is null ? null : (ULLogLevel level, in string message) =>
+			return c is null ? null : (ULLogLevel level, string message) =>
 			{
 				using ULString str = new(message.AsSpan());
 				c(level, &str);

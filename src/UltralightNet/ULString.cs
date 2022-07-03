@@ -172,7 +172,7 @@ public unsafe struct ULString : IDisposable, ICloneable, IEquatable<ULString>
 	}
 
 	/// <remarks>it doesn't copy</remarks>
-	public readonly ULString* Allocate()
+	public readonly ULString* Allocate() // TODO: implement "ULString* Create(ROS<char/byte>)" that will not require member fields
 	{
 		ULString* str = (ULString*)NativeMemory.Alloc((nuint)sizeof(ULString));
 		str->data = data;
