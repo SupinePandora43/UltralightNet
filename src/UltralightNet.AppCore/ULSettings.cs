@@ -6,25 +6,25 @@ namespace UltralightNet.AppCore;
 
 public static unsafe partial class AppCoreMethods
 {
-	[DllImport("AppCore")]
+	[DllImport(LibAppCore)]
 	public static extern _ULSettings* ulCreateSettings();
 
-	[DllImport("AppCore")]
+	[DllImport(LibAppCore)]
 	public static extern void ulDestroySettings(_ULSettings* settings);
 
-	[GeneratedDllImport("AppCore")]
+	[GeneratedDllImport(LibAppCore)]
 	public static partial void ulSettingsSetDeveloperName(_ULSettings* settings, [MarshalUsing(typeof(ULString.ToNative))] string name = "MyCompany");
 
-	[GeneratedDllImport("AppCore")]
+	[GeneratedDllImport(LibAppCore)]
 	public static partial void ulSettingsSetAppName(_ULSettings* settings, [MarshalUsing(typeof(ULString.ToNative))] string name = "MyApp");
 
-	[GeneratedDllImport("AppCore")]
+	[GeneratedDllImport(LibAppCore)]
 	public static partial void ulSettingsSetFileSystemPath(_ULSettings* settings, [MarshalUsing(typeof(ULString.ToNative))] string path = "./assets/");
 
-	[GeneratedDllImport("AppCore")]
+	[GeneratedDllImport(LibAppCore)]
 	public static partial void ulSettingsSetLoadShadersFromFileSystem(_ULSettings* settings, [MarshalAs(UnmanagedType.I1)] bool enabled = false);
 
-	[GeneratedDllImport("AppCore")]
+	[GeneratedDllImport(LibAppCore)]
 	public static partial void ulSettingsSetForceCPURenderer(_ULSettings* settings, [MarshalAs(UnmanagedType.I1)] bool forceCPU = false);
 }
 
@@ -87,6 +87,4 @@ public struct ULSettings : IEquatable<ULSettings>
 		FileSystemPath == settings.FileSystemPath &&
 		LoadShadersFromFileSystem == settings.LoadShadersFromFileSystem &&
 		ForceCPURenderer == settings.ForceCPURenderer;
-
-	public override readonly bool Equals(object? other) => other is ULSettings settings ? Equals(settings) : false;
 }
