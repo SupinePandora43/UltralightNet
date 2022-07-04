@@ -57,6 +57,10 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UltralightNet.Vulkan", "gpu
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UltralightNet.GPUCommon", "gpu\libs\UltralightNet.GPUCommon\UltralightNet.GPUCommon.csproj", "{AAFC2484-A6BF-4E57-8AC5-9F85452B7D56}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{0F38165F-3D4A-4D13-B24D-D2DA8012591A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UltralightNet.TestRunner", "src\UltralightNet.TestRunner\UltralightNet.TestRunner.csproj", "{2340D164-47B8-4EAB-9D16-0A69D3329351}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -135,11 +139,18 @@ Global
 		{AAFC2484-A6BF-4E57-8AC5-9F85452B7D56}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{AAFC2484-A6BF-4E57-8AC5-9F85452B7D56}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{AAFC2484-A6BF-4E57-8AC5-9F85452B7D56}.Release|Any CPU.Build.0 = Release|Any CPU
+		{2340D164-47B8-4EAB-9D16-0A69D3329351}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{2340D164-47B8-4EAB-9D16-0A69D3329351}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{2340D164-47B8-4EAB-9D16-0A69D3329351}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{2340D164-47B8-4EAB-9D16-0A69D3329351}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {21C64D52-FD5B-4D5F-B159-0FF88614B59C}
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{2340D164-47B8-4EAB-9D16-0A69D3329351} = {0F38165F-3D4A-4D13-B24D-D2DA8012591A}
 	EndGlobalSection
 EndGlobal

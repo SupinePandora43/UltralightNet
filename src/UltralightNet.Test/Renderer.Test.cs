@@ -41,7 +41,7 @@ public class RendererTest
 		//data = "<html><body><p>123</p></body></html>";
 		return handles[(int)handle].Read(data);
 	}
-	[UIFact]
+	[Fact]
 	public void TestRenderer()
 	{
 		AppCoreMethods.ulEnablePlatformFontLoader();
@@ -91,7 +91,7 @@ public class RendererTest
 
 		ULConfig config = new();
 
-		// if (OperatingSystem.IsMacOS()) return;
+		if (OperatingSystem.IsMacOS()) return;
 
 		renderer = ULPlatform.CreateRenderer(config);
 
