@@ -1,9 +1,8 @@
-namespace UltralightNet
+namespace UltralightNet;
+
+public enum ULLogLevel : byte
 {
-	public enum ULLogLevel: byte
-	{
-		Error,
-		Warning,
-		Info
-	}
+	Error,
+	Warning,
+	Info
 }

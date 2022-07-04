@@ -1,3 +1,4 @@
+using System;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
@@ -15,12 +16,14 @@ public static unsafe partial class Methods
 /// <summary>
 /// Mouse Event
 /// </summary>
-public struct ULMouseEvent
+public struct ULMouseEvent : IEquatable<ULMouseEvent>
 {
 	private int _Type;
-	public ULMouseEventType Type { get => Unsafe.As<int, ULMouseEventType>(ref _Type); set => _Type = Unsafe.As<ULMouseEventType, int>(ref value); }
+	public ULMouseEventType Type { readonly get => Unsafe.As<int, ULMouseEventType>(ref Unsafe.AsRef(_Type)); set => _Type = Unsafe.As<ULMouseEventType, int>(ref value); }
 	public int X;
 	public int Y;
 	private int _Button;
-	public ULMouseEventButton Button { get => Unsafe.As<int, ULMouseEventButton>(ref _Button); set => _Button = Unsafe.As<ULMouseEventButton, int>(ref value); }
+	public ULMouseEventButton Button { readonly get => Unsafe.As<int, ULMouseEventButton>(ref Unsafe.AsRef(_Button)); set => _Button = Unsafe.As<ULMouseEventButton, int>(ref value); }
+
+	public readonly bool Equals(ULMouseEvent other) => Type == other.Type && X == other.X && Y == other.Y && Button == other.Button;
 }

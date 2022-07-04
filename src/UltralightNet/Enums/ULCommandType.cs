@@ -1,8 +1,7 @@
-namespace UltralightNet
+namespace UltralightNet;
+
+public enum ULCommandType : byte
 {
-	public enum ULCommandType: byte
-	{
-		ClearRenderBuffer,
-		DrawGeometry
-	}
+	ClearRenderBuffer,
+	DrawGeometry
 }

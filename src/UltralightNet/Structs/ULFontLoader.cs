@@ -11,7 +11,7 @@ public unsafe delegate ULString* _ULFontLoaderGetFallbackFontForCharactersCallba
 public delegate ULFontFile ULFontLoaderLoadCallback(string font, int weight, bool italic);
 public unsafe delegate ULFontFile _ULFontLoaderLoadCallback(ULString* font, int weight, bool italic);
 
-public unsafe struct ULFontLoader
+public unsafe struct ULFontLoader : IDisposable, IEquatable<ULFontLoader>
 {
 	public ULFontLoaderGetFallbackFont? GetFallbackFont
 	{
@@ -93,4 +93,16 @@ public unsafe struct ULFontLoader
 	public delegate* unmanaged[Cdecl]<ULString*> __GetFallbackFont;
 	public delegate* unmanaged[Cdecl]<ULString*, int, bool, ULString*> __GetFallbackFontForCharacters;
 	public delegate* unmanaged[Cdecl]<ULString*, int, bool, ULFontFile> __Load;
+
+	public void Dispose() => throw new NotImplementedException();
+
+#pragma warning disable CS8909
+	public readonly bool Equals(ULFontLoader other) => __GetFallbackFont == other.__GetFallbackFont && __GetFallbackFontForCharacters == other.__GetFallbackFontForCharacters && __Load == other.__Load;
+#pragma warning restore CS8909
+	public override int GetHashCode() =>
+#if NETSTANDARD2_1 || NETCOREAPP2_1_OR_GREATER
+		HashCode.Combine((nuint)__GetFallbackFont, (nuint)__GetFallbackFontForCharacters, (nuint)__Load);
+#else
+		base.GetHashCode();
+#endif
 }

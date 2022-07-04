@@ -40,4 +40,5 @@ public unsafe abstract class INativeContainer<TSelf> : IDisposable where TSelf :
 	~INativeContainer() => Dispose(); // it does work (tested on MODiX)
 
 	public override bool Equals(object? other) => other is TSelf container && Equals(container);
+	public override int GetHashCode() => !IsDisposed ? Handle.GetHashCode() : 0;
 }

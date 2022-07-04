@@ -56,7 +56,7 @@ public class Session : INativeContainer<Session>, INativeContainerInterface<Sess
 	public override void Dispose()
 	{
 		if (IsDisposed) return;
-		if(Owns) Methods.ulDestroySession(Handle);
+		if (Owns) Methods.ulDestroySession(Handle);
 
 		IsDisposed = true;
 		GC.SuppressFinalize(this);
