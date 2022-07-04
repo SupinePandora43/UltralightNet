@@ -5,16 +5,16 @@ on:
   pull_request:
     branches: [ master ]
 jobs:
-  BuildCmake:
-    runs-on: ${{ matrix.os }}
-    strategy:
-      fail-fast: true
-      matrix:
-        os: ['windows-latest', 'ubuntu-latest', 'macos-latest']
-    steps:
-      - run: echo "todo :3"
+  # BuildCmake:
+  #   runs-on: ${{ matrix.os }}
+  #   strategy:
+  #     fail-fast: true
+  #     matrix:
+  #       os: ['windows-latest', 'ubuntu-latest', 'macos-latest']
+  #   steps:
+  #     - run: echo "todo :3"
   Build:
-    needs: BuildCmake
+    # needs: BuildCmake
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -99,7 +99,7 @@ jobs:
         run: |
           dotnet tool install --global coverlet.console
           dotnet build -c Release src/UltralightNet.TestRunner/UltralightNet.TestRunner.csproj
-          coverlet src/UltralightNet.TestRunner/bin/Release/net6.0/UltralightNet.TestRunner.dll --target "dotnet" --targetargs "src/UltralightNet.TestRunner/bin/Release/net6.0/UltralightNet.TestRunner.dll" --format cobertura,opencover
+          coverlet src/UltralightNet.TestRunner/bin/Release/net6.0/UltralightNet.TestRunner.dll --target "dotnet" --targetargs "src/UltralightNet.TestRunner/bin/Release/net6.0/UltralightNet.TestRunner.dll" --format cobertura --format opencover
       - name: Upload coverage
         run: |
           curl -s https://codecov.io/bash > codecov
