@@ -2,7 +2,9 @@ using System;
 using System.Numerics;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
+#if NETCOREAPP3_0_OR_GREATER
 using System.Runtime.Intrinsics;
+#endif
 
 namespace UltralightNet;
 
@@ -94,11 +96,21 @@ public unsafe struct ULGPUState : IEquatable<ULGPUState>
 
 	public ULIntRect ScissorRect;
 
-	public readonly bool Equals(ULGPUState other) => Vector64.Create(ViewportWidth, ViewportHeight).Equals(Vector64.Create(other.ViewportWidth, other.ViewportHeight))
+	public readonly bool Equals(ULGPUState other) =>
+#if NETCOREAPP3_0_OR_GREATER
+		Vector64.Create(ViewportWidth, ViewportHeight).Equals(Vector64.Create(other.ViewportWidth, other.ViewportHeight))
+#else
+		ViewportWidth == other.ViewportWidth && ViewportHeight == other.ViewportHeight
+#endif
 		&& Transform == other.Transform
 		&& EnableTexturing == other.EnableTexturing && EnableBlend == other.EnableBlend
+#if NETCOREAPP3_0_OR_GREATER
 		&& Vector128.Create(RenderBufferId, Texture1Id, Texture2Id, Texture3Id).Equals(Vector128.Create(other.RenderBufferId, other.Texture1Id, other.Texture2Id, other.Texture3Id))
 		&& Vector256.Create(scalar_0, scalar_1, scalar_2, scalar_3, scalar_4, scalar_5, scalar_6, scalar_7).Equals(Vector256.Create(other.scalar_0, other.scalar_1, other.scalar_2, other.scalar_3, other.scalar_4, other.scalar_5, other.scalar_6, other.scalar_7))
+#else
+		&& RenderBufferId == other.RenderBufferId && Texture1Id == other.Texture1Id && Texture2Id == other.Texture2Id && Texture3Id == other.Texture3Id
+		&& Scalar.SequenceEqual(other.Scalar)
+#endif
 		&& Vector.SequenceEqual(other.Vector)
 		&& ClipSize == other.ClipSize && Clip.SequenceEqual(other.Clip)
 		&& EnableScissor == other.EnableScissor
