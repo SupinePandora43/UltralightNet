@@ -40,6 +40,7 @@ public unsafe abstract class INativeContainer<TSelf> : IDisposable where TSelf :
 	{
 		if (IsDisposed || !Owns) return;
 		IsDisposed = true;
+		_ptr = default;
 		GC.SuppressFinalize(this);
 	}
 	~INativeContainer() => Dispose(); // it does work (tested on MODiX)

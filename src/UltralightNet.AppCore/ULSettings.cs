@@ -47,7 +47,7 @@ public struct _ULSettings : IDisposable, IEquatable<_ULSettings>
 		AppName = appName;
 		FileSystemPath = fileSystemPath;
 	}
-	public _ULSettings(ULSettings settings)
+	public _ULSettings(in ULSettings settings)
 	{
 		DeveloperName = new(settings.DeveloperName.AsSpan());
 		AppName = new(settings.AppName.AsSpan());

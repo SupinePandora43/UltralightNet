@@ -126,12 +126,12 @@ public unsafe struct _ULConfig : IDisposable
 
 	private byte _FaceWinding = (byte)ULFaceWinding.CounterClockwise;
 	/// <summary>Face winding for ULGPUDriver.</summary>
-	public ULFaceWinding FaceWinding { get => Unsafe.As<byte, ULFaceWinding>(ref _FaceWinding); set => _FaceWinding = Unsafe.As<ULFaceWinding, byte>(ref value); }
+	public ULFaceWinding FaceWinding { readonly get => Unsafe.As<byte, ULFaceWinding>(ref Unsafe.AsRef(_FaceWinding)); set => _FaceWinding = Unsafe.As<ULFaceWinding, byte>(ref value); }
 
 	private byte _FontHinting = (byte)ULFontHinting.Normal;
 	/// <summary>The hinting algorithm to use when rendering fonts.</summary>
 	/// <see cref="ULFontHinting"/>
-	public ULFontHinting FontHinting { get => Unsafe.As<byte, ULFontHinting>(ref _FontHinting); set => _FontHinting = Unsafe.As<ULFontHinting, byte>(ref value); }
+	public ULFontHinting FontHinting { readonly get => Unsafe.As<byte, ULFontHinting>(ref Unsafe.AsRef(_FontHinting)); set => _FontHinting = Unsafe.As<ULFontHinting, byte>(ref value); }
 	/// <summary>The gamma to use when compositing font glyphs, change this value to adjust contrast (Adobe and Apple prefer 1.8, others may prefer 2.2).</summary>
 	public double FontGamma = 1.8;
 
@@ -141,7 +141,7 @@ public unsafe struct _ULConfig : IDisposable
 	private byte _ForceRepaint = 0;
 	/// <summary>Whether or not we should continuously repaint any Views or compositor layers, regardless if they are dirty or not.</summary>
 	/// <remarks>This is mainly used to diagnose painting/shader issues.</remarks>
-	public bool ForceRepaint { get => Unsafe.As<byte, bool>(ref _ForceRepaint); set => _ForceRepaint = Unsafe.As<bool, byte>(ref value); }
+	public bool ForceRepaint { readonly get => Unsafe.As<byte, bool>(ref Unsafe.AsRef(_ForceRepaint)); set => _ForceRepaint = Unsafe.As<bool, byte>(ref value); }
 
 	/// <summary>When a CSS animation is active, the amount of time (in seconds) to wait before triggering another repaint.</summary>
 	public double AnimationTimerDelay = 1.0 / 60.0;
@@ -194,18 +194,18 @@ public unsafe struct _ULConfig : IDisposable
 		UserStylesheet = userStylesheet;
 	}
 
-	public _ULConfig(ULConfig config)
+	public _ULConfig(in ULConfig config)
 	{
 #if NET5_0_OR_GREATER
 		Unsafe.SkipInit(out this);
 #endif
 		CachePath = new(config.CachePath.AsSpan());
 		ResourcePathPrefix = new ULString(config.ResourcePathPrefix.AsSpan());
-		_FaceWinding = Unsafe.As<ULFaceWinding, byte>(ref config.FaceWinding);
-		_FontHinting = Unsafe.As<ULFontHinting, byte>(ref config.FontHinting);
+		_FaceWinding = Unsafe.As<ULFaceWinding, byte>(ref Unsafe.AsRef(config.FaceWinding));
+		_FontHinting = Unsafe.As<ULFontHinting, byte>(ref Unsafe.AsRef(config.FontHinting));
 		FontGamma = config.FontGamma;
 		UserStylesheet = new(config.UserStylesheet.AsSpan());
-		_ForceRepaint = Unsafe.As<bool, byte>(ref config.ForceRepaint);
+		_ForceRepaint = Unsafe.As<bool, byte>(ref Unsafe.AsRef(config.ForceRepaint));
 		AnimationTimerDelay = config.AnimationTimerDelay;
 		ScrollTimerDelay = config.ScrollTimerDelay;
 		RecycleDelay = config.RecycleDelay;
@@ -221,7 +221,6 @@ public unsafe struct _ULConfig : IDisposable
 
 	public void Dispose()
 	{
-		// INTEROPTODO: ZEROFREE
 		CachePath.Dispose();
 		ResourcePathPrefix.Dispose();
 		UserStylesheet.Dispose();
