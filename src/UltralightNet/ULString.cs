@@ -125,7 +125,7 @@ public unsafe struct ULString : IDisposable, ICloneable, IEquatable<ULString>
 		nuint written = (nuint)Encoding.UTF8.GetBytes(newStr, new Span<byte>(data, checked((int)length)));
 #else
 		nuint written = 0;
-		if(newStr.Length is not 0)
+		if (newStr.Length is not 0)
 			fixed (char* charPtr = newStr)
 				written = (nuint)Encoding.UTF8.GetBytes(charPtr, newStr.Length,
 				data = data is not null ?
@@ -196,7 +196,14 @@ public unsafe struct ULString : IDisposable, ICloneable, IEquatable<ULString>
 	}
 	readonly object ICloneable.Clone() => Clone();
 
-	public readonly bool Equals(ULString str) => length == str.length ? (data == str.data ? true : new ReadOnlySpan<byte>(data, (int)length).SequenceEqual(new ReadOnlySpan<byte>(str.data, (int)str.length))) : false;
+	public readonly bool Equals(ULString str)
+	{
+		if (length != str.length) return false;
+		if (data == str.data) return true;
+		if (length < (nuint)int.MaxValue) return new ReadOnlySpan<byte>(data, unchecked((int)length)).SequenceEqual(new ReadOnlySpan<byte>(str.data, unchecked((int)length)));
+		else for (nuint i = 0; i < length; i++) if (data[i] != str.data[i]) return false;
+		return true;
+	}
 	public override readonly bool Equals(object? other) => other is ULString str ? Equals(str) : false;
 
 #if NETSTANDARD2_1 || NETCOREAPP2_1_OR_GREATER
