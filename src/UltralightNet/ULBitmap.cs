@@ -99,7 +99,6 @@ public unsafe class ULBitmap : IDisposable, ICloneable, IEquatable<ULBitmap>
 		{
 			static void Throw() => throw new ObjectDisposedException(nameof(ULBitmap));
 			if (IsDisposed) Throw();
-			ULPlatform.CheckThread();
 			return _ptr;
 		}
 		init => _ptr = value;

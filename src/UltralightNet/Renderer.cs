@@ -1,6 +1,7 @@
 using System;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
+using System.Threading;
 using UltralightNet.LowStuff;
 
 namespace UltralightNet;
@@ -14,9 +15,8 @@ public static unsafe partial class Methods
 	//[GeneratedDllImport(LibUltralight)]
 	public static Handle<Renderer> ulCreateRenderer(in ULConfig config)
 	{
-		_ULConfig nativeConfig = new(config);
+		using _ULConfig nativeConfig = new(config);
 		var ret = ulCreateRenderer(&nativeConfig);
-		nativeConfig.Dispose();
 		return ret;
 	}
 
@@ -42,20 +42,23 @@ public static unsafe partial class Methods
 
 public class Renderer : INativeContainer<Renderer>, INativeContainerInterface<Renderer>, IEquatable<Renderer>
 {
-	private readonly Handle<Renderer> _handle;
 	internal override Handle<Renderer> Handle
 	{
 		get
 		{
-			static void Throw() => throw new ObjectDisposedException(nameof(Renderer));
-			if (IsDisposed) Throw();
-			ULPlatform.CheckThread();
-			return _handle;
+			AssertNotWrongThread();
+			return base.Handle;
 		}
-		init => _handle = value;
+		init => base.Handle = value;
 	}
 
 	private Renderer() { }
+
+	internal int ThreadId { get; set; } = -1;
+	internal void AssertNotWrongThread() // hungry
+	{
+		if (ThreadId is not -1 or int.MaxValue && ThreadId != Thread.CurrentThread.ManagedThreadId) throw new AggregateException("Wrong thread.");
+	}
 
 	public View CreateView(uint width, uint height) => CreateView(width, height, new ULViewConfig());
 	public View CreateView(uint width, uint height, ULViewConfig viewConfig) => CreateView(width, height, viewConfig, DefaultSession);
@@ -103,7 +106,7 @@ public class Renderer : INativeContainer<Renderer>, INativeContainerInterface<Re
 	{
 		if (IsDisposed || !Owns) return;
 		Methods.ulDestroyRenderer(Handle);
-		ULPlatform.thread = null;
+		GC.KeepAlive(this);
 		base.Dispose();
 	}
 

@@ -205,7 +205,7 @@ public unsafe class View : IDisposable
 		{
 			static void Throw() => throw new ObjectDisposedException(nameof(View));
 			if (IsDisposed) Throw();
-			ULPlatform.CheckThread();
+			Renderer?.AssertNotWrongThread();
 			return (IntPtr)_ptr;
 		}
 		private set => _ptr = value.ToPointer();

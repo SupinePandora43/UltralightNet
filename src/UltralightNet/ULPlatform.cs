@@ -157,13 +157,6 @@ public static unsafe class ULPlatform
 	public static bool ErrorGPUDriverNotSet { get; set; } = true;
 
 	public static bool ErrorWrongThread { get; set; } = true;
-	[Obsolete]
-	internal static Thread? thread;
-	internal static void CheckThread()
-	{
-		if (thread is null || !ErrorWrongThread) return;
-		if (Thread.CurrentThread != thread) throw new InvalidOperationException($"{nameof(ULPlatform.ErrorWrongThread)}: Use of ultralight api from a different thread.");
-	}
 
 	private static ULLogger _logger;
 	internal static ULFileSystem _filesystem;
@@ -324,7 +317,8 @@ public static unsafe class ULPlatform
 				LogMessage = (ULLogLevel level, string message) => { foreach (ReadOnlySpan<char> line in new LineEnumerator(message.AsSpan())) { Console.WriteLine($"(UL) {level}: {line.ToString()}"); } }
 			};
 		}
-		thread = Thread.CurrentThread;
-		return Renderer.FromHandle((Handle<Renderer>)Methods.ulCreateRenderer(config), true);
+		var returnValue = Renderer.FromHandle((Handle<Renderer>)Methods.ulCreateRenderer(config), true);
+		returnValue.ThreadId = Thread.CurrentThread.ManagedThreadId;
+		return returnValue;
 	}
 }

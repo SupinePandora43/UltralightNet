@@ -31,7 +31,7 @@ public struct Handle<T>
 }
 public unsafe abstract class INativeContainer<TSelf> : IDisposable where TSelf : INativeContainer<TSelf>, INativeContainerInterface<TSelf>, IEquatable<TSelf>
 {
-	private Handle<TSelf> _ptr;
+	protected Handle<TSelf> _ptr;
 	internal virtual Handle<TSelf> Handle { get => !IsDisposed ? _ptr : throw new ObjectDisposedException(nameof(TSelf)); init => _ptr = value; }
 	public bool IsDisposed { get; protected set; }
 	protected bool Owns { get; init; } = true;

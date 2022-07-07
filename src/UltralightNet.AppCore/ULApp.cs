@@ -60,7 +60,6 @@ public class ULApp : IDisposable
 	public ULApp(ULSettings settings, ULConfig config = default)
 	{
 		Ptr = AppCoreMethods.ulCreateApp(settings, config);
-		ULPlatform.thread = Thread.CurrentThread;
 	}
 
 	public unsafe void SetUpdateCallback(ULUpdateCallback callback, IntPtr userData = default)
@@ -76,16 +75,53 @@ public class ULApp : IDisposable
 			SetUpdateCallback((delegate* unmanaged[Cdecl]<void*, void>)null, (void*)userData);
 		}
 	}
-	public unsafe void SetUpdateCallback(delegate* unmanaged[Cdecl]<void*, void> callback, void* userData = null) => AppCoreMethods.ulAppSetUpdateCallback(Ptr, callback, userData);
+	public unsafe void SetUpdateCallback(delegate* unmanaged[Cdecl]<void*, void> callback, void* userData = null)
+	{
+		AppCoreMethods.ulAppSetUpdateCallback(Ptr, callback, userData);
+		GC.KeepAlive(this);
+	}
 
-	public bool IsRunning => AppCoreMethods.ulAppIsRunning(Ptr);
+	public bool IsRunning
+	{
+		get
+		{
+			var returnValue = AppCoreMethods.ulAppIsRunning(Ptr);
+			GC.KeepAlive(this);
+			return returnValue;
+		}
+	}
 
-	public ULMonitor MainMonitor => new(AppCoreMethods.ulAppGetMainMonitor(Ptr));
+	public ULMonitor MainMonitor
+	{
+		get
+		{
+			ULMonitor returnValue = new(AppCoreMethods.ulAppGetMainMonitor(Ptr));
+			GC.KeepAlive(this);
+			return returnValue;
+		}
+	}
 
-	public Renderer Renderer => Renderer.FromHandle(AppCoreMethods.ulAppGetRenderer(Ptr), false);
+	public Renderer Renderer
+	{
+		get
+		{
+			var returnValue = Renderer.FromHandle(AppCoreMethods.ulAppGetRenderer(Ptr), false);
+			returnValue.ThreadId = Thread.CurrentThread.ManagedThreadId;
+			GC.KeepAlive(this);
+			return returnValue;
+		}
+	}
 
-	public void Run() => AppCoreMethods.ulAppRun(Ptr);
-	public void Quit() => AppCoreMethods.ulAppQuit(Ptr);
+	public void Run()
+	{
+		AppCoreMethods.ulAppRun(Ptr);
+		GC.KeepAlive(this);
+	}
+	public void Quit()
+	{
+		AppCoreMethods.ulAppQuit(Ptr);
+		GC.KeepAlive(this);
+	}
 
 	~ULApp() => Dispose();
 
