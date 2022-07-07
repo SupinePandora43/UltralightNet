@@ -104,9 +104,7 @@ public class Renderer : INativeContainer<Renderer>, INativeContainerInterface<Re
 
 	public override void Dispose()
 	{
-		if (IsDisposed || !Owns) return;
-		Methods.ulDestroyRenderer(Handle);
-		GC.KeepAlive(this);
+		if (!IsDisposed && Owns) Methods.ulDestroyRenderer(Handle);
 		base.Dispose();
 	}
 

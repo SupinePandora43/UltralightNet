@@ -48,7 +48,12 @@ public class ULApp : INativeContainer<ULApp>, INativeContainerInterface<ULApp>, 
 {
 	private GCHandle updateHandle;
 
-	private ULApp() { }
+	private ULApp(Handle<ULApp> handle)
+	{
+		Handle = handle;
+		Renderer = Renderer.FromHandle(AppCoreMethods.ulAppGetRenderer(Handle), false);
+		Renderer.ThreadId = Thread.CurrentThread.ManagedThreadId;
+	}
 
 	public unsafe void SetUpdateCallback(ULUpdateCallback callback, IntPtr userData = default)
 	{
@@ -89,16 +94,7 @@ public class ULApp : INativeContainer<ULApp>, INativeContainerInterface<ULApp>, 
 		}
 	}
 
-	public Renderer Renderer
-	{
-		get
-		{
-			var returnValue = Renderer.FromHandle(AppCoreMethods.ulAppGetRenderer(Handle), false);
-			returnValue.ThreadId = Thread.CurrentThread.ManagedThreadId;
-			GC.KeepAlive(this);
-			return returnValue;
-		}
-	}
+	public Renderer Renderer { get; }
 
 	public void Run()
 	{
@@ -116,8 +112,7 @@ public class ULApp : INativeContainer<ULApp>, INativeContainerInterface<ULApp>, 
 		if (updateHandle.IsAllocated) updateHandle.Free();
 		updateHandle = default;
 
-		if (IsDisposed) return;
-		AppCoreMethods.ulDestroyApp(Handle);
+		if (!IsDisposed && Owns) AppCoreMethods.ulDestroyApp(Handle);
 
 		base.Dispose();
 	}
@@ -134,7 +129,7 @@ public class ULApp : INativeContainer<ULApp>, INativeContainerInterface<ULApp>, 
 	}
 	public override bool Equals(object? other) => other is ULApp app ? Equals(app) : false;
 
-	public static ULApp FromHandle(Handle<ULApp> ptr, bool dispose) => new() { Handle = ptr, Owns = dispose };
+	public static ULApp FromHandle(Handle<ULApp> ptr, bool dispose) => new(ptr) { Owns = dispose };
 
 	public static ULApp Create(in ULSettings settings, in ULConfig config) => FromHandle(AppCoreMethods.ulCreateApp(settings, config), true);
 }

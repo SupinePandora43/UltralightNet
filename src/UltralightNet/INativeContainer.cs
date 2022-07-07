@@ -34,11 +34,19 @@ public unsafe abstract class INativeContainer<TSelf> : IDisposable where TSelf :
 	protected Handle<TSelf> _ptr;
 	internal virtual Handle<TSelf> Handle { get => !IsDisposed ? _ptr : throw new ObjectDisposedException(nameof(TSelf)); init => _ptr = value; }
 	public bool IsDisposed { get; protected set; }
-	protected bool Owns { get; init; } = true;
+	private bool _Owns = true;
+	protected bool Owns
+	{
+		get => _Owns;
+		init
+		{
+			if (value is false) GC.SuppressFinalize(this);
+			_Owns = value;
+		}
+	}
 
 	public virtual void Dispose()
 	{
-		if (IsDisposed || !Owns) return;
 		IsDisposed = true;
 		_ptr = default;
 		GC.SuppressFinalize(this);
