@@ -206,8 +206,14 @@ public unsafe struct ULString : IDisposable, ICloneable, IEquatable<ULString>
 	}
 	public override readonly bool Equals(object? other) => other is ULString str ? Equals(str) : false;
 
-#if NETSTANDARD2_1 || NETCOREAPP2_1_OR_GREATER
-	public override readonly int GetHashCode() => HashCode.Combine((nuint)data, length);
+#if NET6_0_OR_GREATER
+	public override readonly int GetHashCode()
+	{
+		var hash = new HashCode();
+		hash.Add(length);
+		hash.AddBytes(new ReadOnlySpan<byte>(data, unchecked((int)Math.Clamp(length, 0, (nuint)int.MaxValue))));
+		return hash.ToHashCode();
+	}
 #endif
 
 	public static explicit operator string(ULString str) => str.data is null || str.length is 0 ? string.Empty :
