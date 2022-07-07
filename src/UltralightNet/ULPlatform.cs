@@ -157,6 +157,7 @@ public static unsafe class ULPlatform
 	public static bool ErrorGPUDriverNotSet { get; set; } = true;
 
 	public static bool ErrorWrongThread { get; set; } = true;
+	[Obsolete]
 	internal static Thread? thread;
 	internal static void CheckThread()
 	{

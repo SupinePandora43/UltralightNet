@@ -104,9 +104,7 @@ public class Renderer : INativeContainer<Renderer>, INativeContainerInterface<Re
 		if (IsDisposed || !Owns) return;
 		Methods.ulDestroyRenderer(Handle);
 		ULPlatform.thread = null;
-
-		IsDisposed = true;
-		GC.SuppressFinalize(this);
+		base.Dispose();
 	}
 
 	public static Renderer FromHandle(Handle<Renderer> handle, bool dispose) => new() { Handle = handle, Owns = dispose };

@@ -36,7 +36,12 @@ public unsafe abstract class INativeContainer<TSelf> : IDisposable where TSelf :
 	public bool IsDisposed { get; protected set; }
 	protected bool Owns { get; init; } = true;
 
-	public abstract void Dispose();
+	public virtual void Dispose()
+	{
+		if (IsDisposed || !Owns) return;
+		IsDisposed = true;
+		GC.SuppressFinalize(this);
+	}
 	~INativeContainer() => Dispose(); // it does work (tested on MODiX)
 
 	public override bool Equals(object? other) => other is TSelf container && Equals(container);
