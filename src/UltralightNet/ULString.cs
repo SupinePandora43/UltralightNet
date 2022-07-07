@@ -85,12 +85,12 @@ public unsafe struct ULString : IDisposable, ICloneable, IEquatable<ULString>
 	{
 #if NETCOREAPP2_1_OR_GREATER || NETSTANDARD2_1
 		data = (byte*)NativeMemory.Alloc((length = (nuint)Encoding.UTF8.GetByteCount(chars)) + 1);
-		nuint written = (nuint)Encoding.UTF8.GetBytes(chars, new Span<byte>(data, (int)length)); // INTEROPTODO: INT64
+		nuint written = (nuint)Encoding.UTF8.GetBytes(chars, new Span<byte>(data, checked((int)length)));
 #else
 		nuint written = 0;
 		if (chars.Length is not 0)
 			fixed (char* charPtr = chars)
-				written = (nuint)Encoding.UTF8.GetBytes(charPtr, chars.Length, data = (byte*)NativeMemory.Alloc((length = (nuint)Encoding.UTF8.GetByteCount(charPtr, chars.Length)) + 1), (int)length); // INTEROPTODO: INT64
+				written = (nuint)Encoding.UTF8.GetBytes(charPtr, chars.Length, data = (byte*)NativeMemory.Alloc((length = (nuint)Encoding.UTF8.GetByteCount(charPtr, chars.Length)) + 1), checked((int)length));
 		else data = (byte*)NativeMemory.Alloc((length = 0) + 1);
 #endif
 		Debug.Assert(written == length);
@@ -122,7 +122,7 @@ public unsafe struct ULString : IDisposable, ICloneable, IEquatable<ULString>
 	{
 #if NETCOREAPP2_1_OR_GREATER || NETSTANDARD2_1
 		data = (byte*)NativeMemory.Alloc((length = (nuint)Encoding.UTF8.GetByteCount(newStr)) + 1);
-		nuint written = (nuint)Encoding.UTF8.GetBytes(newStr, new Span<byte>(data, (int)length)); // INTEROPTODO: INT64
+		nuint written = (nuint)Encoding.UTF8.GetBytes(newStr, new Span<byte>(data, checked((int)length)));
 #else
 		nuint written = 0;
 		if(newStr.Length is not 0)
@@ -130,7 +130,7 @@ public unsafe struct ULString : IDisposable, ICloneable, IEquatable<ULString>
 				written = (nuint)Encoding.UTF8.GetBytes(charPtr, newStr.Length,
 				data = data is not null ?
 					(byte*)NativeMemory.Realloc(data, (length = (nuint)Encoding.UTF8.GetByteCount(charPtr, newStr.Length)) + 1) :
-					(byte*)NativeMemory.Alloc((length = (nuint)Encoding.UTF8.GetByteCount(charPtr, newStr.Length)) + 1), (int)length); // INTEROPTODO: INT64
+					(byte*)NativeMemory.Alloc((length = (nuint)Encoding.UTF8.GetByteCount(charPtr, newStr.Length)) + 1), checked((int)length));
 		else
 			data = data is not null ?
 				(byte*)NativeMemory.Realloc(data, (length = 0) + 1) :
@@ -203,28 +203,28 @@ public unsafe struct ULString : IDisposable, ICloneable, IEquatable<ULString>
 	public override readonly int GetHashCode() => HashCode.Combine((nuint)data, length);
 #endif
 
-	public static explicit operator string(ULString str) => str.data is null ? string.Empty : // INTEROPTODO: INT64
+	public static explicit operator string(ULString str) => str.data is null || str.length is 0 ? string.Empty :
 #if NETSTANDARD2_1 || NETCOREAPP1_1_OR_GREATER
-		Marshal.PtrToStringUTF8((IntPtr)str.data, (int)str.length);
+		Marshal.PtrToStringUTF8((IntPtr)str.data, checked((int)str.length));
 #elif NETSTANDARD2_0
-		Encoding.UTF8.GetString(str.data, (int)str.length);
+		Encoding.UTF8.GetString(str.data, checked((int)str.length));
 #elif NETFRAMEWORK
-		new string((sbyte*)str.data, 0, (int)str.length);
+		new string((sbyte*)str.data, 0, checked((int)str.length));
 #else
-		Marshal.PtrToStringUTF8((IntPtr)str.data, (int)str.length);
+		Marshal.PtrToStringUTF8((IntPtr)str.data, checked((int)str.length));
 #endif
 
 	public override readonly string ToString() => (string)this;
 
-	internal static string NativeToManaged(ULString* str) => str is null ? string.Empty : // INTEROPTODO: INT64
+	internal static string NativeToManaged(ULString* str) => str is null ? string.Empty :
 #if NETSTANDARD2_1 || NETCOREAPP1_1_OR_GREATER
-		Marshal.PtrToStringUTF8((IntPtr)str->data, (int)str->length);
+		Marshal.PtrToStringUTF8((IntPtr)str->data, checked((int)str->length));
 #elif NETSTANDARD2_0
-		Encoding.UTF8.GetString(str->data, (int)str->length);
+		Encoding.UTF8.GetString(str->data, checked((int)str->length));
 #elif NETFRAMEWORK
-		new string((sbyte*)str->data, 0, (int)str->length);
+		new string((sbyte*)str->data, 0, checked((int)str->length));
 #else
-		Marshal.PtrToStringUTF8((IntPtr)str->data, (int)str->length);
+		Marshal.PtrToStringUTF8((IntPtr)str->data, checked((int)str->length));
 #endif
 
 	// INTEROPTODO: CUSTOMTYPEMARSHALLER

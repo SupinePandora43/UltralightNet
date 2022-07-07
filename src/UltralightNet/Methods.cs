@@ -153,7 +153,7 @@ internal unsafe ref struct UTF8Marshaller
 	public UTF8Marshaller(string str, Span<byte> buffer)
 	{
 		int strLen = str.Length;
-		int byteCount = (strLen + 1) * 3 + 1;
+		int byteCount = checked((strLen + 1) * 3 + 1);
 
 		if (buffer.Length >= byteCount)
 		{
@@ -174,7 +174,7 @@ internal unsafe ref struct UTF8Marshaller
 		else
 		{
 			span = null;
-			bytes = (byte*)NativeMemory.Alloc((nuint)byteCount); // INTEROPTODO: INT64
+			bytes = (byte*)NativeMemory.Alloc((nuint)byteCount);
 
 #if NETSTANDARD2_1 || NET
 			int written = Encoding.UTF8.GetBytes(str.AsSpan(), new Span<byte>(bytes, byteCount));
