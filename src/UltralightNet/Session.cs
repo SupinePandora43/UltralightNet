@@ -55,20 +55,11 @@ public class Session : INativeContainer<Session>, INativeContainerInterface<Sess
 
 	public override void Dispose()
 	{
-		if (IsDisposed) return;
-		if (Owns) Methods.ulDestroySession(Handle);
-
-		IsDisposed = true;
-		GC.SuppressFinalize(this);
+		if (!IsDisposed && Owns) Methods.ulDestroySession(Handle);
+		base.Dispose();
 	}
 
-	public bool Equals(Session? other)
-	{
-		if (other is null) return IsDisposed;
-		if (Handle == other.Handle) return true;
-		if (IsDisposed != other.IsDisposed) return false;
-		return IsPersistent == other.IsPersistent && Name == other.Name && Id == other.Id && DiskPath == other.DiskPath;
-	}
+	public bool Equals(Session? other) => other is not null ? ((!IsDisposed && !other.IsDisposed) ? (Handle == other.Handle || (IsPersistent == other.IsPersistent && Name == other.Name && Id == other.Id && DiskPath == other.DiskPath)) : false) : false;
 
 	public static unsafe Session FromHandle(Handle<Session> handle, bool dispose) => new() { Handle = handle, Owns = dispose };
 }
