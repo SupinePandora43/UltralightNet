@@ -203,7 +203,7 @@ internal unsafe ref struct UTF8Marshaller
 
 	public unsafe byte* Value
 	{
-		readonly get => bytes;
+		readonly get => bytes is not null ? bytes : (byte*)Unsafe.AsPointer(ref span[0]);
 		set
 		{
 			bytes = value;
