@@ -1,4 +1,3 @@
-using System;
 using System.Runtime.InteropServices;
 
 namespace UltralightNet.AppCore;
@@ -6,25 +5,22 @@ namespace UltralightNet.AppCore;
 public static partial class AppCoreMethods
 {
 	[DllImport(LibAppCore)]
-	public static extern double ulMonitorGetScale(IntPtr monitor);
+	public static extern double ulMonitorGetScale(ULMonitor monitor);
 
 	[DllImport(LibAppCore)]
-	public static extern uint ulMonitorGetWidth(IntPtr monitor);
+	public static extern uint ulMonitorGetWidth(ULMonitor monitor);
 
 	[DllImport(LibAppCore)]
-	public static extern uint ulMonitorGetHeight(IntPtr monitor);
+	public static extern uint ulMonitorGetHeight(ULMonitor monitor);
 }
 
-public class ULMonitor
+public readonly struct ULMonitor
 {
-	public IntPtr Ptr { get; private set; }
+	private readonly nuint _handle;
 
-	public ULMonitor(IntPtr ptr)
-	{
-		Ptr = ptr;
-	}
+	public readonly double Scale => AppCoreMethods.ulMonitorGetScale(this);
+	public readonly uint Width => AppCoreMethods.ulMonitorGetWidth(this);
+	public readonly uint Height => AppCoreMethods.ulMonitorGetHeight(this);
 
-	public double Scale => AppCoreMethods.ulMonitorGetScale(Ptr);
-	public uint Width => AppCoreMethods.ulMonitorGetWidth(Ptr);
-	public uint Height => AppCoreMethods.ulMonitorGetHeight(Ptr);
+	public readonly ULWindow CreateWindow(uint width, uint height, bool fullscreen = false, ULWindowFlags flags = ULWindowFlags.Titled | ULWindowFlags.Resizable | ULWindowFlags.Maximizable) => ULWindow.FromHandle(AppCoreMethods.ulCreateWindow(this, width, height, fullscreen, flags), true);
 }

@@ -11,11 +11,11 @@ class Program
 		AppCoreMethods.ulEnablePlatformFileSystem(Path.GetDirectoryName(typeof(Program).Assembly.Location) ?? "./");
 
 		using ULApp app = ULApp.Create(new(), new());
-		using ULWindow window = new(app.MainMonitor, 512, 512, false, ULWindowFlags.Titled | ULWindowFlags.Resizable | ULWindowFlags.Maximizable);
+		using ULWindow window = app.MainMonitor.CreateWindow(512, 512, false, ULWindowFlags.Titled | ULWindowFlags.Resizable | ULWindowFlags.Maximizable);
 
 		window.Title = "test title";
 
-		using ULOverlay overlay = new(window, window.Width, window.Height, 0, 0);
+		using ULOverlay overlay = window.CreateOverlay(window.Width, window.Height, 0, 0);
 		window.SetResizeCallback((IntPtr user_data, ULWindow window, uint width, uint height) => overlay.Resize(width, height));
 		window.SetCloseCallback((_, _) => app.Quit());
 

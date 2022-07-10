@@ -33,7 +33,7 @@ public static unsafe partial class AppCoreMethods
 	public static partial bool ulAppIsRunning(Handle<ULApp> app);
 
 	[DllImport(LibAppCore)]
-	public static extern IntPtr ulAppGetMainMonitor(Handle<ULApp> app);
+	public static extern ULMonitor ulAppGetMainMonitor(Handle<ULApp> app);
 
 	[DllImport(LibAppCore)]
 	public static extern Handle<Renderer> ulAppGetRenderer(Handle<ULApp> app);
@@ -88,7 +88,7 @@ public class ULApp : INativeContainer<ULApp>, INativeContainerInterface<ULApp>, 
 	{
 		get
 		{
-			ULMonitor returnValue = new(AppCoreMethods.ulAppGetMainMonitor(Handle));
+			ULMonitor returnValue = AppCoreMethods.ulAppGetMainMonitor(Handle);
 			GC.KeepAlive(this);
 			return returnValue;
 		}
