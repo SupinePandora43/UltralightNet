@@ -1,3 +1,5 @@
 ﻿using UltralightNet.Test;
 
-new RendererTest().TestRenderer();
+using RendererFixture fixture = new();
+
+new RendererTest(fixture).TestRenderer();

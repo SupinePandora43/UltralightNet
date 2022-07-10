@@ -52,7 +52,7 @@ public class Renderer : INativeContainer<Renderer>, INativeContainerInterface<Re
 		init => base.Handle = value;
 	}
 
-	private Renderer() { }
+	protected Renderer() { }
 
 	internal int ThreadId { get; set; } = -1;
 	internal void AssertNotWrongThread() // hungry

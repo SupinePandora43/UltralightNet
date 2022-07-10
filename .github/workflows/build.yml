@@ -92,11 +92,12 @@ jobs:
       - run: tree
         if: matrix.os=='ubuntu'
       - name: Test
+        if: matrix.os!='macos'
         run: dotnet test src/UltralightNet.Test/UltralightNet.Test.csproj --collect:"XPlat Code Coverage" -- DataCollectionRunSettings.DataCollectors.DataCollector.Configuration.Format=cobertura,opencover -- DataCollectionRunSettings.DataCollectors.DataCollector.Configuration.UseSourceLink=true
-        continue-on-error: true
       - name: Test (macos)
         if: matrix.os=='macos'
         run: |
+          dotnet test src/UltralightNet.Test/UltralightNet.Test.csproj --filter Category!=Renderer --collect:"XPlat Code Coverage" -- DataCollectionRunSettings.DataCollectors.DataCollector.Configuration.Format=cobertura,opencover -- DataCollectionRunSettings.DataCollectors.DataCollector.Configuration.UseSourceLink=true
           dotnet tool install --global coverlet.console
           dotnet build -c Release src/UltralightNet.TestRunner/UltralightNet.TestRunner.csproj
           coverlet src/UltralightNet.TestRunner/bin/Release/net6.0/UltralightNet.TestRunner.dll --target "dotnet" --targetargs "src/UltralightNet.TestRunner/bin/Release/net6.0/UltralightNet.TestRunner.dll" --format cobertura --format opencover
@@ -108,9 +109,7 @@ jobs:
           ./codecov -f "src/UltralightNet.TestRunner/TestResults/*/coverage.opencover.xml"
       - name: Benchmark
         run: dotnet run -c Release --project src/Benchmarks/Benchmarks.csproj
-        continue-on-error: true
-      - name: Test
-        run: dotnet test src/UltralightNet.Test/UltralightNet.Test.csproj --collect:"XPlat Code Coverage" -- DataCollectionRunSettings.DataCollectors.DataCollector.Configuration.Format=cobertura,opencover -- DataCollectionRunSettings.DataCollectors.DataCollector.Configuration.UseSourceLink=true
+        continue-on-error: true # todo
   Deploy:
     needs: Test
     runs-on: ubuntu-latest

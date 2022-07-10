@@ -1,145 +1,61 @@
 using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Net;
-using System.Runtime.InteropServices;
-using System.Text;
 using System.Threading;
-using UltralightNet.AppCore;
 using Xunit;
 
 namespace UltralightNet.Test;
+
+[Collection("Renderer")]
+[Trait("Category", "Renderer")]
 public class RendererTest
 {
-	private Renderer renderer;
+	private Renderer Renderer;
 
-	private readonly ULViewConfig viewConfig = new()
+	public RendererTest(RendererFixture fixture) => Renderer = fixture.Renderer;
+
+	private ULViewConfig ViewConfig => new()
 	{
 		IsAccelerated = false,
 		IsTransparent = false
 	};
 
-	private readonly Dictionary<int, FileStream> handles = new();
-
-	private bool getFileSize(nuint handle, out long size)
-	{
-		Console.WriteLine($"get_file_size({handle})");
-		//size = "<html><body><p>123</p></body></html>".Length;
-		size = handles[(int)handle].Length;
-		return true;
-	}
-	private bool getFileMimeType(in string path, out string result)
-	{
-		Console.WriteLine($"get_file_mime_type({path})");
-		result = "text/html";
-		return true;
-	}
-	private long readFromFile(nuint handle, Span<byte> data)
-	{
-		Console.WriteLine($"readFromFile({handle}, Span<byte> data)");
-		//Assert.Equal("<html><body><p>123</p></body></html>".Length, length);
-		//data = "<html><body><p>123</p></body></html>";
-		return handles[(int)handle].Read(data);
-	}
-	[Fact]
+	// [Fact]
 	public void TestRenderer()
 	{
-		AppCoreMethods.ulEnablePlatformFontLoader();
-		AppCoreMethods.ulEnablePlatformFileSystem("./");
-		/*ULPlatform.Logger = new ULLogger()
-		{
-			LogMessage = (ULLogLevel level, in string message) =>
-			{
-				Console.WriteLine(message);
-			}
-		};*//*
-		AppCoreMethods.ulEnableDefaultLogger("./ullog.txt");
-		*/
-
-		//WebRequest request = WebRequest.CreateHttp("https://raw.githubusercontent.com/SupinePandora43/UltralightNet/gh-pages/index.html");
-		//WebResponse response = request.GetResponse();
-
-
-
-		//File.WriteAllText("test.html", new StreamReader(response.GetResponseStream()).ReadToEnd(), Encoding.UTF8);
-		// TODO: adapt new buffer-like api
-		/*ULFileSystemGetFileSizeCallback get_file_size = getFileSize;
-		ULFileSystemGetFileMimeTypeCallback get_file_mime_type = getFileMimeType;
-		ULFileSystemReadFromFileCallback read_from_file = readFromFile;
-		ULPlatform.FileSystem = new ULFileSystem()
-		{
-			FileExists = (in string path) =>
-			{
-				Console.WriteLine($"file_exists({path})");
-				return File.Exists(path);
-			},
-			GetFileSize = get_file_size,
-			GetFileMimeType = get_file_mime_type,
-			OpenFile = (in string path, bool open_for_writing) =>
-			{
-				Console.WriteLine($"open_file({path}, {open_for_writing})");
-				int handle = new Random().Next(0, 100);
-				handles[handle] = File.OpenRead(path);
-				return (nuint)handle;
-			},
-			CloseFile = (handle) =>
-			{
-				Console.WriteLine($"close_file({handle})");
-			},
-			ReadFromFile = read_from_file
-		};*/
-
-		ULConfig config = new();
-
-		if (OperatingSystem.IsMacOS()) return;
-
-		renderer = ULPlatform.CreateRenderer(config);
-
 		SessionTest();
 
 		// TODO: fix
 		// GenericTest();
 
-		Console.WriteLine("JSTest");
 		JSTest();
 
-		Console.WriteLine("HTMLTest");
 		HTMLTest();
 
 		// TODO: fix
 		// FSTest();
 
-		Console.WriteLine("EVENTTest");
 		EventTest();
 
-		Console.WriteLine("MEMORYTest");
 		MemoryTest();
-
-
-		// ~Renderer() => Dispose()
-
-		Console.WriteLine("Disposing");
-		renderer.Dispose();
-		Console.WriteLine("Disposed");
 	}
 
+	[Fact]
 	private void SessionTest()
 	{
-		Session session = renderer.DefaultSession;
+		using Session session = Renderer.DefaultSession;
 		Assert.Equal("default", session.Name);
 
-		session = renderer.CreateSession(false, "myses1");
-		Assert.Equal("myses1", session.Name);
-		Assert.False(session.IsPersistent);
+		using Session session1 = Renderer.CreateSession(false, "myses1");
+		Assert.Equal("myses1", session1.Name);
+		Assert.False(session1.IsPersistent);
 
-		session = renderer.CreateSession(true, "myses2");
-		Assert.Equal("myses2", session.Name);
-		Assert.True(session.IsPersistent);
+		using Session session2 = Renderer.CreateSession(true, "myses2");
+		Assert.Equal("myses2", session2.Name);
+		Assert.True(session2.IsPersistent);
 	}
 
 	private void GenericTest()
 	{
-		using View view = renderer.CreateView(512, 512, viewConfig);
+		using View view = Renderer.CreateView(512, 512, ViewConfig);
 
 		Assert.Equal(512u, view.Width);
 		Assert.Equal(512u, view.Height);
@@ -163,11 +79,11 @@ public class RendererTest
 
 		while (view.URL == "")
 		{
-			renderer.Update();
+			Renderer.Update();
 			Thread.Sleep(100);
 		}
 
-		renderer.Render();
+		Renderer.Render();
 
 		Assert.Equal("https://github.com/", view.URL);
 		Assert.Contains("GitHub", view.Title);
@@ -175,23 +91,25 @@ public class RendererTest
 		Assert.True(OnChangeURL);
 	}
 
+	[Fact]
 	private void JSTest()
 	{
-		using View view = renderer.CreateView(2, 2, viewConfig);
+		using View view = Renderer.CreateView(2, 2, ViewConfig);
 		Console.WriteLine("EVal");
 		Assert.Equal("3", view.EvaluateScript("1+2", out string exception));
 		Assert.True(string.IsNullOrEmpty(exception));
 	}
 
+	[Fact]
 	private void HTMLTest()
 	{
-		using View view = renderer.CreateView(512, 512, viewConfig);
+		using View view = Renderer.CreateView(512, 512, ViewConfig);
 		view.HTML = "<html />";
 	}
 
 	private void FSTest()
 	{
-		using View view = renderer.CreateView(256, 256, viewConfig);
+		using View view = Renderer.CreateView(256, 256, ViewConfig);
 		view.URL = "file:///test.html";
 
 		view.OnAddConsoleMessage += (source, level, message, line_number, column_number, source_id) =>
@@ -208,23 +126,24 @@ public class RendererTest
 
 		while (!loaded)
 		{
-			renderer.Update();
+			Renderer.Update();
 			Thread.Sleep(10);
 		}
 
 		for (uint i = 0; i < 100; i++)
 		{
-			renderer.Update();
+			Renderer.Update();
 			Thread.Sleep(10);
 		}
 
-		renderer.Render();
+		Renderer.Render();
 		view.Surface!.Bitmap.WritePng("test_FS.png");
 	}
 
+	[Fact]
 	private void EventTest()
 	{
-		using View view = renderer.CreateView(256, 256, viewConfig);
+		using View view = Renderer.CreateView(256, 256, ViewConfig);
 		Console.WriteLine("KeyEvent");
 		view.FireKeyEvent(new(ULKeyEventType.Char, ULKeyEventModifiers.ShiftKey, 0, 0, "A", "A", false, false, false));
 		Console.WriteLine("MouseEvent");
@@ -233,13 +152,14 @@ public class RendererTest
 		view.FireScrollEvent(new() { Type = ULScrollEventType.ByPage, DeltaX = 23, DeltaY = 123 });
 	}
 
+	[Fact]
 	private void MemoryTest()
 	{
 		Console.WriteLine("LogMemoryUsage");
-		renderer.LogMemoryUsage();
+		Renderer.LogMemoryUsage();
 		Console.WriteLine("PurgeMemory");
-		renderer.PurgeMemory();
+		Renderer.PurgeMemory();
 		Console.WriteLine("LogMemoryUsage");
-		renderer.LogMemoryUsage();
+		Renderer.LogMemoryUsage();
 	}
 }
