@@ -1,10 +1,12 @@
 using System.Runtime.CompilerServices;
 
-namespace UltralightNet;
+namespace UltralightNet.JavaScript;
 
-public readonly ref struct JSPropertyNameAccumulator
+public readonly ref struct JSPropertyNameAccumulatorRef
 {
-	public JSPropertyNameAccumulator() => JavaScriptMethods.ThrowUnsupportedConstructor();
+	private readonly nuint _value;
+
+	public void AddName(JSStringRef jsString) => JavaScriptMethods.JSPropertyNameAccumulatorAddName(this, jsString);
 }
 
 unsafe partial class JavaScriptMethods
