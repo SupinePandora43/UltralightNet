@@ -1,6 +1,7 @@
 using System;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
+using UltralightNet.LowStuff;
 
 namespace UltralightNet;
 
@@ -58,7 +59,7 @@ public static partial class Methods
 
 	/// <summary>Get the underlying Bitmap from the default Surface.</summary>
 	[DllImport("Ultralight")]
-	public static extern IntPtr ulBitmapSurfaceGetBitmap(IntPtr surface);
+	public static extern Handle<ULBitmap> ulBitmapSurfaceGetBitmap(IntPtr surface);
 }
 
 public class ULSurface
@@ -91,6 +92,6 @@ public class ULSurface
 	public ULBitmap Bitmap
 	{
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		get => new(Methods.ulBitmapSurfaceGetBitmap(Ptr));
+		get => ULBitmap.FromHandle(Methods.ulBitmapSurfaceGetBitmap(Ptr), false);
 	}
 }

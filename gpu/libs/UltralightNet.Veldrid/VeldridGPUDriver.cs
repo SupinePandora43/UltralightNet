@@ -171,12 +171,12 @@ namespace UltralightNet.Veldrid
 		#region Texture
 		private void UploadTexture(TextureEntry texture, ULBitmap bitmap, uint width, uint height, uint bpp, uint rowBytes)
 		{
-			IntPtr pixelsPTR = bitmap.LockPixels();
-			ReadOnlySpan<byte> pixels = new ReadOnlySpan<byte>((void*)pixelsPTR, (int)(rowBytes * height));
+			byte* pixelsPTR = bitmap.LockPixels();
+			ReadOnlySpan<byte> pixels = new ReadOnlySpan<byte>(pixelsPTR, (int)(rowBytes * height));
 
 			if (rowBytes == width * bpp)
 			{
-				graphicsDevice.UpdateTexture(texture.texture, pixelsPTR, width * height * bpp, 0, 0, 0, width, height, 1, 0, 0);
+				graphicsDevice.UpdateTexture(texture.texture, (IntPtr)pixelsPTR, width * height * bpp, 0, 0, 0, width, height, 1, 0, 0);
 			}
 			else
 			{

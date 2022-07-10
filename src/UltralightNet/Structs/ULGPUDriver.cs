@@ -1,6 +1,7 @@
 using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.InteropServices;
+using UltralightNet.LowStuff;
 
 namespace UltralightNet;
 
@@ -39,16 +40,16 @@ public unsafe struct ULGPUDriver : IDisposable, IEquatable<ULGPUDriver>
 	}
 	public ULGPUDriverCreateTextureCallback? CreateTexture
 	{
-		set => _CreateTexture = value is null ? null : (id, bitmap) => value(id, new ULBitmap((IntPtr)bitmap));
+		set => _CreateTexture = value is null ? null : (id, bitmap) => value(id, ULBitmap.FromHandle(bitmap, false));
 		readonly get
 		{
 			var c = _CreateTexture;
-			return c is null ? null : (id, bitmap) => c(id, (void*)bitmap.Ptr);
+			return c is null ? null : (id, bitmap) => c(id, bitmap.Handle);
 		}
 	}
 	public ULGPUDriverCreateTextureCallback__PInvoke__? _CreateTexture
 	{
-		set => ULPlatform.Handle(ref this, this with { __CreateTexture = value is null ? null : (delegate* unmanaged[Cdecl]<uint, void*, void>)Marshal.GetFunctionPointerForDelegate(value) }, value);
+		set => ULPlatform.Handle(ref this, this with { __CreateTexture = value is null ? null : (delegate* unmanaged[Cdecl]<uint, Handle<ULBitmap>, void>)Marshal.GetFunctionPointerForDelegate(value) }, value);
 		readonly get
 		{
 			var p = __CreateTexture;
@@ -57,16 +58,16 @@ public unsafe struct ULGPUDriver : IDisposable, IEquatable<ULGPUDriver>
 	}
 	public ULGPUDriverUpdateTextureCallback? UpdateTexture
 	{
-		set => _UpdateTexture = value is null ? null : (id, bitmap) => value(id, new ULBitmap((IntPtr)bitmap));
+		set => _UpdateTexture = value is null ? null : (id, bitmap) => value(id, ULBitmap.FromHandle(bitmap, false));
 		readonly get
 		{
 			var c = _UpdateTexture;
-			return c is null ? null : (id, bitmap) => c(id, (void*)bitmap.Ptr);
+			return c is null ? null : (id, bitmap) => c(id, bitmap.Handle);
 		}
 	}
 	public ULGPUDriverUpdateTextureCallback__PInvoke__? _UpdateTexture
 	{
-		set => ULPlatform.Handle(ref this, this with { __UpdateTexture = value is null ? null : (delegate* unmanaged[Cdecl]<uint, void*, void>)Marshal.GetFunctionPointerForDelegate(value) }, value);
+		set => ULPlatform.Handle(ref this, this with { __UpdateTexture = value is null ? null : (delegate* unmanaged[Cdecl]<uint, Handle<ULBitmap>, void>)Marshal.GetFunctionPointerForDelegate(value) }, value);
 		readonly get
 		{
 			var p = __UpdateTexture;
@@ -158,8 +159,8 @@ public unsafe struct ULGPUDriver : IDisposable, IEquatable<ULGPUDriver>
 	public delegate* unmanaged[Cdecl]<void> __BeginSynchronize;
 	public delegate* unmanaged[Cdecl]<void> __EndSynchronize;
 	public delegate* unmanaged[Cdecl]<uint> __NextTextureId;
-	public delegate* unmanaged[Cdecl]<uint, void*, void> __CreateTexture;
-	public delegate* unmanaged[Cdecl]<uint, void*, void> __UpdateTexture;
+	public delegate* unmanaged[Cdecl]<uint, Handle<ULBitmap>, void> __CreateTexture;
+	public delegate* unmanaged[Cdecl]<uint, Handle<ULBitmap>, void> __UpdateTexture;
 	public delegate* unmanaged[Cdecl]<uint, void> __DestroyTexture;
 	public delegate* unmanaged[Cdecl]<uint> __NextRenderBufferId;
 	public delegate* unmanaged[Cdecl]<uint, ULRenderBuffer, void> __CreateRenderBuffer;

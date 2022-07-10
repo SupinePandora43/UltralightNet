@@ -10,6 +10,7 @@ using Silk.NET.OpenGL;
 using UltralightNet;
 using UltralightNet.GPUCommon;
 using System.Runtime.InteropServices;
+using UltralightNet.LowStuff;
 
 [module: SkipLocalsInit]
 
@@ -41,7 +42,7 @@ public static unsafe partial class OpenGLGPUDriver
 #endif
 	}
 
-	private static bool DSA = true;
+	private static bool DSA = false;
 	private static uint samples = 0;
 
 	private static bool initialized = false;
@@ -250,8 +251,8 @@ public static unsafe partial class OpenGLGPUDriver
 	}
 
 	[UnmanagedCallersOnly(CallConvs = new Type[] {typeof(CallConvCdecl)})]
-	private static void CreateTexture(uint entryId, void* bitmapPtr){
-		ULBitmap bitmap = new((IntPtr)bitmapPtr);
+	private static void CreateTexture(uint entryId, Handle<ULBitmap> bitmapPtr){
+		ULBitmap bitmap = ULBitmap.FromHandle(bitmapPtr, false);
 
 		var isRT = bitmap.IsEmpty;
 
@@ -362,8 +363,8 @@ public static unsafe partial class OpenGLGPUDriver
 		textures[(int)entryId].height = height;
 	}
 	[UnmanagedCallersOnly(CallConvs = new Type[] {typeof(CallConvCdecl)})]
-	private static void UpdateTexture(uint entryId, void* bitmapPtr){
-		ULBitmap bitmap = new((IntPtr)bitmapPtr);
+	private static void UpdateTexture(uint entryId, Handle<ULBitmap> bitmapPtr){
+		ULBitmap bitmap = ULBitmap.FromHandle(bitmapPtr, false);
 
 		Check();
 		uint textureId = textures[(int)entryId].textureId;
