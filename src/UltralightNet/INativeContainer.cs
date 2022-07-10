@@ -27,6 +27,7 @@ public struct Handle<T>
 	public static explicit operator Handle<T>(IntPtr ptr) => Unsafe.As<IntPtr, Handle<T>>(ref ptr);
 	public static unsafe explicit operator Handle<T>(void* ptr) => new(ptr);
 	public static unsafe explicit operator void*(Handle<T> handle) => (void*)handle._value;
+	public static explicit operator nuint(Handle<T> handle) => handle._value;
 	public static unsafe explicit operator IntPtr(Handle<T> handle) => Unsafe.As<nuint, IntPtr>(ref handle._value);
 }
 public unsafe abstract class INativeContainer<TSelf> : IDisposable where TSelf : INativeContainer<TSelf>, INativeContainerInterface<TSelf>, IEquatable<TSelf>
