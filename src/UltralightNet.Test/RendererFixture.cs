@@ -1,4 +1,5 @@
 using System;
+using System.IO;
 using UltralightNet.AppCore;
 using Xunit;
 
@@ -10,9 +11,11 @@ public class RendererFixture : IDisposable
 
 	public RendererFixture()
 	{
+		string path = Path.GetDirectoryName(typeof(RendererFixture).Assembly.Location) ?? "./";
+
 		AppCoreMethods.ulEnablePlatformFontLoader();
-		AppCoreMethods.ulEnablePlatformFileSystem("./");
-		AppCoreMethods.ulEnableDefaultLogger("./ullog.txt");
+		AppCoreMethods.ulEnablePlatformFileSystem(path);
+		AppCoreMethods.ulEnableDefaultLogger(Path.Combine(path, "./ullog.txt"));
 
 		Renderer = ULPlatform.CreateRenderer();
 	}
