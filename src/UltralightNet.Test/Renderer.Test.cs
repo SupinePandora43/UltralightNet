@@ -23,8 +23,7 @@ public class RendererTest
 	{
 		SessionTest();
 
-		// TODO: fix
-		// GenericTest();
+		GenericTest();
 
 		JSTest();
 
@@ -53,14 +52,17 @@ public class RendererTest
 		Assert.True(session2.IsPersistent);
 	}
 
+	[Fact]
+	[Trait("Network", "Required")]
+	[Trait("Category", "Renderer")]
 	private void GenericTest()
 	{
+		CancellationToken token = new CancellationTokenSource(TimeSpan.FromSeconds(10)).Token;
+
 		using View view = Renderer.CreateView(512, 512, ViewConfig);
 
 		Assert.Equal(512u, view.Width);
 		Assert.Equal(512u, view.Height);
-
-		view.URL = "https://github.com/";
 
 		bool OnChangeTitle = false;
 		bool OnChangeURL = false;
@@ -77,8 +79,12 @@ public class RendererTest
 			OnChangeURL = true;
 		};
 
+		view.URL = "https://github.com/";
+
 		while (view.URL == "")
 		{
+			if (token.IsCancellationRequested) throw new TimeoutException("Couldn't load page in 10 seconds.");
+
 			Renderer.Update();
 			Thread.Sleep(100);
 		}
@@ -155,11 +161,8 @@ public class RendererTest
 	[Fact]
 	private void MemoryTest()
 	{
-		Console.WriteLine("LogMemoryUsage");
 		Renderer.LogMemoryUsage();
-		Console.WriteLine("PurgeMemory");
 		Renderer.PurgeMemory();
-		Console.WriteLine("LogMemoryUsage");
 		Renderer.LogMemoryUsage();
 	}
 }
