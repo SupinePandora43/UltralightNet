@@ -65,7 +65,7 @@ public unsafe struct ULFileSystem : IDisposable, IEquatable<ULFileSystem>
 		set => _OpenFile = value is null ? null : (path) =>
 		{
 			byte[]? result = value(ULString.NativeToManaged(path));
-			if (result is not null) return ULBuffer.CreateFromSpan<byte>(result);
+			if (result is not null) return ULBuffer.CreateFromDataCopy<byte>(result);
 			else return default;
 		};
 		readonly get

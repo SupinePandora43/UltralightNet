@@ -290,10 +290,16 @@ public static unsafe class ULPlatform
 
 					if (s is not null)
 					{
-						void* data = NativeMemory.Alloc((nuint)s.Length);
-						s.CopyTo(new UnmanagedMemoryStream((byte*)data, s.Length, s.Length, FileAccess.Write));
-						ULBuffer buffer = new(data, (nuint)s.Length);
-						NativeMemory.Free(data);
+						ULBuffer buffer;
+
+						if (s is UnmanagedMemoryStream unmanagedMemoryStream) buffer = ULBuffer.CreateFromOwnedData(unmanagedMemoryStream.PositionPointer, checked((nuint)unmanagedMemoryStream.Length));
+						else
+						{
+							var bytes = new byte[s.Length];
+							int len = s.Read(bytes, 0, checked((int)s.Length));
+							buffer = ULBuffer.CreateFromDataCopy<byte>(bytes.AsSpan().Slice(0, len));
+						}
+
 						return buffer;
 					}
 					else return default;

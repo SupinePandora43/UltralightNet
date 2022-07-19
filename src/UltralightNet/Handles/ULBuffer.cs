@@ -10,25 +10,38 @@ public unsafe struct ULBuffer : IDisposable, IEquatable<ULBuffer> // TODO: INati
 {
 	private nuint handle;
 
-	public ULBuffer(void* data, nuint size, DestroyBufferCallback destroyCallback, void* userData = null) : this(data is null && destroyCallback is not null ? throw new ArgumentException("Callback will not be called, if data is null", nameof(data)) : data, size, destroyCallback is not null ? (delegate*<void*, void*, void>)Marshal.GetFunctionPointerForDelegate(destroyCallback) : null, userData) { }
-	public ULBuffer(void* data, nuint size, delegate*<void*, void*, void> destroyCallback = null, void* userData = null)
+	public static ULBuffer CreateFromOwnedData(void* data, nuint length, delegate* unmanaged[Cdecl]<void*, void*, void> destroyCallback = null, void* userData = null)
 	{
-		handle = data is null && destroyCallback is not null ? throw new ArgumentException("Callback will not be called, if data is null", nameof(data)) : ulCreateBuffer(data, size, userData, destroyCallback);
+		return data is null && destroyCallback is not null ? throw new ArgumentException("Callback will not be called, if data is null", nameof(data)) : ulCreateBuffer(data, length, userData, destroyCallback);
 
 		[DllImport(Methods.LibUltralight)]
-		static extern nuint ulCreateBuffer(void* data, nuint size, void* userData, delegate*<void*, void*, void> destroyCallback);
+		static extern ULBuffer ulCreateBuffer(void* data, nuint length, void* userData, delegate* unmanaged[Cdecl]<void*, void*, void> destroyCallback);
 	}
-	public ULBuffer(void* data, nuint size)
+	public static ULBuffer CreateFromOwnedData(void* data, nuint size, DestroyBufferCallback? destroyCallback, void* userData = null) => CreateFromOwnedData(data is null && destroyCallback is not null ? throw new ArgumentException("Callback will not be called, if data is null", nameof(data)) : data, size, destroyCallback is not null ? (delegate* unmanaged[Cdecl]<void*, void*, void>)Marshal.GetFunctionPointerForDelegate(destroyCallback) : null, userData);
+	public static ULBuffer CreateFromOwnedData<T>(ReadOnlySpan<T> data, delegate* unmanaged[Cdecl]<void*, void*, void> destroyCallback = null, void* userData = null) where T : unmanaged
 	{
-		handle = ulCreateBufferFromCopy(data, size);
+		fixed (T* dataPointer = data)
+			return CreateFromOwnedData(dataPointer, unchecked((nuint)data.Length), destroyCallback, userData);
+	}
+	public static ULBuffer CreateFromOwnedData<T>(ReadOnlySpan<T> data, DestroyBufferCallback? destroyCallback, void* userData = null) where T : unmanaged
+	{
+		fixed (T* dataPointer = data)
+			return CreateFromOwnedData(dataPointer, unchecked((nuint)data.Length), destroyCallback, userData);
+	}
+
+	public static ULBuffer CreateFromDataCopy(void* data, nuint length)
+	{
+		if (data is null && length is not 0) throw new ArgumentNullException(nameof(data));
+
+		return ulCreateBufferFromCopy(data, length);
 
 		[DllImport(Methods.LibUltralight)]
-		static extern nuint ulCreateBufferFromCopy(void* data, nuint size);
+		static extern ULBuffer ulCreateBufferFromCopy(void* data, nuint length);
 	}
-	public static ULBuffer CreateFromSpan<T>(ReadOnlySpan<T> span) where T : unmanaged
+	public static ULBuffer CreateFromDataCopy<T>(ReadOnlySpan<T> data) where T : unmanaged
 	{
-		fixed (byte* bytePtr = MemoryMarshal.Cast<T, byte>(span))
-			return new(bytePtr, (nuint)span.Length);
+		fixed (T* dataPointer = data)
+			return CreateFromDataCopy(dataPointer, (nuint)data.Length);
 	}
 
 	public void Dispose()
@@ -41,6 +54,9 @@ public unsafe struct ULBuffer : IDisposable, IEquatable<ULBuffer> // TODO: INati
 		static extern void* ulDestroyBuffer(nuint buffer);
 	}
 
+	public readonly bool IsDisposed => handle is 0;
+	private readonly nuint Handle => !IsDisposed ? handle : throw new ObjectDisposedException(nameof(ULBuffer));
+
 	/// <summary>Use <see cref="MemoryMarshal.Cast{TFrom, TTo}(Span{TFrom})" /> to convert it to type of your choice</summary>
 	public readonly Span<byte> DataSpan => new(Data, checked((int)Size));
 
@@ -48,8 +64,7 @@ public unsafe struct ULBuffer : IDisposable, IEquatable<ULBuffer> // TODO: INati
 	{
 		get
 		{
-			Debug.Assert(handle is not 0);
-			return ulBufferGetData(handle);
+			return ulBufferGetData(Handle);
 
 			[DllImport(Methods.LibUltralight)]
 			static extern byte* ulBufferGetData(nuint buffer);
@@ -59,8 +74,7 @@ public unsafe struct ULBuffer : IDisposable, IEquatable<ULBuffer> // TODO: INati
 	{
 		get
 		{
-			Debug.Assert(handle is not 0);
-			return ulBufferGetSize(handle);
+			return ulBufferGetSize(Handle);
 
 			[DllImport(Methods.LibUltralight)]
 			static extern nuint ulBufferGetSize(nuint buffer);
@@ -70,8 +84,7 @@ public unsafe struct ULBuffer : IDisposable, IEquatable<ULBuffer> // TODO: INati
 	{
 		get
 		{
-			Debug.Assert(handle is not 0);
-			return ulBufferGetUserData(handle);
+			return ulBufferGetUserData(Handle);
 
 			[DllImport(Methods.LibUltralight)]
 			static extern void* ulBufferGetUserData(nuint buffer);
@@ -81,8 +94,7 @@ public unsafe struct ULBuffer : IDisposable, IEquatable<ULBuffer> // TODO: INati
 	{
 		get
 		{
-			Debug.Assert(handle is not 0);
-			return ulBufferOwnsData(handle) != 0;
+			return ulBufferOwnsData(Handle) != 0;
 
 			[DllImport(Methods.LibUltralight)]
 			static extern byte ulBufferOwnsData(nuint buffer);
