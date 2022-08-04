@@ -135,4 +135,4 @@ jobs:
         dotnet nuget push UltralightNet.*.nupkg -k ${{ secrets.NUGET_TOKEN }} --source https://api.nuget.org/v3/index.json
         dotnet nuget push UltralightNet.AppCore.*.nupkg -k ${{ secrets.NUGET_TOKEN }} --source https://api.nuget.org/v3/index.json
         dotnet nuget push UltralightNet.Resources.*.nupkg -k ${{ secrets.NUGET_TOKEN }} --source https://api.nuget.org/v3/index.json
-      continue-on-error: true
+      # continue-on-error: true
