@@ -7,6 +7,7 @@ using System.Text;
 
 [assembly: InternalsVisibleTo("UltralightNet.AppCore")]
 [assembly: DisableRuntimeMarshallingAttribute]
+[assembly: AssemblyMetadata("IsTrimmable", "True")]
 
 #if RELEASE
 [module: SkipLocalsInit]

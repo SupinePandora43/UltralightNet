@@ -1,4 +1,5 @@
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
 
 namespace UltralightNet.LowStuff;
@@ -39,6 +40,7 @@ public unsafe abstract class INativeContainer<TSelf> : IDisposable where TSelf :
 	protected bool Owns
 	{
 		get => _Owns;
+		[SuppressMessage("Usage", "CA1816: Call GC.SupressFinalize correctly")]
 		init
 		{
 			if (value is false) GC.SuppressFinalize(this);

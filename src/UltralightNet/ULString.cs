@@ -228,6 +228,7 @@ public unsafe struct ULString : IDisposable, ICloneable, IEquatable<ULString>
 #endif
 
 	public override readonly string ToString() => (string)this;
+	public readonly ReadOnlySpan<byte> ToSpan() => new(data, checked((int)length));
 
 	internal static string NativeToManaged(ULString* str) => str is null ? string.Empty :
 #if NETSTANDARD2_1 || NETCOREAPP1_1_OR_GREATER

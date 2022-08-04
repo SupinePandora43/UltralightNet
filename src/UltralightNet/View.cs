@@ -217,6 +217,7 @@ public unsafe class View : IDisposable
 	private JSContext Context { get; set; }
 	private JSContext? lockedContext;
 
+	[Obsolete]
 	public View(IntPtr ptr, bool dispose = false)
 	{
 		Ptr = ptr;

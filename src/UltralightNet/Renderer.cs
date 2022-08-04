@@ -1,7 +1,7 @@
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
-using System.Threading;
 using UltralightNet.LowStuff;
 
 namespace UltralightNet;
@@ -57,7 +57,7 @@ public class Renderer : INativeContainer<Renderer>, INativeContainerInterface<Re
 	internal int ThreadId { get; set; } = -1;
 	internal void AssertNotWrongThread() // hungry
 	{
-		if (ThreadId is not -1 or int.MaxValue && ThreadId != Thread.CurrentThread.ManagedThreadId) throw new AggregateException("Wrong thread.");
+		if (ThreadId is not -1 or int.MaxValue && ThreadId != Environment.CurrentManagedThreadId) throw new AggregateException("Wrong thread.");
 	}
 
 	public View CreateView(uint width, uint height) => CreateView(width, height, new ULViewConfig());
@@ -70,7 +70,7 @@ public class Renderer : INativeContainer<Renderer>, INativeContainerInterface<Re
 		{
 			throw new Exception("No ULPlatform.GPUDriver set, but ULViewConfig.IsAccelerated==true. (Disable error by setting ULPlatform.ErrorGPUDriverNotSet to false.)");
 		}
-		View view = new(Methods.ulCreateView(Handle, width, height, viewConfig, session.Handle), dispose);
+		View view = new(Methods.ulCreateView(Handle, width, height, in viewConfig, session.Handle), dispose);
 		GC.KeepAlive(this);
 		view.Renderer = this;
 		return view;
@@ -102,6 +102,7 @@ public class Renderer : INativeContainer<Renderer>, INativeContainerInterface<Re
 	public void PurgeMemory() { Methods.ulPurgeMemory(Handle); GC.KeepAlive(this); }
 	public void LogMemoryUsage() { Methods.ulLogMemoryUsage(Handle); GC.KeepAlive(this); }
 
+	[SuppressMessage("Usage", "CA1816: Call GC.SupressFinalize correctly")]
 	public override void Dispose()
 	{
 		if (!IsDisposed && Owns) Methods.ulDestroyRenderer(Handle);
@@ -116,4 +117,6 @@ public class Renderer : INativeContainer<Renderer>, INativeContainerInterface<Re
 		if (other.IsDisposed) return IsDisposed;
 		return Handle == other.Handle;
 	}
+	public override bool Equals(object? other) => other is Renderer renderer && Equals(renderer);
+	public override int GetHashCode() => unchecked((int)(nuint)_ptr);
 }

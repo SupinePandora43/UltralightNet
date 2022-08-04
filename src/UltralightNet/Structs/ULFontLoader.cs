@@ -1,4 +1,5 @@
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Runtime.InteropServices;
 namespace UltralightNet;
 
@@ -29,8 +30,10 @@ public unsafe struct ULFontLoader : IDisposable, IEquatable<ULFontLoader>
 			: null;
 		}
 	}
+	[SuppressMessage("", "IDE1006: Naming rule violation")]
 	public _ULFontLoaderGetFallbackFont? _GetFallbackFont
 	{
+		[SuppressMessage("", "EPS09: An argument may be passed explicitly")]
 		set => ULPlatform.Handle(ref this, this with { __GetFallbackFont = value is not null ? (delegate* unmanaged[Cdecl]<ULString*>)Marshal.GetFunctionPointerForDelegate(value) : null }, value);
 		readonly get
 		{
@@ -56,8 +59,10 @@ public unsafe struct ULFontLoader : IDisposable, IEquatable<ULFontLoader>
 			: null;
 		}
 	}
+	[SuppressMessage("Code Rule", "IDE1006: Naming rule violation")]
 	public _ULFontLoaderGetFallbackFontForCharactersCallback? _GetFallbackFontForCharacters
 	{
+		[SuppressMessage("", "EPS09: An argument may be passed explicitly")]
 		set => ULPlatform.Handle(ref this, this with { __GetFallbackFontForCharacters = value is not null ? (delegate* unmanaged[Cdecl]<ULString*, int, bool, ULString*>)Marshal.GetFunctionPointerForDelegate(value) : null }, value);
 		readonly get
 		{
@@ -80,8 +85,10 @@ public unsafe struct ULFontLoader : IDisposable, IEquatable<ULFontLoader>
 			: null;
 		}
 	}
+	[SuppressMessage("Code Rule", "IDE1006: Naming rule violation")]
 	public _ULFontLoaderLoadCallback? _Load
 	{
+		[SuppressMessage("", "EPS09: An argument may be passed explicitly")]
 		set => ULPlatform.Handle(ref this, this with { __Load = value is not null ? (delegate* unmanaged[Cdecl]<ULString*, int, bool, ULFontFile>)Marshal.GetFunctionPointerForDelegate(value) : null }, value);
 		readonly get
 		{
@@ -99,10 +106,15 @@ public unsafe struct ULFontLoader : IDisposable, IEquatable<ULFontLoader>
 #pragma warning disable CS8909
 	public readonly bool Equals(ULFontLoader other) => __GetFallbackFont == other.__GetFallbackFont && __GetFallbackFontForCharacters == other.__GetFallbackFontForCharacters && __Load == other.__Load;
 #pragma warning restore CS8909
+	public override readonly bool Equals(object? other) => other is ULFontLoader fontLoader && Equals(fontLoader);
+
 	public override int GetHashCode() =>
 #if NETSTANDARD2_1 || NETCOREAPP2_1_OR_GREATER
 		HashCode.Combine((nuint)__GetFallbackFont, (nuint)__GetFallbackFontForCharacters, (nuint)__Load);
 #else
 		base.GetHashCode();
 #endif
+
+	public static bool operator ==(ULFontLoader left, ULFontLoader right) => left.Equals(right);
+	public static bool operator !=(ULFontLoader left, ULFontLoader right) => !(left == right);
 }

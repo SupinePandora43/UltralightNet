@@ -1,5 +1,6 @@
 using System;
 using System.Runtime.InteropServices;
+using System.Runtime.Versioning;
 
 namespace UltralightNet;
 
@@ -16,13 +17,15 @@ public static unsafe partial class Methods
 		[MarshalAs(UnmanagedType.I1)] bool is_system_key);
 
 #if NETSTANDARD || NETFRAMEWORK
-		[DllImport(LibUltralight)]
-		public static extern IntPtr ulCreateKeyEventWindows(ULKeyEventType type, UIntPtr wparam, IntPtr lparam);
-#if !NETFRAMEWORK
-		[DllImport(LibUltralight)]
-		public static extern IntPtr ulCreateKeyEventMacOS(IntPtr evt);
-#endif
+	[DllImport(LibUltralight)]
+	[SupportedOSPlatform("Windows")]
+	public static extern IntPtr ulCreateKeyEventWindows(ULKeyEventType type, UIntPtr wparam, IntPtr lparam);
+
+	[DllImport(LibUltralight)]
+	[SupportedOSPlatform("OSX")]
+	public static extern IntPtr ulCreateKeyEventMacOS(IntPtr evt);
 #else
+	[SupportedOSPlatform("Windows")]
 	public static IntPtr ulCreateKeyEventWindows(ULKeyEventType type, UIntPtr wparam, IntPtr lparam)
 	{
 		IntPtr ul = NativeLibrary.Load(LibUltralight);
@@ -36,6 +39,7 @@ public static unsafe partial class Methods
 		}
 	}
 
+	[SupportedOSPlatform("OSX")]
 	public static IntPtr ulCreateKeyEventMacOS(IntPtr nsevent)
 	{
 		IntPtr ul = NativeLibrary.Load(LibUltralight);
@@ -89,12 +93,9 @@ public class ULKeyEvent : IDisposable
 	/// <summary>
 	/// Create <see cref="ULKeyEvent"/> from Windows event
 	/// </summary>
+	[SupportedOSPlatform("Windows")]
 	public ULKeyEvent(ULKeyEventType type, UIntPtr wparam, IntPtr lparam)
 	{
-		// prevent EntryPointNotFoundException
-#if !NETFRAMEWORK
-		if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows)) throw new PlatformNotSupportedException("Windows only");
-#endif
 		Ptr = Methods.ulCreateKeyEventWindows(type, wparam, lparam);
 	}
 
@@ -102,15 +103,10 @@ public class ULKeyEvent : IDisposable
 	/// Create a key event from native macOS event.
 	/// </summary>
 	/// <param name="evt">NSEvent*</param>
+	[SupportedOSPlatform("OSX")]
 	public static ULKeyEvent CreateFromNSEvent(IntPtr evt)
 	{
-		// prevent EntryPointNotFoundException
-#if NETFRAMEWORK
-			throw new PlatformNotSupportedException("MacOS only");
-#else
-		if (!RuntimeInformation.IsOSPlatform(OSPlatform.OSX)) throw new PlatformNotSupportedException("MacOS only");
 		return new(Methods.ulCreateKeyEventMacOS(evt), true);
-#endif
 	}
 
 	~ULKeyEvent() => Dispose();

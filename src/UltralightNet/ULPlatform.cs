@@ -1,6 +1,8 @@
 using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.IO;
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Threading;
 using UltralightNet.LowStuff;
@@ -245,10 +247,26 @@ public static unsafe class ULPlatform
 	public static Renderer CreateRenderer() => CreateRenderer(new());
 	public static Renderer CreateRenderer(ULConfig config, bool dispose = true)
 	{
-		if (config == default(ULConfig)) throw new ArgumentException($"You passed default({nameof(ULConfig)}). It's invalid. Use at least \"new {nameof(ULConfig)}()\"", nameof(config));
+		if (config == default) throw new ArgumentException($"You passed default({nameof(ULConfig)}). It's invalid. Use at least \"new {nameof(ULConfig)}()\" instead.", nameof(config));
 		if (SetDefaultFileSystem && !fileSystemSet) // TODO
 		{
 			Console.WriteLine("UltralightNet: no filesystem set, default (with access only to required files) will be used.");
+
+#if NET5_0_OR_GREATER
+			[UnmanagedCallersOnly(CallConvs = new Type[] { typeof(CallConvCdecl) })]
+#endif
+			static ULString* GetFileMimeType(ULString* file)
+			{
+				var span = file->ToString();
+				string result; // C#VER: utf8 (u8)
+
+				if (span.EndsWith(".css")) result = "text/css";
+				else if (span.EndsWith(".js")) result = "application/javascript";
+				else result = "application/octet-stream";
+
+				ULString returnValue = new(result.AsSpan());
+				return returnValue.Allocate();
+			}
 
 			FileSystem = new()
 			{
@@ -265,16 +283,11 @@ public static unsafe class ULPlatform
 						_ => false
 					};
 				},
-				GetFileMimeType = (string file) =>
-				{
-					return file switch
-					{
-						"resources/mediaControls.css" => "text/css",
-						"resources/mediaControls.js" => "application/javascript",
-						"resources/mediaControlsLocalizedStrings.js" => "application/javascript",
-						_ => "application/octet-stream" // or "application/unknown"
-					};
-				},
+#if NET5_0_OR_GREATER
+				__GetFileMimeType = &GetFileMimeType,
+#else
+				_GetFileMimeType = GetFileMimeType,
+#endif
 				GetFileCharset = (string file) => "utf-8",
 				_OpenFile = (ULString* file) =>
 				{
@@ -297,8 +310,12 @@ public static unsafe class ULPlatform
 						{
 							var bytes = new byte[s.Length];
 							int len = s.Read(bytes, 0, checked((int)s.Length));
+#pragma warning disable IDE0057
 							buffer = ULBuffer.CreateFromDataCopy<byte>(bytes.AsSpan().Slice(0, len));
+#pragma warning restore IDE0057
 						}
+
+						GC.KeepAlive(s);
 
 						return buffer;
 					}
@@ -323,8 +340,8 @@ public static unsafe class ULPlatform
 				LogMessage = (ULLogLevel level, string message) => { foreach (ReadOnlySpan<char> line in new LineEnumerator(message.AsSpan())) { Console.WriteLine($"(UL) {level}: {line.ToString()}"); } }
 			};
 		}
-		var returnValue = Renderer.FromHandle((Handle<Renderer>)Methods.ulCreateRenderer(config), true);
-		returnValue.ThreadId = Thread.CurrentThread.ManagedThreadId;
+		var returnValue = Renderer.FromHandle(Methods.ulCreateRenderer(in config), true);
+		returnValue.ThreadId = Environment.CurrentManagedThreadId;
 		return returnValue;
 	}
 }

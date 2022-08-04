@@ -42,3 +42,33 @@ namespace System.Diagnostics.CodeAnalysis
 	}
 }
 #endif
+
+#if !NET5_0_OR_GREATER
+namespace System.Runtime.Versioning
+{
+	internal abstract class OSPlatformAttribute : Attribute
+	{
+		//
+		// Сводка:
+		//     Gets the name and optional version of the platform that the attribute applies
+		//     to.
+		//
+		// Возврат:
+		//     The applicable platform name and optional version.
+		public string PlatformName { get; }
+
+		private protected OSPlatformAttribute(string platformName)
+		{
+			PlatformName = platformName;
+		}
+	}
+	[AttributeUsage(AttributeTargets.Assembly | AttributeTargets.Module | AttributeTargets.Class | AttributeTargets.Struct | AttributeTargets.Enum | AttributeTargets.Constructor | AttributeTargets.Method | AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Event | AttributeTargets.Interface, AllowMultiple = true, Inherited = false)]
+	internal sealed class SupportedOSPlatformAttribute : OSPlatformAttribute
+	{
+		public SupportedOSPlatformAttribute(string platformName)
+			: base(platformName)
+		{
+		}
+	}
+}
+#endif

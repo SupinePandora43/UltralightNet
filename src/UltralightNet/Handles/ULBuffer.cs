@@ -1,9 +1,9 @@
 using System;
-using System.Diagnostics;
 using System.Runtime.InteropServices;
 
 namespace UltralightNet;
 
+[UnmanagedFunctionPointer(CallingConvention.Cdecl)]
 public unsafe delegate void DestroyBufferCallback(void* userData, void* data);
 
 public unsafe struct ULBuffer : IDisposable, IEquatable<ULBuffer> // TODO: INativeContainer
@@ -106,13 +106,19 @@ public unsafe struct ULBuffer : IDisposable, IEquatable<ULBuffer> // TODO: INati
 		if (handle == buffer.handle) return true;
 		if (handle is 0 || buffer.handle is 0) return false;
 		nuint size = Size;
-		if (size != buffer.Size || OwnsData != buffer.OwnsData) return false;
+		if (size != buffer.Size) return false;
 		byte* data = Data, bufferData = buffer.Data;
 		if (data == bufferData) return true;
-		if (size < (nuint)int.MaxValue) return new ReadOnlySpan<byte>(data, unchecked((int)size)).SequenceEqual(new ReadOnlySpan<byte>(bufferData, unchecked((int)size)));
+		if (size < int.MaxValue) return new ReadOnlySpan<byte>(data, unchecked((int)size)).SequenceEqual(new ReadOnlySpan<byte>(bufferData, unchecked((int)size)));
 		else
 			for (nuint i = 0; i < Size; i++)
 				if (data[i] != bufferData[i]) return false;
 		return true;
 	}
+
+	public readonly override bool Equals(object? obj) => obj is ULBuffer buffer && Equals(buffer);
+	public override int GetHashCode() => unchecked((int)handle);
+
+	public static bool operator ==(ULBuffer left, ULBuffer right) => left.Equals(right);
+	public static bool operator !=(ULBuffer left, ULBuffer right) => !(left == right);
 }

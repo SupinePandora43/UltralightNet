@@ -1,4 +1,5 @@
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
@@ -8,13 +9,6 @@ namespace UltralightNet;
 [StructLayout(LayoutKind.Sequential)]
 public unsafe struct ULFileSystem : IDisposable, IEquatable<ULFileSystem>
 {
-	public static nuint InvalidFileHandle =>
-#if NET5_0_OR_GREATER
-		nuint.MaxValue; // -1 is equal to MaxValue. Don't ask me how - i don't know either.
-#else
-			sizeof(void*) == 8 ? unchecked((nuint)ulong.MaxValue) : uint.MaxValue;
-#endif
-
 	public ULFileSystemFileExistsCallback? FileExists
 	{
 		set => _FileExists = value is null ? null : (path) => Unsafe.As<bool, byte>(ref Unsafe.AsRef(value(ULString.NativeToManaged(path))));
@@ -36,7 +30,7 @@ public unsafe struct ULFileSystem : IDisposable, IEquatable<ULFileSystem>
 			var c = _GetFileMimeType;
 			return c is null ? null : (string path) =>
 			{
-				using ULString uPath = new ULString(path.AsSpan());
+				using ULString uPath = new(path.AsSpan());
 				ULString* mime = c(&uPath);
 				string retVal = ULString.NativeToManaged(mime);
 				mime->Deallocate();
@@ -52,7 +46,7 @@ public unsafe struct ULFileSystem : IDisposable, IEquatable<ULFileSystem>
 			var c = _GetFileCharset;
 			return c is null ? null : (string path) =>
 			{
-				using ULString uPath = new ULString(path.AsSpan());
+				using ULString uPath = new(path.AsSpan());
 				ULString* mime = c(&uPath);
 				string retVal = ULString.NativeToManaged(mime);
 				mime->Deallocate();
@@ -94,8 +88,10 @@ public unsafe struct ULFileSystem : IDisposable, IEquatable<ULFileSystem>
 			};
 		}
 	}
+	[SuppressMessage("Code Rule", "IDE1006: Naming rule violation")]
 	public ULFileSystemFileExistsCallback__PInvoke__? _FileExists
 	{
+		[SuppressMessage("", "EPS09: An argument may be passed explicitly")]
 		set => ULPlatform.Handle(ref this, this with { __FileExists = value is null ? null : (delegate* unmanaged[Cdecl]<ULString*, byte>)Marshal.GetFunctionPointerForDelegate(value) }, value);
 		readonly get
 		{
@@ -103,8 +99,10 @@ public unsafe struct ULFileSystem : IDisposable, IEquatable<ULFileSystem>
 			return p is null ? null : (path) => p(path);
 		}
 	}
+	[SuppressMessage("Code Rule", "IDE1006: Naming rule violation")]
 	public ULFileSystemGetFileMimeTypeCallback__PInvoke__? _GetFileMimeType
 	{
+		[SuppressMessage("", "EPS09: An argument may be passed explicitly")]
 		set => ULPlatform.Handle(ref this, this with { __GetFileMimeType = value is null ? null : (delegate* unmanaged[Cdecl]<ULString*, ULString*>)Marshal.GetFunctionPointerForDelegate(value) }, value);
 		readonly get
 		{
@@ -112,8 +110,10 @@ public unsafe struct ULFileSystem : IDisposable, IEquatable<ULFileSystem>
 			return p is null ? null : (path) => p(path);
 		}
 	}
+	[SuppressMessage("Code Rule", "IDE1006: Naming rule violation")]
 	public ULFileSystemGetFileCharsetCallback__PInvoke__? _GetFileCharset
 	{
+		[SuppressMessage("", "EPS09: An argument may be passed explicitly")]
 		set => ULPlatform.Handle(ref this, this with { __GetFileCharset = value is null ? null : (delegate* unmanaged[Cdecl]<ULString*, ULString*>)Marshal.GetFunctionPointerForDelegate(value) }, value);
 		readonly get
 		{
@@ -121,8 +121,10 @@ public unsafe struct ULFileSystem : IDisposable, IEquatable<ULFileSystem>
 			return p is null ? null : (path) => p(path);
 		}
 	}
+	[SuppressMessage("Code Rule", "IDE1006: Naming rule violation")]
 	public ULFileSystemOpenFileCallback__PInvoke__? _OpenFile
 	{
+		[SuppressMessage("", "EPS09: An argument may be passed explicitly")]
 		set => ULPlatform.Handle(ref this, this with { __OpenFile = value is null ? null : (delegate* unmanaged[Cdecl]<ULString*, ULBuffer>)Marshal.GetFunctionPointerForDelegate(value) }, value);
 		readonly get
 		{
@@ -138,14 +140,18 @@ public unsafe struct ULFileSystem : IDisposable, IEquatable<ULFileSystem>
 
 	public void Dispose()
 	{
-		ULPlatform.Free(this);
+		ULPlatform.Free(in this);
 	}
+
 #pragma warning disable CS8909
 	public readonly bool Equals(ULFileSystem other) => __FileExists == other.__FileExists && __GetFileMimeType == other.__GetFileMimeType && __GetFileCharset == other.__GetFileCharset && __OpenFile == other.__OpenFile;
 #pragma warning restore CS8909
-	public readonly override bool Equals(object? other) => other is ULFileSystem fileSystem ? Equals(fileSystem) : false;
+	public readonly override bool Equals(object? other) => other is ULFileSystem fileSystem && Equals(fileSystem);
 
 #if NETSTANDARD2_1 || NETCOREAPP2_1_OR_GREATER
 	public readonly override int GetHashCode() => HashCode.Combine((nuint)__FileExists, (nuint)__GetFileMimeType, (nuint)__GetFileCharset, (nuint)__OpenFile);
 #endif
+
+	public static bool operator ==(ULFileSystem left, ULFileSystem right) => left.Equals(right);
+	public static bool operator !=(ULFileSystem left, ULFileSystem right) => !(left == right);
 }
