@@ -199,7 +199,6 @@ void main()
 			gpuDriver.CommandList = commandList;
 
 			AppCoreMethods.ulEnablePlatformFileSystem("./");
-			ULPlatform.Logger = new ULLogger() { LogMessage = (ULLogLevel lvl, in string msg) => Console.WriteLine(msg) };
 			AppCoreMethods.ulEnablePlatformFontLoader();
 			ULPlatform.GPUDriver = gpuDriver.GetGPUDriver();
 
@@ -210,9 +209,9 @@ void main()
 
 			const string url = "https://en.key-test.ru/";//*/"https://github.com/SupinePandora43";
 
-			//view.URL = url;
+			view.URL = url;
 
-			view.HTML = "<html><body><p>123</p></body></html>";
+			//view.HTML = "<html><body><p>123</p></body></html>";
 			//view.URL = "https://github.com";
 			//view.URL = "https://youtu.be/YNL692WN6EE";
 			//cpuView.URL = url;
@@ -316,10 +315,11 @@ void main()
 			};
 			window.MouseWheel += (mw) =>
 			{
+				Console.WriteLine(mw.WheelDelta);
 				ULScrollEvent scrollEvent = new()
 				{
 					Type = ULScrollEventType.ByPixel,
-					DeltaY = (int)mw.WheelDelta * 100
+					DeltaY = (int)mw.WheelDelta*16//(int)((mw.WheelDelta / scale)*0.8) // PixelsToScreen(Delta) * 0.8 from AppCore/win/WindowWin.cpp(h)
 				};
 				view.FireScrollEvent(scrollEvent);
 				//cpuView.FireScrollEvent(scrollEvent);
@@ -371,8 +371,6 @@ void main()
 				//view.EvaluateScript("window.location = \"https://heeeeeeeey.com/\"", out string exception);
 			});
 
-			IntPtr rendererPtr = renderer.Ptr;
-
 			uint frame_of_second = 0;
 
 			framerateStopwatch.Restart();
@@ -384,14 +382,14 @@ void main()
 				if (framerateStopwatch.ElapsedMilliseconds / 1000 >= 1)
 				{
 					fps = frame_of_second;
-					Console.WriteLine(fps);
+					//Console.WriteLine(fps);
 					frame_of_second = 0;
 					framerateStopwatch.Restart();
 				}
 
 				commandList.Begin();
 				//Console.WriteLine("Update");
-				Methods.ulUpdate(rendererPtr);
+				renderer.Update();
 				gpuDriver.time = stopwatch.ElapsedTicks / 1000f;
 				//Console.WriteLine("Render");
 				renderer.Render();

@@ -7,7 +7,7 @@
 			"type": "process",
 			"args": [
 				"build",
-				"-c", "Release",
+				"-c", "Debug",
 				"${workspaceFolder}/Examples/gpu/UltralightNet.OpenGL.TestApp/UltralightNet.OpenGL.TestApp.csproj",
 				"/property:GenerateFullPaths=true",
 				"/consoleloggerparameters:NoSummary"

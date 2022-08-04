@@ -207,11 +207,19 @@ unsafe class HelloTriangleApplication
 		input.Mice[0].MouseDown += OnMouseDown;
 		input.Mice[0].MouseUp += OnMouseUp;
 		input.Mice[0].MouseMove += OnMouseMove;
+
+		input.Keyboards[0].KeyChar += (keyboard, character) => view.FireKeyEvent(new(
+			ULKeyEventType.Char,
+			(keyboard.IsKeyPressed(Key.AltLeft) || keyboard.IsKeyPressed(Key.AltRight) ? ULKeyEventModifiers.AltKey : 0) |
+			(keyboard.IsKeyPressed(Key.ControlLeft) || keyboard.IsKeyPressed(Key.ControlRight) ? ULKeyEventModifiers.CtrlKey : 0) |
+			(keyboard.IsKeyPressed(Key.SuperLeft) || keyboard.IsKeyPressed(Key.SuperRight) ? ULKeyEventModifiers.MetaKey : 0) |
+			(keyboard.IsKeyPressed(Key.ShiftLeft) || keyboard.IsKeyPressed(Key.ShiftRight) ? ULKeyEventModifiers.ShiftKey : 0),
+			0, 0, character.ToString(), character.ToString(), false, false, false));
 	}
 
 	void OnScroll(IMouse _, ScrollWheel scroll)
 	{
-		view.FireScrollEvent(new ULScrollEvent { Type = ULScrollEventType.ByPixel, DeltaX = (int)scroll.X * 100, DeltaY = (int)scroll.Y * 100 });
+		view.FireScrollEvent(new ULScrollEvent { Type = ULScrollEventType.ByPage, DeltaX = (int)scroll.X, DeltaY = (int)scroll.Y });
 	}
 
 	void OnMouseDown(IMouse mouse, MouseButton button)
@@ -275,13 +283,13 @@ unsafe class HelloTriangleApplication
 		dr.commandBuffer = BeginSingleTimeCommands();
 		dr.graphicsQueue = graphicsQueue;
 		ULPlatform.GPUDriver = dr.GPUDriver;
-		renderer = ULPlatform.CreateRenderer(new ULConfig() { ForceRepaint = true, FaceWinding = ULFaceWinding.CounterClockwise, MaxUpdateTime = (double)1/(double)61 });
+		renderer = ULPlatform.CreateRenderer(new ULConfig() { ForceRepaint = true, FaceWinding = ULFaceWinding.CounterClockwise, MaxUpdateTime = (double)1/(double)120,ScrollTimerDelay = 1f/120f });
 		view = renderer.CreateView((uint)window!.Size.X, (uint)window!.Size.Y, new() { IsAccelerated = true, IsTransparent = false });
 		bool loaded = false;
 		view.OnFinishLoading += (frameId, isMain, url) => loaded = true;
 		//view.HTML = "<html><body><p>123</p></body></html>";
-		view.URL = "https://github.com";
-		//view.URL = "https://www.youtube.com/watch?v=N1v4TjntTJI";
+		//view.URL = "https://github.com";
+		view.URL = "https://www.youtube.com/watch?v=N1v4TjntTJI";
 		while (!loaded) { renderer.Update(); Thread.Sleep(10); }
 
 		renderer.Render();
@@ -2182,10 +2190,11 @@ unsafe class HelloTriangleApplication
 
 	private static PresentModeKHR ChoosePresentMode(IReadOnlyList<PresentModeKHR> availablePresentModes)
 	{
-		return availablePresentModes.Contains(PresentModeKHR.PresentModeMailboxKhr) ? PresentModeKHR.PresentModeMailboxKhr // vsync buffering
-			: availablePresentModes.Contains(PresentModeKHR.PresentModeImmediateKhr) ? PresentModeKHR.PresentModeImmediateKhr // instant
-			: availablePresentModes.Contains(PresentModeKHR.PresentModeFifoRelaxedKhr) ? PresentModeKHR.PresentModeFifoRelaxedKhr // kinda vsync
-			: PresentModeKHR.PresentModeFifoKhr; // vsync
+		return //availablePresentModes.Contains(PresentModeKHR.PresentModeMailboxKhr) ? PresentModeKHR.PresentModeMailboxKhr // vsync buffering
+			//: availablePresentModes.Contains(PresentModeKHR.PresentModeImmediateKhr) ? PresentModeKHR.PresentModeImmediateKhr // instant
+			//: availablePresentModes.Contains(PresentModeKHR.PresentModeFifoRelaxedKhr) ? PresentModeKHR.PresentModeFifoRelaxedKhr // kinda vsync
+			//:
+			PresentModeKHR.PresentModeFifoKhr; // vsync
 	}
 
 	private Extent2D ChooseSwapExtent(SurfaceCapabilitiesKHR capabilities)

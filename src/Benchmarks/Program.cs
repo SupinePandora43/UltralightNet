@@ -1,53 +1,44 @@
+using System;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using BenchmarkDotNet.Attributes;
+using BenchmarkDotNet.Configs;
+using BenchmarkDotNet.Environments;
+using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Running;
 using UltralightNet;
 
 namespace Benchmarks;
 
+public class MyConfig : ManualConfig
+{
+	public MyConfig()
+	{
+		AddJob(Job.Default.WithRuntime(CoreRuntime.Core60));
+		// AddJob(Job.Default.WithRuntime(CoreRuntime.CreateForNewVersion("net7.0", ".NET Core 7")));
+	}
+}
+
 public class Program
 {
 	static void Main()
 	{
-		BenchmarkRunner.Run<StringBenchmark>();
+		BenchmarkRunner.Run<SimdBenchmark>();
+		//BenchmarkRunner.Run<StringBenchmark>();
 		//BenchmarkSwitcher.FromAssembly(typeof(Program).Assembly).Run(null, new DebugInProcessConfig());
 	}
 }
 
-[MemoryDiagnoser]
-public unsafe class StringBenchmark
+[Config(typeof(MyConfig))]
+public class SimdBenchmark
 {
-	public StringBenchmark() { }
-
-	private const int Step = 1024;
-	private const int Steps = 10;
-
-	public static IEnumerable<string> GetTestStrings()
+	public static IEnumerable<ULIntRect> GetRects()
 	{
-		for (int step = 0; step < Steps; step++)
-		{
-			yield return new('Ё', step * Step);
-		}
+		yield return new() { Left = 0, Top = 0, Right = 512, Bottom = 512 };
 	}
 
 	[Benchmark]
-	[ArgumentsSource(nameof(GetTestStrings))]
-	public void ulCreateStringUTF16(string str)
-	{
-		ULString* n = Methods.ulCreateStringUTF16(str, (nuint)str.Length);
-		Methods.ulDestroyString(n);
-	}
-	[Benchmark]
-	[ArgumentsSource(nameof(GetTestStrings))]
-	public void Managed(string str)
-	{
-		ULString* n = (ULString*)NativeMemory.Alloc((nuint)sizeof(ULString));
-
-		*n = new(str);
-
-		n->Dispose();
-
-		NativeMemory.Free(n);
-	}
+	[ArgumentsSource(nameof(GetRects))]
+	public ULIntRect ToIntRect(ULRect rect) => (ULIntRect)rect;
 }

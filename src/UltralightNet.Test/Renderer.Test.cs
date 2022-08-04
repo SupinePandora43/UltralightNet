@@ -1,4 +1,8 @@
 using System;
+using System.Diagnostics;
+using System.IO;
+using System.Runtime.InteropServices;
+using System.Text;
 using System.Threading;
 using Xunit;
 
@@ -147,7 +151,7 @@ public class RendererTest
 	}
 
 	[Fact]
-	private void EventTest()
+	public void EventTest()
 	{
 		using View view = Renderer.CreateView(256, 256, ViewConfig);
 		Console.WriteLine("KeyEvent");
@@ -159,10 +163,54 @@ public class RendererTest
 	}
 
 	[Fact]
-	private void MemoryTest()
+	public void MemoryTest()
 	{
 		Renderer.LogMemoryUsage();
 		Renderer.PurgeMemory();
 		Renderer.LogMemoryUsage();
 	}
+
+	/*[Fact]
+	public unsafe void Gio()
+	{
+		nint gio = default;
+		try
+		{
+			gio = NativeLibrary.Load(OperatingSystem.IsWindows() ? "gio-2.0-0.dll" : "gio-2.0");
+
+			delegate* unmanaged[Cdecl]<byte*, byte*, nuint, int*, byte*> g_content_type_guess = (delegate* unmanaged[Cdecl]<byte*, byte*, nuint, int*, byte*>)NativeLibrary.GetExport(gio, "g_content_type_guess");
+			delegate* unmanaged[Cdecl]<byte*, byte*> g_content_type_get_mime_type = (delegate* unmanaged[Cdecl]<byte*, byte*>)NativeLibrary.GetExport(gio, "g_content_type_get_mime_type");
+
+			ULString* file = new ULString("resources/mediaControls.css".AsSpan()).Allocate();
+
+			/*Stream? s = file->ToString() switch
+			{
+				"resources/cacert.pem" => Resources.Cacertpem,
+				"resources/icudt67l.dat" => Resources.Icudt67ldat,
+				"resources/mediaControls.css" => Resources.MediaControlscss,
+				"resources/mediaControls.js" => Resources.MediaControlsjs,
+				"resources/mediaControlsLocalizedStrings.js" => Resources.MediaControlsLocalizedStringsjs,
+				_ => null
+			};*/
+
+			Stream? s = Resources.MediaControlscss;
+
+			if (s is not UnmanagedMemoryStream unmanagedMemoryStream) throw new FileNotFoundException();
+
+			//fixed (char* p = "resources/mediaControlsLocalizedStrings.js")
+			int resultUncertain = 100;
+			byte* content_type = g_content_type_guess(file->data, (byte*)unmanagedMemoryStream.PositionPointer, checked((nuint)unmanagedMemoryStream.Length), &resultUncertain);
+			if (content_type is null) throw new FormatException();
+			byte* mime = g_content_type_get_mime_type(content_type);
+			// NativeMemory.Free(content_type);
+
+			var str = Encoding.UTF8.GetString(MemoryMarshal.CreateReadOnlySpanFromNullTerminated(mime));
+
+			GC.KeepAlive(unmanagedMemoryStream);
+		}
+		finally
+		{
+			if (gio is not 0) NativeLibrary.Free(gio);
+		}
+	}*/
 }
