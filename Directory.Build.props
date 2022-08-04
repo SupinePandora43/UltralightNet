@@ -18,6 +18,10 @@
 
 		<NoWarn>1006</NoWarn>
 		<AnalysisModeReliability>all</AnalysisModeReliability>
+
+		<IsTrimmable>true</IsTrimmable>
+		<PublishTrimmed>true</PublishTrimmed>
+		<TrimMode>link</TrimMode>
 	</PropertyGroup>
 
 	<ItemGroup>
