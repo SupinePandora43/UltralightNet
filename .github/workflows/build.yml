@@ -79,10 +79,9 @@ jobs:
         run: | # missing libraries workaround
           sudo add-apt-repository ppa:linuxuprising/libpng12
           sudo apt update
-          sudo apt install libpng12-0
+          sudo apt install libpng12-0 libpulse0 libxv1
           find /usr/lib -name "libffi.so*"
           sudo ln -s  /usr/lib/x86_64-linux-gnu/libffi.so.7.1.0  /usr/lib/x86_64-linux-gnu/libffi.so.6
-          sudo apt-get install libpulse0
         if: matrix.os=='ubuntu'
       - name: Download packages
         uses: actions/download-artifact@v3
