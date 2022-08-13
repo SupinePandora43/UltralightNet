@@ -191,7 +191,7 @@ public class RendererTest
 				"resources/mediaControls.js" => Resources.MediaControlsjs,
 				"resources/mediaControlsLocalizedStrings.js" => Resources.MediaControlsLocalizedStringsjs,
 				_ => null
-			};*/
+			};
 
 			Stream? s = Resources.MediaControlscss;
 
