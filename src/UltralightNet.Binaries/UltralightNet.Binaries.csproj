@@ -11,6 +11,7 @@
 
 		<PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
 
+		<PackageLicenseExpression></PackageLicenseExpression>
 		<PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
 	</PropertyGroup>
 	<ItemGroup>
