@@ -10,14 +10,6 @@
 		<!-- <PackageLicenseFile>LICENSE.txt</PackageLicenseFile> -->
 	</PropertyGroup>
 	<ItemGroup>
-		<_NativeAssetName Include="runtimes/win-x64/native/AppCore.dll" PackagePath="runtimes/win-x64/native" />
-		<_NativeAssetName Include="runtimes/osx-x64/native/libAppCore.dylib" PackagePath="runtimes/osx-x64/native" />
-		<_NativeAssetName Include="runtimes/linux-x64/native/libAppCore.so" PackagePath="runtimes/linux-x64/native" />
-
-		<_ExistingAssets Include="@(_NativeAssetName)" />
-		<Content Include="@(_ExistingAssets->'%(Identity)')" CopyToOutputDirectory="PreserveNewest" PackagePath="%(PackagePath)" Pack="true" />
-	</ItemGroup>
-	<ItemGroup>
 		<PackageReference Include="Microsoft.Interop.DllImportGenerator" Version="7.0.0-preview.3.22123.2" OutputItemType="Analyzer" ReferenceOutputAssembly="false" PrivateAssets="All" />
 		<PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0" PrivateAssets="All" />
 		<PackageReference Include="System.ValueTuple" Version="4.5.0" PrivateAssets="All" />
