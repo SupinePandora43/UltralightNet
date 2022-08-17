@@ -18,8 +18,8 @@
 
 		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
 		<Nullable>enable</Nullable>
-		<LangVersion>preview</LangVersion>
-		<ImplicitUsings>enable</ImplicitUsings>
+		<LangVersion>10</LangVersion> <!-- Set to 11, when .NET 7 comes out <3 -->
+		<ImplicitUsings>disable</ImplicitUsings>
 
 		<NoWarn>1006</NoWarn>
 		<AnalysisModeReliability>all</AnalysisModeReliability>

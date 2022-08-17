@@ -26,7 +26,6 @@
 		<PackageReference Include="ErrorProne.NET.CoreAnalyzers" Version="0.4.0-beta.1" OutputItemType="Analyzer" ReferenceOutputAssembly="false" PrivateAssets="All" />
 
 		<PackageReference Include="Microsoft.Interop.DllImportGenerator" Version="7.0.0-preview.3.22123.2" OutputItemType="Analyzer" ReferenceOutputAssembly="false" PrivateAssets="All" />
-		<PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0" PrivateAssets="All" />
 
 		<PackageReference Condition="'$(TargetFramework)'!='net5.0'" Include="System.Memory" Version="4.5.4" />
 		<PackageReference Condition="'$(TargetFramework)'!='net5.0'" Include="System.Numerics.Vectors" Version="4.5.0" />
