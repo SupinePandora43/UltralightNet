@@ -115,4 +115,5 @@ public unsafe struct ULGPUState : IEquatable<ULGPUState>
 		&& ClipSize == other.ClipSize && Clip.SequenceEqual(other.Clip)
 		&& EnableScissor == other.EnableScissor
 		&& ScissorRect == other.ScissorRect;
+	public override readonly bool Equals(object? other) => other is ULGPUState otherState && Equals(otherState);
 }
