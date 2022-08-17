@@ -12,7 +12,6 @@
 		<RunAnalyzers>false</RunAnalyzers>
 	</PropertyGroup>
 	<ItemGroup>
-		<PackageReference Condition="'$(TargetFramework)'!='net5.0'" Include="System.Memory" Version="4.5.4" />
 		<Content Include="resources/cacert.pem">
 			<Pack>True</Pack>
 			<CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
