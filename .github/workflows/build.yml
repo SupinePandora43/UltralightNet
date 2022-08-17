@@ -1,4 +1,4 @@
-name: Build & Test
+name: Main CI
 on:
   push:
     branches: [ '*' ]
@@ -55,10 +55,11 @@ jobs:
         run: echo "version_suffix=dev-$(date -u +%Y%m%d%H%M%S)-$(git rev-parse --short ${{ github.sha }})" >> $GITHUB_ENV
       - name: Pack
         run: |
-          dotnet pack src/UltralightNet.Binaries -c Release --version-suffix ${{ env.version_suffix }}
-          dotnet pack src/UltralightNet -c Release --version-suffix ${{ env.version_suffix }}
-          dotnet pack src/UltralightNet.AppCore -c Release --version-suffix ${{ env.version_suffix }}
-          dotnet pack src/UltralightNet.Resources -c Release --version-suffix ${{ env.version_suffix }}
+          dotnet pack src/UltralightNet.Binaries -c Release --version-suffix ${{ env.version_suffix }} -p:RepositoryBranch=${{ github.ref_name }} -p:RepositoryCommit=${{ github.sha }}
+          dotnet pack src/UltralightNet.Resources -c Release --version-suffix ${{ env.version_suffix }} -p:RepositoryBranch=${{ github.ref_name }} -p:RepositoryCommit=${{ github.sha }}
+          dotnet pack src/UltralightNet -c Release --version-suffix ${{ env.version_suffix }} -p:RepositoryBranch=${{ github.ref_name }} -p:RepositoryCommit=${{ github.sha }}
+          dotnet pack src/UltralightNet.AppCore.Binaries -c Release --version-suffix ${{ env.version_suffix }} -p:RepositoryBranch=${{ github.ref_name }} -p:RepositoryCommit=${{ github.sha }}
+          dotnet pack src/UltralightNet.AppCore -c Release --version-suffix ${{ env.version_suffix }} -p:RepositoryBranch=${{ github.ref_name }} -p:RepositoryCommit=${{ github.sha }}
       - name: Publish
         run: dotnet nuget push *.nupkg --api-key ${{ github.token }} --source github
   Test:
@@ -124,15 +125,13 @@ jobs:
         dotnet-version: 6.0.100
     - name: Pack
       run: |
-        dotnet pack -c Release UltralightNet.Binaries
-        dotnet pack -c Release UltralightNet
-        dotnet pack -c Release UltralightNet.AppCore
-        dotnet pack -c Release UltralightNet.Resources
+        dotnet pack src/UltralightNet.Binaries -c Release --version-suffix ${{ env.version_suffix }} -p:RepositoryBranch=${{ github.ref_name }} -p:RepositoryCommit=${{ github.sha }}
+        dotnet pack src/UltralightNet.Resources -c Release --version-suffix ${{ env.version_suffix }} -p:RepositoryBranch=${{ github.ref_name }} -p:RepositoryCommit=${{ github.sha }}
+        dotnet pack src/UltralightNet -c Release --version-suffix ${{ env.version_suffix }} -p:RepositoryBranch=${{ github.ref_name }} -p:RepositoryCommit=${{ github.sha }}
+        dotnet pack src/UltralightNet.AppCore.Binaries -c Release --version-suffix ${{ env.version_suffix }} -p:RepositoryBranch=${{ github.ref_name }} -p:RepositoryCommit=${{ github.sha }}
+        dotnet pack src/UltralightNet.AppCore -c Release --version-suffix ${{ env.version_suffix }} -p:RepositoryBranch=${{ github.ref_name }} -p:RepositoryCommit=${{ github.sha }}
     - run: tree
     - name: Publish
       run: |
-        dotnet nuget push UltralightNet.Binaries.*.nupkg -k ${{ secrets.NUGET_TOKEN }} --source https://api.nuget.org/v3/index.json
-        dotnet nuget push UltralightNet.*.nupkg -k ${{ secrets.NUGET_TOKEN }} --source https://api.nuget.org/v3/index.json
-        dotnet nuget push UltralightNet.AppCore.*.nupkg -k ${{ secrets.NUGET_TOKEN }} --source https://api.nuget.org/v3/index.json
-        dotnet nuget push UltralightNet.Resources.*.nupkg -k ${{ secrets.NUGET_TOKEN }} --source https://api.nuget.org/v3/index.json
+        dotnet nuget push *.nupkg -k ${{ secrets.NUGET_TOKEN }} --source https://api.nuget.org/v3/index.json
       # continue-on-error: true

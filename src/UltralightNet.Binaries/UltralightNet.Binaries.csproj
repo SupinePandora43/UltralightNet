@@ -1,12 +1,15 @@
 <Project Sdk="Microsoft.NET.Sdk">
-
 	<PropertyGroup>
 		<TargetFrameworks>net6.0;net471;net46;net451;net45;netstandard2.1;netstandard2</TargetFrameworks>
 		<Platform>x64</Platform>
 
 		<Authors>Ultralight, Inc.</Authors>
 		<PackageId>UltralightNet.Binaries</PackageId>
-		<Description>Ultralight's binaries</Description>
+		<Description>Ultralight binaries</Description>
+
+		<Copyright>Ultralight, Inc.</Copyright>
+
+		<PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
 
 		<PackageLicenseFile>LICENSE.txt</PackageLicenseFile>
 	</PropertyGroup>

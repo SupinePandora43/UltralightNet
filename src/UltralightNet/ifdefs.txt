@@ -1,2 +1,0 @@
-`UL_CONSERVATIVEHEAP` - use less heap memory
-`UL_CONSERVATIVESTACK` - use less stack memory

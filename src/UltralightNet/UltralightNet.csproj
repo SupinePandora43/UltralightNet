@@ -1,15 +1,8 @@
 <Project Sdk="Microsoft.NET.Sdk">
 	<PropertyGroup>
 		<TargetFrameworks>net6.0;net471;net46;net451;net45;netstandard2.1;netstandard2</TargetFrameworks>
-		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-		<EmitCompilerGeneratedFiles>true</EmitCompilerGeneratedFiles>
-		<LangVersion>preview</LangVersion>
 		<UseAppHost>true</UseAppHost>
 		<IsPackable>true</IsPackable>
-
-		<PublishRepositoryUrl>true</PublishRepositoryUrl>
-		<IncludeSymbols>true</IncludeSymbols>
-		<SymbolPackageFormat>snupkg</SymbolPackageFormat>
 
 		<PackageId>UltralightNet</PackageId>
 		<Description>Ultralight .NET bindings</Description>
@@ -38,5 +31,8 @@
 		<PackageReference Condition="'$(TargetFramework)'!='net5.0'" Include="System.Memory" Version="4.5.4" />
 		<PackageReference Condition="'$(TargetFramework)'!='net5.0'" Include="System.Numerics.Vectors" Version="4.5.0" />
 		<PackageReference Condition="$(TargetFramework.StartsWith('netstandard'))" Include="System.Runtime.CompilerServices.Unsafe" Version="6.0.0" />
+
+		<PackageReference Include="UltralightNet.Binaries" Version="$(Version)" />
+		<PackageReference Include="UltralightNet.Resources" Version="$(Version)" />
 	</ItemGroup>
 </Project>
