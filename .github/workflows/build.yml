@@ -26,9 +26,10 @@ jobs:
       - name: Build packages
         run: |
           dotnet pack src/UltralightNet.Binaries -c Release
-          dotnet pack src/UltralightNet -c Release
-          dotnet pack src/UltralightNet.AppCore -c Release
           dotnet pack src/UltralightNet.Resources -c Release
+          dotnet pack src/UltralightNet -c Release
+          dotnet pack src/UltralightNet.AppCore.Binaries -c Release
+          dotnet pack src/UltralightNet.AppCore -c Release
       - run: tree
       - name: Upload nuget packages artifacts
         uses: actions/upload-artifact@v3

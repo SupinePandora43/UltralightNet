@@ -17,7 +17,9 @@
 		<!-- <None Include="EULA.txt" Pack="true" PackagePath="EULA.txt"/> -->
 		<!-- <None Include="NOTICES.txt" Pack="true" PackagePath="NOTICES.txt"/> -->
 	</ItemGroup>
-		<ItemGroup>
+	<ItemGroup>
+		<PackageReference Include="UltralightNet.Binaries" Version="$(Version)" />
+
 		<_NativeAssetName Include="runtimes/win-x64/native/AppCore.dll" PackagePath="runtimes/win-x64/native" />
 		<_NativeAssetName Include="runtimes/osx-x64/native/libAppCore.dylib" PackagePath="runtimes/osx-x64/native" />
 		<_NativeAssetName Include="runtimes/linux-x64/native/libAppCore.so" PackagePath="runtimes/linux-x64/native" />
