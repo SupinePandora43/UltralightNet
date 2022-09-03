@@ -14,8 +14,8 @@ public class RendererFixture : IDisposable
 		string path = Path.GetDirectoryName(typeof(RendererFixture).Assembly.Location) ?? "./";
 
 		AppCoreMethods.ulEnablePlatformFontLoader();
-		AppCoreMethods.ulEnablePlatformFileSystem(path);
-		AppCoreMethods.ulEnableDefaultLogger(Path.Combine(path, "./ullog.txt"));
+		//AppCoreMethods.ulEnablePlatformFileSystem(path);
+		//AppCoreMethods.ulEnableDefaultLogger(Path.Combine(path, "./ullog.txt"));
 
 		Renderer = ULPlatform.CreateRenderer();
 	}
