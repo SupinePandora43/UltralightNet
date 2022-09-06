@@ -102,9 +102,6 @@ jobs:
           dotnet tool install --global coverlet.console
           dotnet build -c Release src/UltralightNet.TestRunner/UltralightNet.TestRunner.csproj
           coverlet src/UltralightNet.TestRunner/bin/Release/net6.0/UltralightNet.TestRunner.dll --target "dotnet" --targetargs "src/UltralightNet.TestRunner/bin/Release/net6.0/UltralightNet.TestRunner.dll" --format cobertura --format opencover
-      - name: Show test ultralight log
-        if: always() && matrix.os=='macos'
-        run: cat ./src/UltralightNet.TestRunner/bin/Release/net6.0/ullog.txt # bruh
       - name: Upload coverage
         run: |
           curl -s https://codecov.io/bash > codecov
