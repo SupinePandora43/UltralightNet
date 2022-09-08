@@ -103,7 +103,7 @@ jobs:
           dotnet build -c Release src/UltralightNet.TestRunner/UltralightNet.TestRunner.csproj
           coverlet src/UltralightNet.TestRunner/bin/Release/net6.0/UltralightNet.TestRunner.dll --target "dotnet" --targetargs "src/UltralightNet.TestRunner/bin/Release/net6.0/UltralightNet.TestRunner.dll" --format cobertura --format opencover
       - name: Upload coverage
-        if: matrix.os!='macos'
+        # if: matrix.os!='macos'
         run: |
           curl -s https://codecov.io/bash > codecov
           chmod +x codecov
