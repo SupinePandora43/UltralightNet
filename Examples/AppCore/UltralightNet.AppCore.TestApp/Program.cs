@@ -28,10 +28,11 @@ class Program
 
 		view.OnFinishLoading += (frame_id, is_main_frame, url) => l = true;
 
-		view.HTML = "<html><body><p>123</p></body></html>";
+		//view.HTML = "<html><body><p>123</p></body></html>";
 		//view.URL = "https://vk.com/supinepandora43";
 		//view.URL = "https://www.youtube.com/watch?v=N1v4TjntTJI";
 		//view.URL = "https://twitter.com/@supinepandora43";
+		view.URL = "https://en.key-test.ru/";
 		//while (!l) { app.Renderer.Update(); Thread.Sleep(20); }
 
 		app.Run();

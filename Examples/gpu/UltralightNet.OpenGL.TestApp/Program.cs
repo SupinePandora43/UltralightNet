@@ -63,7 +63,6 @@ void main()
 
 	public unsafe static void Main()
 	{
-		AppContext.SetSwitch("Switch.System.Reflection.Assembly.SimulatedLocationInBaseDirectory", true);
 		AppCoreMethods.ulEnablePlatformFontLoader();
 		AppCoreMethods.ulEnablePlatformFileSystem("./");
 		AppCoreMethods.ulEnableDefaultLogger("./log123as.txt");
@@ -227,7 +226,8 @@ void main()
 		//view.URL = "https://vk.com/supinepandora43";
 		//view.URL = "https://twitter.com/@supinepandora43";
 		//view.URL = "https://youtube.com";
-		view.HTML = "<html><body><p>123</p></body></html>";
+		view.URL = "https://en.key-test.ru/";
+		//view.HTML = "<html><body><p>123</p></body></html>";
 		bool loaded = false;
 
 		view.OnFinishLoading += (_, _, _) => loaded = true;
