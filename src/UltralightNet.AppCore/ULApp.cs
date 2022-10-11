@@ -52,7 +52,7 @@ public class ULApp : INativeContainer<ULApp>, INativeContainerInterface<ULApp>, 
 	{
 		Handle = handle;
 		Renderer = Renderer.FromHandle(AppCoreMethods.ulAppGetRenderer(Handle), false);
-		Renderer.ThreadId = Thread.CurrentThread.ManagedThreadId;
+		Renderer.ThreadId = Environment.CurrentManagedThreadId;
 	}
 
 	public unsafe void SetUpdateCallback(ULUpdateCallback callback, IntPtr userData = default)
@@ -127,7 +127,7 @@ public class ULApp : INativeContainer<ULApp>, INativeContainerInterface<ULApp>, 
 		GC.KeepAlive(other);
 		return returnValue;
 	}
-	public override bool Equals(object? other) => other is ULApp app ? Equals(app) : false;
+	public override bool Equals(object? other) => other is ULApp app && Equals(app);
 
 	public static ULApp FromHandle(Handle<ULApp> ptr, bool dispose) => new(ptr) { Owns = dispose };
 

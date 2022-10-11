@@ -32,6 +32,5 @@
 		<PackageReference Condition="$(TargetFramework.StartsWith('netstandard'))" Include="System.Runtime.CompilerServices.Unsafe" Version="6.0.0" />
 
 		<PackageReference Include="UltralightNet.Binaries" Version="$(Version)" />
-		<PackageReference Include="UltralightNet.Resources" Version="$(Version)" />
 	</ItemGroup>
 </Project>

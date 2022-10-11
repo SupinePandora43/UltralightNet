@@ -40,7 +40,7 @@ public static unsafe partial class Methods
 	public static extern void ulLogMemoryUsage(Handle<Renderer> renderer);
 }
 
-public class Renderer : INativeContainer<Renderer>, INativeContainerInterface<Renderer>, IEquatable<Renderer>
+public unsafe class Renderer : INativeContainer<Renderer>, INativeContainerInterface<Renderer>, IEquatable<Renderer>
 {
 	internal override Handle<Renderer> Handle
 	{
@@ -57,7 +57,7 @@ public class Renderer : INativeContainer<Renderer>, INativeContainerInterface<Re
 	internal int ThreadId { get; set; } = -1;
 	internal void AssertNotWrongThread() // hungry
 	{
-		if (ThreadId is not -1 or int.MaxValue && ThreadId != Environment.CurrentManagedThreadId) throw new AggregateException("Wrong thread.");
+		if (ThreadId is not -1 or int.MaxValue && ULPlatform.ErrorWrongThread && ThreadId != Environment.CurrentManagedThreadId) throw new AggregateException("Wrong thread. (ULPlatform.ErrorWrongThread)");
 	}
 
 	public View CreateView(uint width, uint height) => CreateView(width, height, new ULViewConfig());
@@ -66,9 +66,9 @@ public class Renderer : INativeContainer<Renderer>, INativeContainerInterface<Re
 
 	public View CreateView(uint width, uint height, ULViewConfig viewConfig, Session session, bool dispose)
 	{
-		if (Owns && ULPlatform.ErrorGPUDriverNotSet && viewConfig.IsAccelerated && !ULPlatform.gpudriverSet)
+		if (Owns && ULPlatform.ErrorGPUDriverNotSet && viewConfig.IsAccelerated && (ULPlatform.GPUDriver.__UpdateCommandList is null))
 		{
-			throw new Exception("No ULPlatform.GPUDriver set, but ULViewConfig.IsAccelerated==true. (Disable error by setting ULPlatform.ErrorGPUDriverNotSet to false.)");
+			throw new Exception("No ULPlatform.GPUDriver set, but ULViewConfig.IsAccelerated was set to true. (Disable check by setting ULPlatform.ErrorGPUDriverNotSet to false.)");
 		}
 		View view = new(Methods.ulCreateView(Handle, width, height, in viewConfig, session.Handle), dispose);
 		GC.KeepAlive(this);

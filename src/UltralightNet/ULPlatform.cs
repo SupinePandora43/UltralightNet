@@ -153,6 +153,10 @@ public static unsafe class ULPlatform
 	}
 
 	public static bool SetDefaultLogger { get; set; } = true;
+	/// <summary>
+	/// Default filesystrem with access to bundled in assembly files (cacert.pem, icudt67l.dat, mediaControls*).
+	/// By disabling that (ULPlatform.SetDefaultFileSystem = false), you will face crash, if no filesystem was set.
+	/// </summary>
 	public static bool SetDefaultFileSystem { get; set; } = true;
 
 	public static bool ErrorMissingResources { get; set; } = true;
@@ -165,7 +169,9 @@ public static unsafe class ULPlatform
 	private static ULGPUDriver _gpudriver;
 	private static ULClipboard _clipboard;
 
+	[Obsolete]
 	internal static bool gpudriverSet = false;
+	[Obsolete]
 	internal static bool fileSystemSet = false;
 
 	public static ULLogger Logger
@@ -184,7 +190,6 @@ public static unsafe class ULPlatform
 		{
 			_filesystem = value;
 			Methods.ulPlatformSetFileSystem(value);
-			fileSystemSet = true;
 		}
 	}
 	public static ULGPUDriver GPUDriver
@@ -194,7 +199,6 @@ public static unsafe class ULPlatform
 		{
 			_gpudriver = value;
 			Methods.ulPlatformSetGPUDriver(value);
-			gpudriverSet = true;
 		}
 	}
 	public static ULClipboard Clipboard
@@ -247,10 +251,39 @@ public static unsafe class ULPlatform
 	public static Renderer CreateRenderer() => CreateRenderer(new());
 	public static Renderer CreateRenderer(ULConfig config, bool dispose = true)
 	{
-		if (config == default) throw new ArgumentException($"You passed default({nameof(ULConfig)}). It's invalid. Use at least \"new {nameof(ULConfig)}()\" instead.", nameof(config));
-		if (SetDefaultFileSystem && !fileSystemSet) // TODO
+		if (SetDefaultLogger && _logger.__LogMessage is null)
 		{
-			Console.WriteLine("UltralightNet: no filesystem set, default (with access only to required files) will be used.");
+			Console.WriteLine("UltralightNet: no logger set, console logger will be used.");
+			Logger = new()
+			{
+				LogMessage = (ULLogLevel level, string message) => { foreach (ReadOnlySpan<char> line in new LineEnumerator(message.AsSpan())) { Console.WriteLine($"(UL) {level}: {line.ToString()}"); } }
+			};
+		}
+		var log = Logger.__LogMessage;
+		if (config == default) throw new ArgumentException($"You passed default({nameof(ULConfig)}). It's invalid. Use at least \"new {nameof(ULConfig)}()\" instead.", nameof(config));
+		if (_filesystem != default) // some filesystem was set in managed env
+		{
+			if (_filesystem.__FileExists == null || _filesystem.__GetFileCharset == null || _filesystem.__GetFileMimeType == null || _filesystem.__OpenFile == null) throw new ArgumentException($"Not all callbacks of current {nameof(ULFileSystem)} are set."); // it doesn't implement all required functions
+			if (ErrorMissingResources) // some filesystem was set in managed env, optionally check required files
+			{
+				using ULString icuUL = new(Path.Combine(config.ResourcePathPrefix, "icudt67l.dat").AsSpan());
+				if (_filesystem.__FileExists(&icuUL) is false) throw new FileNotFoundException($"Known to UltralightNet {typeof(ULFileSystem)} doesn't provide icudt67l.dat in \"{config.ResourcePathPrefix}\". (Disable this check by setting {nameof(ULPlatform)}.{nameof(ErrorMissingResources)} to false.)");
+
+				using ULString cacertUL = new(Path.Combine(config.ResourcePathPrefix, "cacert.pem").AsSpan());
+				if (_filesystem.__FileExists(&cacertUL) is false) if (log is not null)
+					{
+						ULString noticeMsg = new("(UltralightNet) FileSystem doesn't provide \"cacert.pem\", no network functionality will be available.".AsSpan());// C#VER
+						log(ULLogLevel.Warning, &noticeMsg);
+					}
+			}
+		}
+		else if (SetDefaultFileSystem) // no filesystem was set in managed env, optionally set default
+		{
+			if (log is not null)
+			{
+				using ULString noticeMsg = new("(UltralightNet) No FileSystem set, default (with access only to required files) will be used.".AsSpan()); // C#VER
+				log(ULLogLevel.Info, &noticeMsg);
+			}
 
 #if NET5_0_OR_GREATER
 			[UnmanagedCallersOnly(CallConvs = new Type[] { typeof(CallConvCdecl) })]
@@ -321,23 +354,6 @@ public static unsafe class ULPlatform
 					}
 					else return default;
 				}
-			};
-		}
-		else
-		{
-			using ULString m = new("resources/icudt67l.dat".AsSpan()); // C#VER: utf8 (u8)
-
-			if (ErrorMissingResources && _filesystem.__FileExists(&m) is 0)
-			{
-				throw new FileNotFoundException($"{typeof(ULFileSystem)} doesn't provide icudt67l.dat from resources/ folder. (Disable error by setting ULPlatform.ErrorMissingResources to false.)");
-			}
-		}
-		if (SetDefaultLogger && _logger.__LogMessage is null)
-		{
-			Console.WriteLine("UltralightNet: no logger set, console logger will be used.");
-			Logger = new()
-			{
-				LogMessage = (ULLogLevel level, string message) => { foreach (ReadOnlySpan<char> line in new LineEnumerator(message.AsSpan())) { Console.WriteLine($"(UL) {level}: {line.ToString()}"); } }
 			};
 		}
 		var returnValue = Renderer.FromHandle(Methods.ulCreateRenderer(in config), true);

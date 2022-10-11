@@ -11,14 +11,14 @@ public unsafe struct ULFileSystem : IDisposable, IEquatable<ULFileSystem>
 {
 	public ULFileSystemFileExistsCallback? FileExists
 	{
-		set => _FileExists = value is null ? null : (path) => Unsafe.As<bool, byte>(ref Unsafe.AsRef(value(ULString.NativeToManaged(path))));
+		set => _FileExists = value is null ? null : (path) => value(ULString.NativeToManaged(path));
 		readonly get
 		{
 			var c = _FileExists;
 			return c is null ? null : (string path) =>
 			{
 				using ULString pathNative = new(path.AsSpan());
-				return Unsafe.As<byte, bool>(ref Unsafe.AsRef(c(&pathNative)));
+				return c(&pathNative);
 			};
 		}
 	}
@@ -92,7 +92,7 @@ public unsafe struct ULFileSystem : IDisposable, IEquatable<ULFileSystem>
 	public ULFileSystemFileExistsCallback__PInvoke__? _FileExists
 	{
 		[SuppressMessage("", "EPS09: An argument may be passed explicitly")]
-		set => ULPlatform.Handle(ref this, this with { __FileExists = value is null ? null : (delegate* unmanaged[Cdecl]<ULString*, byte>)Marshal.GetFunctionPointerForDelegate(value) }, value);
+		set => ULPlatform.Handle(ref this, this with { __FileExists = value is null ? null : (delegate* unmanaged[Cdecl]<ULString*, bool>)Marshal.GetFunctionPointerForDelegate(value) }, value);
 		readonly get
 		{
 			var p = __FileExists;
@@ -133,7 +133,7 @@ public unsafe struct ULFileSystem : IDisposable, IEquatable<ULFileSystem>
 		}
 	}
 
-	public delegate* unmanaged[Cdecl]<ULString*, byte> __FileExists;
+	public delegate* unmanaged[Cdecl]<ULString*, bool> __FileExists;
 	public delegate* unmanaged[Cdecl]<ULString*, ULString*> __GetFileMimeType;
 	public delegate* unmanaged[Cdecl]<ULString*, ULString*> __GetFileCharset;
 	public delegate* unmanaged[Cdecl]<ULString*, ULBuffer> __OpenFile;
