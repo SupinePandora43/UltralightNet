@@ -70,9 +70,9 @@
             "type": "coreclr",
             "request": "launch",
             "preLaunchTask": "build_Examples_GettingStarted",
-            "program": "${workspaceFolder}/Examples/GettingStarted/bin/Debug/net6.0/GettingStarted.dll",
+            "program": "${workspaceFolder}/Examples/Headless/GettingStarted/bin/Debug/net6.0/GettingStarted.dll",
             "args": [],
-            "cwd": "${workspaceFolder}/Examples/GettingStarted/bin/Debug/net6.0",
+            "cwd": "${workspaceFolder}/Examples/Headless/GettingStarted/bin/Debug/net6.0",
             "console": "internalConsole",
             "stopAtEntry": false
         },

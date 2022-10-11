@@ -9,9 +9,8 @@
 		<PackageReference Include="UltralightNet.Binaries" Version="$(Version)" />
 		<!-- AppCore bindings -->
 		<PackageReference Include="UltralightNet.AppCore" Version="$(Version)" />
-		<!-- "resources" folder -->
-		<PackageReference Include="UltralightNet.Resources" Version="$(Version)" />
 		<!-- UltralightNet bindings itself -->
+		<!-- <ProjectReference Include="..\..\..\src\UltralightNet\UltralightNet.csproj" /> -->
 		<PackageReference Include="UltralightNet" Version="$(Version)" />
 	</ItemGroup>
 

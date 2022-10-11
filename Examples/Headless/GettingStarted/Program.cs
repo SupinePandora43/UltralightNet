@@ -13,10 +13,6 @@ namespace GettingStarted
 			// Set Font Loader
 			AppCoreMethods.ulEnablePlatformFontLoader();
 
-			// Set filesystem (Ultralight requires "resources/icudt67l.dat")
-			var path = Path.GetDirectoryName(typeof(Program).Assembly.Location);
-			AppCoreMethods.ulEnablePlatformFileSystem(path);
-
 			// Create Renderer
 			var cfg = new ULConfig();
 			Renderer renderer = ULPlatform.CreateRenderer(cfg);
@@ -53,6 +49,7 @@ namespace GettingStarted
 			ULBitmap bitmap = surface.Bitmap;
 
 			// Save bitmap to png file
+			var path = Path.GetDirectoryName(typeof(Program).Assembly.Location);
 			bitmap.WritePng(Path.Combine(path, "OUTPUT.png"));
 		}
 	}

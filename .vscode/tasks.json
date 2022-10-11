@@ -72,7 +72,7 @@
 			"type": "process",
 			"args": [
 				"build",
-				"${workspaceFolder}/Examples/GettingStarted/GettingStarted.csproj",
+				"${workspaceFolder}/Examples/Headless/GettingStarted/GettingStarted.csproj",
 				"/property:GenerateFullPaths=true",
 				"/consoleloggerparameters:NoSummary"
 			],
