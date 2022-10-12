@@ -124,11 +124,11 @@ jobs:
         dotnet-version: 6.0.100
     - name: Pack
       run: |
-        dotnet pack src/UltralightNet.Binaries -c Release --version-suffix ${{ env.version_suffix }} -p:RepositoryBranch=${{ github.ref_name }} -p:RepositoryCommit=${{ github.sha }}
-        dotnet pack src/UltralightNet.Resources -c Release --version-suffix ${{ env.version_suffix }} -p:RepositoryBranch=${{ github.ref_name }} -p:RepositoryCommit=${{ github.sha }}
-        dotnet pack src/UltralightNet -c Release --version-suffix ${{ env.version_suffix }} -p:RepositoryBranch=${{ github.ref_name }} -p:RepositoryCommit=${{ github.sha }}
-        dotnet pack src/UltralightNet.AppCore.Binaries -c Release --version-suffix ${{ env.version_suffix }} -p:RepositoryBranch=${{ github.ref_name }} -p:RepositoryCommit=${{ github.sha }}
-        dotnet pack src/UltralightNet.AppCore -c Release --version-suffix ${{ env.version_suffix }} -p:RepositoryBranch=${{ github.ref_name }} -p:RepositoryCommit=${{ github.sha }}
+        dotnet pack src/UltralightNet.Binaries -c Release -p:RepositoryBranch=${{ github.ref_name }} -p:RepositoryCommit=${{ github.sha }}
+        dotnet pack src/UltralightNet.Resources -c Release -p:RepositoryBranch=${{ github.ref_name }} -p:RepositoryCommit=${{ github.sha }}
+        dotnet pack src/UltralightNet -c Release -p:RepositoryBranch=${{ github.ref_name }} -p:RepositoryCommit=${{ github.sha }}
+        dotnet pack src/UltralightNet.AppCore.Binaries -c Release -p:RepositoryBranch=${{ github.ref_name }} -p:RepositoryCommit=${{ github.sha }}
+        dotnet pack src/UltralightNet.AppCore -c Release -p:RepositoryBranch=${{ github.ref_name }} -p:RepositoryCommit=${{ github.sha }}
     - run: tree
     - name: Publish
       run: |
