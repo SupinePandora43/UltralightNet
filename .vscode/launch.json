@@ -5,18 +5,74 @@
     "version": "0.2.0",
     "configurations": [
         {
-            // Use IntelliSense to find out which attributes exist for C# debugging
-            // Use hover for the description of the existing attributes
-            // For further information visit https://github.com/OmniSharp/omnisharp-vscode/blob/master/debugger-launchjson.md
-            "name": ".NET Core Launch (console)",
+            "name": "OpenGL TestApp",
             "type": "coreclr",
             "request": "launch",
-            "preLaunchTask": "build",
-            // If you have changed target frameworks, make sure to update the program path.
-            "program": "${workspaceFolder}/UltralightNet.OpenGL.TestApp/bin/Debug/net6.0/UltralightNet.OpenGL.TestApp.dll",
+            "preLaunchTask": "buildOpenGL",
+            "program": "${workspaceFolder}/Examples/gpu/UltralightNet.OpenGL.TestApp/bin/Debug/net6.0/UltralightNet.OpenGL.TestApp.dll",
             "args": [],
-            "cwd": "${workspaceFolder}/UltralightNet.OpenGL.TestApp/bin/Debug/net6.0",
-            // For more information about the 'console' field, see https://aka.ms/VSCode-CS-LaunchJson-Console
+            "cwd": "${workspaceFolder}/Examples/gpu/UltralightNet.OpenGL.TestApp/bin/Debug/net6.0",
+            "console": "internalConsole",
+            "stopAtEntry": false,
+            "env": {
+                "DISPLAY": ":0.0",
+				"DOTNET_TieredPGO": "1",
+				"DOTNET_ReadyToRun": "0",
+				"DOTNET_TC_QuickJitForLoops": "1"
+            }
+        },
+		{
+            "name": "Vulkan TestApp",
+            "type": "coreclr",
+            "request": "launch",
+            "preLaunchTask": "buildVulkan",
+            "program": "${workspaceFolder}/Examples/gpu/UltralightNet.Vulkan.TestApp/bin/Debug/net6.0/UltralightNet.Vulkan.TestApp.dll",
+            "args": [],
+            "cwd": "${workspaceFolder}/Examples/gpu/UltralightNet.Vulkan.TestApp/bin/Debug/net6.0",
+            "console": "internalConsole",
+            "stopAtEntry": false
+        },
+		{
+            "name": "Veldrid TestApp",
+            "type": "coreclr",
+            "request": "launch",
+            "preLaunchTask": "buildVeldrid",
+            "program": "${workspaceFolder}/Examples/gpu/UltralightNet.Veldrid.TestApp/bin/Debug/net6.0/UltralightNet.Veldrid.TestApp.dll",
+            "args": [],
+            "cwd": "${workspaceFolder}/Examples/gpu/UltralightNet.Veldrid.TestApp/bin/Debug/net6.0",
+            "console": "internalConsole",
+            "stopAtEntry": false
+        },
+		{
+            "name": "AppCore TestApp",
+            "type": "coreclr",
+            "request": "launch",
+            "preLaunchTask": "buildAppCore",
+            "program": "${workspaceFolder}/Examples/AppCore/UltralightNet.AppCore.TestApp/bin/Debug/net6.0/UltralightNet.AppCore.TestApp.dll",
+            "args": [],
+            "cwd": "${workspaceFolder}/Examples/AppCore/UltralightNet.AppCore.TestApp/bin/Debug/net6.0",
+            "console": "internalConsole",
+            "stopAtEntry": false
+        },
+		{
+            "name": "TestApp",
+            "type": "coreclr",
+            "request": "launch",
+            "preLaunchTask": "buildTestApp",
+            "program": "${workspaceFolder}/src/UltralightNet.TestApp/bin/Debug/net6.0/UltralightNet.TestApp.dll",
+            "args": [],
+            "cwd": "${workspaceFolder}/src/UltralightNet.TestApp/bin/Debug/net6.0",
+            "console": "internalConsole",
+            "stopAtEntry": false
+        },
+		{
+            "name": "Examples/GettingStarted",
+            "type": "coreclr",
+            "request": "launch",
+            "preLaunchTask": "build_Examples_GettingStarted",
+            "program": "${workspaceFolder}/Examples/Headless/GettingStarted/bin/Debug/net6.0/GettingStarted.dll",
+            "args": [],
+            "cwd": "${workspaceFolder}/Examples/Headless/GettingStarted/bin/Debug/net6.0",
             "console": "internalConsole",
             "stopAtEntry": false
         },

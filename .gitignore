@@ -64,3 +64,6 @@ TestResult.xml
 !.keep
 *.log
 /publish
+*.spv
+gpu/shaders/compiled
+BenchmarkDotNet.Artifacts

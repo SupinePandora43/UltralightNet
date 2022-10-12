@@ -1,45 +1,136 @@
-name: Build & Test
+name: Main CI
 on:
   push:
     branches: [ '*' ]
   pull_request:
     branches: [ master ]
 jobs:
-  build-and-test:
-    runs-on: ${{ matrix.os }}
+  # BuildCmake:
+  #   runs-on: ${{ matrix.os }}
+  #   strategy:
+  #     fail-fast: true
+  #     matrix:
+  #       os: ['windows-latest', 'ubuntu-latest', 'macos-latest']
+  #   steps:
+  #     - run: echo "todo :3"
+  Build:
+    # needs: BuildCmake
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: 6.0.x
+      - name: Build packages
+        run: |
+          dotnet pack src/UltralightNet.Binaries -c Release
+          dotnet pack src/UltralightNet.Resources -c Release
+          dotnet pack src/UltralightNet -c Release
+          dotnet pack src/UltralightNet.AppCore.Binaries -c Release
+          dotnet pack src/UltralightNet.AppCore -c Release
+      - run: tree
+      - name: Upload nuget packages artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: nugets
+          path: |
+            UltralightNet.*.nupkg
+            UltralightNet.*.snupkg
+          retention-days: 30
+          if-no-files-found: error
+  DevBuilds:
+    needs: Build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v1
+        with:
+          dotnet-version: 6.0.x
+      - name: Add Github Packages to NuGet sources
+        run: dotnet nuget add source --username ${{ github.actor }} --password ${{ github.token }} --store-password-in-clear-text --name github "https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json"
+      - name: Define a version suffix
+        run: echo "version_suffix=dev-$(date -u +%Y%m%d%H%M%S)-$(git rev-parse --short ${{ github.sha }})" >> $GITHUB_ENV
+      - name: Pack
+        run: |
+          dotnet pack src/UltralightNet.Binaries -c Release --version-suffix ${{ env.version_suffix }} -p:RepositoryBranch=${{ github.ref_name }} -p:RepositoryCommit=${{ github.sha }}
+          dotnet pack src/UltralightNet.Resources -c Release --version-suffix ${{ env.version_suffix }} -p:RepositoryBranch=${{ github.ref_name }} -p:RepositoryCommit=${{ github.sha }}
+          dotnet pack src/UltralightNet -c Release --version-suffix ${{ env.version_suffix }} -p:RepositoryBranch=${{ github.ref_name }} -p:RepositoryCommit=${{ github.sha }}
+          dotnet pack src/UltralightNet.AppCore.Binaries -c Release --version-suffix ${{ env.version_suffix }} -p:RepositoryBranch=${{ github.ref_name }} -p:RepositoryCommit=${{ github.sha }}
+          dotnet pack src/UltralightNet.AppCore -c Release --version-suffix ${{ env.version_suffix }} -p:RepositoryBranch=${{ github.ref_name }} -p:RepositoryCommit=${{ github.sha }}
+      - name: Publish
+        run: dotnet nuget push *.nupkg --api-key ${{ github.token }} --source github
+  Test:
+    needs: Build
+    runs-on: ${{ matrix.os }}-latest
     strategy:
       fail-fast: false
       matrix:
-        os : ['windows-latest', 'ubuntu-latest', 'macos-latest']
+        os : ['windows', 'ubuntu', 'macos']
     steps:
-      - uses: actions/checkout@v2
+      - name: Checkout
+        uses: actions/checkout@v2
       - name: Setup .NET
         uses: actions/setup-dotnet@v1
         with:
           dotnet-version: 6.0.100
-      - name: Pack
-        run: |
-          dotnet pack UltralightNet.Binaries
-          dotnet pack UltralightNet
-          dotnet pack UltralightNet.AppCore
-
-          dotnet pack UltralightNet.OpenGL
-
-          dotnet pack UltralightNet.Resources
-      - run: | # missing libraries workaround
+      - name: Install missing libraries
+        run: | # missing libraries workaround
           sudo add-apt-repository ppa:linuxuprising/libpng12
           sudo apt update
-          sudo apt install libpng12-0
+          sudo apt install libpng12-0 libpulse0 libxv1
           find /usr/lib -name "libffi.so*"
           sudo ln -s  /usr/lib/x86_64-linux-gnu/libffi.so.7.1.0  /usr/lib/x86_64-linux-gnu/libffi.so.6
-        if: matrix.os=='ubuntu-latest'
-      #- name: Test Application
-      #  run: dotnet run --project UltralightNet.TestApplication
-      - name: Benchmark
-        run: dotnet run -c Release --project Benchmarks/Benchmarks.csproj
+        if: matrix.os=='ubuntu'
+      - name: Download packages
+        uses: actions/download-artifact@v3
+        with:
+          name: nugets
+          path: ./
+      - run: tree
+        if: matrix.os=='ubuntu'
       - name: Test
-        run: dotnet test UltralightNet.Test/UltralightNet.Test.csproj --collect:"XPlat Code Coverage" -- DataCollectionRunSettings.DataCollectors.DataCollector.Configuration.Format=cobertura,opencover -- DataCollectionRunSettings.DataCollectors.DataCollector.Configuration.UseSourceLink=true
-      - run: |
+        if: matrix.os!='macos'
+        run: dotnet test src/UltralightNet.Test/UltralightNet.Test.csproj --collect:"XPlat Code Coverage" -- DataCollectionRunSettings.DataCollectors.DataCollector.Configuration.Format=cobertura,opencover -- DataCollectionRunSettings.DataCollectors.DataCollector.Configuration.UseSourceLink=true
+      - name: Test (macos)
+        if: matrix.os=='macos'
+        run: |
+          dotnet test src/UltralightNet.Test/UltralightNet.Test.csproj --filter Category!=Renderer --collect:"XPlat Code Coverage" -- DataCollectionRunSettings.DataCollectors.DataCollector.Configuration.Format=cobertura,opencover -- DataCollectionRunSettings.DataCollectors.DataCollector.Configuration.UseSourceLink=true
+          dotnet tool install --global coverlet.console
+          dotnet build -c Release src/UltralightNet.TestRunner/UltralightNet.TestRunner.csproj
+          coverlet src/UltralightNet.TestRunner/bin/Release/net6.0/UltralightNet.TestRunner.dll --target "dotnet" --targetargs "src/UltralightNet.TestRunner/bin/Release/net6.0/UltralightNet.TestRunner.dll" --format cobertura --format opencover
+      - name: Upload coverage
+        # if: matrix.os!='macos'
+        run: |
           curl -s https://codecov.io/bash > codecov
           chmod +x codecov
-          ./codecov -f "UltralightNet.Test/TestResults/*/coverage.opencover.xml"
+          ./codecov -f "src/UltralightNet.Test/TestResults/*/coverage.opencover.xml"
+          ./codecov -f "src/UltralightNet.TestRunner/TestResults/*/coverage.opencover.xml"
+      - name: Benchmark
+        run: dotnet run -c Release --project src/Benchmarks/Benchmarks.csproj
+        continue-on-error: true # todo
+  Deploy:
+    needs: Test
+    runs-on: ubuntu-latest
+    if: github.branch == 'master'
+    steps:
+    - uses: actions/checkout@v2
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: 6.0.100
+    - name: Pack
+      run: |
+        dotnet pack src/UltralightNet.Binaries -c Release --version-suffix ${{ env.version_suffix }} -p:RepositoryBranch=${{ github.ref_name }} -p:RepositoryCommit=${{ github.sha }}
+        dotnet pack src/UltralightNet.Resources -c Release --version-suffix ${{ env.version_suffix }} -p:RepositoryBranch=${{ github.ref_name }} -p:RepositoryCommit=${{ github.sha }}
+        dotnet pack src/UltralightNet -c Release --version-suffix ${{ env.version_suffix }} -p:RepositoryBranch=${{ github.ref_name }} -p:RepositoryCommit=${{ github.sha }}
+        dotnet pack src/UltralightNet.AppCore.Binaries -c Release --version-suffix ${{ env.version_suffix }} -p:RepositoryBranch=${{ github.ref_name }} -p:RepositoryCommit=${{ github.sha }}
+        dotnet pack src/UltralightNet.AppCore -c Release --version-suffix ${{ env.version_suffix }} -p:RepositoryBranch=${{ github.ref_name }} -p:RepositoryCommit=${{ github.sha }}
+    - run: tree
+    - name: Publish
+      run: |
+        dotnet nuget push *.nupkg -k ${{ secrets.NUGET_TOKEN }} --source https://api.nuget.org/v3/index.json
+      # continue-on-error: true

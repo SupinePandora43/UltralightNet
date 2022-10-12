@@ -1,0 +1,30 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<TargetFrameworks>net6.0</TargetFrameworks>
+		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+		<LangVersion>preview</LangVersion>
+
+		<PublishRepositoryUrl>true</PublishRepositoryUrl>
+		<IncludeSymbols>true</IncludeSymbols>
+		<SymbolPackageFormat>snupkg</SymbolPackageFormat>
+	</PropertyGroup>
+
+	<Import Project="../CompileShaders.targets" />
+
+	<ItemGroup>
+	  <EmbeddedResource Include="../../shaders/compiled/glsl/shader_fill.vert" />
+	  <EmbeddedResource Include="../../shaders/compiled/glsl/shader_fill.frag" />
+	  <EmbeddedResource Include="../../shaders/compiled/glsl/shader_fill_path.vert" />
+	  <EmbeddedResource Include="../../shaders/compiled/glsl/shader_fill_path.frag" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<ProjectReference Include="../../../src/UltralightNet/UltralightNet.csproj" />
+		<ProjectReference Include="../UltralightNet.GPUCommon/UltralightNet.GPUCommon.csproj" />
+
+		<PackageReference Include="Silk.NET.OpenGL" Version="2.12.0"/>
+		<PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0" PrivateAssets="All" />
+	</ItemGroup>
+
+</Project>

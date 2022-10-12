@@ -1,0 +1,17 @@
+<Project Sdk="Microsoft.NET.Sdk">
+	<PropertyGroup>
+		<OutputType>Exe</OutputType>
+		<TargetFramework>net6.0</TargetFramework>
+	</PropertyGroup>
+
+	<ItemGroup>
+		<!-- Ultralight Binaries -->
+		<PackageReference Include="UltralightNet.Binaries" Version="$(Version)" />
+		<!-- AppCore bindings -->
+		<PackageReference Include="UltralightNet.AppCore" Version="$(Version)" />
+		<!-- UltralightNet bindings itself -->
+		<!-- <ProjectReference Include="..\..\..\src\UltralightNet\UltralightNet.csproj" /> -->
+		<PackageReference Include="UltralightNet" Version="$(Version)" />
+	</ItemGroup>
+
+</Project>
