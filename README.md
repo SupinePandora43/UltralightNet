@@ -13,7 +13,7 @@ You can learn more about Ultralight on [Ultralight's official site](https://ultr
 ## Reporting issues
 
 * [issues page on github](https://github.com/SupinePandora43/UltralightNet/issues)
-* Discord `SupinePandora43#3399`
+* Discord `Supinepandora43#3399`
 
 ## License
 
