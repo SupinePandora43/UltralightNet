@@ -132,5 +132,5 @@ jobs:
     - run: tree
     - name: Publish
       run: |
-        dotnet nuget push *.nupkg -k ${{ secrets.NUGET_TOKEN }} --source https://api.nuget.org/v3/index.json
+        dotnet nuget push *.nupkg -k ${{ secrets.NUGET_TOKEN }} --source https://api.nuget.org/v3/index.json --skip-duplicate
       # continue-on-error: true
