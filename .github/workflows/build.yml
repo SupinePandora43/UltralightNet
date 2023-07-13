@@ -103,12 +103,12 @@ jobs:
           dotnet build -c Release src/UltralightNet.TestRunner/UltralightNet.TestRunner.csproj
           coverlet src/UltralightNet.TestRunner/bin/Release/net6.0/UltralightNet.TestRunner.dll --target "dotnet" --targetargs "src/UltralightNet.TestRunner/bin/Release/net6.0/UltralightNet.TestRunner.dll" --format cobertura --format opencover
       - name: Upload coverage
-        # if: matrix.os!='macos'
-        run: |
-          curl -s https://codecov.io/bash > codecov
-          chmod +x codecov
-          ./codecov -f "src/UltralightNet.Test/TestResults/*/coverage.opencover.xml"
-          ./codecov -f "src/UltralightNet.TestRunner/TestResults/*/coverage.opencover.xml"
+        uses: codecov/codecov-action@v3
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          files: src/UltralightNet.Test/TestResults/*/coverage.opencover.xml
+          fail_ci_if_error: true
+          verbose: true
       - name: Benchmark
         run: dotnet run -c Release --project src/Benchmarks/Benchmarks.csproj
         continue-on-error: true # todo
