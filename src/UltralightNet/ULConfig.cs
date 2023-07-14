@@ -172,10 +172,10 @@ public unsafe struct _ULConfig : IDisposable
 
 	/// <summary>The max amount of time (in seconds) to allow <see cref="Renderer.Update()"/> to run per call.</summary>
 	/// <remarks>The library will attempt to throttle timers and/or reschedule work if this time budget is exceeded.</remarks>
-	public double MaxUpdateTime = 1.0 / 100.0;
+	public double MaxUpdateTime = 1.0 / 200.0;
 
 	/// <summary>The alignment (in bytes) of the BitmapSurface when using the CPU renderer.</summary>
-	/// <remarks>You can set this to '0' to perform no padding (row_bytes will always be width * 4) at a slight cost to performance.</remarks>
+	/// <remarks>You can set this to '0' to perform no padding (row_bytes will always be width * Bpp) at a slight cost to performance.</remarks>
 	public uint BitmapAlignment = 16;
 
 	/// <example>
@@ -270,7 +270,7 @@ public struct ULConfig : IEquatable<ULConfig>
 	public uint NumRendererThreads = 0;
 
 	/// <inheritdoc cref="_ULConfig.MaxUpdateTime" />
-	public double MaxUpdateTime = 1.0 / 100.0;
+	public double MaxUpdateTime = 1.0 / 200.0;
 
 	/// <inheritdoc cref="_ULConfig.BitmapAlignment" />
 	public uint BitmapAlignment = 16;

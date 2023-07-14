@@ -1,4 +1,3 @@
-using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.InteropServices;
 namespace UltralightNet;
@@ -101,7 +100,7 @@ public unsafe struct ULFontLoader : IDisposable, IEquatable<ULFontLoader>
 	public delegate* unmanaged[Cdecl]<ULString*, int, bool, ULString*> __GetFallbackFontForCharacters;
 	public delegate* unmanaged[Cdecl]<ULString*, int, bool, ULFontFile> __Load;
 
-	public void Dispose() => throw new NotImplementedException();
+	public void Dispose() => ULPlatform.Free(in this);
 
 #pragma warning disable CS8909
 	public readonly bool Equals(ULFontLoader other) => __GetFallbackFont == other.__GetFallbackFont && __GetFallbackFontForCharacters == other.__GetFallbackFontForCharacters && __Load == other.__Load;

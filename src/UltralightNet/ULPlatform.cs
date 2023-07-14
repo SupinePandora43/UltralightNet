@@ -18,6 +18,9 @@ public static partial class Methods
 	[DllImport("Ultralight", EntryPoint = "ulPlatformSetFileSystem")]
 	public static extern void ulPlatformSetFileSystem(ULFileSystem file_system);
 
+	[DllImport("Ultralight", EntryPoint = "ulPlatformSetFontLoader")]
+	public static extern void ulPlatformSetFontLoader(ULFontLoader fontLoader);
+
 	[DllImport("Ultralight", EntryPoint = "ulPlatformSetGPUDriver")]
 	public static extern void ulPlatformSetGPUDriver(ULGPUDriver gpu_driver);
 
@@ -112,6 +115,11 @@ public static unsafe class ULPlatform
 		if (filesystemHandles.Remove(filesystem, out List<GCHandle>? handles))
 			foreach (GCHandle handle in handles!) handle.Free();
 	}
+	internal static void Free(in ULFontLoader fontLoader)
+	{
+		if (fontloaderHandles.Remove(fontLoader, out List<GCHandle>? handles))
+			foreach (GCHandle handle in handles!) handle.Free();
+	}
 	internal static void Free(in ULGPUDriver gpudriver)
 	{
 		if (gpudriverHandles.Remove(gpudriver, out List<GCHandle>? handles))
@@ -134,21 +142,24 @@ public static unsafe class ULPlatform
 		lock (loggerHandles)
 			lock (clipboardHandles)
 				lock (filesystemHandles)
-					lock (gpudriverHandles)
-						lock (surfaceHandles)
-						{
-							foreach (List<GCHandle> handles in loggerHandles.Values) foreach (GCHandle handle in handles) if (handle.IsAllocated) handle.Free();
-							foreach (List<GCHandle> handles in clipboardHandles.Values) foreach (GCHandle handle in handles) if (handle.IsAllocated) handle.Free();
-							foreach (List<GCHandle> handles in filesystemHandles.Values) foreach (GCHandle handle in handles) if (handle.IsAllocated) handle.Free();
-							foreach (List<GCHandle> handles in gpudriverHandles.Values) foreach (GCHandle handle in handles) if (handle.IsAllocated) handle.Free();
-							foreach (List<GCHandle> handles in surfaceHandles.Values) foreach (GCHandle handle in handles) if (handle.IsAllocated) handle.Free();
+					lock (fontloaderHandles)
+						lock (gpudriverHandles)
+							lock (surfaceHandles)
+							{
+								foreach (List<GCHandle> handles in loggerHandles.Values) foreach (GCHandle handle in handles) if (handle.IsAllocated) handle.Free();
+								foreach (List<GCHandle> handles in clipboardHandles.Values) foreach (GCHandle handle in handles) if (handle.IsAllocated) handle.Free();
+								foreach (List<GCHandle> handles in filesystemHandles.Values) foreach (GCHandle handle in handles) if (handle.IsAllocated) handle.Free();
+								foreach (List<GCHandle> handles in fontloaderHandles.Values) foreach (GCHandle handle in handles) if (handle.IsAllocated) handle.Free();
+								foreach (List<GCHandle> handles in gpudriverHandles.Values) foreach (GCHandle handle in handles) if (handle.IsAllocated) handle.Free();
+								foreach (List<GCHandle> handles in surfaceHandles.Values) foreach (GCHandle handle in handles) if (handle.IsAllocated) handle.Free();
 
-							loggerHandles.Clear();
-							clipboardHandles.Clear();
-							filesystemHandles.Clear();
-							gpudriverHandles.Clear();
-							surfaceHandles.Clear();
-						}
+								loggerHandles.Clear();
+								clipboardHandles.Clear();
+								filesystemHandles.Clear();
+								fontloaderHandles.Clear();
+								gpudriverHandles.Clear();
+								surfaceHandles.Clear();
+							}
 	}
 
 	public static bool SetDefaultLogger { get; set; } = true;
@@ -165,6 +176,7 @@ public static unsafe class ULPlatform
 
 	private static ULLogger _logger;
 	internal static ULFileSystem _filesystem;
+	private static ULFontLoader _fontLoader;
 	private static ULGPUDriver _gpudriver;
 	private static ULClipboard _clipboard;
 
@@ -189,6 +201,15 @@ public static unsafe class ULPlatform
 		{
 			_filesystem = value;
 			Methods.ulPlatformSetFileSystem(value);
+		}
+	}
+	public static ULFontLoader FontLoader
+	{
+		get => _fontLoader;
+		set
+		{
+			_fontLoader = value;
+			Methods.ulPlatformSetFontLoader(value);
 		}
 	}
 	public static ULGPUDriver GPUDriver
