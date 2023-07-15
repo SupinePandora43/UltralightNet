@@ -1,6 +1,8 @@
 using System;
+using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
+using System.Runtime.InteropServices.Marshalling;
 
 namespace UltralightNet.AppCore;
 
@@ -12,22 +14,24 @@ public static unsafe partial class AppCoreMethods
 	[DllImport(LibAppCore)]
 	public static extern void ulDestroySettings(_ULSettings* settings);
 
-	[GeneratedDllImport(LibAppCore)]
-	public static partial void ulSettingsSetDeveloperName(_ULSettings* settings, [MarshalUsing(typeof(ULString.ToNative))] string name = "MyCompany");
+	[LibraryImport(LibAppCore)]
+	public static partial void ulSettingsSetDeveloperName(_ULSettings* settings, [MarshalUsing(typeof(ULString))] string name = "MyCompany");
 
-	[GeneratedDllImport(LibAppCore)]
-	public static partial void ulSettingsSetAppName(_ULSettings* settings, [MarshalUsing(typeof(ULString.ToNative))] string name = "MyApp");
+	[LibraryImport(LibAppCore)]
+	public static partial void ulSettingsSetAppName(_ULSettings* settings, [MarshalUsing(typeof(ULString))] string name = "MyApp");
 
-	[GeneratedDllImport(LibAppCore)]
-	public static partial void ulSettingsSetFileSystemPath(_ULSettings* settings, [MarshalUsing(typeof(ULString.ToNative))] string path = "./assets/");
+	[LibraryImport(LibAppCore)]
+	public static partial void ulSettingsSetFileSystemPath(_ULSettings* settings, [MarshalUsing(typeof(ULString))] string path = "./assets/");
 
-	[GeneratedDllImport(LibAppCore)]
-	public static partial void ulSettingsSetLoadShadersFromFileSystem(_ULSettings* settings, [MarshalAs(UnmanagedType.I1)] bool enabled = false);
+	[LibraryImport(LibAppCore)]
+	public static partial void ulSettingsSetLoadShadersFromFileSystem(_ULSettings* settings, bool enabled = false);
 
-	[GeneratedDllImport(LibAppCore)]
-	public static partial void ulSettingsSetForceCPURenderer(_ULSettings* settings, [MarshalAs(UnmanagedType.I1)] bool forceCPU = false);
+	[LibraryImport(LibAppCore)]
+	public static partial void ulSettingsSetForceCPURenderer(_ULSettings* settings, bool forceCPU = false);
 }
 
+[SuppressMessage("Code Rule", "IDE1006: Naming rule violation")]
+[CustomMarshaller(typeof(ULSettings), MarshalMode.ManagedToUnmanagedIn, typeof(_ULSettings))]
 public struct _ULSettings : IDisposable, IEquatable<_ULSettings>
 {
 	public ULString DeveloperName;
@@ -35,11 +39,9 @@ public struct _ULSettings : IDisposable, IEquatable<_ULSettings>
 
 	public ULString FileSystemPath;
 
-	private byte _LoadShadersFromFileSystem = 0;
-	public bool LoadShadersFromFileSystem { readonly get => Unsafe.As<byte, bool>(ref Unsafe.AsRef(_LoadShadersFromFileSystem)); set => _LoadShadersFromFileSystem = Unsafe.As<bool, byte>(ref value); }
+	public bool LoadShadersFromFileSystem;
 
-	private byte _ForceCPURenderer = 0;
-	public bool ForceCPURenderer { readonly get => Unsafe.As<byte, bool>(ref Unsafe.AsRef(_ForceCPURenderer)); set => _ForceCPURenderer = Unsafe.As<bool, byte>(ref value); }
+	public bool ForceCPURenderer;
 
 	public _ULSettings(ULString developerName, ULString appName, ULString fileSystemPath)
 	{
@@ -47,7 +49,7 @@ public struct _ULSettings : IDisposable, IEquatable<_ULSettings>
 		AppName = appName;
 		FileSystemPath = fileSystemPath;
 	}
-	public _ULSettings(in ULSettings settings)
+	public void FromManaged(in ULSettings settings)
 	{
 		DeveloperName = new(settings.DeveloperName.AsSpan());
 		AppName = new(settings.AppName.AsSpan());
@@ -56,12 +58,15 @@ public struct _ULSettings : IDisposable, IEquatable<_ULSettings>
 		ForceCPURenderer = settings.ForceCPURenderer;
 	}
 
-	public void Dispose()
+	public _ULSettings ToUnmanaged() => this;
+
+	public void Free()
 	{
 		DeveloperName.Dispose();
 		AppName.Dispose();
 		FileSystemPath.Dispose();
 	}
+	void IDisposable.Dispose() => Free();
 
 	public readonly bool Equals(_ULSettings settings) =>
 		DeveloperName.Equals(settings.DeveloperName) &&
@@ -71,6 +76,7 @@ public struct _ULSettings : IDisposable, IEquatable<_ULSettings>
 		ForceCPURenderer == settings.ForceCPURenderer;
 }
 
+[NativeMarshalling(typeof(_ULSettings))]
 public struct ULSettings : IEquatable<ULSettings>
 {
 	public string DeveloperName = "MyCompany";

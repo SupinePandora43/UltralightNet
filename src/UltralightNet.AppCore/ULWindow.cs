@@ -1,21 +1,22 @@
 using System;
 using System.Runtime.InteropServices;
+using System.Runtime.InteropServices.Marshalling;
 using UltralightNet.LowStuff;
 
 namespace UltralightNet.AppCore;
 
 public static partial class AppCoreMethods
 {
-	[GeneratedDllImport(LibAppCore)]
-	public static partial Handle<ULWindow> ulCreateWindow(ULMonitor monitor, uint width, uint height, [MarshalAs(UnmanagedType.I1)] bool fullscreen, ULWindowFlags flags);
+	[LibraryImport(LibAppCore)]
+	public static partial Handle<ULWindow> ulCreateWindow(ULMonitor monitor, uint width, uint height, bool fullscreen, ULWindowFlags flags);
 
 	[DllImport(LibAppCore)]
 	public static extern void ulDestroyWindow(Handle<ULWindow> window);
 
-	[GeneratedDllImport(LibAppCore)]
+	[LibraryImport(LibAppCore)]
 	public static partial void ulWindowSetCloseCallback(Handle<ULWindow> window, ULCloseCallback__PInvoke__? callback, IntPtr user_data);
 
-	[GeneratedDllImport(LibAppCore)]
+	[LibraryImport(LibAppCore)]
 	public static partial void ulWindowSetResizeCallback(Handle<ULWindow> window, ULResizeCallback__PInvoke__? callback, IntPtr user_data);
 
 	[DllImport(LibAppCore)]
@@ -42,15 +43,14 @@ public static partial class AppCoreMethods
 	[DllImport(LibAppCore)]
 	public static extern int ulWindowGetPositionY(Handle<ULWindow> window);
 
-	[GeneratedDllImport(LibAppCore)]
-	[return: MarshalAs(UnmanagedType.I1)]
+	[LibraryImport(LibAppCore)]
 	public static partial bool ulWindowIsFullscreen(Handle<ULWindow> window);
 
 	[DllImport(LibAppCore)]
 	public static extern double ulWindowGetScale(Handle<ULWindow> window);
 
-	[GeneratedDllImport(LibAppCore)]
-	public static partial void ulWindowSetTitle(Handle<ULWindow> window, [MarshalUsing(typeof(UTF8Marshaller))] string title);
+	[LibraryImport(LibAppCore)]
+	public static partial void ulWindowSetTitle(Handle<ULWindow> window, [MarshalUsing(typeof(Utf8StringMarshaller))] string title);
 
 	[DllImport(LibAppCore)]
 	public static extern void ulWindowSetCursor(Handle<ULWindow> window, ULCursor cursor);
@@ -61,8 +61,7 @@ public static partial class AppCoreMethods
 	[DllImport(LibAppCore)]
 	public static extern void ulWindowHide(Handle<ULWindow> window);
 
-	[GeneratedDllImport(LibAppCore)]
-	[return: MarshalAs(UnmanagedType.I1)]
+	[LibraryImport(LibAppCore)]
 	public static partial bool ulWindowIsVisible(Handle<ULWindow> window);
 
 	[DllImport(LibAppCore)]

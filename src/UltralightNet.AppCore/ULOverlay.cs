@@ -36,8 +36,7 @@ public static partial class AppCoreMethods
 	[DllImport(LibAppCore)]
 	public static extern void ulOverlayResize(Handle<ULOverlay> overlay, uint width, uint height);
 
-	[GeneratedDllImport(LibAppCore)]
-	[return: MarshalAs(UnmanagedType.I1)]
+	[LibraryImport(LibAppCore)]
 	public static partial bool ulOverlayIsHidden(Handle<ULOverlay> overlay);
 
 	[DllImport(LibAppCore)]
@@ -46,8 +45,7 @@ public static partial class AppCoreMethods
 	[DllImport(LibAppCore)]
 	public static extern void ulOverlayShow(Handle<ULOverlay> overlay);
 
-	[GeneratedDllImport(LibAppCore)]
-	[return: MarshalAs(UnmanagedType.I1)]
+	[LibraryImport(LibAppCore)]
 	public static partial bool ulOverlayHasFocus(Handle<ULOverlay> overlay);
 
 	[DllImport(LibAppCore)]

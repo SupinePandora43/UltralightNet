@@ -12,15 +12,8 @@ public static unsafe partial class AppCoreMethods
 	[DllImport(LibAppCore)]
 	public static extern Handle<ULApp> ulCreateApp(_ULSettings* settings, _ULConfig* config);
 
-	// INTEROPTODO: NATIVEMARSHALLING
-	//[GeneratedDllImport("AppCore")]
-	public static Handle<ULApp> ulCreateApp(in ULSettings settings, in ULConfig config)
-	{
-		using _ULSettings nativeSettings = new(settings);
-		using _ULConfig nativeConfig = new(config);
-		var ret = ulCreateApp(&nativeSettings, &nativeConfig);
-		return ret;
-	}
+	[LibraryImport(LibAppCore)]
+	public static partial Handle<ULApp> ulCreateApp(in ULSettings settings, in ULConfig config);
 
 	[DllImport(LibAppCore)]
 	public static extern void ulDestroyApp(Handle<ULApp> app);
@@ -28,8 +21,7 @@ public static unsafe partial class AppCoreMethods
 	[DllImport(LibAppCore)]
 	public static extern unsafe void ulAppSetUpdateCallback(Handle<ULApp> app, delegate* unmanaged[Cdecl]<void*, void> callback, void* user_data);
 
-	[GeneratedDllImport(LibAppCore)]
-	[return: MarshalAs(UnmanagedType.I1)]
+	[LibraryImport(LibAppCore)]
 	public static partial bool ulAppIsRunning(Handle<ULApp> app);
 
 	[DllImport(LibAppCore)]
