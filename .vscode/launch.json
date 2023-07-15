@@ -80,6 +80,20 @@
             "name": ".NET Core Attach",
             "type": "coreclr",
             "request": "attach"
+        },
+		{
+            "name": ".NET Script Debug",
+            "type": "coreclr",
+            "request": "launch",
+            "program": "dotnet",
+            "args": [
+                "exec",
+                "/usr/local/lib/dotnet-script/dotnet-script.dll",
+                "${file}"
+            ],
+			"env": {"DOTNET_ROLL_FORWARD": "LatestMajor"},
+            "cwd": "${workspaceRoot}",
+            "stopAtEntry": false
         }
     ]
 }
