@@ -44,7 +44,7 @@ public unsafe struct ULClipboard : IDisposable, IEquatable<ULClipboard>
 	}
 	public ULClipboardWritePlainTextCallback? WritePlainText
 	{
-		set => _WritePlainText = value is null ? null : (text) => value(ULString.NativeToManaged(text));
+		set => _WritePlainText = value is null ? null : (text) => value(text->ToString());
 		readonly get
 		{
 			var c = _WritePlainText;

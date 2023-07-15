@@ -11,14 +11,8 @@ public static unsafe partial class Methods
 	[DllImport(LibUltralight)]
 	public static extern Handle<Renderer> ulCreateRenderer(_ULConfig* config);
 
-	// INTEROPTODO: NATIVEMARSHALLING
-	//[GeneratedDllImport(LibUltralight)]
-	public static Handle<Renderer> ulCreateRenderer(in ULConfig config)
-	{
-		using _ULConfig nativeConfig = new(config);
-		var ret = ulCreateRenderer(&nativeConfig);
-		return ret;
-	}
+	[LibraryImport(LibUltralight)]
+	public static partial Handle<Renderer> ulCreateRenderer(in ULConfig config);
 
 	/// <summary>Destroy the renderer.</summary>
 	[DllImport(LibUltralight)]

@@ -1,10 +1,8 @@
-using System;
 using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
+using System.Runtime.InteropServices.Marshalling;
 using System.Text;
-
-using LibraryImportAttribute = System.Runtime.InteropServices.GeneratedDllImportAttribute;
 
 namespace UltralightNet;
 
@@ -12,7 +10,7 @@ public static unsafe partial class Methods
 {
 	/// <summary>Create string from null-terminated ASCII C-string.</summary>
 	[LibraryImport(LibUltralight)]
-	public static partial ULString* ulCreateString([MarshalUsing(typeof(UTF8Marshaller))] in string str);
+	public static partial ULString* ulCreateString([MarshalUsing(typeof(Utf8StringMarshaller))] string str);
 
 	/// <summary>Create string from UTF-8 buffer.</summary>
 	[LibraryImport(LibUltralight)]
@@ -57,7 +55,6 @@ public static unsafe partial class Methods
 
 	/// <summary>Whether this string is empty or not.</summary>
 	[LibraryImport(LibUltralight)]
-	[return: MarshalAs(UnmanagedType.I1)]
 	public static partial bool ulStringIsEmpty(ULString* str);
 
 	/// <summary>Replaces the contents of 'str' with the contents of 'new_str'</summary>
@@ -76,6 +73,9 @@ public static unsafe partial class Methods
 
 [DebuggerDisplay("{ToString(),raw}")]
 [StructLayout(LayoutKind.Sequential)]
+[CustomMarshaller(typeof(string), MarshalMode.ManagedToUnmanagedIn, typeof(ManagedToUnmanaged))]
+[CustomMarshaller(typeof(string), MarshalMode.ManagedToUnmanagedRef, typeof(ManagedToUnmanaged))]
+[CustomMarshaller(typeof(string), MarshalMode.ManagedToUnmanagedOut, typeof(UnmanagedToManaged))]
 public unsafe struct ULString : IDisposable, ICloneable, IEquatable<ULString>
 {
 	public byte* data;
@@ -230,44 +230,37 @@ public unsafe struct ULString : IDisposable, ICloneable, IEquatable<ULString>
 	public override readonly string ToString() => (string)this;
 	public readonly ReadOnlySpan<byte> ToSpan() => new(data, checked((int)length));
 
-	internal static string NativeToManaged(ULString* str) => str is null ? string.Empty :
+
+	internal static class ManagedToUnmanaged
+	{
+		internal static string ConvertToManaged(void* str) => str is null ? string.Empty :
 #if NETSTANDARD2_1 || NETCOREAPP1_1_OR_GREATER
-		Marshal.PtrToStringUTF8((IntPtr)str->data, checked((int)str->length));
+			Marshal.PtrToStringUTF8((IntPtr)((ULString*)str)->data, checked((int)((ULString*)str)->length));
 #elif NETSTANDARD2_0
-		Encoding.UTF8.GetString(str->data, checked((int)str->length));
+			Encoding.UTF8.GetString(str->data, checked((int)str->length));
 #elif NETFRAMEWORK
-		new string((sbyte*)str->data, 0, checked((int)str->length));
+			new string((sbyte*)str->data, 0, checked((int)str->length));
 #else
-		Marshal.PtrToStringUTF8((IntPtr)str->data, checked((int)str->length));
+			Marshal.PtrToStringUTF8((IntPtr)str->data, checked((int)str->length));
 #endif
-
-	// INTEROPTODO: CUSTOMTYPEMARSHALLER
-	[StructLayout(LayoutKind.Auto)]
-	public unsafe ref struct ToNative
-	{
-		public ULString ulString;
-
-		public ToNative(string str)
+		internal static void* ConvertToUnmanaged(string? managed) => new ULString(managed).Allocate();
+		internal static void Free(void* unmanaged)
 		{
-			ulString = new(str.AsSpan());
+			NativeMemory.Free(((ULString*)unmanaged)->data);
+			NativeMemory.Free(unmanaged);
 		}
-
-		public ULString* Value => (ULString*)Unsafe.AsPointer(ref ulString);
-
-		public void FreeNative() => ulString.Dispose();
 	}
-
-	public unsafe ref struct ToManaged_
+	internal static class UnmanagedToManaged
 	{
-		public ToManaged_(string _) { }
-
-		private ULString ul = default;
-		public ULString* Value
-		{
-			get => null;
-			set => ul = *value;
-		}
-
-		public string ToManaged() => (string)ul;
+		internal static string ConvertToManaged(void* str) => str is null ? string.Empty :
+#if NETSTANDARD2_1 || NETCOREAPP1_1_OR_GREATER
+			Marshal.PtrToStringUTF8((IntPtr)((ULString*)str)->data, checked((int)((ULString*)str)->length));
+#elif NETSTANDARD2_0
+			Encoding.UTF8.GetString(str->data, checked((int)str->length));
+#elif NETFRAMEWORK
+			new string((sbyte*)str->data, 0, checked((int)str->length));
+#else
+			Marshal.PtrToStringUTF8((IntPtr)str->data, checked((int)str->length));
+#endif
 	}
 }

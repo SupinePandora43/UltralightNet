@@ -1,4 +1,3 @@
-using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.InteropServices;
 
@@ -8,7 +7,7 @@ public unsafe struct ULLogger : IDisposable, IEquatable<ULLogger>
 {
 	public ULLoggerLogMessageCallback? LogMessage
 	{
-		set => _LogMessage = value is null ? null : (level, msg) => value(level, ULString.NativeToManaged(msg));
+		set => _LogMessage = value is null ? null : (level, msg) => value(level, msg->ToString());
 		readonly get
 		{
 			var c = _LogMessage;

@@ -1,9 +1,7 @@
-using System;
-using System.IO;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
-using System.Text;
+using System.Runtime.InteropServices.Marshalling;
 
 [assembly: InternalsVisibleTo("UltralightNet.AppCore")]
 [assembly: DisableRuntimeMarshallingAttribute]
@@ -23,17 +21,17 @@ public static partial class Methods
 
 	static Methods() => Preload();
 
-	[GeneratedDllImport(LibUltralight)]
-	[return: MarshalUsing(typeof(UTF8Marshaller))]
+	[LibraryImport(LibUltralight)]
+	[return: MarshalUsing(typeof(Utf8StringMarshaller))]
 	public static partial string ulVersionString();
 
-	[DllImport(LibUltralight)]
+	[LibraryImport(LibUltralight)]
 	public static extern uint ulVersionMajor();
 
-	[DllImport(LibUltralight)]
+	[LibraryImport(LibUltralight)]
 	public static extern uint ulVersionMinor();
 
-	[DllImport(LibUltralight)]
+	[LibraryImport(LibUltralight)]
 	public static extern uint ulVersionPatch();
 
 	/// <summary>
@@ -117,105 +115,11 @@ public static partial class Methods
 #if NETSTANDARD
 		private static partial class NativeLibrary
 		{
-			public static IntPtr Load(string libraryPath) => dlopen(libraryPath, 0x002); // RTLD_NOW
+			public static System.IntPtr Load(string libraryPath) => dlopen(libraryPath, 0x002); // RTLD_NOW
 
 			// LPUTF8Str = 48
 			[DllImport("libdl")]
-			private static extern IntPtr dlopen([MarshalAs(48)] string path, int mode);
+			private static extern System.IntPtr dlopen([MarshalAs(48)] string path, int mode);
 		}
 #endif
-}
-// INTEROPTODO: CUSTOMTYPEMARSHALLER
-internal unsafe ref struct UTF8Marshaller
-{
-	public const int BufferSize = 0x100;
-
-	public byte* bytes;
-	public Span<byte> span;
-
-	public UTF8Marshaller(string str)
-	{
-		span = null;
-		int strLen = str.Length;
-		int byteCount = (strLen + 1) * 3 + 1;
-		bytes = (byte*)NativeMemory.Alloc((nuint)byteCount);
-
-#if NETSTANDARD2_1 || NET
-		int written = Encoding.UTF8.GetBytes(str.AsSpan(), new Span<byte>(bytes, byteCount));
-#else
-			int written;
-			fixed(char* characterPtr = str){
-				written = Encoding.UTF8.GetBytes(characterPtr, strLen, bytes, byteCount);
-			}
-#endif
-		bytes[written] = 0;
-	}
-	[MethodImpl(MethodImplOptions.AggressiveInlining)]
-	public UTF8Marshaller(string str, Span<byte> buffer)
-	{
-		int strLen = str.Length;
-		int byteCount = checked((strLen + 1) * 3 + 1);
-
-		if (buffer.Length >= byteCount)
-		{
-			bytes = null;
-			span = buffer;
-#if NETSTANDARD2_1 || NET
-			int written = Encoding.UTF8.GetBytes(str.AsSpan(), span);
-			span[written] = 0;
-#else
-				int written;
-				fixed(char* characterPtr = str)
-				fixed(byte* bytePtr = span){
-					written = Encoding.UTF8.GetBytes(characterPtr, strLen, bytePtr, byteCount);
-					bytePtr[written] = 0;
-				}
-#endif
-		}
-		else
-		{
-			span = null;
-			bytes = (byte*)NativeMemory.Alloc((nuint)byteCount);
-
-#if NETSTANDARD2_1 || NET
-			int written = Encoding.UTF8.GetBytes(str.AsSpan(), new Span<byte>(bytes, byteCount));
-#else
-				int written;
-				fixed(char* characterPtr = str){
-					written = Encoding.UTF8.GetBytes(characterPtr, strLen, bytes, byteCount);
-				}
-#endif
-			bytes[written] = 0;
-		}
-	}
-
-	public readonly ref byte GetPinnableReference()
-	{
-		if (bytes is not null) return ref *bytes;
-		return ref span.GetPinnableReference();
-	}
-
-	public readonly string ToManaged() =>
-#if NETSTANDARD2_1 || NETCOREAPP1_1_OR_GREATER
-		Marshal.PtrToStringUTF8((IntPtr)bytes)!;
-#else
-			new((sbyte*)bytes);
-#endif
-
-	public unsafe byte* Value
-	{
-		readonly get => bytes is not null ? bytes : (byte*)Unsafe.AsPointer(ref span[0]);
-		set
-		{
-			bytes = value;
-			span = default;
-		}
-	}
-
-	public void FreeNative()
-	{
-		if (bytes is not null)
-			NativeMemory.Free(bytes);
-		bytes = null;
-	}
 }

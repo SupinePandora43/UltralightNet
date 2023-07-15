@@ -1,17 +1,13 @@
-using System;
 using System.Diagnostics.CodeAnalysis;
-using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
 namespace UltralightNet;
 
-// INTEROPTODO: TEST
-[StructLayout(LayoutKind.Sequential)]
 public unsafe struct ULFileSystem : IDisposable, IEquatable<ULFileSystem>
 {
 	public ULFileSystemFileExistsCallback? FileExists
 	{
-		set => _FileExists = value is null ? null : (path) => value(ULString.NativeToManaged(path));
+		set => _FileExists = value is null ? null : (path) => value(path->ToString());
 		readonly get
 		{
 			var c = _FileExists;
@@ -24,7 +20,7 @@ public unsafe struct ULFileSystem : IDisposable, IEquatable<ULFileSystem>
 	}
 	public ULFileSystemGetFileMimeTypeCallback? GetFileMimeType
 	{
-		set => _GetFileMimeType = value is null ? null : (path) => new ULString(value(ULString.NativeToManaged(path)).AsSpan()).Allocate();
+		set => _GetFileMimeType = value is null ? null : (path) => new ULString(value(path->ToString()).AsSpan()).Allocate();
 		readonly get
 		{
 			var c = _GetFileMimeType;
@@ -32,7 +28,7 @@ public unsafe struct ULFileSystem : IDisposable, IEquatable<ULFileSystem>
 			{
 				using ULString uPath = new(path.AsSpan());
 				ULString* mime = c(&uPath);
-				string retVal = ULString.NativeToManaged(mime);
+				string retVal = mime->ToString();
 				mime->Deallocate();
 				return retVal;
 			};
@@ -40,7 +36,7 @@ public unsafe struct ULFileSystem : IDisposable, IEquatable<ULFileSystem>
 	}
 	public ULFileSystemGetFileCharsetCallback? GetFileCharset
 	{
-		set => _GetFileCharset = value is null ? null : (path) => new ULString(value(ULString.NativeToManaged(path)).AsSpan()).Allocate();
+		set => _GetFileCharset = value is null ? null : (path) => new ULString(value(path->ToString()).AsSpan()).Allocate();
 		readonly get
 		{
 			var c = _GetFileCharset;
@@ -48,7 +44,7 @@ public unsafe struct ULFileSystem : IDisposable, IEquatable<ULFileSystem>
 			{
 				using ULString uPath = new(path.AsSpan());
 				ULString* mime = c(&uPath);
-				string retVal = ULString.NativeToManaged(mime);
+				string retVal = mime->ToString();
 				mime->Deallocate();
 				return retVal;
 			};
@@ -58,7 +54,7 @@ public unsafe struct ULFileSystem : IDisposable, IEquatable<ULFileSystem>
 	{
 		set => _OpenFile = value is null ? null : (path) =>
 		{
-			byte[]? result = value(ULString.NativeToManaged(path));
+			byte[]? result = value(path->ToString());
 			if (result is not null) return ULBuffer.CreateFromDataCopy<byte>(result);
 			else return default;
 		};

@@ -6,6 +6,8 @@
 
 		<PackageId>UltralightNet</PackageId>
 		<Description>Ultralight .NET bindings</Description>
+
+		<LangVersion>11</LangVersion>
 	</PropertyGroup>
 	<ItemGroup>
 	  <None Remove="resources\cacert.pem" />

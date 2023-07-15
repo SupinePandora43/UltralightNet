@@ -1,65 +1,67 @@
-using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
+using System.Runtime.InteropServices.Marshalling;
 
 namespace UltralightNet;
 
 public static unsafe partial class Methods
 {
 	[Obsolete]
-	[DllImport(LibUltralight)]
-	public static extern _ULViewConfig* ulCreateViewConfig();
+	[LibraryImport(LibUltralight)]
+	public static partial _ULViewConfig* ulCreateViewConfig();
 
 	[Obsolete]
-	[DllImport(LibUltralight)]
-	public static extern void ulDestroyViewConfig(_ULViewConfig* viewConfig);
+	[LibraryImport(LibUltralight)]
+	public static partial void ulDestroyViewConfig(_ULViewConfig* viewConfig);
 
 	[Obsolete]
-	[GeneratedDllImport(LibUltralight)]
-	public static partial void ulViewConfigSetIsAccelerated(_ULViewConfig* viewConfig, [MarshalAs(UnmanagedType.I1)] bool isAccelerated = false);
+	[LibraryImport(LibUltralight)]
+	public static partial void ulViewConfigSetIsAccelerated(_ULViewConfig* viewConfig, bool isAccelerated = false);
 
 	[Obsolete]
-	[GeneratedDllImport(LibUltralight)]
-	public static partial void ulViewConfigSetIsTransparent(_ULViewConfig* viewConfig, [MarshalAs(UnmanagedType.I1)] bool isTransparent = false);
+	[LibraryImport(LibUltralight)]
+	public static partial void ulViewConfigSetIsTransparent(_ULViewConfig* viewConfig, bool isTransparent = false);
 
 	[Obsolete]
-	[DllImport(LibUltralight)]
-	public static extern void ulViewConfigSetInitialDeviceScale(_ULViewConfig* viewConfig, double initialDeviceScale = 1.0);
+	[LibraryImport(LibUltralight)]
+	public static partial void ulViewConfigSetInitialDeviceScale(_ULViewConfig* viewConfig, double initialDeviceScale = 1.0);
 
 	[Obsolete]
-	[GeneratedDllImport(LibUltralight)]
-	public static partial void ulViewConfigSetInitialFocus(_ULViewConfig* viewConfig, [MarshalAs(UnmanagedType.I1)] bool initialFocus = true);
+	[LibraryImport(LibUltralight)]
+	public static partial void ulViewConfigSetInitialFocus(_ULViewConfig* viewConfig, bool initialFocus = true);
 
 	[Obsolete]
-	[GeneratedDllImport(LibUltralight)]
-	public static partial void ulViewConfigSetEnableImages(_ULViewConfig* viewConfig, [MarshalAs(UnmanagedType.I1)] bool enable = true);
+	[LibraryImport(LibUltralight)]
+	public static partial void ulViewConfigSetEnableImages(_ULViewConfig* viewConfig, bool enable = true);
 
 	[Obsolete]
-	[GeneratedDllImport(LibUltralight)]
-	public static partial void ulViewConfigSetEnableJavaScript(_ULViewConfig* viewConfig, [MarshalAs(UnmanagedType.I1)] bool enable = true);
+	[LibraryImport(LibUltralight)]
+	public static partial void ulViewConfigSetEnableJavaScript(_ULViewConfig* viewConfig, bool enable = true);
 
 	[Obsolete]
-	[GeneratedDllImport(LibUltralight)]
-	public static partial void ulViewConfigSetFontFamilyStandard(_ULViewConfig* viewConfig, [MarshalUsing(typeof(ULString.ToNative))] string fontName = "Times New Roman");
+	[LibraryImport(LibUltralight)]
+	public static partial void ulViewConfigSetFontFamilyStandard(_ULViewConfig* viewConfig, [MarshalUsing(typeof(ULString))] string fontName = "Times New Roman");
 
 	[Obsolete]
-	[GeneratedDllImport(LibUltralight)]
-	public static partial void ulViewConfigSetFontFamilyFixed(_ULViewConfig* viewConfig, [MarshalUsing(typeof(ULString.ToNative))] string fontName = "Courier New");
+	[LibraryImport(LibUltralight)]
+	public static partial void ulViewConfigSetFontFamilyFixed(_ULViewConfig* viewConfig, [MarshalUsing(typeof(ULString))] string fontName = "Courier New");
 
 	[Obsolete]
-	[GeneratedDllImport(LibUltralight)]
-	public static partial void ulViewConfigSetFontFamilySerif(_ULViewConfig* viewConfig, [MarshalUsing(typeof(ULString.ToNative))] string fontName = "Times New Roman");
+	[LibraryImport(LibUltralight)]
+	public static partial void ulViewConfigSetFontFamilySerif(_ULViewConfig* viewConfig, [MarshalUsing(typeof(ULString))] string fontName = "Times New Roman");
 
 	[Obsolete]
-	[GeneratedDllImport(LibUltralight)]
-	public static partial void ulViewConfigSetFontFamilySansSerif(_ULViewConfig* viewConfig, [MarshalUsing(typeof(ULString.ToNative))] string fontName = "Arial");
+	[LibraryImport(LibUltralight)]
+	public static partial void ulViewConfigSetFontFamilySansSerif(_ULViewConfig* viewConfig, [MarshalUsing(typeof(ULString))] string fontName = "Arial");
 
 	[Obsolete]
-	[GeneratedDllImport(LibUltralight)]
-	public static partial void ulViewConfigSetUserAgent(_ULViewConfig* viewConfig, [MarshalUsing(typeof(ULString.ToNative))] string agent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/608.3.10 (KHTML, like Gecko) Ultralight/1.3.0 Safari/608.3.10");
+	[LibraryImport(LibUltralight)]
+	public static partial void ulViewConfigSetUserAgent(_ULViewConfig* viewConfig, [MarshalUsing(typeof(ULString))] string agent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/608.3.10 (KHTML, like Gecko) Ultralight/1.3.0 Safari/608.3.10");
 }
 
+[SuppressMessage("Code Rule", "IDE1006: Naming rule violation")]
+[CustomMarshaller(typeof(ULViewConfig), MarshalMode.ManagedToUnmanagedIn, typeof(_ULViewConfig))]
 public struct _ULViewConfig : IDisposable
 {
 	private byte _IsAccelerated = 0;
@@ -102,11 +104,8 @@ public struct _ULViewConfig : IDisposable
 		UserAgent = userAgent;
 	}
 
-	public _ULViewConfig(ULViewConfig config)
+	public void FromManaged(ULViewConfig config)
 	{
-#if NET5_0_OR_GREATER
-		Unsafe.SkipInit(out this);
-#endif
 		_IsAccelerated = Unsafe.As<bool, byte>(ref config.IsAccelerated);
 		_IsTransparent = Unsafe.As<bool, byte>(ref config.IsTransparent);
 		InitialDeviceScale = config.InitialDeviceScale;
@@ -119,7 +118,8 @@ public struct _ULViewConfig : IDisposable
 		FontFamilySansSerif = new(config.FontFamilySansSerif.AsSpan());
 		UserAgent = new(config.UserAgent.AsSpan());
 	}
-	public void Dispose()
+	public _ULViewConfig ToUnmanaged() => this;
+	public void Free()
 	{
 		FontFamilyStandard.Dispose();
 		FontFamilyFixed.Dispose();
@@ -127,6 +127,7 @@ public struct _ULViewConfig : IDisposable
 		FontFamilySansSerif.Dispose();
 		UserAgent.Dispose();
 	}
+	void IDisposable.Dispose() => Free();
 }
 /// <inheritdoc cref="_ULViewConfig" />
 [NativeMarshalling(typeof(_ULViewConfig))]

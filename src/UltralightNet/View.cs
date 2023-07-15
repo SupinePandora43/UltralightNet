@@ -1,133 +1,127 @@
-using System;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
+using System.Runtime.InteropServices.Marshalling;
 using UltralightNet.LowStuff;
 
 namespace UltralightNet;
 
 public static unsafe partial class Methods
 {
-	[DllImport(LibUltralight)]
-	public static extern void* ulCreateView(Handle<Renderer> renderer, uint width, uint height, _ULViewConfig* viewConfig, Handle<Session> session);
-	// INTEROPTODO: NATIVEMARSHALLING
-	//[GeneratedDllImport(LibUltralight)]
-	public static IntPtr ulCreateView(Handle<Renderer> renderer, uint width, uint height, in ULViewConfig viewConfig, Handle<Session> session)
-	{
-		_ULViewConfig nativeConfig = new(viewConfig);
-		var ret = ulCreateView(renderer, width, height, &nativeConfig, session);
-		nativeConfig.Dispose();
-		return (IntPtr)ret;
-	}
+	[LibraryImport(LibUltralight)]
+	public static partial void* ulCreateView(Handle<Renderer> renderer, uint width, uint height, _ULViewConfig* viewConfig, Handle<Session> session);
 
-	[DllImport(LibUltralight)]
-	public static extern void ulDestroyView(IntPtr view);
+	[LibraryImport(LibUltralight)]
+	public static partial IntPtr ulCreateView(Handle<Renderer> renderer, uint width, uint height, in ULViewConfig viewConfig, Handle<Session> session);
 
-	[GeneratedDllImport(LibUltralight)]
-	[return: MarshalUsing(typeof(ULString.ToManaged_))]
+	[LibraryImport(LibUltralight)]
+	public static partial void ulDestroyView(IntPtr view);
+
+	[LibraryImport(LibUltralight)]
+	[return: MarshalUsing(typeof(ULString))]
 	public static partial string ulViewGetURL(IntPtr view);
 
-	[GeneratedDllImport(LibUltralight)]
-	[return: MarshalUsing(typeof(ULString.ToManaged_))]
+	[LibraryImport(LibUltralight)]
+	[return: MarshalUsing(typeof(ULString))]
 	public static partial string ulViewGetTitle(IntPtr view);
 
-	[DllImport(LibUltralight)]
-	public static extern uint ulViewGetWidth(IntPtr view);
+	[LibraryImport(LibUltralight)]
+	public static partial uint ulViewGetWidth(IntPtr view);
 
-	[DllImport(LibUltralight)]
-	public static extern uint ulViewGetHeight(IntPtr view);
+	[LibraryImport(LibUltralight)]
+	public static partial uint ulViewGetHeight(IntPtr view);
 
-	[DllImport(LibUltralight)]
-	public static extern double ulViewGetDeviceScale(IntPtr view);
+	[LibraryImport(LibUltralight)]
+	public static partial double ulViewGetDeviceScale(IntPtr view);
 
-	[DllImport(LibUltralight)]
-	public static extern void ulViewSetDeviceScale(IntPtr view, double scale);
+	[LibraryImport(LibUltralight)]
+	public static partial void ulViewSetDeviceScale(IntPtr view, double scale);
 
-	[GeneratedDllImport(LibUltralight)]
+	[LibraryImport(LibUltralight)]
 	[return: MarshalAs(UnmanagedType.I1)]
 	public static partial bool ulViewIsAccelerated(IntPtr view);
 
-	[GeneratedDllImport(LibUltralight)]
+	[LibraryImport(LibUltralight)]
 	[return: MarshalAs(UnmanagedType.I1)]
 	public static partial bool ulViewIsTransparent(IntPtr view);
 
-	[GeneratedDllImport(LibUltralight)]
+	[LibraryImport(LibUltralight)]
 	[return: MarshalAs(UnmanagedType.I1)]
 	public static partial bool ulViewIsLoading(IntPtr view);
 
-	[DllImport(LibUltralight)]
-	public static extern RenderTarget ulViewGetRenderTarget(IntPtr view);
+	[LibraryImport(LibUltralight)]
+	public static partial RenderTarget ulViewGetRenderTarget(IntPtr view);
 
-	[DllImport(LibUltralight)]
-	public static extern IntPtr ulViewGetSurface(IntPtr view);
+	[LibraryImport(LibUltralight)]
+	public static partial IntPtr ulViewGetSurface(IntPtr view);
 
-	[GeneratedDllImport(LibUltralight)]
-	public static partial void ulViewLoadHTML(IntPtr view, [MarshalUsing(typeof(ULString.ToNative))] string html_string);
+	[LibraryImport(LibUltralight)]
+	public static partial void ulViewLoadHTML(IntPtr view, [MarshalUsing(typeof(ULString))] string html_string);
 
-	[GeneratedDllImport(LibUltralight)]
-	public static partial void ulViewLoadURL(IntPtr view, [MarshalUsing(typeof(ULString.ToNative))] string url_string);
+	[LibraryImport(LibUltralight)]
+	public static partial void ulViewLoadURL(IntPtr view, [MarshalUsing(typeof(ULString))] string url_string);
 
-	[DllImport(LibUltralight)]
-	public static extern void ulViewResize(IntPtr view, uint width, uint height);
+	[LibraryImport(LibUltralight)]
+	public static partial void ulViewResize(IntPtr view, uint width, uint height);
 
 	//todo: JavaScriptCore bindings
-	[DllImport(LibUltralight)]
-	public static extern unsafe void* ulViewLockJSContext(IntPtr view);
+	[LibraryImport(LibUltralight)]
+	public static partial void* ulViewLockJSContext(IntPtr view);
 
-	[DllImport(LibUltralight)]
-	public static extern void ulViewUnlockJSContext(IntPtr view);
+	[LibraryImport(LibUltralight)]
+	public static partial void ulViewUnlockJSContext(IntPtr view);
 
-	[GeneratedDllImport(LibUltralight)]
-	[return: MarshalUsing(typeof(ULString.ToManaged_))]
-	public static partial string ulViewEvaluateScript(IntPtr view, [MarshalUsing(typeof(ULString.ToNative))] string js, [MarshalUsing(typeof(ULString.ToManaged_))] out string exception);
+	[LibraryImport(LibUltralight)]
+	[return: MarshalUsing(typeof(ULString))]
+	public static partial string ulViewEvaluateScript(IntPtr view, [MarshalUsing(typeof(ULString))] string js, [MarshalUsing(typeof(ULString))] out string exception);
 
 	/// <summary>Check if can navigate backwards in history.</summary>
-	[GeneratedDllImport(LibUltralight)]
+	[LibraryImport(LibUltralight)]
 	[return: MarshalAs(UnmanagedType.I1)]
 	public static partial bool ulViewCanGoBack(IntPtr view);
 
 	/// <summary>Check if can navigate forwards in history.</summary>
-	[GeneratedDllImport(LibUltralight)]
+	[LibraryImport(LibUltralight)]
 	[return: MarshalAs(UnmanagedType.I1)]
 	public static partial bool ulViewCanGoForward(IntPtr view);
 
 	/// <summary>Navigate backwards in history.</summary>
-	[DllImport(LibUltralight)]
-	public static extern void ulViewGoBack(IntPtr view);
+	[LibraryImport(LibUltralight)]
+	public static partial void ulViewGoBack(IntPtr view);
 
 	/// <summary>Navigate forwards in history.</summary>
-	[DllImport(LibUltralight)]
-	public static extern void ulViewGoForward(IntPtr view);
+	[LibraryImport(LibUltralight)]
+	public static partial void ulViewGoForward(IntPtr view);
 
 	/// <summary>Navigate to arbitrary offset in history.</summary>
-	[DllImport(LibUltralight)]
-	public static extern void ulViewGoToHistoryOffset(IntPtr view, int offset);
+	[LibraryImport(LibUltralight)]
+	public static partial void ulViewGoToHistoryOffset(IntPtr view, int offset);
 
 	/// <summary>Reload current page.</summary>
-	[DllImport(LibUltralight)]
-	public static extern void ulViewReload(IntPtr view);
+	[LibraryImport(LibUltralight)]
+	public static partial void ulViewReload(IntPtr view);
 
 	/// <summary>Stop all page loads.</summary>
-	[DllImport(LibUltralight)]
-	public static extern void ulViewStop(IntPtr view);
+	[LibraryImport(LibUltralight)]
+	public static partial void ulViewStop(IntPtr view);
 
 	/// <summary>Give focus to the View.</summary>
 	/// <remarks>
 	/// You should call this to give visual indication that the View has input
 	/// focus (changes active text selection colors, for example).
 	/// </remarks>
-	[DllImport(LibUltralight)]
-	public static extern void ulViewFocus(IntPtr view);
+	[LibraryImport(LibUltralight)]
+	public static partial void ulViewFocus(IntPtr view);
 
 	/// <summary>Remove focus from the View and unfocus any focused input elements.</summary>
 	/// <remarks>
 	/// You should call this to give visual indication that the View has lost
 	/// input focus.
 	/// </remarks>
-	[DllImport(LibUltralight)]
-	public static extern void ulViewUnfocus(IntPtr view);
+	[LibraryImport(LibUltralight)]
+	public static partial void ulViewUnfocus(IntPtr view);
 
 	/// <summary>Whether or not the View has focus.</summary>
-	[GeneratedDllImport(LibUltralight)]
+	[LibraryImport(LibUltralight)]
 	[return: MarshalAs(UnmanagedType.I1)]
 	public static partial bool ulViewHasFocus(IntPtr view);
 
@@ -136,64 +130,63 @@ public static unsafe partial class Methods
 	/// You can use this to decide whether or not the View should consume
 	/// keyboard input events (useful in games with mixed UI and key handling).
 	/// </remarks>
-	[GeneratedDllImport(LibUltralight)]
-	[return: MarshalAs(UnmanagedType.I1)]
+	[LibraryImport(LibUltralight)]
 	public static partial bool ulViewHasInputFocus(IntPtr view);
 
-	[DllImport(LibUltralight)]
-	public static extern void ulViewFireKeyEvent(IntPtr view, IntPtr key_event);
+	[LibraryImport(LibUltralight)]
+	public static partial void ulViewFireKeyEvent(IntPtr view, IntPtr key_event);
 
-	[DllImport(LibUltralight)]
-	public static extern unsafe void ulViewFireMouseEvent(IntPtr view, ULMouseEvent* mouseEvent);
+	[LibraryImport(LibUltralight)]
+	public static partial void ulViewFireMouseEvent(IntPtr view, ULMouseEvent* mouseEvent);
 
-	[DllImport(LibUltralight)]
-	public static extern unsafe void ulViewFireScrollEvent(IntPtr view, ULScrollEvent* scrollEvent);
+	[LibraryImport(LibUltralight)]
+	public static partial void ulViewFireScrollEvent(IntPtr view, ULScrollEvent* scrollEvent);
 
-	[GeneratedDllImport(LibUltralight)]
+	[LibraryImport(LibUltralight)]
 	public static partial void ulViewSetChangeTitleCallback(IntPtr view, ULChangeTitleCallback__PInvoke__? callback, IntPtr user_data);
 
-	[GeneratedDllImport(LibUltralight)]
+	[LibraryImport(LibUltralight)]
 	public static partial void ulViewSetChangeURLCallback(IntPtr view, ULChangeURLCallback__PInvoke__? callback, IntPtr user_data);
 
-	[GeneratedDllImport(LibUltralight)]
+	[LibraryImport(LibUltralight)]
 	public static partial void ulViewSetChangeTooltipCallback(IntPtr view, ULChangeTooltipCallback__PInvoke__? callback, IntPtr user_data);
 
-	[GeneratedDllImport(LibUltralight)]
+	[LibraryImport(LibUltralight)]
 	public static partial void ulViewSetChangeCursorCallback(IntPtr view, ULChangeCursorCallback__PInvoke__? callback, IntPtr user_data);
 
-	[GeneratedDllImport(LibUltralight)]
+	[LibraryImport(LibUltralight)]
 	public static partial void ulViewSetAddConsoleMessageCallback(IntPtr view, ULAddConsoleMessageCallback__PInvoke__? callback, IntPtr user_data);
 
-	[GeneratedDllImport(LibUltralight)]
+	[LibraryImport(LibUltralight)]
 	public static partial void ulViewSetCreateChildViewCallback(IntPtr view, ULCreateChildViewCallback__PInvoke__? callback, IntPtr user_data);
 
-	[GeneratedDllImport(LibUltralight)]
+	[LibraryImport(LibUltralight)]
 	public static partial void ulViewSetBeginLoadingCallback(IntPtr view, ULBeginLoadingCallback__PInvoke__? callback, IntPtr user_data);
 
-	[GeneratedDllImport(LibUltralight)]
+	[LibraryImport(LibUltralight)]
 	public static partial void ulViewSetFinishLoadingCallback(IntPtr view, ULFinishLoadingCallback__PInvoke__? callback, IntPtr user_data);
 
-	[GeneratedDllImport(LibUltralight)]
+	[LibraryImport(LibUltralight)]
 	public static partial void ulViewSetFailLoadingCallback(IntPtr view, ULFailLoadingCallback__PInvoke__? callback, IntPtr user_data);
 
-	[GeneratedDllImport(LibUltralight)]
+	[LibraryImport(LibUltralight)]
 	public static partial void ulViewSetWindowObjectReadyCallback(IntPtr view, ULWindowObjectReadyCallback__PInvoke__? callback, IntPtr user_data);
 
-	[GeneratedDllImport(LibUltralight)]
+	[LibraryImport(LibUltralight)]
 	public static partial void ulViewSetDOMReadyCallback(IntPtr view, ULDOMReadyCallback__PInvoke__? callback, IntPtr user_data);
 
-	[GeneratedDllImport(LibUltralight)]
+	[LibraryImport(LibUltralight)]
 	public static partial void ulViewSetUpdateHistoryCallback(IntPtr view, ULUpdateHistoryCallback__PInvoke__? callback, IntPtr user_data);
 
-	[GeneratedDllImport(LibUltralight)]
-	public static partial void ulViewSetNeedsPaint(IntPtr view, [MarshalAs(UnmanagedType.I1)] bool needs_paint);
+	[LibraryImport(LibUltralight)]
+	public static partial void ulViewSetNeedsPaint(IntPtr view, bool needs_paint);
 
-	[GeneratedDllImport(LibUltralight)]
+	[LibraryImport(LibUltralight)]
 	[return: MarshalAs(UnmanagedType.I1)]
 	public static partial bool ulViewGetNeedsPaint(IntPtr view);
 
-	[DllImport(LibUltralight)]
-	public static extern IntPtr ulViewCreateInspectorView(IntPtr view);
+	[LibraryImport(LibUltralight)]
+	public static partial IntPtr ulViewCreateInspectorView(IntPtr view);
 }
 
 public unsafe class View : IDisposable
@@ -605,7 +598,7 @@ public unsafe class View : IDisposable
 	{
 		if (callback is not null)
 		{
-			ULChangeTitleCallback__PInvoke__ callback__PInvoke__ = (user_data, caller, title) => callback(user_data, new View(caller), ULString.NativeToManaged(title));
+			ULChangeTitleCallback__PInvoke__ callback__PInvoke__ = (user_data, caller, title) => callback(user_data, new View(caller), title->ToString());
 			Handle(0, GCHandle.Alloc(callback__PInvoke__, GCHandleType.Normal));
 			Methods.ulViewSetChangeTitleCallback(Ptr, callback__PInvoke__, userData);
 		}
@@ -619,7 +612,7 @@ public unsafe class View : IDisposable
 	{
 		if (callback is not null)
 		{
-			ULChangeURLCallback__PInvoke__ callback__PInvoke__ = (user_data, caller, url) => callback(user_data, new View(caller), ULString.NativeToManaged(url));
+			ULChangeURLCallback__PInvoke__ callback__PInvoke__ = (user_data, caller, url) => callback(user_data, new View(caller), url->ToString());
 			Handle(1, GCHandle.Alloc(callback__PInvoke__, GCHandleType.Normal));
 			Methods.ulViewSetChangeURLCallback(Ptr, callback__PInvoke__, userData);
 		}
@@ -633,7 +626,7 @@ public unsafe class View : IDisposable
 	{
 		if (callback is not null)
 		{
-			ULChangeTooltipCallback__PInvoke__ callback__PInvoke__ = (user_data, caller, tooltip) => callback(user_data, new View(caller), ULString.NativeToManaged(tooltip));
+			ULChangeTooltipCallback__PInvoke__ callback__PInvoke__ = (user_data, caller, tooltip) => callback(user_data, new View(caller), tooltip->ToString());
 			Handle(2, GCHandle.Alloc(callback__PInvoke__, GCHandleType.Normal));
 			Methods.ulViewSetChangeTooltipCallback(Ptr, callback__PInvoke__, userData);
 		}
@@ -661,7 +654,7 @@ public unsafe class View : IDisposable
 	{
 		if (callback is not null)
 		{
-			ULAddConsoleMessageCallback__PInvoke__ callback__PInvoke__ = (user_data, caller, source, level, message, line_number, column_number, source_id) => callback(user_data, new View(caller), source, level, ULString.NativeToManaged(message), line_number, column_number, ULString.NativeToManaged(source_id));
+			ULAddConsoleMessageCallback__PInvoke__ callback__PInvoke__ = (user_data, caller, source, level, message, line_number, column_number, source_id) => callback(user_data, new View(caller), source, level, message->ToString(), line_number, column_number, source_id->ToString());
 			Handle(4, GCHandle.Alloc(callback__PInvoke__, GCHandleType.Normal));
 			Methods.ulViewSetAddConsoleMessageCallback(Ptr, callback__PInvoke__, userData);
 		}
@@ -677,7 +670,7 @@ public unsafe class View : IDisposable
 		{
 			ULCreateChildViewCallback__PInvoke__ callback__PInvoke__ = (user_data, caller, opener_url, target_url, is_popup, popup_rect) =>
 			{
-				View? view = callback(user_data, new View(caller), ULString.NativeToManaged(opener_url), ULString.NativeToManaged(target_url), is_popup != 0, popup_rect);
+				View? view = callback(user_data, new View(caller), opener_url->ToString(), target_url->ToString(), is_popup != 0, popup_rect);
 				return view is null ? IntPtr.Zero : view.Ptr;
 			};
 			Handle(5, GCHandle.Alloc(callback__PInvoke__, GCHandleType.Normal));
@@ -693,7 +686,7 @@ public unsafe class View : IDisposable
 	{
 		if (callback is not null)
 		{
-			ULBeginLoadingCallback__PInvoke__ callback__PInvoke__ = (user_data, caller, frame_id, is_main_frame, url) => callback(user_data, new View(caller), frame_id, is_main_frame != 0, ULString.NativeToManaged(url));
+			ULBeginLoadingCallback__PInvoke__ callback__PInvoke__ = (user_data, caller, frame_id, is_main_frame, url) => callback(user_data, new View(caller), frame_id, is_main_frame != 0, url->ToString());
 			Handle(6, GCHandle.Alloc(callback__PInvoke__, GCHandleType.Normal));
 			Methods.ulViewSetBeginLoadingCallback(Ptr, callback__PInvoke__, userData);
 		}
@@ -707,7 +700,7 @@ public unsafe class View : IDisposable
 	{
 		if (callback is not null)
 		{
-			ULFinishLoadingCallback__PInvoke__ callback__PInvoke__ = (user_data, caller, frame_id, is_main_frame, url) => callback(user_data, new View(caller), frame_id, is_main_frame != 0, ULString.NativeToManaged(url));
+			ULFinishLoadingCallback__PInvoke__ callback__PInvoke__ = (user_data, caller, frame_id, is_main_frame, url) => callback(user_data, new View(caller), frame_id, is_main_frame != 0, url->ToString());
 			Handle(7, GCHandle.Alloc(callback__PInvoke__, GCHandleType.Normal));
 			Methods.ulViewSetFinishLoadingCallback(Ptr, callback__PInvoke__, userData);
 		}
@@ -721,7 +714,7 @@ public unsafe class View : IDisposable
 	{
 		if (callback is not null)
 		{
-			ULFailLoadingCallback__PInvoke__ callback__PInvoke__ = (user_data, caller, frame_id, is_main_frame, url, description, error_domain, error_code) => callback(user_data, new View(caller), frame_id, is_main_frame != 0, ULString.NativeToManaged(url), ULString.NativeToManaged(description), ULString.NativeToManaged(error_domain), error_code);
+			ULFailLoadingCallback__PInvoke__ callback__PInvoke__ = (user_data, caller, frame_id, is_main_frame, url, description, error_domain, error_code) => callback(user_data, new View(caller), frame_id, is_main_frame != 0, url->ToString(), description->ToString(), error_domain->ToString(), error_code);
 			Handle(8, GCHandle.Alloc(callback__PInvoke__, GCHandleType.Normal));
 			Methods.ulViewSetFailLoadingCallback(Ptr, callback__PInvoke__, userData);
 		}
@@ -735,7 +728,7 @@ public unsafe class View : IDisposable
 	{
 		if (callback is not null)
 		{
-			ULWindowObjectReadyCallback__PInvoke__ callback__PInvoke__ = (user_data, caller, frame_id, is_main_frame, url) => callback(user_data, new View(caller), frame_id, is_main_frame != 0, ULString.NativeToManaged(url));
+			ULWindowObjectReadyCallback__PInvoke__ callback__PInvoke__ = (user_data, caller, frame_id, is_main_frame, url) => callback(user_data, new View(caller), frame_id, is_main_frame != 0, url->ToString());
 			Handle(9, GCHandle.Alloc(callback__PInvoke__, GCHandleType.Normal));
 			Methods.ulViewSetWindowObjectReadyCallback(Ptr, callback__PInvoke__, userData);
 		}
@@ -749,7 +742,7 @@ public unsafe class View : IDisposable
 	{
 		if (callback is not null)
 		{
-			ULDOMReadyCallback__PInvoke__ callback__PInvoke__ = (user_data, caller, frame_id, is_main_frame, url) => callback(user_data, new View(caller), frame_id, is_main_frame != 0, ULString.NativeToManaged(url));
+			ULDOMReadyCallback__PInvoke__ callback__PInvoke__ = (user_data, caller, frame_id, is_main_frame, url) => callback(user_data, new View(caller), frame_id, is_main_frame != 0, url->ToString());
 			Handle(10, GCHandle.Alloc(callback__PInvoke__, GCHandleType.Normal));
 			Methods.ulViewSetDOMReadyCallback(Ptr, callback__PInvoke__, userData);
 		}

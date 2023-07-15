@@ -1,7 +1,7 @@
-using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
+using System.Runtime.InteropServices.Marshalling;
 
 namespace UltralightNet;
 
@@ -19,12 +19,12 @@ public static unsafe partial class Methods
 
 	/// <summary>Set the file path to a writable directory that will be used to store cookies, cached resources, and other persistent data.</summary>
 	[Obsolete]
-	[GeneratedDllImport(LibUltralight)]
-	public static partial void ulConfigSetCachePath(_ULConfig* config, [MarshalUsing(typeof(ULString.ToNative))] string cachePath = "");
+	[LibraryImport(LibUltralight)]
+	public static partial void ulConfigSetCachePath(_ULConfig* config, [MarshalUsing(typeof(ULString))] string cachePath = "");
 
 	[Obsolete]
-	[GeneratedDllImport(LibUltralight)]
-	public static partial void ulConfigSetResourcePathPrefix(_ULConfig* config, [MarshalUsing(typeof(ULString.ToNative))] string resourcePathPrefix = "resources/");
+	[LibraryImport(LibUltralight)]
+	public static partial void ulConfigSetResourcePathPrefix(_ULConfig* config, [MarshalUsing(typeof(ULString))] string resourcePathPrefix = "resources/");
 
 	/// <summary>The winding order for front-facing triangles.</summary>
 	/// <see cref="ULFaceWinding"/>
@@ -46,13 +46,13 @@ public static unsafe partial class Methods
 
 	/// <summary>Set user stylesheet (CSS) (Default = Empty).</summary>
 	[Obsolete]
-	[GeneratedDllImport(LibUltralight)]
-	public static partial void ulConfigSetUserStylesheet(_ULConfig* config, [MarshalUsing(typeof(ULString.ToNative))] string font_name);
+	[LibraryImport(LibUltralight)]
+	public static partial void ulConfigSetUserStylesheet(_ULConfig* config, [MarshalUsing(typeof(ULString))] string font_name);
 
 	/// <summary>Set whether or not we should continuously repaint any Views or compositor layers, regardless if they are dirty or not. This is mainly used to diagnose painting/shader issues.</summary>
 	[Obsolete]
-	[GeneratedDllImport(LibUltralight)]
-	public static partial void ulConfigSetForceRepaint(_ULConfig* config, [MarshalAs(UnmanagedType.I1)] bool enabled = false);
+	[LibraryImport(LibUltralight)]
+	public static partial void ulConfigSetForceRepaint(_ULConfig* config, bool enabled = false);
 
 	/// <summary>Set the amount of time to wait before triggering another repaint when a CSS animation is active.</summary>
 	[Obsolete]
@@ -115,8 +115,8 @@ public static unsafe partial class Methods
 }
 
 /// <summary>Configuration settings for Ultralight.</summary>
-[StructLayout(LayoutKind.Sequential)]
-[CustomTypeMarshaller(typeof(ULConfig), CustomTypeMarshallerKind.Value, Direction = CustomTypeMarshallerDirection.In, Features = CustomTypeMarshallerFeatures.TwoStageMarshalling)]
+[SuppressMessage("Code Rule", "IDE1006: Naming rule violation")]
+[CustomMarshaller(typeof(ULConfig), MarshalMode.ManagedToUnmanagedIn, typeof(_ULConfig))]
 public unsafe struct _ULConfig : IDisposable
 {
 	/// <summary>The file path to a writable directory that will be used to store cookies, cached resources, and other persistent data.</summary>
@@ -194,11 +194,8 @@ public unsafe struct _ULConfig : IDisposable
 		UserStylesheet = userStylesheet;
 	}
 
-	public _ULConfig(in ULConfig config)
+	public void FromManaged(ULConfig config)
 	{
-#if NET5_0_OR_GREATER
-		Unsafe.SkipInit(out this);
-#endif
 		CachePath = new(config.CachePath.AsSpan());
 		ResourcePathPrefix = new ULString(config.ResourcePathPrefix.AsSpan());
 		_FaceWinding = Unsafe.As<ULFaceWinding, byte>(ref Unsafe.AsRef(config.FaceWinding));
@@ -218,13 +215,15 @@ public unsafe struct _ULConfig : IDisposable
 		MaxUpdateTime = config.MaxUpdateTime;
 		BitmapAlignment = config.BitmapAlignment;
 	}
+	public _ULConfig ToUnmanaged() => this;
 
-	public void Dispose()
+	public void Free()
 	{
 		CachePath.Dispose();
 		ResourcePathPrefix.Dispose();
 		UserStylesheet.Dispose();
 	}
+	void IDisposable.Dispose() => Free();
 }
 /// <inheritdoc cref="_ULConfig" />
 [NativeMarshalling(typeof(_ULConfig))]

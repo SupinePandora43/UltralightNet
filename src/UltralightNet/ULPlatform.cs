@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
 using System.IO;
@@ -324,7 +323,7 @@ public static unsafe class ULPlatform
 				GetFileCharset = (string file) => "utf-8",
 				_OpenFile = (ULString* file) =>
 				{
-					Stream? s = ULString.NativeToManaged(file) switch
+					Stream? s = file->ToString() switch
 					{
 						"resources/cacert.pem" => Resources.Cacertpem,
 						"resources/icudt67l.dat" => Resources.Icudt67ldat,

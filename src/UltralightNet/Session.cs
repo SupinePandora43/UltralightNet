@@ -1,5 +1,5 @@
-using System;
 using System.Runtime.InteropServices;
+using System.Runtime.InteropServices.Marshalling;
 using UltralightNet.LowStuff;
 
 namespace UltralightNet;
@@ -7,8 +7,8 @@ namespace UltralightNet;
 public static partial class Methods
 {
 	/// <summary>Create a Session to store local data in (such as cookies, local storage, application cache, indexed db, etc).</summary>
-	[GeneratedDllImport(LibUltralight)]
-	public static partial Handle<Session> ulCreateSession(Handle<Renderer> renderer, [MarshalAs(UnmanagedType.I1)] bool is_persistent, [MarshalUsing(typeof(ULString.ToNative))] string name);
+	[LibraryImport(LibUltralight)]
+	public static partial Handle<Session> ulCreateSession(Handle<Renderer> renderer, bool is_persistent, [MarshalUsing(typeof(ULString))] string name);
 
 	/// <summary>Destroy a Session.</summary>
 	[DllImport(LibUltralight)]
@@ -20,13 +20,12 @@ public static partial class Methods
 	public static extern Handle<Session> ulDefaultSession(Handle<Renderer> renderer);
 
 	/// <summary>Whether or not is persistent (backed to disk).</summary>
-	[GeneratedDllImport(LibUltralight)]
-	[return: MarshalAs(UnmanagedType.I1)]
+	[LibraryImport(LibUltralight)]
 	public static partial bool ulSessionIsPersistent(Handle<Session> session);
 
 	/// <summary>Unique name identifying the session (used for unique disk path).</summary>
-	[GeneratedDllImport(LibUltralight)]
-	[return: MarshalUsing(typeof(ULString.ToManaged_))]
+	[LibraryImport(LibUltralight)]
+	[return: MarshalUsing(typeof(ULString))]
 	public static partial string ulSessionGetName(Handle<Session> session);
 
 	/// <summary>Unique numeric Id for the session.</summary>
@@ -34,8 +33,8 @@ public static partial class Methods
 	public static extern ulong ulSessionGetId(Handle<Session> session);
 
 	/// <summary>The disk path to write to (used by persistent sessions only).</summary>
-	[GeneratedDllImport(LibUltralight)]
-	[return: MarshalUsing(typeof(ULString.ToManaged_))]
+	[LibraryImport(LibUltralight)]
+	[return: MarshalUsing(typeof(ULString))]
 	public static partial string ulSessionGetDiskPath(Handle<Session> session);
 }
 
