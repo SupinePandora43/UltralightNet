@@ -1,9 +1,9 @@
-using System;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
-using UltralightNet.LowStuff;
+using System.Runtime.InteropServices.Marshalling;
 using UltralightNet.Gamepad;
+using UltralightNet.LowStuff;
 
 namespace UltralightNet;
 
@@ -35,13 +35,15 @@ public static unsafe partial class Methods
 	public static extern void ulLogMemoryUsage(Handle<Renderer> renderer);
 
 	[LibraryImport(LibUltralight)]
-	public static extern bool ulStartRemoteInspectorServer(Handle<Renderer> renderer, ReadOnlySpan<byte> address, ushort port);
+	[return: MarshalAs(UnmanagedType.U1)]
+	public static partial bool ulStartRemoteInspectorServer(Handle<Renderer> renderer, ReadOnlySpan<byte> address, ushort port);
 
 	[LibraryImport(LibUltralight)]
-	public static extern bool ulStartRemoteInspectorServer(Handle<Renderer> renderer, [MarshalAs(UnmanagedType.LPStr)]ReadOnlySpan<char> address, ushort port);
+	[return: MarshalAs(UnmanagedType.U1)]
+	public static partial bool ulStartRemoteInspectorServer(Handle<Renderer> renderer, [MarshalAs(UnmanagedType.LPUTF8Str)] string address, ushort port);
 
-	[DllImport(LibUltralight)]
-	public static extern void ulSetGamepadDetails(Handle<Renderer> renderer, uint index, ULString id, uint axisCount, uint buttonCount);
+	[LibraryImport(LibUltralight)]
+	public static partial void ulSetGamepadDetails(Handle<Renderer> renderer, uint index, [MarshalUsing(typeof(ULString))] string id, uint axisCount, uint buttonCount);
 
 	[DllImport(LibUltralight)]
 	public static extern void ulFireGamepadEvent(Handle<Renderer> renderer, GamepadEvent gamepadEvent);
@@ -115,17 +117,33 @@ public unsafe class Renderer : INativeContainer<Renderer>, INativeContainerInter
 	public void PurgeMemory() { Methods.ulPurgeMemory(Handle); GC.KeepAlive(this); }
 	public void LogMemoryUsage() { Methods.ulLogMemoryUsage(Handle); GC.KeepAlive(this); }
 
-	public void StartRemoteInspectorServer(ReadOnlySpan<byte> address, ushort port){
-		throw new NotImplementedException();
+	public void StartRemoteInspectorServer(string address, ushort port)
+	{
 		bool result = Methods.ulStartRemoteInspectorServer(Handle, address, port);
 		GC.KeepAlive(this);
-		if(!result) throw new System.Net.WebException("Failed to start remote inspector server.");
+		throw new NotImplementedException("Error handling is not yet implemented.");
 	}
 
-	public void SetGamepadDetails(uint index, ReadOnlySpan<char> id, uint axisCount, uint buttonCount) => throw new NotImplementedException();
-	public void FireGamepadEvent(GamepadEvent gamepadEvent) => throw new NotImplementedException();
-	public void FireGamepadAxisEvent(GamepadAxisEvent gamepadAxisEvent) => throw new NotImplementedException();
-	public void FireGamepadButtonEvent(GamepadButtonEvent gamepadbuttonEvent) => throw new NotImplementedException();
+	public void SetGamepadDetails(uint index, string id, uint axisCount, uint buttonCount)
+	{
+		Methods.ulSetGamepadDetails(Handle, index, id, axisCount, buttonCount);
+		GC.KeepAlive(this);
+	}
+	public void FireGamepadEvent(GamepadEvent gamepadEvent)
+	{
+		Methods.ulFireGamepadEvent(Handle, gamepadEvent);
+		GC.KeepAlive(this);
+	}
+	public void FireGamepadAxisEvent(GamepadAxisEvent gamepadAxisEvent)
+	{
+		Methods.ulFireGamepadAxisEvent(Handle, gamepadAxisEvent);
+		GC.KeepAlive(this);
+	}
+	public void FireGamepadButtonEvent(GamepadButtonEvent gamepadbuttonEvent)
+	{
+		Methods.ulFireGamepadButtonEvent(Handle, gamepadbuttonEvent);
+		GC.KeepAlive(this);
+	}
 
 	[SuppressMessage("Usage", "CA1816: Call GC.SupressFinalize correctly")]
 	public override void Dispose()
