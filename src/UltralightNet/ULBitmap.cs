@@ -17,7 +17,7 @@ public static unsafe partial class Methods
 
 	/// <summary>Create bitmap from existing pixel buffer. @see Bitmap for help using this function.</summary>
 	[LibraryImport(LibUltralight)]
-	public static unsafe partial Handle<ULBitmap> ulCreateBitmapFromPixels(uint width, uint height, ULBitmapFormat format, uint rowBytes, byte* pixels, nuint size, bool shouldCopy);
+	public static unsafe partial Handle<ULBitmap> ulCreateBitmapFromPixels(uint width, uint height, ULBitmapFormat format, uint rowBytes, byte* pixels, nuint size, [MarshalAs(UnmanagedType.U1)] bool shouldCopy);
 
 	/// <summary>Create bitmap from copy.</summary>
 	[DllImport(LibUltralight)]
@@ -55,6 +55,7 @@ public static unsafe partial class Methods
 
 	/// <summary>Whether or not this bitmap owns its own pixel buffer.</summary>
 	[LibraryImport(LibUltralight)]
+	[return: MarshalAs(UnmanagedType.U1)]
 	public static partial bool ulBitmapOwnsPixels(Handle<ULBitmap> bitmap);
 
 	/// <summary>Lock pixels for reading/writing, returns pointer to pixel buffer.</summary>
@@ -72,6 +73,7 @@ public static unsafe partial class Methods
 
 	/// <summary>Whether or not this bitmap is empty.</summary>
 	[LibraryImport(LibUltralight)]
+	[return: MarshalAs(UnmanagedType.U1)]
 	public static partial bool ulBitmapIsEmpty(Handle<ULBitmap> bitmap);
 
 	/// <summary>Reset bitmap pixels to 0.</summary>
@@ -80,6 +82,7 @@ public static unsafe partial class Methods
 
 	/// <summary>Write bitmap to a PNG on disk.</summary>
 	[LibraryImport(LibUltralight)]
+	[return: MarshalAs(UnmanagedType.U1)]
 	public static partial bool ulBitmapWritePNG(Handle<ULBitmap> bitmap, [MarshalUsing(typeof(Utf8StringMarshaller))] string path);
 
 	/// <summary>This converts a BGRA bitmap to RGBA bitmap and vice-versa by swapping the red and blue channels.</summary>

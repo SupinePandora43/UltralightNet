@@ -1,13 +1,11 @@
 <Project Sdk="Microsoft.NET.Sdk">
 	<PropertyGroup>
-		<TargetFrameworks>net6.0;net471;net46;net451;net45;netstandard2.1;netstandard2</TargetFrameworks>
+		<TargetFrameworks>net7.0;net6.0;net471;net46;net451;net45;netstandard2.1;netstandard2</TargetFrameworks>
 		<UseAppHost>true</UseAppHost>
 		<IsPackable>true</IsPackable>
 
 		<PackageId>UltralightNet</PackageId>
 		<Description>Ultralight .NET bindings</Description>
-
-		<LangVersion>11</LangVersion>
 	</PropertyGroup>
 	<ItemGroup>
 	  <None Remove="resources\cacert.pem" />
@@ -24,10 +22,14 @@
 	  <EmbeddedResource Include="resources\mediaControlsLocalizedStrings.js" />
 	</ItemGroup>
 	<ItemGroup>
-		<PackageReference Include="ErrorProne.NET.Structs" Version="0.4.0-beta.1" OutputItemType="Analyzer" ReferenceOutputAssembly="false" PrivateAssets="All" />
-		<PackageReference Include="ErrorProne.NET.CoreAnalyzers" Version="0.4.0-beta.1" OutputItemType="Analyzer" ReferenceOutputAssembly="false" PrivateAssets="All" />
+		<Compile Remove="DllImportGenerator/**" Condition="'$(TargetFramework)'=='net7.0'" />
+		<Compile Remove="JavaScript/**" />
+	</ItemGroup>
+	<ItemGroup>
+		<!-- <PackageReference Include="ErrorProne.NET.Structs" Version="0.4.0-beta.1" OutputItemType="Analyzer" ReferenceOutputAssembly="false" PrivateAssets="All" /> -->
+		<!-- <PackageReference Include="ErrorProne.NET.CoreAnalyzers" Version="0.4.0-beta.1" OutputItemType="Analyzer" ReferenceOutputAssembly="false" PrivateAssets="All" /> -->
 
-		<PackageReference Include="Microsoft.Interop.DllImportGenerator" Version="7.0.0-preview.3.22123.2" OutputItemType="Analyzer" ReferenceOutputAssembly="false" PrivateAssets="All" />
+		<PackageReference Include="Microsoft.Interop.LibraryImportGenerator" Version="7.0.8.32201" OutputItemType="Analyzer" ReferenceOutputAssembly="false" PrivateAssets="All" />
 
 		<PackageReference Condition="'$(TargetFramework)'!='net5.0'" Include="System.Memory" Version="4.5.4" />
 		<PackageReference Condition="'$(TargetFramework)'!='net5.0'" Include="System.Numerics.Vectors" Version="4.5.0" />

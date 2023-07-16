@@ -8,7 +8,7 @@ public static partial class Methods
 {
 	/// <summary>Create a Session to store local data in (such as cookies, local storage, application cache, indexed db, etc).</summary>
 	[LibraryImport(LibUltralight)]
-	public static partial Handle<Session> ulCreateSession(Handle<Renderer> renderer, bool is_persistent, [MarshalUsing(typeof(ULString))] string name);
+	public static partial Handle<Session> ulCreateSession(Handle<Renderer> renderer, [MarshalAs(UnmanagedType.U1)] bool is_persistent, [MarshalUsing(typeof(ULString))] string name);
 
 	/// <summary>Destroy a Session.</summary>
 	[DllImport(LibUltralight)]
@@ -21,6 +21,7 @@ public static partial class Methods
 
 	/// <summary>Whether or not is persistent (backed to disk).</summary>
 	[LibraryImport(LibUltralight)]
+	[return: MarshalAs(UnmanagedType.U1)]
 	public static partial bool ulSessionIsPersistent(Handle<Session> session);
 
 	/// <summary>Unique name identifying the session (used for unique disk path).</summary>

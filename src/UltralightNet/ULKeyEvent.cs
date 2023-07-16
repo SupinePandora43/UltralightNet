@@ -12,9 +12,9 @@ public static unsafe partial class Methods
 		uint modifiers,
 		int virtual_key_code, int native_key_code,
 		[MarshalUsing(typeof(ULString))] string text, [MarshalUsing(typeof(ULString))] string unmodified_text,
-		bool is_keypad,
-		bool is_auto_repeat,
-		bool is_system_key);
+		[MarshalAs(UnmanagedType.U1)] bool is_keypad,
+		[MarshalAs(UnmanagedType.U1)] bool is_auto_repeat,
+		[MarshalAs(UnmanagedType.U1)] bool is_system_key);
 
 #if NETSTANDARD || NETFRAMEWORK
 	[DllImport(LibUltralight)]

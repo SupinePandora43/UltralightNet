@@ -1,10 +1,9 @@
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
-using System.Runtime.InteropServices.Marshalling;
 
 [assembly: InternalsVisibleTo("UltralightNet.AppCore")]
-[assembly: DisableRuntimeMarshallingAttribute]
+[assembly: DisableRuntimeMarshalling]
 [assembly: AssemblyMetadata("IsTrimmable", "True")]
 
 #if RELEASE
@@ -15,24 +14,23 @@ namespace UltralightNet;
 
 [System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE1006:Naming Styles", Justification = "<Pending>")]
 [System.Diagnostics.CodeAnalysis.SuppressMessage("Interoperability", "CA1401:P/Invokes should not be visible", Justification = "<Pending>")]
-public static partial class Methods
+public static unsafe partial class Methods
 {
 	public const string LibUltralight = "Ultralight";
 
 	static Methods() => Preload();
 
 	[LibraryImport(LibUltralight)]
-	[return: MarshalUsing(typeof(Utf8StringMarshaller))]
-	public static partial string ulVersionString();
+	public static partial byte* ulVersionString();
 
 	[LibraryImport(LibUltralight)]
-	public static extern uint ulVersionMajor();
+	public static partial uint ulVersionMajor();
 
 	[LibraryImport(LibUltralight)]
-	public static extern uint ulVersionMinor();
+	public static partial uint ulVersionMinor();
 
 	[LibraryImport(LibUltralight)]
-	public static extern uint ulVersionPatch();
+	public static partial uint ulVersionPatch();
 
 	/// <summary>
 	/// Preload Ultralight binaries on OSX/MacOS

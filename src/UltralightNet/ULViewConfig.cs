@@ -17,11 +17,11 @@ public static unsafe partial class Methods
 
 	[Obsolete]
 	[LibraryImport(LibUltralight)]
-	public static partial void ulViewConfigSetIsAccelerated(_ULViewConfig* viewConfig, bool isAccelerated = false);
+	public static partial void ulViewConfigSetIsAccelerated(_ULViewConfig* viewConfig, [MarshalAs(UnmanagedType.U1)] bool isAccelerated = false);
 
 	[Obsolete]
 	[LibraryImport(LibUltralight)]
-	public static partial void ulViewConfigSetIsTransparent(_ULViewConfig* viewConfig, bool isTransparent = false);
+	public static partial void ulViewConfigSetIsTransparent(_ULViewConfig* viewConfig, [MarshalAs(UnmanagedType.U1)] bool isTransparent = false);
 
 	[Obsolete]
 	[LibraryImport(LibUltralight)]
@@ -29,15 +29,15 @@ public static unsafe partial class Methods
 
 	[Obsolete]
 	[LibraryImport(LibUltralight)]
-	public static partial void ulViewConfigSetInitialFocus(_ULViewConfig* viewConfig, bool initialFocus = true);
+	public static partial void ulViewConfigSetInitialFocus(_ULViewConfig* viewConfig, [MarshalAs(UnmanagedType.U1)] bool initialFocus = true);
 
 	[Obsolete]
 	[LibraryImport(LibUltralight)]
-	public static partial void ulViewConfigSetEnableImages(_ULViewConfig* viewConfig, bool enable = true);
+	public static partial void ulViewConfigSetEnableImages(_ULViewConfig* viewConfig, [MarshalAs(UnmanagedType.U1)] bool enable = true);
 
 	[Obsolete]
 	[LibraryImport(LibUltralight)]
-	public static partial void ulViewConfigSetEnableJavaScript(_ULViewConfig* viewConfig, bool enable = true);
+	public static partial void ulViewConfigSetEnableJavaScript(_ULViewConfig* viewConfig, [MarshalAs(UnmanagedType.U1)] bool enable = true);
 
 	[Obsolete]
 	[LibraryImport(LibUltralight)]

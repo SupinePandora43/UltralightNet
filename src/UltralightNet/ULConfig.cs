@@ -52,7 +52,7 @@ public static unsafe partial class Methods
 	/// <summary>Set whether or not we should continuously repaint any Views or compositor layers, regardless if they are dirty or not. This is mainly used to diagnose painting/shader issues.</summary>
 	[Obsolete]
 	[LibraryImport(LibUltralight)]
-	public static partial void ulConfigSetForceRepaint(_ULConfig* config, bool enabled = false);
+	public static partial void ulConfigSetForceRepaint(_ULConfig* config, [MarshalAs(UnmanagedType.U1)] bool enabled = false);
 
 	/// <summary>Set the amount of time to wait before triggering another repaint when a CSS animation is active.</summary>
 	[Obsolete]

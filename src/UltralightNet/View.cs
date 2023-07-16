@@ -37,15 +37,15 @@ public static unsafe partial class Methods
 	public static partial void ulViewSetDeviceScale(IntPtr view, double scale);
 
 	[LibraryImport(LibUltralight)]
-	[return: MarshalAs(UnmanagedType.I1)]
+	[return: MarshalAs(UnmanagedType.U1)]
 	public static partial bool ulViewIsAccelerated(IntPtr view);
 
 	[LibraryImport(LibUltralight)]
-	[return: MarshalAs(UnmanagedType.I1)]
+	[return: MarshalAs(UnmanagedType.U1)]
 	public static partial bool ulViewIsTransparent(IntPtr view);
 
 	[LibraryImport(LibUltralight)]
-	[return: MarshalAs(UnmanagedType.I1)]
+	[return: MarshalAs(UnmanagedType.U1)]
 	public static partial bool ulViewIsLoading(IntPtr view);
 
 	[LibraryImport(LibUltralight)]
@@ -76,12 +76,12 @@ public static unsafe partial class Methods
 
 	/// <summary>Check if can navigate backwards in history.</summary>
 	[LibraryImport(LibUltralight)]
-	[return: MarshalAs(UnmanagedType.I1)]
+	[return: MarshalAs(UnmanagedType.U1)]
 	public static partial bool ulViewCanGoBack(IntPtr view);
 
 	/// <summary>Check if can navigate forwards in history.</summary>
 	[LibraryImport(LibUltralight)]
-	[return: MarshalAs(UnmanagedType.I1)]
+	[return: MarshalAs(UnmanagedType.U1)]
 	public static partial bool ulViewCanGoForward(IntPtr view);
 
 	/// <summary>Navigate backwards in history.</summary>
@@ -122,7 +122,7 @@ public static unsafe partial class Methods
 
 	/// <summary>Whether or not the View has focus.</summary>
 	[LibraryImport(LibUltralight)]
-	[return: MarshalAs(UnmanagedType.I1)]
+	[return: MarshalAs(UnmanagedType.U1)]
 	public static partial bool ulViewHasFocus(IntPtr view);
 
 	/// <summary>Whether or not the View has an input element with visible keyboard focus (indicated by a blinking caret).</summary>
@@ -131,6 +131,7 @@ public static unsafe partial class Methods
 	/// keyboard input events (useful in games with mixed UI and key handling).
 	/// </remarks>
 	[LibraryImport(LibUltralight)]
+	[return: MarshalAs(UnmanagedType.U1)]
 	public static partial bool ulViewHasInputFocus(IntPtr view);
 
 	[LibraryImport(LibUltralight)]
@@ -179,10 +180,10 @@ public static unsafe partial class Methods
 	public static partial void ulViewSetUpdateHistoryCallback(IntPtr view, ULUpdateHistoryCallback__PInvoke__? callback, IntPtr user_data);
 
 	[LibraryImport(LibUltralight)]
-	public static partial void ulViewSetNeedsPaint(IntPtr view, bool needs_paint);
+	public static partial void ulViewSetNeedsPaint(IntPtr view, [MarshalAs(UnmanagedType.U1)] bool needs_paint);
 
 	[LibraryImport(LibUltralight)]
-	[return: MarshalAs(UnmanagedType.I1)]
+	[return: MarshalAs(UnmanagedType.U1)]
 	public static partial bool ulViewGetNeedsPaint(IntPtr view);
 
 	[LibraryImport(LibUltralight)]

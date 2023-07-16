@@ -1,15 +1,13 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<TargetFrameworks>net7.0;net471;net46;net451;net45;netstandard2.1;netstandard2</TargetFrameworks>
+		<TargetFrameworks>net7.0;net6.0;net471;net46;net451;net45;netstandard2.1;netstandard2</TargetFrameworks>
 
 		<!-- <Authors>Ultralight, Inc.</Authors> -->
 		<PackageId>UltralightNet.AppCore</PackageId>
 		<Description>AppCore bindings</Description>
 
 		<!-- <PackageLicenseFile>LICENSE.txt</PackageLicenseFile> -->
-
-		<LangVersion>11</LangVersion>
 	</PropertyGroup>
 	<ItemGroup>
 		<PackageReference Include="Microsoft.Interop.DllImportGenerator" Version="7.0.0-preview.3.22123.2" OutputItemType="Analyzer" ReferenceOutputAssembly="false" PrivateAssets="All" />

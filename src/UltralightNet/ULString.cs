@@ -55,6 +55,7 @@ public static unsafe partial class Methods
 
 	/// <summary>Whether this string is empty or not.</summary>
 	[LibraryImport(LibUltralight)]
+	[return: MarshalAs(UnmanagedType.U1)]
 	public static partial bool ulStringIsEmpty(ULString* str);
 
 	/// <summary>Replaces the contents of 'str' with the contents of 'new_str'</summary>
@@ -233,9 +234,9 @@ public unsafe struct ULString : IDisposable, ICloneable, IEquatable<ULString>
 
 	internal static class ManagedToUnmanaged
 	{
-		internal static string ConvertToManaged(void* str) => str is null ? string.Empty :
+		internal static string ConvertToManaged(ULString* str) => str is null ? string.Empty :
 #if NETSTANDARD2_1 || NETCOREAPP1_1_OR_GREATER
-			Marshal.PtrToStringUTF8((IntPtr)((ULString*)str)->data, checked((int)((ULString*)str)->length));
+			Marshal.PtrToStringUTF8((IntPtr)str->data, checked((int)str->length));
 #elif NETSTANDARD2_0
 			Encoding.UTF8.GetString(str->data, checked((int)str->length));
 #elif NETFRAMEWORK
@@ -243,8 +244,8 @@ public unsafe struct ULString : IDisposable, ICloneable, IEquatable<ULString>
 #else
 			Marshal.PtrToStringUTF8((IntPtr)str->data, checked((int)str->length));
 #endif
-		internal static void* ConvertToUnmanaged(string? managed) => new ULString(managed).Allocate();
-		internal static void Free(void* unmanaged)
+		internal static ULString* ConvertToUnmanaged(string? managed) => new ULString(managed).Allocate();
+		internal static void Free(ULString* unmanaged)
 		{
 			NativeMemory.Free(((ULString*)unmanaged)->data);
 			NativeMemory.Free(unmanaged);
@@ -252,9 +253,9 @@ public unsafe struct ULString : IDisposable, ICloneable, IEquatable<ULString>
 	}
 	internal static class UnmanagedToManaged
 	{
-		internal static string ConvertToManaged(void* str) => str is null ? string.Empty :
+		internal static string ConvertToManaged(ULString* str) => str is null ? string.Empty :
 #if NETSTANDARD2_1 || NETCOREAPP1_1_OR_GREATER
-			Marshal.PtrToStringUTF8((IntPtr)((ULString*)str)->data, checked((int)((ULString*)str)->length));
+			Marshal.PtrToStringUTF8((IntPtr)str->data, checked((int)str->length));
 #elif NETSTANDARD2_0
 			Encoding.UTF8.GetString(str->data, checked((int)str->length));
 #elif NETFRAMEWORK

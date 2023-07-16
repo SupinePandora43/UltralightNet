@@ -67,3 +67,4 @@ TestResult.xml
 *.spv
 gpu/shaders/compiled
 BenchmarkDotNet.Artifacts
+**/**.g.cs

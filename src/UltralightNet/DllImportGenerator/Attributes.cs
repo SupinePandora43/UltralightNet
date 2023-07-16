@@ -35,7 +35,15 @@ namespace System
 #pragma warning restore 0649
 
 #if !NET7_0_OR_GREATER
-namespace System.Runtime.InteropServices.Marshalling
+namespace System.Runtime.CompilerServices
+{
+	[AttributeUsage(AttributeTargets.Assembly, Inherited = false, AllowMultiple = false)]
+	internal sealed class DisableRuntimeMarshallingAttribute : Attribute
+	{
+		public DisableRuntimeMarshallingAttribute() { }
+	}
+}
+namespace System.Runtime.InteropServices
 {
 	namespace Marshalling
 	{
@@ -71,6 +79,17 @@ namespace System.Runtime.InteropServices.Marshalling
 		{
 			public NativeMarshallingAttribute(Type nativeType) { NativeType = nativeType; }
 			public Type NativeType { get; }
+		}
+		[AttributeUsage(AttributeTargets.Parameter | AttributeTargets.ReturnValue, AllowMultiple = true)]
+		public sealed class MarshalUsingAttribute : Attribute
+		{
+			public const string ReturnsCountValue = "return-value";
+			public MarshalUsingAttribute() { }
+			public MarshalUsingAttribute(Type nativeType) { NativeType = nativeType; }
+			public Type? NativeType { get; }
+			public string CountElementName { get; set; } = ReturnsCountValue;
+			public int ConstantElementCount { get; set; }
+			public int ElementIndirectionDepth { get; set; }
 		}
 	}
 	internal enum StringMarshalling
