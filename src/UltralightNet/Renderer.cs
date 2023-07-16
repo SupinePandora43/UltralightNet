@@ -36,7 +36,7 @@ public static unsafe partial class Methods
 
 	[LibraryImport(LibUltralight)]
 	[return: MarshalAs(UnmanagedType.U1)]
-	public static partial bool ulStartRemoteInspectorServer(Handle<Renderer> renderer, ReadOnlySpan<byte> address, ushort port);
+	public static partial bool ulStartRemoteInspectorServer(Handle<Renderer> renderer, byte* address, ushort port);
 
 	[LibraryImport(LibUltralight)]
 	[return: MarshalAs(UnmanagedType.U1)]
