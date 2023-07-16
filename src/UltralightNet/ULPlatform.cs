@@ -292,7 +292,7 @@ public static unsafe class ULPlatform
 				using ULString cacertUL = new(Path.Combine(config.ResourcePathPrefix, "cacert.pem").AsSpan());
 				if (_filesystem.__FileExists(&cacertUL) is false) if (log is not null)
 					{
-						ULString noticeMsg = new("(UltralightNet) FileSystem doesn't provide \"cacert.pem\", no network functionality will be available.".AsSpan());// C#VER
+						using ULString noticeMsg = new("(UltralightNet) FileSystem doesn't provide \"cacert.pem\", no network functionality will be available."u8);
 						log(ULLogLevel.Warning, &noticeMsg);
 					}
 			}
@@ -301,7 +301,7 @@ public static unsafe class ULPlatform
 		{
 			if (log is not null)
 			{
-				using ULString noticeMsg = new("(UltralightNet) No FileSystem set, default (with access only to required files) will be used.".AsSpan()); // C#VER
+				using ULString noticeMsg = new("(UltralightNet) No FileSystem set, default (with access only to required files) will be used."u8);
 				log(ULLogLevel.Info, &noticeMsg);
 			}
 
@@ -311,13 +311,13 @@ public static unsafe class ULPlatform
 			static ULString* GetFileMimeType(ULString* file)
 			{
 				var span = file->ToString();
-				string result; // C#VER: utf8 (u8)
+				ReadOnlySpan<byte> result;
 
-				if (span.EndsWith(".css")) result = "text/css";
-				else if (span.EndsWith(".js")) result = "application/javascript";
-				else result = "application/octet-stream";
+				if (span.EndsWith(".css")) result = "text/css"u8;
+				else if (span.EndsWith(".js")) result = "application/javascript"u8;
+				else result = "application/octet-stream"u8;
 
-				ULString returnValue = new(result.AsSpan());
+				ULString returnValue = new(result);
 				return returnValue.Allocate();
 			}
 
