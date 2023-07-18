@@ -14,9 +14,9 @@ internal unsafe static class Utils
 	private static bool HasInstanceLayer(this Vk vk, ReadOnlySpan<byte> layer)
 	{
 		uint propertyCount = 0;
-		vk.EnumerateInstanceLayerProperties(ref propertyCount, null);
+		vk.EnumerateInstanceLayerProperties(ref propertyCount, null).Check();
 		var properties = stackalloc LayerProperties[(int)propertyCount];
-		vk.EnumerateInstanceLayerProperties(ref propertyCount, properties);
+		vk.EnumerateInstanceLayerProperties(ref propertyCount, properties).Check();
 		for (int i = 0; i < propertyCount; i++)
 			if (layer.SequenceEqual(MemoryMarshal.CreateReadOnlySpanFromNullTerminated(properties[i].LayerName))) return true;
 		return false;

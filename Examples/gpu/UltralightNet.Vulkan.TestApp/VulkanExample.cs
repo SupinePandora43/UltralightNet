@@ -1,6 +1,5 @@
 //namespace VulkanExample;
 
-using Silk.NET.Core.Native;
 using Silk.NET.Vulkan;
 using Silk.NET.Windowing;
 
@@ -14,6 +13,8 @@ internal unsafe partial class Application : IDisposable
 	readonly Vk vk = Vk.GetApi();
 	readonly Instance instance;
 
+	readonly PhysicalDevice physicalDevice;
+
 	public Application()
 	{
 		{ // Window
@@ -23,6 +24,14 @@ internal unsafe partial class Application : IDisposable
 		{ // Instance
 			var extensions = window.VkSurface.GetRequiredExtensions(out uint extensionCount);
 			Utils.CreateInstance(vk, extensionCount, extensions, out instance);
+		}
+		{ // Physical Device
+			uint deviceCount = 0;
+			vk.EnumeratePhysicalDevices(instance, ref deviceCount, null).Check();
+			if (deviceCount is 0) throw new Exception("Couldn't find physical vulkan device.");
+			var devices = stackalloc PhysicalDevice[(int)deviceCount];
+			vk.EnumeratePhysicalDevices(instance, ref deviceCount, devices).Check();
+			physicalDevice = devices[0]; // idc
 		}
 		Console.WriteLine();
 	}
