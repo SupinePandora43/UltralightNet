@@ -30,7 +30,8 @@
             "args": [],
             "cwd": "${workspaceFolder}/Examples/gpu/UltralightNet.Vulkan.TestApp/bin/Debug/net6.0",
             "console": "internalConsole",
-            "stopAtEntry": false
+            "stopAtEntry": false,
+			"envFile": "${workspaceFolder}/.env"
         },
 		{
             "name": "Veldrid TestApp",
@@ -52,7 +53,8 @@
             "args": [],
             "cwd": "${workspaceFolder}/Examples/AppCore/UltralightNet.AppCore.TestApp/bin/Debug/net6.0",
             "console": "internalConsole",
-            "stopAtEntry": false
+            "stopAtEntry": false,
+			"envFile": "${workspaceFolder}/.env"
         },
 		{
             "name": "TestApp",

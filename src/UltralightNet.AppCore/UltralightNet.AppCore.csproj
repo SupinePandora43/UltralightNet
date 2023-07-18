@@ -13,6 +13,7 @@
 		<Compile Remove="LibraryImportGenerator/**" Condition="'$(TargetFramework)'=='net7.0'" />
 	</ItemGroup>
 	<ItemGroup>
+		<!-- <PackageReference Include="Microsoft.Interop.LibraryImportGenerator" Version="7.0.8.32201" OutputItemType="Analyzer" ReferenceOutputAssembly="false" PrivateAssets="All" /> -->
 		<PackageReference Include="System.ValueTuple" Version="4.5.0" PrivateAssets="All" />
 		<ProjectReference Include="..\UltralightNet\UltralightNet.csproj" />
 		<ProjectReference Include="..\UltralightNet.AppCore.Binaries\UltralightNet.AppCore.Binaries.csproj" />
