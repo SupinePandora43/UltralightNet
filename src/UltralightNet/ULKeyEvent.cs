@@ -61,7 +61,7 @@ public static unsafe partial class Methods
 /// <summary>
 /// A generic keyboard event
 /// </summary>
-public class ULKeyEvent : IDisposable
+public sealed class ULKeyEvent : IDisposable
 {
 	public readonly IntPtr Ptr;
 	//todo: DoDispose bool

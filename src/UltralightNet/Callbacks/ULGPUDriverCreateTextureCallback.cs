@@ -1,12 +1,11 @@
 using System.Runtime.InteropServices;
-using UltralightNet.LowStuff;
 
 namespace UltralightNet;
 
 [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
 public unsafe delegate void ULGPUDriverCreateTextureCallback__PInvoke__(
 	uint textureId,
-	Handle<ULBitmap> bitmap
+	void* bitmap
 );
 public delegate void ULGPUDriverCreateTextureCallback(
 	uint textureId,

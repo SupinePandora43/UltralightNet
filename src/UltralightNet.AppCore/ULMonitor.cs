@@ -22,5 +22,5 @@ public readonly struct ULMonitor
 	public readonly uint Width => AppCoreMethods.ulMonitorGetWidth(this);
 	public readonly uint Height => AppCoreMethods.ulMonitorGetHeight(this);
 
-	public readonly ULWindow CreateWindow(uint width, uint height, bool fullscreen = false, ULWindowFlags flags = ULWindowFlags.Titled | ULWindowFlags.Resizable | ULWindowFlags.Maximizable) => ULWindow.FromHandle(AppCoreMethods.ulCreateWindow(this, width, height, fullscreen, flags), true);
+	public unsafe readonly ULWindow CreateWindow(uint width, uint height, bool fullscreen = false, ULWindowFlags flags = ULWindowFlags.Titled | ULWindowFlags.Resizable | ULWindowFlags.Maximizable) => ULWindow.FromHandle(AppCoreMethods.ulCreateWindow(this, width, height, fullscreen, flags), true);
 }

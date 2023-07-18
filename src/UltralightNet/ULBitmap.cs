@@ -1,4 +1,3 @@
-using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Runtime.InteropServices.Marshalling;
 using UltralightNet.LowStuff;
@@ -8,229 +7,131 @@ namespace UltralightNet;
 public static unsafe partial class Methods
 {
 	/// <summary>Create empty bitmap.</summary>
-	[DllImport(LibUltralight)]
-	public static extern Handle<ULBitmap> ulCreateEmptyBitmap();
+	[LibraryImport(LibUltralight)]
+	internal static partial ULBitmap ulCreateEmptyBitmap();
 
 	/// <summary>Create bitmap with certain dimensions and pixel format.</summary>
-	[DllImport(LibUltralight)]
-	public static extern Handle<ULBitmap> ulCreateBitmap(uint width, uint height, ULBitmapFormat format);
+	[LibraryImport(LibUltralight)]
+	internal static partial ULBitmap ulCreateBitmap(uint width, uint height, ULBitmapFormat format);
 
 	/// <summary>Create bitmap from existing pixel buffer. @see Bitmap for help using this function.</summary>
 	[LibraryImport(LibUltralight)]
-	public static unsafe partial Handle<ULBitmap> ulCreateBitmapFromPixels(uint width, uint height, ULBitmapFormat format, uint rowBytes, byte* pixels, nuint size, [MarshalAs(UnmanagedType.U1)] bool shouldCopy);
+	internal static unsafe partial ULBitmap ulCreateBitmapFromPixels(uint width, uint height, ULBitmapFormat format, uint rowBytes, byte* pixels, nuint size, [MarshalAs(UnmanagedType.U1)] bool shouldCopy);
 
 	/// <summary>Create bitmap from copy.</summary>
-	[DllImport(LibUltralight)]
-	public static extern Handle<ULBitmap> ulCreateBitmapFromCopy(Handle<ULBitmap> existingBitmap);
+	[LibraryImport(LibUltralight)]
+	internal static partial ULBitmap ulCreateBitmapFromCopy(ULBitmap existingBitmap);
 
 	/// <summary>Destroy a bitmap (you should only destroy Bitmaps you have explicitly created via one of the creation functions above.</summary>
-	[DllImport(LibUltralight)]
-	public static extern void ulDestroyBitmap(Handle<ULBitmap> bitmap);
+	[LibraryImport(LibUltralight)]
+	internal static partial void ulDestroyBitmap(ULBitmap bitmap);
 
 	/// <summary>Get the width in pixels.</summary>
-	[DllImport(LibUltralight)]
-	public static extern uint ulBitmapGetWidth(Handle<ULBitmap> bitmap);
+	[LibraryImport(LibUltralight)]
+	internal static partial uint ulBitmapGetWidth(ULBitmap bitmap);
 
 	/// <summary>Get the height in pixels.</summary>
-	[DllImport(LibUltralight)]
-	public static extern uint ulBitmapGetHeight(Handle<ULBitmap> bitmap);
+	[LibraryImport(LibUltralight)]
+	internal static partial uint ulBitmapGetHeight(ULBitmap bitmap);
 
 	/// <summary>Get the pixel format.</summary>
-	[DllImport(LibUltralight)]
-	public static extern ULBitmapFormat ulBitmapGetFormat(Handle<ULBitmap> bitmap);
+	[LibraryImport(LibUltralight)]
+	internal static partial ULBitmapFormat ulBitmapGetFormat(ULBitmap bitmap);
 
 	/// <summary>Get the bytes per pixel.</summary>
-	[DllImport(LibUltralight)]
-	public static extern uint ulBitmapGetBpp(Handle<ULBitmap> bitmap);
+	[LibraryImport(LibUltralight)]
+	internal static partial uint ulBitmapGetBpp(ULBitmap bitmap);
 
 	/// <summary>Get the number of bytes per row.</summary>
-	[DllImport(LibUltralight)]
-	public static extern uint ulBitmapGetRowBytes(Handle<ULBitmap> bitmap);
+	[LibraryImport(LibUltralight)]
+	internal static partial uint ulBitmapGetRowBytes(ULBitmap bitmap);
 
 	/// <summary>
 	/// Get the size in bytes of the underlying pixel buffer.
 	/// </summary>
-	[DllImport(LibUltralight)]
-	public static extern nuint ulBitmapGetSize(Handle<ULBitmap> bitmap);
+	[LibraryImport(LibUltralight)]
+	internal static partial nuint ulBitmapGetSize(ULBitmap bitmap);
 
 	/// <summary>Whether or not this bitmap owns its own pixel buffer.</summary>
 	[LibraryImport(LibUltralight)]
 	[return: MarshalAs(UnmanagedType.U1)]
-	public static partial bool ulBitmapOwnsPixels(Handle<ULBitmap> bitmap);
+	internal static partial bool ulBitmapOwnsPixels(ULBitmap bitmap);
 
 	/// <summary>Lock pixels for reading/writing, returns pointer to pixel buffer.</summary>
-	[DllImport(LibUltralight)]
-	public static extern byte* ulBitmapLockPixels(Handle<ULBitmap> bitmap);
+	[LibraryImport(LibUltralight)]
+	internal static partial byte* ulBitmapLockPixels(ULBitmap bitmap);
 
 	/// <summary>Unlock pixels after locking.</summary>
-	[DllImport(LibUltralight)]
-	public static extern void ulBitmapUnlockPixels(Handle<ULBitmap> bitmap);
+	[LibraryImport(LibUltralight)]
+	internal static partial void ulBitmapUnlockPixels(ULBitmap bitmap);
 
 	/// <summary>Get raw pixel buffer</summary>
 	/// <remarks>you should only call this if Bitmap is already locked.</remarks>
-	[DllImport(LibUltralight)]
-	public static extern byte* ulBitmapRawPixels(Handle<ULBitmap> bitmap);
+	[LibraryImport(LibUltralight)]
+	internal static partial byte* ulBitmapRawPixels(ULBitmap bitmap);
 
 	/// <summary>Whether or not this bitmap is empty.</summary>
 	[LibraryImport(LibUltralight)]
 	[return: MarshalAs(UnmanagedType.U1)]
-	public static partial bool ulBitmapIsEmpty(Handle<ULBitmap> bitmap);
+	internal static partial bool ulBitmapIsEmpty(ULBitmap bitmap);
 
 	/// <summary>Reset bitmap pixels to 0.</summary>
-	[DllImport(LibUltralight)]
-	public static extern void ulBitmapErase(Handle<ULBitmap> bitmap);
+	[LibraryImport(LibUltralight)]
+	internal static partial void ulBitmapErase(ULBitmap bitmap);
 
 	/// <summary>Write bitmap to a PNG on disk.</summary>
 	[LibraryImport(LibUltralight)]
 	[return: MarshalAs(UnmanagedType.U1)]
-	public static partial bool ulBitmapWritePNG(Handle<ULBitmap> bitmap, [MarshalUsing(typeof(Utf8StringMarshaller))] string path);
+	internal static partial bool ulBitmapWritePNG(ULBitmap bitmap, [MarshalUsing(typeof(Utf8StringMarshaller))] string path);
 
 	/// <summary>This converts a BGRA bitmap to RGBA bitmap and vice-versa by swapping the red and blue channels.</summary>
-	[DllImport(LibUltralight)]
-	public static extern void ulBitmapSwapRedBlueChannels(Handle<ULBitmap> bitmap);
+	[LibraryImport(LibUltralight)]
+	internal static partial void ulBitmapSwapRedBlueChannels(ULBitmap bitmap);
 }
 
 #pragma warning disable CS0659
-public unsafe class ULBitmap : INativeContainer<ULBitmap>, INativeContainerInterface<ULBitmap>, ICloneable, IEquatable<ULBitmap>
+[NativeMarshalling(typeof(Marshaller))]
+public sealed unsafe class ULBitmap : NativeContainer, ICloneable, IEquatable<ULBitmap>
 #pragma warning restore CS0659
 {
 	private ULBitmap() { }
 
-	public ULBitmap(uint width, uint height, ULBitmapFormat format) => Handle = Methods.ulCreateBitmap(width, height, format);
-	public ULBitmap(uint width, uint height, ULBitmapFormat format, uint rowBytes, byte* pixels, uint size, bool shouldCopy) => Handle = Methods.ulCreateBitmapFromPixels(width, height, format, rowBytes, pixels, size, shouldCopy);
+	public uint Width => Methods.ulBitmapGetWidth(this);
+	public uint Height => Methods.ulBitmapGetHeight(this);
 
-	public uint Width
-	{
-		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		get
-		{
-			var returnValue = Methods.ulBitmapGetWidth(Handle);
-			GC.KeepAlive(this);
-			return returnValue;
-		}
-	}
-	public uint Height
-	{
-		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		get
-		{
-			var returnValue = Methods.ulBitmapGetHeight(Handle);
-			GC.KeepAlive(this);
-			return returnValue;
-		}
-	}
+	public ULBitmapFormat Format => Methods.ulBitmapGetFormat(this);
+	public uint Bpp => Methods.ulBitmapGetBpp(this);
+	public uint RowBytes => Methods.ulBitmapGetRowBytes(this);
+	public nuint Size => Methods.ulBitmapGetSize(this);
 
-	public ULBitmapFormat Format
-	{
-		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		get
-		{
-			var returnValue = Methods.ulBitmapGetFormat(Handle);
-			GC.KeepAlive(this);
-			return returnValue;
-		}
-	}
-	public uint Bpp
-	{
-		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		get
-		{
-			var returnValue = Methods.ulBitmapGetBpp(Handle);
-			GC.KeepAlive(this);
-			return returnValue;
-		}
-	}
-	public uint RowBytes
-	{
-		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		get
-		{
-			var returnValue = Methods.ulBitmapGetRowBytes(Handle);
-			GC.KeepAlive(this);
-			return returnValue;
-		}
-	}
-	public nuint Size
-	{
-		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		get
-		{
-			var returnValue = Methods.ulBitmapGetSize(Handle);
-			GC.KeepAlive(this);
-			return returnValue;
-		}
-	}
+	public bool OwnsPixels => Methods.ulBitmapOwnsPixels(this);
 
-	public bool OwnsPixels
-	{
-		get
-		{
-			var returnValue = Methods.ulBitmapOwnsPixels(Handle);
-			GC.KeepAlive(this);
-			return returnValue;
-		}
-	}
+	public byte* LockPixels() => Methods.ulBitmapLockPixels(this);
+	public void UnlockPixels() => Methods.ulBitmapUnlockPixels(this);
 
-	[MethodImpl(MethodImplOptions.AggressiveInlining)]
-	public byte* LockPixels()
-	{
-		var returnValue = Methods.ulBitmapLockPixels(Handle);
-		GC.KeepAlive(this);
-		return returnValue;
-	}
-	[MethodImpl(MethodImplOptions.AggressiveInlining)]
-	public void UnlockPixels() => Methods.ulBitmapUnlockPixels(Handle);
+	public byte* RawPixels => Methods.ulBitmapRawPixels(this);
+	public bool IsEmpty => Methods.ulBitmapIsEmpty(this);
+	public void Erase() => Methods.ulBitmapErase(this);
 
-	public byte* RawPixels
-	{
-		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		get
-		{
-			var returnValue = Methods.ulBitmapRawPixels(Handle);
-			GC.KeepAlive(this);
-			return returnValue;
-		}
-	}
-	public bool IsEmpty
-	{
-		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		get
-		{
-			var returnValue = Methods.ulBitmapIsEmpty(Handle);
-			GC.KeepAlive(this);
-			return returnValue;
-		}
-	}
-	public void Erase()
-	{
-		Methods.ulBitmapErase(Handle);
-		GC.KeepAlive(this);
-	}
+	public bool WritePng(string path) => Methods.ulBitmapWritePNG(this, path);
 
-	public bool WritePng(string path)
-	{
-		var returnValue = Methods.ulBitmapWritePNG(Handle, path);
-		GC.KeepAlive(this);
-		return returnValue;
-	}
-
-	[MethodImpl(MethodImplOptions.AggressiveInlining)]
-	public void SwapRedBlueChannels()
-	{
-		Methods.ulBitmapSwapRedBlueChannels(Handle);
-		GC.KeepAlive(this);
-	}
+	public void SwapRedBlueChannels() => Methods.ulBitmapSwapRedBlueChannels(this);
 
 	public override void Dispose()
 	{
-		if (!IsDisposed && Owns) Methods.ulDestroyBitmap(Handle);
+		if (!IsDisposed && Owns) Methods.ulDestroyBitmap(this);
 		base.Dispose();
 	}
 
-	public ULBitmap Clone() => ULBitmap.FromHandle(Methods.ulCreateBitmapFromCopy(Handle), true);
+	public ULBitmap Clone() => Methods.ulCreateBitmapFromCopy(this);
 	object ICloneable.Clone() => Clone();
 
-	public static bool ReferenceEquals(ULBitmap? objA, ULBitmap? objB) => objA is not null ? (objB is not null ? objA._ptr == objB._ptr : false) : objB is null;
+	public static bool ReferenceEquals(ULBitmap? objA, ULBitmap? objB)
+	{
+		if (objA is null || objB is null) return objA is null && objB is null;
+		if (objA.IsDisposed || objB.IsDisposed) return objA.IsDisposed == objB.IsDisposed;
+		return objA.Handle == objB.Handle;
+	}
 
 	public bool Equals(ULBitmap? other)
 	{
@@ -245,8 +146,8 @@ public unsafe class ULBitmap : INativeContainer<ULBitmap>, INativeContainerInter
 
 		nuint rowBytes = RowBytes;
 		nuint rowBytesOther = other.RowBytes;
-		byte* pixels = (byte*)LockPixels();
-		byte* pixelsOther = (byte*)other.LockPixels();
+		byte* pixels = LockPixels();
+		byte* pixelsOther = other.LockPixels();
 
 		bool seqEq = true;
 
@@ -264,7 +165,34 @@ public unsafe class ULBitmap : INativeContainer<ULBitmap>, INativeContainerInter
 
 		return seqEq;
 	}
-	public override bool Equals(object? other) => other is ULBitmap bitmap ? Equals(bitmap) : false;
+	public override bool Equals(object? other) => other is ULBitmap bitmap && Equals(bitmap);
 
-	public static ULBitmap FromHandle(Handle<ULBitmap> handle, bool dispose) => new() { Handle = handle, Owns = dispose };
+	public static ULBitmap CreateEmpty() => Methods.ulCreateEmptyBitmap();
+	public static ULBitmap Create(uint width, uint height, ULBitmapFormat format) => Methods.ulCreateBitmap(width, height, format);
+	public static ULBitmap CreateFromPixels(uint width, uint height, ULBitmapFormat format, uint rowBytes, byte* pixels, uint size, bool shouldCopy) => Methods.ulCreateBitmapFromPixels(width, height, format, rowBytes, pixels, size, shouldCopy);
+
+
+	public static ULBitmap FromHandle(void* handle, bool dispose) => new() { Handle = handle, Owns = dispose };
+
+	[CustomMarshaller(typeof(ULBitmap), MarshalMode.ManagedToUnmanagedIn, typeof(ManagedToUnmanagedIn))]
+	[CustomMarshaller(typeof(ULBitmap), MarshalMode.ManagedToUnmanagedOut, typeof(ManagedToUnmanagedOut))]
+	internal static class Marshaller
+	{
+		internal ref struct ManagedToUnmanagedIn
+		{
+			private ULBitmap bitmap;
+
+			public void FromManaged(ULBitmap bitmap) => this.bitmap = bitmap;
+			public readonly void* ToUnmanaged() => bitmap.Handle;
+			public readonly void Free() => GC.KeepAlive(bitmap);
+		}
+		internal ref struct ManagedToUnmanagedOut
+		{
+			private ULBitmap bitmap;
+
+			public void FromUnmanaged(void* unmanaged) => bitmap = FromHandle(unmanaged, true);
+			public readonly ULBitmap ToManaged() => bitmap;
+			public readonly void Free() { }
+		}
+	}
 }

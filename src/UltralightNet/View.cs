@@ -1,17 +1,16 @@
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Runtime.InteropServices.Marshalling;
-using UltralightNet.LowStuff;
 
 namespace UltralightNet;
 
 public static unsafe partial class Methods
 {
 	[LibraryImport(LibUltralight)]
-	public static partial void* ulCreateView(Handle<Renderer> renderer, uint width, uint height, _ULViewConfig* viewConfig, Handle<Session> session);
+	public static partial void* ulCreateView(Renderer renderer, uint width, uint height, _ULViewConfig* viewConfig, Session session);
 
 	[LibraryImport(LibUltralight)]
-	public static partial IntPtr ulCreateView(Handle<Renderer> renderer, uint width, uint height, in ULViewConfig viewConfig, Handle<Session> session);
+	public static partial IntPtr ulCreateView(Renderer renderer, uint width, uint height, in ULViewConfig viewConfig, Session session);
 
 	[LibraryImport(LibUltralight)]
 	public static partial void ulDestroyView(IntPtr view);
@@ -52,7 +51,7 @@ public static unsafe partial class Methods
 	public static partial RenderTarget ulViewGetRenderTarget(IntPtr view);
 
 	[LibraryImport(LibUltralight)]
-	public static partial IntPtr ulViewGetSurface(IntPtr view);
+	public static partial nuint ulViewGetSurface(IntPtr view);
 
 	[LibraryImport(LibUltralight)]
 	public static partial void ulViewLoadHTML(IntPtr view, [MarshalUsing(typeof(ULString))] string html_string);
@@ -193,6 +192,7 @@ public static unsafe partial class Methods
 public unsafe class View : IDisposable
 {
 	private void* _ptr;
+	[Obsolete]
 	public IntPtr Ptr
 	{
 		get
@@ -208,15 +208,15 @@ public unsafe class View : IDisposable
 	private bool dispose = true;
 	internal Renderer? Renderer { get; set; }
 
-	private JSContext Context { get; set; }
-	private JSContext? lockedContext;
+	//private JSContext Context { get; set; }
+	//private JSContext? lockedContext;
 
 	[Obsolete]
 	public View(IntPtr ptr, bool dispose = false)
 	{
 		Ptr = ptr;
 		this.dispose = dispose;
-		Context = new();
+		//Context = new();
 	}
 
 	private readonly GCHandle[] handles = new GCHandle[12];
@@ -261,15 +261,15 @@ public unsafe class View : IDisposable
 		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		get
 		{
-			IntPtr surfacePtr = Methods.ulViewGetSurface(Ptr);
-			if (surfacePtr == IntPtr.Zero) return null;
-			return new(surfacePtr);
+			nuint surfaceHandle = Methods.ulViewGetSurface(Ptr);
+			if (surfaceHandle is 0) return null;
+			return ULSurface.FromHandle(surfaceHandle);
 		}
 	}
 
 	public void Resize(in uint width, in uint height) => Methods.ulViewResize(Ptr, width, height);
 
-	public ref readonly JSContext LockJSContext()
+	/*public ref readonly JSContext LockJSContext()
 	{
 		void* contextHandle = Methods.ulViewLockJSContext(Ptr);
 		Context.OnLocked(contextHandle);
@@ -280,7 +280,7 @@ public unsafe class View : IDisposable
 	{
 		lockedContext = null;
 		Methods.ulViewUnlockJSContext(Ptr);
-	}
+	}*/
 
 	public string EvaluateScript(string js_string, out string exception) => Methods.ulViewEvaluateScript(Ptr, js_string, out exception);
 

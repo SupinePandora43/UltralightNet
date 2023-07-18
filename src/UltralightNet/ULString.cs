@@ -247,7 +247,7 @@ public unsafe struct ULString : IDisposable, ICloneable, IEquatable<ULString>
 		internal static ULString* ConvertToUnmanaged(string? managed) => new ULString(managed).Allocate();
 		internal static void Free(ULString* unmanaged)
 		{
-			NativeMemory.Free(((ULString*)unmanaged)->data);
+			NativeMemory.Free(unmanaged->data);
 			NativeMemory.Free(unmanaged);
 		}
 	}

@@ -1,6 +1,6 @@
 using System;
 using System.Runtime.InteropServices;
-using System.Threading;
+using System.Runtime.InteropServices.Marshalling;
 using UltralightNet.LowStuff;
 
 namespace UltralightNet.AppCore;
@@ -9,41 +9,41 @@ public static unsafe partial class AppCoreMethods
 {
 	public const string LibAppCore = "AppCore";
 
-	[DllImport(LibAppCore)]
-	public static extern Handle<ULApp> ulCreateApp(_ULSettings* settings, _ULConfig* config);
+	[LibraryImport(LibAppCore)]
+	public static unsafe partial void* ulCreateApp(in ULSettings settings, in ULConfig config);
 
 	[LibraryImport(LibAppCore)]
-	public static partial Handle<ULApp> ulCreateApp(in ULSettings settings, in ULConfig config);
-
-	[DllImport(LibAppCore)]
-	public static extern void ulDestroyApp(Handle<ULApp> app);
-
-	[DllImport(LibAppCore)]
-	public static extern unsafe void ulAppSetUpdateCallback(Handle<ULApp> app, delegate* unmanaged[Cdecl]<void*, void> callback, void* user_data);
+	public static partial void ulDestroyApp(ULApp app);
 
 	[LibraryImport(LibAppCore)]
-	public static partial bool ulAppIsRunning(Handle<ULApp> app);
+	public static unsafe partial void ulAppSetUpdateCallback(ULApp app, delegate* unmanaged[Cdecl]<void*, void> callback, void* user_data);
 
-	[DllImport(LibAppCore)]
-	public static extern ULMonitor ulAppGetMainMonitor(Handle<ULApp> app);
+	[LibraryImport(LibAppCore)]
+	[return: MarshalAs(UnmanagedType.U1)]
+	public static partial bool ulAppIsRunning(ULApp app);
 
-	[DllImport(LibAppCore)]
-	public static extern Handle<Renderer> ulAppGetRenderer(Handle<ULApp> app);
+	[LibraryImport(LibAppCore)]
+	public static partial ULMonitor ulAppGetMainMonitor(ULApp app);
 
-	[DllImport(LibAppCore)]
-	public static extern void ulAppRun(Handle<ULApp> app);
+	[LibraryImport(LibAppCore)]
+	public static unsafe partial void* ulAppGetRenderer(ULApp app);
 
-	[DllImport(LibAppCore)]
-	public static extern void ulAppQuit(Handle<ULApp> app);
+	[LibraryImport(LibAppCore)]
+	public static partial void ulAppRun(ULApp app);
+
+	[LibraryImport(LibAppCore)]
+	public static partial void ulAppQuit(ULApp app);
 }
-public class ULApp : INativeContainer<ULApp>, INativeContainerInterface<ULApp>, IEquatable<ULApp>
+
+[NativeMarshalling(typeof(Marshaller))]
+public class ULApp : NativeContainer
 {
 	private GCHandle updateHandle;
 
-	private ULApp(Handle<ULApp> handle)
+	private unsafe ULApp(void* handle)
 	{
 		Handle = handle;
-		Renderer = Renderer.FromHandle(AppCoreMethods.ulAppGetRenderer(Handle), false);
+		Renderer = Renderer.FromHandle(AppCoreMethods.ulAppGetRenderer(this), false);
 		Renderer.ThreadId = Environment.CurrentManagedThreadId;
 	}
 
@@ -60,68 +60,39 @@ public class ULApp : INativeContainer<ULApp>, INativeContainerInterface<ULApp>, 
 			SetUpdateCallback((delegate* unmanaged[Cdecl]<void*, void>)null, (void*)userData);
 		}
 	}
-	public unsafe void SetUpdateCallback(delegate* unmanaged[Cdecl]<void*, void> callback, void* userData = null)
-	{
-		AppCoreMethods.ulAppSetUpdateCallback(Handle, callback, userData);
-		GC.KeepAlive(this);
-	}
+	public unsafe void SetUpdateCallback(delegate* unmanaged[Cdecl]<void*, void> callback, void* userData = null) => AppCoreMethods.ulAppSetUpdateCallback(this, callback, userData);
 
-	public bool IsRunning
-	{
-		get
-		{
-			var returnValue = AppCoreMethods.ulAppIsRunning(Handle);
-			GC.KeepAlive(this);
-			return returnValue;
-		}
-	}
+	public bool IsRunning => AppCoreMethods.ulAppIsRunning(this);
 
-	public ULMonitor MainMonitor
-	{
-		get
-		{
-			ULMonitor returnValue = AppCoreMethods.ulAppGetMainMonitor(Handle);
-			GC.KeepAlive(this);
-			return returnValue;
-		}
-	}
+
+	public ULMonitor MainMonitor => AppCoreMethods.ulAppGetMainMonitor(this);
 
 	public Renderer Renderer { get; }
 
-	public void Run()
-	{
-		AppCoreMethods.ulAppRun(Handle);
-		GC.KeepAlive(this);
-	}
-	public void Quit()
-	{
-		AppCoreMethods.ulAppQuit(Handle);
-		GC.KeepAlive(this);
-	}
+	public void Run() => AppCoreMethods.ulAppRun(this);
+	public void Quit() => AppCoreMethods.ulAppQuit(this);
 
 	public override void Dispose()
 	{
 		if (updateHandle.IsAllocated) updateHandle.Free();
-		updateHandle = default;
+		// updateHandle = default; // INTEROPTODO: Do we even need it?
 
-		if (!IsDisposed && Owns) AppCoreMethods.ulDestroyApp(Handle);
+		if (!IsDisposed && Owns) AppCoreMethods.ulDestroyApp(this);
 
 		base.Dispose();
 	}
 
-	public bool Equals(ULApp? other)
+	public static unsafe ULApp FromHandle(void* ptr, bool dispose) => new(ptr) { Owns = dispose };
+
+	public static unsafe ULApp Create(in ULSettings settings, in ULConfig config) => FromHandle(AppCoreMethods.ulCreateApp(settings, config), true);
+
+	[CustomMarshaller(typeof(ULApp), MarshalMode.ManagedToUnmanagedIn, typeof(Marshaller))]
+	internal ref struct Marshaller
 	{
-		if (other is null) return false;
-		if (IsDisposed != other.IsDisposed) return false;
-		if (IsDisposed) return true;
-		var returnValue = Handle == other.Handle;
-		GC.KeepAlive(this);
-		GC.KeepAlive(other);
-		return returnValue;
+		private ULApp app;
+
+		public void FromManaged(ULApp app) => this.app = app;
+		public readonly unsafe void* ToUnmanaged() => app.Handle;
+		public readonly void Free() => GC.KeepAlive(app);
 	}
-	public override bool Equals(object? other) => other is ULApp app && Equals(app);
-
-	public static ULApp FromHandle(Handle<ULApp> ptr, bool dispose) => new(ptr) { Owns = dispose };
-
-	public static ULApp Create(in ULSettings settings, in ULConfig config) => FromHandle(AppCoreMethods.ulCreateApp(settings, config), true);
 }
