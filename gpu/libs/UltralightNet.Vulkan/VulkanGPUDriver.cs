@@ -72,7 +72,7 @@ internal unsafe struct GeometryEntry
 		public BufferResource ToWrite => VulkanGPUDriver.UnifiedMemory ? buffers[mostRecent = (int)VulkanGPUDriver.CurrentFrame + 1] : buffers[(int)VulkanGPUDriver.CurrentFrame];
 		public readonly BufferResource ToUse => VulkanGPUDriver.UnifiedMemory ? buffers[mostRecent] : buffers[0];
 
-		public AllocationTuple(BufferResource[] buffers!!)
+		public AllocationTuple(BufferResource[] buffers)
 		{
 			Debug.Assert(buffers.Length > 0);
 			this.buffers = buffers;
