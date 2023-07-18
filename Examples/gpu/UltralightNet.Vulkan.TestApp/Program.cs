@@ -284,17 +284,14 @@ unsafe class HelloTriangleApplication
 		dr.commandBuffer = BeginSingleTimeCommands();
 		dr.graphicsQueue = graphicsQueue;
 		ULPlatform.GPUDriver = dr.GPUDriver;
-<<<<<<< HEAD
 		renderer = ULPlatform.CreateRenderer(new ULConfig() { ForceRepaint = true, FaceWinding = ULFaceWinding.CounterClockwise });
 		view = renderer.CreateView((uint)window!.Size.X, (uint)window!.Size.Y, new() { IsAccelerated = true, IsTransparent = false });
 		bool loaded = false;
 		view.OnFinishLoading += (frameId, isMain, url) => loaded = true;
-=======
 		view.HTML = "<html><body><p>123</p></body></html>";
 		//view.URL = "https://en.key-test.ru/";
 		//view.URL = "https://github.com";
 		//view.URL = "https://youtu.be/30jrmzzgHLc";
->>>>>>> bd4e5a3 (save changes)
 		while (!loaded) { renderer.Update(); Thread.Sleep(10); }
 
 		renderer.Render();
