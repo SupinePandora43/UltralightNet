@@ -7,7 +7,8 @@
 			"type": "process",
 			"args": [
 				"build",
-				"-c", "Debug",
+				"-c",
+				"Debug",
 				"${workspaceFolder}/Examples/gpu/UltralightNet.OpenGL.TestApp/UltralightNet.OpenGL.TestApp.csproj",
 				"/property:GenerateFullPaths=true",
 				"/consoleloggerparameters:NoSummary"
@@ -24,9 +25,11 @@
 			"type": "process",
 			"args": [
 				"build",
+				//"-f",
+				//"net7.0",
 				"${workspaceFolder}/Examples/gpu/UltralightNet.Vulkan.TestApp/UltralightNet.Vulkan.TestApp.csproj",
-				"/property:GenerateFullPaths=true",
-				"/consoleloggerparameters:NoSummary"
+				//"/property:GenerateFullPaths=true",
+				//"/consoleloggerparameters:NoSummary"
 			],
 			"problemMatcher": "$msCompile"
 		},
