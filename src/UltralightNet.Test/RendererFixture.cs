@@ -5,7 +5,7 @@ using Xunit;
 
 namespace UltralightNet.Test;
 
-public class RendererFixture : IDisposable
+public sealed class RendererFixture : IDisposable
 {
 	public Renderer Renderer { get; private set; }
 
@@ -20,15 +20,7 @@ public class RendererFixture : IDisposable
 		Renderer = ULPlatform.CreateRenderer();
 	}
 
-	public void Dispose()
-	{
-		Renderer.Dispose();
-		Renderer.Dispose();
-		Renderer = null!;
-		GC.Collect();
-		GC.WaitForPendingFinalizers();
-		GC.Collect();
-	}
+	public void Dispose() => Renderer.Dispose(); // we're good boys
 }
 
 [CollectionDefinition("Renderer", DisableParallelization = true)]

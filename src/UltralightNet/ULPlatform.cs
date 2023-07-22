@@ -271,6 +271,9 @@ public static unsafe class ULPlatform
 	public static Renderer CreateRenderer() => CreateRenderer(new());
 	public static Renderer CreateRenderer(ULConfig config, bool dispose = true)
 	{
+#if NET5_0_OR_GREATER
+		if (OperatingSystem.IsMacOS() && Environment.CurrentManagedThreadId is not 1) throw new Exception("Renderer can only be created from the main thread on MacOS.");
+#endif
 		if (SetDefaultLogger && _logger.__LogMessage is null)
 		{
 			Console.WriteLine("UltralightNet: no logger set, console logger will be used.");

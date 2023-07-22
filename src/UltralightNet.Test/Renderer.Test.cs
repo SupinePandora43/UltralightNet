@@ -1,16 +1,15 @@
 using System;
-using System.Threading;
 using System.Diagnostics;
+using System.Threading;
 using Xunit;
 
 namespace UltralightNet.Test;
 
 [Collection("Renderer")]
 [Trait("Category", "Renderer")]
-public class RendererTest
+public sealed class RendererTest
 {
-	private readonly Renderer Renderer;
-
+	private Renderer Renderer { get; }
 	public RendererTest(RendererFixture fixture) => Renderer = fixture.Renderer;
 
 	private static ULViewConfig ViewConfig => new()
@@ -94,39 +93,6 @@ public class RendererTest
 	{
 		using View view = Renderer.CreateView(512, 512, ViewConfig);
 		view.HTML = "<html />";
-	}
-
-	public void FSTest()
-	{
-		using View view = Renderer.CreateView(256, 256, ViewConfig);
-		view.URL = "file:///test.html";
-
-		view.OnAddConsoleMessage += (source, level, message, line_number, column_number, source_id) =>
-		{
-			Console.WriteLine($"{source_id} {level}: {line_number}, {column_number} ({source}) - {message}");
-		};
-
-		bool loaded = false;
-
-		view.OnFinishLoading += (frame_id, is_main_frame, url) =>
-		{
-			loaded = true;
-		};
-
-		while (!loaded)
-		{
-			Renderer.Update();
-			Thread.Sleep(10);
-		}
-
-		for (uint i = 0; i < 100; i++)
-		{
-			Renderer.Update();
-			Thread.Sleep(10);
-		}
-
-		Renderer.Render();
-		view.Surface!.Value.Bitmap.WritePng("test_FS.png");
 	}
 
 	[Fact]

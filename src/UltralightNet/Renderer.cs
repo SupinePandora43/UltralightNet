@@ -53,7 +53,7 @@ public static unsafe partial class Methods
 }
 
 [NativeMarshalling(typeof(Marshaller))]
-public unsafe class Renderer : NativeContainer
+public sealed unsafe class Renderer : NativeContainer
 {
 	internal override void* Handle
 	{
@@ -64,8 +64,6 @@ public unsafe class Renderer : NativeContainer
 		}
 		init => base.Handle = value;
 	}
-
-	protected Renderer() { }
 
 	internal int ThreadId { get; set; } = -1;
 	internal void AssertNotWrongThread() // hungry
@@ -113,7 +111,6 @@ public unsafe class Renderer : NativeContainer
 	public void FireGamepadAxisEvent(GamepadAxisEvent gamepadAxisEvent) => Methods.ulFireGamepadAxisEvent(this, gamepadAxisEvent);
 	public void FireGamepadButtonEvent(GamepadButtonEvent gamepadbuttonEvent) => Methods.ulFireGamepadButtonEvent(this, gamepadbuttonEvent);
 
-	[SuppressMessage("Usage", "CA1816: Call GC.SupressFinalize correctly")]
 	public override void Dispose()
 	{
 		if (!IsDisposed && Owns) Methods.ulDestroyRenderer(this);
@@ -121,14 +118,6 @@ public unsafe class Renderer : NativeContainer
 	}
 
 	internal static Renderer FromHandle(void* handle, bool dispose) => new() { Handle = handle, Owns = dispose };
-
-	public bool Equals(Renderer? other)
-	{
-		if (other is null) return false;
-		if (other.IsDisposed) return IsDisposed;
-		return Handle == other.Handle;
-	}
-	public override bool Equals(object? other) => other is Renderer renderer && Equals(renderer);
 
 	[CustomMarshaller(typeof(Renderer), MarshalMode.ManagedToUnmanagedIn, typeof(Marshaller))]
 	internal ref struct Marshaller
