@@ -11,3 +11,4 @@ DIR="$( cd -P "$( dirname "$SOURCE" )" && pwd )"
 
 dotnet pack -c Release src/UltralightNet.Binaries
 dotnet pack -c Release src/UltralightNet.AppCore.Binaries
+dotnet pack -c Release src/UltralightNet.Resources
