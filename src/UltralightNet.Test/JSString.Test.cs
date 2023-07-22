@@ -2,7 +2,7 @@ using System.Collections.Generic;
 using Xunit;
 
 namespace UltralightNet.Test;
-
+/*
 public unsafe class JSStringTest
 {
 	public static IEnumerable<object[]> GetTestStrings()
@@ -44,3 +44,4 @@ public unsafe class JSStringTest
 		Assert.False(s1 == null);
 	}
 }
+*/

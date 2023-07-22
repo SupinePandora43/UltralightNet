@@ -8,9 +8,6 @@
 		<Description>AppCore bindings</Description>
 
 		<!-- <PackageLicenseFile>LICENSE.txt</PackageLicenseFile> -->
-
-
-		<EmitCompilerGeneratedFiles>true</EmitCompilerGeneratedFiles>
 	</PropertyGroup>
 	<ItemGroup>
 		<Compile Remove="LibraryImportGenerator/**" Condition="'$(TargetFramework)'=='net7.0'" />

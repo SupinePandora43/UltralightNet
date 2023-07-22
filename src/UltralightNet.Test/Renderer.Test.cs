@@ -147,7 +147,7 @@ public class RendererTest
 		}
 
 		Renderer.Render();
-		view.Surface!.Bitmap.WritePng("test_FS.png");
+		view.Surface!.Value.Bitmap.WritePng("test_FS.png");
 	}
 
 	[Fact]
