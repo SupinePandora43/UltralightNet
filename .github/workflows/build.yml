@@ -49,22 +49,25 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
       - name: Setup .NET
-        uses: actions/setup-dotnet@v1
+        uses: actions/setup-dotnet@v3
         with:
-          dotnet-version: 6.0.x
+          dotnet-version: 7.x
       - name: Add Github Packages to NuGet sources
         run: dotnet nuget add source --username ${{ github.actor }} --password ${{ github.token }} --store-password-in-clear-text --name github "https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json"
-      - name: Define a version suffix
-        run: echo "version_suffix=dev-$(date -u +%Y%m%d%H%M%S)-$(git rev-parse --short ${{ github.sha }})" >> $GITHUB_ENV
+      - name: Build packages (generated)
+        run: |
+          chmod +x ./regenerate.sh
+          ./regenerate.sh
       - name: Pack
         run: |
-          dotnet pack src/UltralightNet.Binaries -c Release --version-suffix ${{ env.version_suffix }} -p:RepositoryBranch=${{ github.ref_name }} -p:RepositoryCommit=${{ github.sha }}
-          dotnet pack src/UltralightNet.Resources -c Release --version-suffix ${{ env.version_suffix }} -p:RepositoryBranch=${{ github.ref_name }} -p:RepositoryCommit=${{ github.sha }}
-          dotnet pack src/UltralightNet -c Release --version-suffix ${{ env.version_suffix }} -p:RepositoryBranch=${{ github.ref_name }} -p:RepositoryCommit=${{ github.sha }}
-          dotnet pack src/UltralightNet.AppCore.Binaries -c Release --version-suffix ${{ env.version_suffix }} -p:RepositoryBranch=${{ github.ref_name }} -p:RepositoryCommit=${{ github.sha }}
-          dotnet pack src/UltralightNet.AppCore -c Release --version-suffix ${{ env.version_suffix }} -p:RepositoryBranch=${{ github.ref_name }} -p:RepositoryCommit=${{ github.sha }}
+          version_suffix=dev-$(date -u +%Y%m%d%H%M%S)-$(git rev-parse --short ${{ github.sha }})
+          dotnet pack src/UltralightNet.Binaries -c Release --version-suffix $version_suffix -p:RepositoryBranch=${{ github.ref_name }} -p:RepositoryCommit=${{ github.sha }}
+          dotnet pack src/UltralightNet.Resources -c Release --version-suffix $version_suffix -p:RepositoryBranch=${{ github.ref_name }} -p:RepositoryCommit=${{ github.sha }}
+          dotnet pack src/UltralightNet -c Release --version-suffix $version_suffix -p:RepositoryBranch=${{ github.ref_name }} -p:RepositoryCommit=${{ github.sha }}
+          dotnet pack src/UltralightNet.AppCore.Binaries -c Release --version-suffix $version_suffix -p:RepositoryBranch=${{ github.ref_name }} -p:RepositoryCommit=${{ github.sha }}
+          dotnet pack src/UltralightNet.AppCore -c Release --version-suffix $version_suffix -p:RepositoryBranch=${{ github.ref_name }} -p:RepositoryCommit=${{ github.sha }}
       - name: Publish
         run: dotnet nuget push *.nupkg --api-key ${{ github.token }} --source github
   Test:
@@ -76,11 +79,11 @@ jobs:
         os : ['windows', 'ubuntu', 'macos']
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
       - name: Setup .NET
-        uses: actions/setup-dotnet@v1
+        uses: actions/setup-dotnet@v3
         with:
-          dotnet-version: 6.0.100
+          dotnet-version: 7.x
       - name: Install missing libraries
         run: | # missing libraries workaround
           sudo add-apt-repository ppa:linuxuprising/libpng12
@@ -94,6 +97,10 @@ jobs:
         with:
           name: nugets
           path: ./
+      - name: Build packages (generated)
+        run: |
+          chmod +x ./regenerate.sh
+          ./regenerate.sh
       - run: tree
         if: matrix.os=='ubuntu'
       - name: Test
@@ -121,11 +128,11 @@ jobs:
     runs-on: ubuntu-latest
     if: github.ref_name == 'master'
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
     - name: Setup .NET
-      uses: actions/setup-dotnet@v1
+      uses: actions/setup-dotnet@v3
       with:
-        dotnet-version: 6.0.100
+        dotnet-version: 7.x
     - name: Pack
       run: |
         dotnet pack src/UltralightNet.Binaries -c Release -p:RepositoryBranch=${{ github.ref_name }} -p:RepositoryCommit=${{ github.sha }}

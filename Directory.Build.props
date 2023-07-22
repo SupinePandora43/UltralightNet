@@ -10,6 +10,7 @@
 
 		<PublishRepositoryUrl>true</PublishRepositoryUrl>
 		<IncludeSymbols>true</IncludeSymbols>
+		<UseSourceLink>true</UseSourceLink>
 		<SymbolPackageFormat>snupkg</SymbolPackageFormat>
 
 		<SolutionDir>$(MSBuildThisFileDirectory)</SolutionDir>
