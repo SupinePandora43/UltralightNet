@@ -22,6 +22,7 @@ jobs:
       - name: Setup .NET
         uses: actions/setup-dotnet@v3
         with:
+          dotnet-version: x
           dotnet-quality: 'ga'
       - name: Build packages
         run: |
