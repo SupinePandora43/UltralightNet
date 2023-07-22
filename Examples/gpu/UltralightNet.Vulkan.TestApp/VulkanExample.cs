@@ -31,6 +31,7 @@ internal unsafe partial class Application : IDisposable
 	readonly Device device;
 	readonly Queue graphicsQueue;
 	readonly Queue presentQueue;
+	readonly KhrSwapchain khrSwapchain;
 
 	public Application()
 	{
@@ -100,6 +101,8 @@ internal unsafe partial class Application : IDisposable
 				vk.GetDeviceQueue(device, graphicsQueueFamily, 0, out graphicsQueue);
 				if (graphicsQueueFamily == presentQueueFamily) presentQueue = graphicsQueue;
 				else vk.GetDeviceQueue(device, presentQueueFamily, 0, out presentQueue);
+
+				if (!vk.TryGetDeviceExtension(instance, device, out khrSwapchain)) throw new Exception($"{KhrSwapchain.ExtensionName} extension not found.");
 			}
 			finally
 			{
@@ -108,6 +111,9 @@ internal unsafe partial class Application : IDisposable
 			}
 		}
 
+		{
+
+		}
 		Console.WriteLine($"Initialized Application in {stopwatch.Elapsed}");
 	}
 
