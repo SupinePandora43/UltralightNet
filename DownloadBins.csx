@@ -1,5 +1,6 @@
 #!/usr/bin/env dotnet-script
 #r "System.Net.Http"
+// #r "nuget: SharpCompress,0.33.0" // see https://github.com/adamhathcock/sharpcompress/issues/751
 #nullable enable
 
 using System.Net.Http;
@@ -38,19 +39,22 @@ WebCore_REV = ParseRev(await depsStreamReader.ReadLineAsync() ?? throw ParseExce
 Ultralight_REV = ParseRev(await depsStreamReader.ReadLineAsync() ?? throw ParseException);
 AppCore_REV = ParseRev(await depsStreamReader.ReadLineAsync() ?? throw ParseException);
 
-static string PlatformToString(OSPlatform platform) => platform.ToString() switch
+static string PlatformToString(OSPlatform platform) => platform.ToString().ToLower() switch
 {
-	"Linux" => "linux",
-	"OSX" => "mac",
-	"Windows" => "win",
+	"linux" => "linux",
+	"osx" => "mac",
+	"windows" => "win",
 	_ => throw new PlatformNotSupportedException($"Not supported platform: {platform}")
 };
-static string BuildURL(string name, string rev, OSPlatform platform) => $"https://{name}.sfo2.cdn.digitaloceanspaces.com/{name}-{rev}-{PlatformToString(platform)}-x64.7z";
+
+static string BuildFileName(string name, string rev, OSPlatform platform) => $"{name}-{rev}-{PlatformToString(platform)}-x64.7z";
+static string BuildURL(string name, string rev, OSPlatform platform) => $"https://{name}.sfo2.cdn.digitaloceanspaces.com/{BuildFileName(name, rev, platform)}";
 
 
-var tempFolder = Directory.CreateTempSubdirectory("UltralightDownloader");
+var tempFolder = Path.Combine(Path.GetTempPath(), "UltralightDownloader");
+if (!Directory.Exists(tempFolder)) Directory.CreateDirectory(tempFolder);
 
-Queue<Task> taskQueue = new(12);
+List<Task> taskQueue = new(12);
 
 foreach (var (lib, rev) in new[] {
 	("ultralightcore-bin", UltralightCore_REV),
@@ -60,12 +64,29 @@ foreach (var (lib, rev) in new[] {
 {
 	foreach (OSPlatform platform in new[] { OSPlatform.Linux, OSPlatform.OSX, OSPlatform.Windows })
 	{
-		var httpStream = await client.GetStreamAsync(BuildURL(lib, rev, platform));
+		var archiveFileName = BuildFileName(lib, rev, platform);
 
-		var archiveFileName = $"{lib}-{rev}-{PlatformToString(platform)}-x64.7z";
+		if (!Args.Contains("--all") && !OperatingSystem.IsOSPlatform(platform.ToString()))
+		{
+			WriteLine($"Skipping {archiveFileName}");
+			continue;
+		}
 
-		var fileStream = File.Create(Path.Combine(tempFolder.ToString(), archiveFileName), checked((int)httpStream.Length));
-		await httpStream.CopyToAsync(fileStream);
+		if (!File.Exists(Path.Combine(tempFolder, archiveFileName + ".ok")))
+		{
+			taskQueue.Add(Task.Run(async () =>
+			{
+				using var httpStream = await client.GetStreamAsync(BuildURL(lib, rev, platform));
+
+				using var archiveDownloadStream = File.Create(Path.Combine(tempFolder, archiveFileName));
+
+				await httpStream.CopyToAsync(archiveDownloadStream);
+
+				await File.Create(Path.Combine(tempFolder, archiveFileName + ".ok")).DisposeAsync();
+			}));
+		}
+		// WriteLine(BuildURL(lib, rev, platform));
+		// using var downloadedArchive = File.Open(Path.Combine(tempFolder, archiveFileName), FileMode.Open, FileAccess.Read);
 
 		// TODO: unarchive
 
