@@ -24,7 +24,7 @@ jobs:
         with:
           dotnet-version: 7.x
       - name: Build packages (generated)
-        run: build.sh
+        run: ./build.sh
       - name: Build packages
         run: |
           dotnet pack src/UltralightNet.Binaries -c Release
