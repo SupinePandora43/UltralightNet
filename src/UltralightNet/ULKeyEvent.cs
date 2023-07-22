@@ -63,6 +63,7 @@ public static unsafe partial class Methods
 /// </summary>
 public sealed class ULKeyEvent : IDisposable
 {
+	[Obsolete]
 	public readonly IntPtr Ptr;
 	//todo: DoDispose bool
 	public bool IsDisposed { get; private set; }

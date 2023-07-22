@@ -93,7 +93,7 @@ public unsafe class Renderer : NativeContainer
 	/// <param name="is_persistent">Whether or not to store the session on disk.<br/>Persistent sessions will be written to the path set in <see cref="ULConfig.CachePath"/></param>
 	/// <param name="name">A unique name for this session, this will be used to generate a unique disk path for persistent sessions.</param>
 	public Session CreateSession(bool isPersistent, string name) => Session.FromHandle(Methods.ulCreateSession(this, isPersistent, name), true);
-	public Session DefaultSession => Session.FromHandle(Methods.ulDefaultSession(this), true);
+	public Session DefaultSession => Session.FromHandle(Methods.ulDefaultSession(this), false);
 
 	[MethodImpl(MethodImplOptions.AggressiveInlining)]
 	public void Update() => Methods.ulUpdate(this);

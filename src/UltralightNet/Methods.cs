@@ -38,6 +38,7 @@ public static unsafe partial class Methods
 	/// <remarks>UltralightCore, WebCore, Ultralight</remarks>
 	public static void Preload()
 	{
+		return;
 #if !NETFRAMEWORK
 #if NET5_0_OR_GREATER
 		bool isLinux = OperatingSystem.IsLinux();
