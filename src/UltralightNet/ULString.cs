@@ -244,7 +244,7 @@ public unsafe struct ULString : IDisposable, ICloneable, IEquatable<ULString>
 #else
 			Marshal.PtrToStringUTF8((IntPtr)str->data, checked((int)str->length));
 #endif
-		internal static ULString* ConvertToUnmanaged(string? managed) => new ULString(managed).Allocate();
+		internal static ULString* ConvertToUnmanaged(string? managed) => new ULString(managed.AsSpan()).Allocate();
 		internal static void Free(ULString* unmanaged)
 		{
 			NativeMemory.Free(unmanaged->data);

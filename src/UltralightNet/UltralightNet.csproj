@@ -1,11 +1,13 @@
 <Project Sdk="Microsoft.NET.Sdk">
 	<PropertyGroup>
-		<TargetFrameworks>net7.0;net6.0;net471;net46;net451;net45;netstandard2.1;netstandard2</TargetFrameworks>
+		<TargetFrameworks>net7.0;net6.0;netstandard2.1;netstandard2.0</TargetFrameworks>
 		<UseAppHost>true</UseAppHost>
 		<IsPackable>true</IsPackable>
 
 		<PackageId>UltralightNet</PackageId>
 		<Description>Ultralight .NET bindings</Description>
+
+		<EmitCompilerGeneratedFiles>true</EmitCompilerGeneratedFiles>
 	</PropertyGroup>
 	<ItemGroup>
 	  <None Remove="resources\cacert.pem" />
@@ -22,7 +24,7 @@
 	  <EmbeddedResource Include="resources\mediaControlsLocalizedStrings.js" />
 	</ItemGroup>
 	<ItemGroup>
-		<Compile Remove="DllImportGenerator/**" Condition="'$(TargetFramework)'=='net7.0'" />
+		<Compile Remove="LibraryImportGenerator/**" Condition="'$(TargetFramework)'=='net7.0'" />
 		<Compile Remove="JavaScript/**" />
 	</ItemGroup>
 	<ItemGroup>

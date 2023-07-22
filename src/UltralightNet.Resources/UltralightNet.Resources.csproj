@@ -1,6 +1,6 @@
 <Project Sdk="Microsoft.NET.Sdk">
 	<PropertyGroup>
-		<TargetFrameworks>net6.0;net471;net46;net451;net45;netstandard2.1;netstandard2</TargetFrameworks>
+		<TargetFramework>netstandard2.0</TargetFramework>
 
 		<Authors>Ultralight, Inc.</Authors>
 		<PackageId>UltralightNet.Resources</PackageId>

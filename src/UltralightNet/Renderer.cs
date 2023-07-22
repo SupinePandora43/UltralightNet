@@ -35,9 +35,9 @@ public static unsafe partial class Methods
 	[return: MarshalAs(UnmanagedType.U1)]
 	internal static partial bool ulStartRemoteInspectorServer(Renderer renderer, byte* address, ushort port);
 
-	[LibraryImport(LibUltralight)]
+	[LibraryImport(LibUltralight, StringMarshalling = StringMarshalling.Utf8)]
 	[return: MarshalAs(UnmanagedType.U1)]
-	internal static partial bool ulStartRemoteInspectorServer(Renderer renderer, [MarshalAs(UnmanagedType.LPUTF8Str)] string address, ushort port);
+	internal static partial bool ulStartRemoteInspectorServer(Renderer renderer, string address, ushort port);
 
 	[LibraryImport(LibUltralight)]
 	internal static partial void ulSetGamepadDetails(Renderer renderer, uint index, [MarshalUsing(typeof(ULString))] string id, uint axisCount, uint buttonCount);

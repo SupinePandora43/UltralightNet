@@ -1,4 +1,3 @@
-#if !NET7_0_OR_GREATER
 using System.Runtime.CompilerServices;
 using System.Text;
 
@@ -53,7 +52,7 @@ internal static unsafe class Utf8StringMarshaller
 		{
 			if (managed is null) return;
 
-			ReadOnlySpan<char> managedSpan = managed;
+			ReadOnlySpan<char> managedSpan = managed.AsSpan();
 			int len = managedSpan.Length;
 			int byteCount = checked((len + 1) * 3 + 1);
 
@@ -80,4 +79,3 @@ internal static unsafe class Utf8StringMarshaller
 		public readonly byte* ToUnmanaged() => unmanaged;
 	}
 }
-#endif

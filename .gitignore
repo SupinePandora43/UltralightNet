@@ -9,7 +9,6 @@
 *.pdb
 *.pidb
 *.psess
-*.resources
 *.sln.docstates
 *.suo
 *.svclog

@@ -23,6 +23,8 @@ jobs:
         uses: actions/setup-dotnet@v3
         with:
           dotnet-version: 7.x
+      - name: Build packages (generated)
+        run: build.sh
       - name: Build packages
         run: |
           dotnet pack src/UltralightNet.Binaries -c Release
