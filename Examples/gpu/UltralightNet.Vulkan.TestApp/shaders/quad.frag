@@ -2,8 +2,6 @@
 precision highp float;
 
 layout(set=0, binding = 0) uniform sampler2D _texture;
-//layout(binding = 0) uniform sampler _sampler;
-//layout(binding = 1) uniform texture2D _texture;
 
 layout(location = 0) in vec2 out_uv;
 

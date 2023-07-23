@@ -17,7 +17,7 @@ internal unsafe static class Utils
 	{
 		if (result is not Result.Success) throw new Exception("Result is not OK");
 	}
-	private static byte* ToPointer(this ReadOnlySpan<byte> span) => (byte*)Unsafe.AsPointer(ref Unsafe.AsRef(in span[0]));
+	public static byte* ToPointer(this ReadOnlySpan<byte> span) => (byte*)Unsafe.AsPointer(ref Unsafe.AsRef(in span[0]));
 
 	public static void CreateInstance(Vk vk, string[] extensions, out Instance instance)
 	{
@@ -31,7 +31,7 @@ internal unsafe static class Utils
 		if (Debug)
 		{
 			DebugUtilsMessengerCreateInfoEXT debugUtilsMessengerCreateInfo = new(
-				messageSeverity: DebugUtilsMessageSeverityFlagsEXT.DebugUtilsMessageSeverityWarningBitExt | DebugUtilsMessageSeverityFlagsEXT.DebugUtilsMessageSeverityWarningBitExt,
+				messageSeverity: DebugUtilsMessageSeverityFlagsEXT.DebugUtilsMessageSeverityWarningBitExt,
 				messageType: DebugUtilsMessageTypeFlagsEXT.DebugUtilsMessageTypeValidationBitExt | DebugUtilsMessageTypeFlagsEXT.DebugUtilsMessageTypeGeneralBitExt | DebugUtilsMessageTypeFlagsEXT.DebugUtilsMessageTypePerformanceBitExt,
 				pfnUserCallback: (delegate* unmanaged[Cdecl]<DebugUtilsMessageSeverityFlagsEXT, DebugUtilsMessageTypeFlagsEXT, DebugUtilsMessengerCallbackDataEXT*, void*, Bool32>)&DebugLogger
 			);

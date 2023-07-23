@@ -33,6 +33,16 @@ internal unsafe partial class Application : IDisposable
 	readonly Queue presentQueue;
 	readonly KhrSwapchain khrSwapchain;
 
+	readonly SampleCountFlags sampleCountFlags = SampleCountFlags.SampleCount4Bit;
+	readonly SurfaceFormatKHR surfaceFormat = new(Format.B8G8R8A8Srgb, ColorSpaceKHR.ColorSpaceSrgbNonlinearKhr);
+	readonly PresentModeKHR presentMode = PresentModeKHR.PresentModeFifoKhr;
+
+	//readonly Sampler sampler;
+	readonly DescriptorSetLayout descriptorSetLayout;
+	readonly PipelineLayout pipelineLayout;
+	readonly RenderPass renderPass;
+	readonly Pipeline pipeline;
+
 	public Application()
 	{
 		{ // Window
@@ -111,8 +121,136 @@ internal unsafe partial class Application : IDisposable
 			}
 		}
 
-		{
+		/*{ // Sampler
+			var samplerCreateInfo = new SamplerCreateInfo()
+			{
+				SType = StructureType.SamplerCreateInfo,
+				MagFilter = Filter.Linear,
+				MinFilter = Filter.Linear,
+				AddressModeU = SamplerAddressMode.ClampToEdge,
+				AddressModeV = SamplerAddressMode.ClampToEdge,
+				AddressModeW = SamplerAddressMode.Repeat,
+				AnisotropyEnable = false,
+				MaxAnisotropy = 1,
+				BorderColor = BorderColor.IntOpaqueBlack,
+				UnnormalizedCoordinates = false,
+				CompareEnable = false,
+				CompareOp = CompareOp.Never,
+				MipmapMode = SamplerMipmapMode.Linear,
+				MinLod = 0,
+				MaxLod = 1,
+				MipLodBias = 0
+			};
+			vk.CreateSampler(device, &samplerCreateInfo, null, out sampler);
+		}*/
+		{ // Surface support
+			khrSurface.GetPhysicalDeviceSurfaceCapabilities(physicalDevice, surface, out SurfaceCapabilitiesKHR surfaceCapabilitiesKHR);
 
+			uint surfaceFormatCount = 0;
+			khrSurface.GetPhysicalDeviceSurfaceFormats(physicalDevice, surface, &surfaceFormatCount, null).Check();
+			if (surfaceFormatCount is 0) throw new Exception("No surface formats found.");
+			Span<SurfaceFormatKHR> surfaceFormats = stackalloc SurfaceFormatKHR[(int)surfaceFormatCount];
+			khrSurface.GetPhysicalDeviceSurfaceFormats(physicalDevice, surface, &surfaceFormatCount, surfaceFormats).Check();
+
+			uint presentModeCount = 0;
+			khrSurface.GetPhysicalDeviceSurfacePresentModes(physicalDevice, surface, &presentModeCount, null).Check();
+			if (presentModeCount is 0) throw new Exception("No present modes found.");
+			Span<PresentModeKHR> presentModes = stackalloc PresentModeKHR[(int)presentModeCount];
+			khrSurface.GetPhysicalDeviceSurfacePresentModes(physicalDevice, surface, &presentModeCount, presentModes).Check();
+
+			for (int i = 0; i < surfaceFormats.Length; i++)
+			{
+				SurfaceFormatKHR surfaceFormat = surfaceFormats[i];
+				if (surfaceFormat.Format == this.surfaceFormat.Format && surfaceFormat.ColorSpace == this.surfaceFormat.ColorSpace) break;
+				else if (i == surfaceFormats.Length - 1) throw new Exception("No supported surface format found.");
+			}
+
+			for (int i = 0; i < presentModes.Length; i++)
+			{
+				PresentModeKHR presentMode = presentModes[i];
+				if (presentMode == this.presentMode) break;
+				else if (i == presentModes.Length - 1) throw new Exception("No supported present mode found.");
+			}
+		}
+		{ // DescriptorSetLayout
+			var descriptorSetLayoutBinding = new DescriptorSetLayoutBinding(binding: 0, descriptorType: DescriptorType.CombinedImageSampler, descriptorCount: 1, stageFlags: ShaderStageFlags.ShaderStageFragmentBit);
+			var descriptorSetLayoutCreateInfo = new DescriptorSetLayoutCreateInfo(bindingCount: 1, pBindings: &descriptorSetLayoutBinding);
+			vk.CreateDescriptorSetLayout(device, &descriptorSetLayoutCreateInfo, null, out descriptorSetLayout).Check();
+		}
+		{ // PipelineLayout
+			fixed (DescriptorSetLayout* pDescriptorSetLayout = &descriptorSetLayout)
+			{
+				var pipelineLayoutCreateInfo = new PipelineLayoutCreateInfo(setLayoutCount: 1, pSetLayouts: pDescriptorSetLayout);
+				vk.CreatePipelineLayout(device, &pipelineLayoutCreateInfo, null, out pipelineLayout).Check();
+			}
+		}
+		{ // RenderPass
+			var colorAttachment = new AttachmentDescription(
+				format: surfaceFormat.Format, samples: SampleCountFlags.SampleCount1Bit,
+				loadOp: AttachmentLoadOp.DontCare, storeOp: AttachmentStoreOp.Store,
+				stencilLoadOp: AttachmentLoadOp.DontCare, stencilStoreOp: AttachmentStoreOp.DontCare,
+				initialLayout: ImageLayout.Undefined, finalLayout: ImageLayout.PresentSrcKhr);
+			var colorAttachmentRef = new AttachmentReference(0, ImageLayout.ColorAttachmentOptimal);
+			var subpass = new SubpassDescription(pipelineBindPoint: PipelineBindPoint.Graphics, colorAttachmentCount: 1, pColorAttachments: &colorAttachmentRef);
+			var subpassDependency = new SubpassDependency(
+				Vk.SubpassExternal, 0,
+				PipelineStageFlags.PipelineStageColorAttachmentOutputBit | PipelineStageFlags.PipelineStageFragmentShaderBit, PipelineStageFlags.PipelineStageColorAttachmentOutputBit | PipelineStageFlags.PipelineStageFragmentShaderBit,
+				0, AccessFlags.AccessColorAttachmentWriteBit);
+			var renderPassCreateInfo = new RenderPassCreateInfo(
+				attachmentCount: 1, pAttachments: &colorAttachment,
+				subpassCount: 1, pSubpasses: &subpass,
+				dependencyCount: 1, pDependencies: &subpassDependency);
+			vk.CreateRenderPass(device, &renderPassCreateInfo, null, out renderPass).Check();
+		}
+		{ // Pipeline
+			ShaderModule CreateShaderModule(byte* pointer, nuint length)
+			{
+				var shaderModuleCreateInfo = new ShaderModuleCreateInfo(codeSize: length, pCode: (uint*)pointer);
+				ShaderModule module;
+				vk.CreateShaderModule(device, &shaderModuleCreateInfo, null, &module).Check();
+				return module;
+			}
+
+			var vertStream = typeof(Application).Assembly.GetManifestResourceStream("UltralightNet.Vulkan.TestApp.shaders.spirv.quad.vert.spv") as UnmanagedMemoryStream ?? throw new Exception("Shaders not found.");
+			var fragStream = typeof(Application).Assembly.GetManifestResourceStream("UltralightNet.Vulkan.TestApp.shaders.spirv.quad.frag.spv") as UnmanagedMemoryStream ?? throw new Exception("Shaders not found.");
+
+			var vert = CreateShaderModule(vertStream.PositionPointer, (nuint)vertStream.Length);
+			var frag = CreateShaderModule(fragStream.PositionPointer, (nuint)fragStream.Length);
+
+			try
+			{
+				var pipelineStages = stackalloc PipelineShaderStageCreateInfo[2] {
+					new(stage: ShaderStageFlags.ShaderStageVertexBit, module: vert, pName: "main"u8.ToPointer()),
+					new(stage: ShaderStageFlags.ShaderStageFragmentBit, module: frag, pName: "main"u8.ToPointer())
+				};
+				var pipelineVertexInputStateCreateInfo = new PipelineVertexInputStateCreateInfo(flags: 0);
+				var pipelineInputAssemblyStateCreateInfo = new PipelineInputAssemblyStateCreateInfo(topology: PrimitiveTopology.TriangleList);
+				var pipelineViewportStateCreateInfo = new PipelineViewportStateCreateInfo(viewportCount: 1, scissorCount: 1);
+				var pipelineRasterizationStateCreateInfo = new PipelineRasterizationStateCreateInfo(polygonMode: PolygonMode.Fill, cullMode: CullModeFlags.CullModeFrontBit, frontFace: FrontFace.CounterClockwise, lineWidth: 1.0f);
+				var pipelineMultisampleStateCreateInfo = new PipelineMultisampleStateCreateInfo(rasterizationSamples: SampleCountFlags.SampleCount1Bit);
+				var pipelineDepthStencilStateCreateInfo = new PipelineDepthStencilStateCreateInfo(depthTestEnable: false);
+				var pipelineColorBlendAttachmentState = new PipelineColorBlendAttachmentState(blendEnable: false, colorWriteMask: ColorComponentFlags.ColorComponentRBit | ColorComponentFlags.ColorComponentGBit | ColorComponentFlags.ColorComponentBBit | ColorComponentFlags.ColorComponentABit);
+				var pipelineColorBlendStateCreateInfo = new PipelineColorBlendStateCreateInfo(attachmentCount: 1, pAttachments: &pipelineColorBlendAttachmentState);
+				var dynamicStates = stackalloc DynamicState[] { DynamicState.Viewport, DynamicState.Scissor };
+				var pipelineDynamicStateCreateInfo = new PipelineDynamicStateCreateInfo(dynamicStateCount: 2, pDynamicStates: dynamicStates);
+				var graphicsPipelineCreateInfo = new GraphicsPipelineCreateInfo(
+					stageCount: 2, pStages: pipelineStages,
+					pVertexInputState: &pipelineVertexInputStateCreateInfo,
+					pInputAssemblyState: &pipelineInputAssemblyStateCreateInfo,
+					pViewportState: &pipelineViewportStateCreateInfo,
+					pRasterizationState: &pipelineRasterizationStateCreateInfo,
+					pMultisampleState: &pipelineMultisampleStateCreateInfo,
+					pDepthStencilState: &pipelineDepthStencilStateCreateInfo,
+					pColorBlendState: &pipelineColorBlendStateCreateInfo,
+					pDynamicState: &pipelineDynamicStateCreateInfo,
+					layout: pipelineLayout, renderPass: renderPass);
+				vk.CreateGraphicsPipelines(device, default /* TODO: PipelineCache */, 1, &graphicsPipelineCreateInfo, null, out pipeline);
+			}
+			finally
+			{
+				vk.DestroyShaderModule(device, frag, null);
+				vk.DestroyShaderModule(device, vert, null);
+			}
 		}
 		Console.WriteLine($"Initialized Application in {stopwatch.Elapsed}");
 	}
@@ -126,6 +264,11 @@ internal unsafe partial class Application : IDisposable
 
 	void IDisposable.Dispose()
 	{
+		vk.DestroyPipeline(device, pipeline, null);
+		vk.DestroyRenderPass(device, renderPass, null);
+		vk.DestroyPipelineLayout(device, pipelineLayout, null);
+		vk.DestroyDescriptorSetLayout(device, descriptorSetLayout, null);
+		//vk.DestroySampler(device, sampler, null);
 		vk.DestroyDevice(device, null);
 		khrSurface.DestroySurface(instance, surface, null);
 		vk.DestroyInstance(instance, null);
