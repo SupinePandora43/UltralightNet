@@ -15,7 +15,7 @@ internal unsafe static class Utils
 
 	public static void Check(this Result result)
 	{
-		if (result is not Result.Success) throw new Exception("Result is not OK");
+		if (result is not Result.Success) throw new Exception($"Result is {result}");
 	}
 	public static byte* ToPointer(this ReadOnlySpan<byte> span) => (byte*)Unsafe.AsPointer(ref Unsafe.AsRef(in span[0]));
 

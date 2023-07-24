@@ -230,6 +230,13 @@ public static unsafe class ULPlatform
 			Methods.ulPlatformSetClipboard(value);
 		}
 	}
+	public static ULSurfaceDefinition SurfaceDefinition
+	{
+		set
+		{
+			Methods.ulPlatformSetSurfaceDefinition(value);
+		}
+	}
 
 	/// <summary>Cheap copy of MEZIANTOU's ROS<char> line enumerator</summary>
 	private ref struct LineEnumerator
