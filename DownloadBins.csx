@@ -66,15 +66,10 @@ foreach (var (lib, rev) in new[] {
 	{
 		var archiveFileName = BuildFileName(lib, rev, platform);
 
-		if (!Args.Contains("--all") && !OperatingSystem.IsOSPlatform(platform.ToString()))
-		{
-			WriteLine($"Skipping {archiveFileName}");
-			continue;
-		}
-
 		if (!File.Exists(Path.Combine(tempFolder, archiveFileName + ".ok")))
 		{
-			taskQueue.Add(Task.Run(async () =>
+			Console.WriteLine(BuildURL(lib, rev, platform));
+			/*taskQueue.Add(Task.Run(async () =>
 			{
 				using var httpStream = await client.GetStreamAsync(BuildURL(lib, rev, platform));
 
@@ -83,7 +78,7 @@ foreach (var (lib, rev) in new[] {
 				await httpStream.CopyToAsync(archiveDownloadStream);
 
 				await File.Create(Path.Combine(tempFolder, archiveFileName + ".ok")).DisposeAsync();
-			}));
+			}));*/
 		}
 		// WriteLine(BuildURL(lib, rev, platform));
 		// using var downloadedArchive = File.Open(Path.Combine(tempFolder, archiveFileName), FileMode.Open, FileAccess.Read);
