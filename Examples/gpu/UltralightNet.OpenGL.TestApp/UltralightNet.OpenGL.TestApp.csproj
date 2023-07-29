@@ -10,7 +10,6 @@
 	<ItemGroup>
 		<PackageReference Include="UltralightNet.Binaries" Version="$(Version)" />
 		<PackageReference Include="UltralightNet.AppCore" Version="$(Version)" />
-		<PackageReference Include="UltralightNet.Resources" Version="$(Version)" />
 		<!--<PackageReference Include="Microsoft.DotNet.ILCompiler" Version="7.0.0-preview.4.22180.7" />-->
 
 		<PackageReference Include="Silk.NET.Core" Version="2.12.0" />

@@ -77,7 +77,7 @@ public sealed unsafe class Renderer : NativeContainer
 
 	public View CreateView(uint width, uint height, ULViewConfig viewConfig, Session session, bool dispose)
 	{
-		if (Owns && ULPlatform.ErrorGPUDriverNotSet && viewConfig.IsAccelerated && (ULPlatform.GPUDriver.__UpdateCommandList is null))
+		if (Owns && ULPlatform.ErrorGPUDriverNotSet && viewConfig.IsAccelerated && !ULPlatform.IsGPUDriverValid)
 		{
 			throw new Exception("No ULPlatform.GPUDriver set, but ULViewConfig.IsAccelerated was set to true. (Disable check by setting ULPlatform.ErrorGPUDriverNotSet to false.)");
 		}
@@ -103,7 +103,7 @@ public sealed unsafe class Renderer : NativeContainer
 	public void StartRemoteInspectorServer(string address, ushort port)
 	{
 		bool result = Methods.ulStartRemoteInspectorServer(this, address, port);
-		if(result) throw new Exception("Failed to start remote inspector server.");
+		if (result) throw new Exception("Failed to start remote inspector server.");
 	}
 
 	public void SetGamepadDetails(uint index, string id, uint axisCount, uint buttonCount) => Methods.ulSetGamepadDetails(this, index, id, axisCount, buttonCount);
@@ -114,6 +114,7 @@ public sealed unsafe class Renderer : NativeContainer
 	public override void Dispose()
 	{
 		if (!IsDisposed && Owns) Methods.ulDestroyRenderer(this);
+		ULPlatform.KeepAliveGPUDriver();
 		base.Dispose();
 	}
 
