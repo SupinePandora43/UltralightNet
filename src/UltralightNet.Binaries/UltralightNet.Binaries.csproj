@@ -27,7 +27,6 @@
 		<_NativeAssetName Include="runtimes/osx-x64/native/libUltralight.dylib" PackagePath="runtimes/osx-x64/native" />
 		<_NativeAssetName Include="runtimes/osx-x64/native/libUltralightCore.dylib" PackagePath="runtimes/osx-x64/native" />
 		<_NativeAssetName Include="runtimes/osx-x64/native/libWebCore.dylib" PackagePath="runtimes/osx-x64/native" />
-		<_NativeAssetName Include="runtimes/osx-x64/native/libgthread-2.0.dylib" PackagePath="runtimes/osx-x64/native" />
 
 		<_NativeAssetName Include="runtimes/linux-x64/native/libUltralight.so" PackagePath="runtimes/linux-x64/native" />
 		<_NativeAssetName Include="runtimes/linux-x64/native/libUltralightCore.so" PackagePath="runtimes/linux-x64/native" />
