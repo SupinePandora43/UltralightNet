@@ -104,7 +104,7 @@ jobs:
       - run: tree
         if: matrix.os=='ubuntu'
       - name: Test
-        run: dotnet test src/UltralightNet.Test/UltralightNet.Test.csproj -p:ParallelizeTestCollections=false --logger "trx;LogFileName=TestResult.trx" --collect:"XPlat Code Coverage" -- DataCollectionRunSettings.DataCollectors.DataCollector.Configuration.Format=cobertura,opencover -- DataCollectionRunSettings.DataCollectors.DataCollector.Configuration.UseSourceLink=true
+        run: DYLD_PRINT_LIBRARIES=1 dotnet test src/UltralightNet.Test/UltralightNet.Test.csproj -p:ParallelizeTestCollections=false --logger "trx;LogFileName=TestResult.trx" --collect:"XPlat Code Coverage" -- DataCollectionRunSettings.DataCollectors.DataCollector.Configuration.Format=cobertura,opencover -- DataCollectionRunSettings.DataCollectors.DataCollector.Configuration.UseSourceLink=true
       - name: Read test results
         if: always()
         run: cat src/UltralightNet.Test/TestResults/TestResult.trx
