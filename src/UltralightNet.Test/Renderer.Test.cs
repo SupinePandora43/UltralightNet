@@ -23,7 +23,7 @@ public sealed class RendererTest
 	{
 		using Session session = Renderer.DefaultSession;
 		Assert.Equal("default", session.Name);
-		Assert.Equal("/default", session.DiskPath);
+		Assert.Equal(OperatingSystem.IsWindows() ? "default" : "/default", session.DiskPath);
 
 		using Session session1 = Renderer.CreateSession(false, "myses1");
 		Assert.Equal("myses1", session1.Name);
