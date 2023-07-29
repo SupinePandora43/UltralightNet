@@ -38,87 +38,31 @@ public static unsafe partial class Methods
 	/// <remarks>UltralightCore, WebCore, Ultralight</remarks>
 	public static void Preload()
 	{
-		return;
-#if !NETFRAMEWORK
 #if NET5_0_OR_GREATER
-		bool isLinux = OperatingSystem.IsLinux();
 		bool isOSX = OperatingSystem.IsMacOS();
-#else
-			bool isLinux = RuntimeInformation.IsOSPlatform(OSPlatform.Linux);
-			bool isOSX = RuntimeInformation.IsOSPlatform(OSPlatform.OSX);
-#endif
-		if (isLinux || isOSX)
+		if (isOSX)
 		{
-			ReadOnlySpan<string> libsLinux = new[] { "libglib-2.0.so.0.6800.3", "libgthread-2.0.so.0.6800.3", "libgobject-2.0.so.0.6800.3", "libgmodule-2.0.so.0.6800.3", "libgio-2.0.so.0.6800.3", /* --- */ "libgstreamer-full-1.0.so", "libUltralightCore.so", "libWebCore.so", "libUltralight.so" };
-			ReadOnlySpan<string> libsOSX = new[] { "libgstreamer-full-1.0.dylib", "libUltralightCore.dylib", "libWebCore.dylib", "libUltralight.dylib" };
+			ReadOnlySpan<string> libsOSX = new[] { "libUltralightCore.dylib", "libWebCore.dylib", "libUltralight.dylib" };
 
 			string? absoluteAssemblyLocationDir = Path.GetDirectoryName(typeof(Methods).Assembly.Location);
-			if (string.IsNullOrEmpty(absoluteAssemblyLocationDir)) absoluteAssemblyLocationDir = Path.GetDirectoryName(
-#if NET6_0_OR_GREATER
-				Environment.ProcessPath ??
-#endif
-				"NonExistantFolder") ?? "AnotherNonExistantFolder";
-			string absoluteRuntimeNativesDir = Path.Combine(absoluteAssemblyLocationDir, "runtimes", isLinux ? "linux-x64" : "osx-x64", "native");
+			if (string.IsNullOrEmpty(absoluteAssemblyLocationDir)) return;
+			string absoluteRuntimeNativesDir = Path.Combine(absoluteAssemblyLocationDir, "runtimes", "osx-x64", "native");
 
-#if !NETSTANDARD
-			Assembly assembly = typeof(Methods).Assembly;
+			Assembly assembly = typeof(UltralightNet.Binaries.Binaries).Assembly;
 			DllImportSearchPath searchPath =
 				DllImportSearchPath.UseDllDirectoryForDependencies |
 				DllImportSearchPath.AssemblyDirectory |
 				DllImportSearchPath.ApplicationDirectory;
-#endif
-			foreach (string lib in (isLinux ? libsLinux : libsOSX))
+
+			foreach (string lib in libsOSX)
 			{
-				string absoluteRuntimeNative = Path.Combine(absoluteRuntimeNativesDir, lib);
-				if (File.Exists(absoluteRuntimeNative))
+				if (!NativeLibrary.TryLoad(lib, assembly, searchPath, out nint _))
 				{
-					NativeLibrary.Load(absoluteRuntimeNative
-#if !NETSTANDARD
-						, assembly, searchPath
-#endif
-						);
-					continue;
-				}
-				else
-				{
-					string absoluteAssemblyLocation = Path.Combine(absoluteAssemblyLocationDir, lib);
-					if (File.Exists(absoluteAssemblyLocation))
-					{
-						NativeLibrary.Load(absoluteAssemblyLocation
-#if !NETSTANDARD
-							, assembly, searchPath
-#endif
-							);
-					}
-					else
-						try
-						{
-							NativeLibrary.Load(lib
-#if !NETSTANDARD
-								, assembly, searchPath
-#endif
-								); // last hope (will not work)
-						}
-						catch (DllNotFoundException)
-						{
-#if DEBUG
-							Console.WriteLine($"UltralightNet: failed to load {lib}");
-#endif
-						} // will cause DllNotFoundException somewhere else
+					string absoluteRuntimeNative = Path.Combine(absoluteRuntimeNativesDir, lib);
+					NativeLibrary.TryLoad(absoluteRuntimeNative, assembly, searchPath, out nint _);
 				}
 			}
 		}
 #endif
 	}
-
-#if NETSTANDARD
-		private static partial class NativeLibrary
-		{
-			public static System.IntPtr Load(string libraryPath) => dlopen(libraryPath, 0x002); // RTLD_NOW
-
-			// LPUTF8Str = 48
-			[DllImport("libdl")]
-			private static extern System.IntPtr dlopen([MarshalAs(48)] string path, int mode);
-		}
-#endif
 }

@@ -104,15 +104,7 @@ jobs:
       - run: tree
         if: matrix.os=='ubuntu'
       - name: Test
-        if: matrix.os!='macos'
-        run: dotnet test src/UltralightNet.Test/UltralightNet.Test.csproj --collect:"XPlat Code Coverage" -- DataCollectionRunSettings.DataCollectors.DataCollector.Configuration.Format=cobertura,opencover -- DataCollectionRunSettings.DataCollectors.DataCollector.Configuration.UseSourceLink=true
-      - name: Test (macos)
-        if: matrix.os=='macos'
-        run: |
-          dotnet test src/UltralightNet.Test/UltralightNet.Test.csproj --filter Category!=Renderer --collect:"XPlat Code Coverage" -- DataCollectionRunSettings.DataCollectors.DataCollector.Configuration.Format=cobertura,opencover -- DataCollectionRunSettings.DataCollectors.DataCollector.Configuration.UseSourceLink=true
-          dotnet tool install --global coverlet.console
-          dotnet build -c Release src/UltralightNet.TestRunner/UltralightNet.TestRunner.csproj
-          coverlet src/UltralightNet.TestRunner/bin/Release/net6.0/UltralightNet.TestRunner.dll --target "dotnet" --targetargs "src/UltralightNet.TestRunner/bin/Release/net6.0/UltralightNet.TestRunner.dll" --format cobertura --format opencover
+        run: dotnet test src/UltralightNet.Test/UltralightNet.Test.csproj -e DOTNET_GCStress=0xC --collect:"XPlat Code Coverage" -- DataCollectionRunSettings.DataCollectors.DataCollector.Configuration.Format=cobertura,opencover -- DataCollectionRunSettings.DataCollectors.DataCollector.Configuration.UseSourceLink=true
       - name: Upload coverage
         uses: codecov/codecov-action@v3
         with:
