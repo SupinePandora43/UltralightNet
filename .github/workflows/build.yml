@@ -44,7 +44,7 @@ jobs:
   Test:
     needs: Build
     runs-on: ${{ matrix.os }}-latest
-    continue-on-error: ${{ matrix.os }} == 'macos'
+    continue-on-error: ${{ matrix.os }}=='macos'
     strategy:
       fail-fast: false
       matrix:
