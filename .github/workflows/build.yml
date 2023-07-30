@@ -104,14 +104,14 @@ jobs:
       - run: tree
         if: matrix.os=='ubuntu'
       - name: Test
-        run: dotnet test src/UltralightNet.Test/UltralightNet.Test.csproj -p:ParallelizeTestCollections=false --logger "trx;LogFileName=TestResult.trx" --collect:"XPlat Code Coverage" -- DataCollectionRunSettings.DataCollectors.DataCollector.Configuration.Format=cobertura,opencover -- DataCollectionRunSettings.DataCollectors.DataCollector.Configuration.UseSourceLink=true
+        run: dotnet test src/UltralightNet.Test/UltralightNet.Test.csproj --logger "trx;LogFileName=TestResult.trx" --collect:"XPlat Code Coverage" -- DataCollectionRunSettings.DataCollectors.DataCollector.Configuration.Format=cobertura,opencover -- DataCollectionRunSettings.DataCollectors.DataCollector.Configuration.UseSourceLink=true -- ParallelizeTestCollections=false
         env:
           DYLD_PRINT_LIBRARIES: 1
       - name: Read test results
         if: always()
         run: cat src/UltralightNet.Test/TestResults/TestResult.trx
       - name: Test (Stress)
-        run: dotnet test src/UltralightNet.Test/UltralightNet.Test.csproj -e DOTNET_GCStress=0xC -p:ParallelizeTestCollections=false --logger "trx;LogFileName=TestResult.trx" --collect:"XPlat Code Coverage" -- DataCollectionRunSettings.DataCollectors.DataCollector.Configuration.Format=cobertura,opencover -- DataCollectionRunSettings.DataCollectors.DataCollector.Configuration.UseSourceLink=true
+        run: dotnet test src/UltralightNet.Test/UltralightNet.Test.csproj -e DOTNET_GCStress=0xC --logger "trx;LogFileName=TestResult.trx" --collect:"XPlat Code Coverage" -- DataCollectionRunSettings.DataCollectors.DataCollector.Configuration.Format=cobertura,opencover -- DataCollectionRunSettings.DataCollectors.DataCollector.Configuration.UseSourceLink=true -- ParallelizeTestCollections=false
       - name: Read test results
         if: always()
         run: cat src/UltralightNet.Test/TestResults/TestResult.trx
