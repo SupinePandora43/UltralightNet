@@ -149,35 +149,20 @@ public static unsafe class ULPlatform
 	{
 		internal DefaultResourceOnlyFileSystem() { }
 
-		bool IFileSystem.FileExists(string path)
+		bool IFileSystem.FileExists(string path) => path switch
 		{
-			Console.WriteLine(path);
-			return path switch
-			{
-				"resources/cacert.pem" => true,
-				"resources/icudt67l.dat" => true,
-				"resources/mediaControls.css" => true,
-				"resources/mediaControls.js" => true,
-				"resources/mediaControlsLocalizedStrings.js" => true,
-				_ => false
-			};
-		}
+			"resources/cacert.pem" => true,
+			"resources/icudt67l.dat" => true,
+			_ => false
+		};
 		string IFileSystem.GetFileCharset(string path) => "utf-8";
-		string IFileSystem.GetFileMimeType(string path)
-		{
-			if (path.EndsWith(".css")) return "text/css";
-			else if (path.EndsWith(".js")) return "application/javascript";
-			else return "application/octet-stream";
-		}
+		string IFileSystem.GetFileMimeType(string path) => "application/octet-stream";
 		ULBuffer IFileSystem.OpenFile(string path)
 		{
 			Stream? s = path switch
 			{
 				"resources/cacert.pem" => Resources.Cacertpem,
 				"resources/icudt67l.dat" => Resources.Icudt67ldat,
-				"resources/mediaControls.css" => Resources.MediaControlscss,
-				"resources/mediaControls.js" => Resources.MediaControlsjs,
-				"resources/mediaControlsLocalizedStrings.js" => Resources.MediaControlsLocalizedStringsjs,
 				_ => null
 			};
 			if (s is UnmanagedMemoryStream unmanagedMemoryStream) return ULBuffer.CreateFromOwnedData(unmanagedMemoryStream.PositionPointer, checked((nuint)unmanagedMemoryStream.Length));

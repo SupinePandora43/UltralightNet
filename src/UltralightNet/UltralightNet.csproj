@@ -14,16 +14,10 @@
 	<ItemGroup>
 	  <None Remove="resources\cacert.pem" />
 	  <None Remove="resources\icudt67l.dat" />
-	  <None Remove="resources\mediaControls.css" />
-	  <None Remove="resources\mediaControls.js" />
-	  <None Remove="resources\mediaControlsLocalizedStrings.js" />
 	</ItemGroup>
 	<ItemGroup>
 	  <EmbeddedResource Include="resources\cacert.pem" />
 	  <EmbeddedResource Include="resources\icudt67l.dat" />
-	  <EmbeddedResource Include="resources\mediaControls.css" />
-	  <EmbeddedResource Include="resources\mediaControls.js" />
-	  <EmbeddedResource Include="resources\mediaControlsLocalizedStrings.js" />
 	</ItemGroup>
 	<ItemGroup>
 		<Compile Remove="LibraryImportGenerator/**" Condition="'$(TargetFramework)'=='net7.0'" />
@@ -35,8 +29,8 @@
 
 		<!-- <PackageReference Include="Microsoft.Interop.LibraryImportGenerator" Version="7.0.8.32201" OutputItemType="Analyzer" ReferenceOutputAssembly="false" PrivateAssets="All" /> -->
 
-		<PackageReference Condition="'$(TargetFramework)'!='net5.0'" Include="System.Memory" Version="4.5.4" />
-		<PackageReference Condition="'$(TargetFramework)'!='net5.0'" Include="System.Numerics.Vectors" Version="4.5.0" />
+		<PackageReference Condition="$(TargetFramework.StartsWith('netstandard'))" Include="System.Memory" Version="4.5.4" />
+		<PackageReference Condition="$(TargetFramework.StartsWith('netstandard'))" Include="System.Numerics.Vectors" Version="4.5.0" />
 		<PackageReference Condition="$(TargetFramework.StartsWith('netstandard'))" Include="System.Runtime.CompilerServices.Unsafe" Version="6.0.0" />
 
 		<PackageReference Include="UltralightNet.Binaries" Version="$(UltralightVersion)" />
