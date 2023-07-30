@@ -62,10 +62,12 @@ jobs:
       #    sudo ln -s  /usr/lib/x86_64-linux-gnu/libffi.so.7.1.0  /usr/lib/x86_64-linux-gnu/libffi.so.6
       #  if: matrix.os=='ubuntu'
       - name: Pack bins
+        shell: bash
         run: |
           chmod +x ./packbinaries.sh
           ./packbinaries.sh -p:RepositoryBranch=${{ github.ref_name }} -p:RepositoryCommit=${{ github.sha }}
       - name: Build
+        shell: bash
         run: |
           chmod +x ./regenerate.sh
           ./regenerate.sh
