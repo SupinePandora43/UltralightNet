@@ -23,7 +23,7 @@
 		<ProjectReference Include="..\..\..\src\UltralightNet.AppCore\UltralightNet.AppCore.csproj" />
 		<ProjectReference Include="..\..\..\gpu/libs/UltralightNet.Vulkan\UltralightNet.Vulkan.csproj" />
 
-		<PackageReference Include="UltralightNet.Binaries" Version="$(Version)" />
+		<PackageReference Include="UltralightNet.Binaries" Version="$(UltralightVersion)" />
 		<PackageReference Include="UltralightNet.AppCore" Version="$(Version)" />
 	</ItemGroup>
 

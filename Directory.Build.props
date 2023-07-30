@@ -35,6 +35,8 @@
 
 
 		<EmitCompilerGeneratedFiles>true</EmitCompilerGeneratedFiles>
+
+		<UltralightVersion>1.3.0</UltralightVersion>
 	</PropertyGroup>
 
 	<ItemGroup>

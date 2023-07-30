@@ -6,7 +6,7 @@
 
 	<ItemGroup>
 		<!-- Ultralight Binaries -->
-		<PackageReference Include="UltralightNet.Binaries" Version="$(Version)" />
+		<PackageReference Include="UltralightNet.Binaries" Version="$(UltralightVersion)" />
 		<!-- AppCore bindings -->
 		<PackageReference Include="UltralightNet.AppCore" Version="$(Version)" />
 		<!-- UltralightNet bindings itself -->

@@ -7,7 +7,7 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<PackageReference Include="UltralightNet.Binaries" Version="$(Version)" />
+		<PackageReference Include="UltralightNet.Binaries" Version="$(UltralightVersion)" />
 		<PackageReference Include="UltralightNet.AppCore" Version="$(Version)" />
 		<PackageReference Include="Veldrid" Version="4.9.0-beta1" />
 		<PackageReference Include="Veldrid.SDL2" Version="4.9.0-beta1" />

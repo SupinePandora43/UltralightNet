@@ -49,10 +49,7 @@ public static unsafe partial class Methods
 			string absoluteRuntimeNativesDir = Path.Combine(absoluteAssemblyLocationDir, "runtimes", "osx-x64", "native");
 
 			Assembly assembly = typeof(UltralightNet.Binaries.Binaries).Assembly;
-			DllImportSearchPath searchPath =
-				DllImportSearchPath.UseDllDirectoryForDependencies |
-				DllImportSearchPath.AssemblyDirectory |
-				DllImportSearchPath.ApplicationDirectory;
+			DllImportSearchPath searchPath = DllImportSearchPath.UseDllDirectoryForDependencies;
 
 			foreach (string lib in libsOSX)
 			{

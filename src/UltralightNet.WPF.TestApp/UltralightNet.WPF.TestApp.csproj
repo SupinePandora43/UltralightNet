@@ -9,7 +9,7 @@
 	<ItemGroup>
 		<ProjectReference Include="..\UltralightNet.WPF\UltralightNet.WPF.csproj" />
 
-		<PackageReference Include="UltralightNet.Binaries" Version="$(Version)" />
+		<PackageReference Include="UltralightNet.Binaries" Version="$(UltralightVersion)" />
 		<PackageReference Include="UltralightNet.AppCore" Version="$(Version)" />
 	</ItemGroup>
 
