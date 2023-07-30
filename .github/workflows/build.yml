@@ -39,8 +39,8 @@ jobs:
           version_suffix=dev-$(date -u +%Y%m%d%H%M%S)-$(git rev-parse --short ${{ github.sha }})
           dotnet pack src/UltralightNet -c Release --version-suffix $version_suffix -p:RepositoryBranch=${{ github.ref_name }} -p:RepositoryCommit=${{ github.sha }}
           dotnet pack src/UltralightNet.AppCore -c Release --version-suffix $version_suffix -p:RepositoryBranch=${{ github.ref_name }} -p:RepositoryCommit=${{ github.sha }}
-          dotnet nuget push *.nupkg --api-key ${{ github.token }} --source github
-          dotnet nuget push *.snupkg --api-key ${{ github.token }} --source github
+          dotnet nuget push *.nupkg --api-key ${{ github.token }} --source github --skip-duplicate
+          dotnet nuget push *.snupkg --api-key ${{ github.token }} --source github --skip-duplicate
   Test:
     needs: Build
     runs-on: ${{ matrix.os }}-latest
