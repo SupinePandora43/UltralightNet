@@ -84,25 +84,25 @@ jobs:
         uses: actions/setup-dotnet@v3
         with:
           dotnet-version: 7.x
-      - name: Install missing libraries
-        run: | # missing libraries workaround
-          sudo add-apt-repository ppa:linuxuprising/libpng12
-          sudo apt update
-          sudo apt install libpng12-0 libpulse0 libxv1
-          find /usr/lib -name "libffi.so*"
-          sudo ln -s  /usr/lib/x86_64-linux-gnu/libffi.so.7.1.0  /usr/lib/x86_64-linux-gnu/libffi.so.6
-        if: matrix.os=='ubuntu'
+      #- name: Install missing libraries
+      #  run: | # missing libraries workaround
+      #    sudo add-apt-repository ppa:linuxuprising/libpng12
+      #    sudo apt update
+      #    sudo apt install libpng12-0 libpulse0 libxv1
+      #    find /usr/lib -name "libffi.so*"
+      #    sudo ln -s  /usr/lib/x86_64-linux-gnu/libffi.so.7.1.0  /usr/lib/x86_64-linux-gnu/libffi.so.6
+      #  if: matrix.os=='ubuntu'
       - name: Download packages
         uses: actions/download-artifact@v3
         with:
           name: nugets
           path: ./
+      - run: tree
+        if: matrix.os=='ubuntu'
       - name: Build packages (generated)
         run: |
           chmod +x ./regenerate.sh
           ./regenerate.sh
-      - run: tree
-        if: matrix.os=='ubuntu'
       - name: Test
         run: dotnet test src/UltralightNet.Test/UltralightNet.Test.csproj --logger "trx;LogFileName=TestResult.trx" --collect:"XPlat Code Coverage" -- DataCollectionRunSettings.DataCollectors.DataCollector.Configuration.Format=cobertura,opencover -- DataCollectionRunSettings.DataCollectors.DataCollector.Configuration.UseSourceLink=true -- ParallelizeTestCollections=false
         env:
