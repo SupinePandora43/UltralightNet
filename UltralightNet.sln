@@ -37,8 +37,6 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "GettingStarted", "Examples\
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UltralightNet.AppCore.TestApp", "Examples\AppCore\UltralightNet.AppCore.TestApp\UltralightNet.AppCore.TestApp.csproj", "{6066A6F2-EE9A-4F71-9CC0-8D6D068ED97F}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Supine.Unstride", "src\Supine.Unstride\Supine.Unstride.csproj", "{EC79BB43-93EE-4D29-AA2C-6A7437244FA7}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UltralightNet.Veldrid.SDL2", "src\UltralightNet.Veldrid.SDL2\UltralightNet.Veldrid.SDL2.csproj", "{D2C07055-8EBB-4327-995E-612B566E4B8E}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Benchmarks", "src\Benchmarks\Benchmarks.csproj", "{166A9C81-274E-4ECA-A057-07C5067D7DE6}"
@@ -91,10 +89,6 @@ Global
 		{6066A6F2-EE9A-4F71-9CC0-8D6D068ED97F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{6066A6F2-EE9A-4F71-9CC0-8D6D068ED97F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{6066A6F2-EE9A-4F71-9CC0-8D6D068ED97F}.Release|Any CPU.Build.0 = Release|Any CPU
-		{EC79BB43-93EE-4D29-AA2C-6A7437244FA7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{EC79BB43-93EE-4D29-AA2C-6A7437244FA7}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{EC79BB43-93EE-4D29-AA2C-6A7437244FA7}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{EC79BB43-93EE-4D29-AA2C-6A7437244FA7}.Release|Any CPU.Build.0 = Release|Any CPU
 		{D2C07055-8EBB-4327-995E-612B566E4B8E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{D2C07055-8EBB-4327-995E-612B566E4B8E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D2C07055-8EBB-4327-995E-612B566E4B8E}.Release|Any CPU.ActiveCfg = Release|Any CPU

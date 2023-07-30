@@ -3,13 +3,11 @@
 	<PropertyGroup>
 		<OutputType>Exe</OutputType>
 		<TargetFramework>net6.0</TargetFramework>
-		<LangVersion>10</LangVersion>
-		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
 	</PropertyGroup>
 
 	<ItemGroup>
-		<PackageReference Include="UltralightNet.Binaries" Version="$(Version)" />
-		<PackageReference Include="UltralightNet.AppCore" Version="$(Version)" />
+		<PackageReference Include="UltralightNet.Binaries" Version="$(UltralightVersion)" />
+		<PackageReference Include="UltralightNet.AppCore" Version="$(UltralightVersion)" />
 		<!--<PackageReference Include="Microsoft.DotNet.ILCompiler" Version="7.0.0-preview.4.22180.7" />-->
 
 		<PackageReference Include="Silk.NET.Core" Version="2.12.0" />

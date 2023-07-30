@@ -3,7 +3,6 @@
 	<PropertyGroup>
 		<TargetFrameworks>net7.0;net6.0;netstandard2.1;netstandard2.0</TargetFrameworks>
 
-		<!-- <Authors>Ultralight, Inc.</Authors> -->
 		<PackageId>UltralightNet.AppCore</PackageId>
 		<Description>AppCore bindings</Description>
 
