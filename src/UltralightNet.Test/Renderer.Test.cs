@@ -40,7 +40,7 @@ public sealed class RendererTest
 	[Trait("Network", "Required")]
 	public void GenericTest()
 	{
-		using View view = Renderer.CreateView(512, 512, ViewConfig);
+		View view = Renderer.CreateView(512, 512, ViewConfig);
 
 		Assert.Equal(512u, view.Width);
 		Assert.Equal(512u, view.Height);
@@ -83,7 +83,7 @@ public sealed class RendererTest
 	[Fact]
 	public void JSTest()
 	{
-		using View view = Renderer.CreateView(2, 2, ViewConfig);
+		View view = Renderer.CreateView(2, 2, ViewConfig);
 		Assert.Equal("3", view.EvaluateScript("1+2", out string exception));
 		Assert.True(string.IsNullOrEmpty(exception));
 	}
@@ -91,14 +91,14 @@ public sealed class RendererTest
 	[Fact]
 	public void HTMLTest()
 	{
-		using View view = Renderer.CreateView(512, 512, ViewConfig);
+		View view = Renderer.CreateView(512, 512, ViewConfig);
 		view.HTML = "<html />";
 	}
 
 	[Fact]
 	public void EventTest()
 	{
-		using View view = Renderer.CreateView(256, 256, ViewConfig);
+		View view = Renderer.CreateView(256, 256, ViewConfig);
 		view.FireKeyEvent(new(ULKeyEventType.Char, ULKeyEventModifiers.ShiftKey, 0, 0, "A", "A", false, false, false));
 		view.FireMouseEvent(new ULMouseEvent() { Type = ULMouseEventType.MouseDown, X = 100, Y = 100, Button = ULMouseEventButton.Left });
 		view.FireScrollEvent(new() { Type = ULScrollEventType.ByPage, DeltaX = 23, DeltaY = 123 });
