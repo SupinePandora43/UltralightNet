@@ -15,8 +15,7 @@
 	<ItemGroup>
 		<PackageReference Include="System.ValueTuple" Version="4.5.0" PrivateAssets="All" />
 		<ProjectReference Include="..\UltralightNet\UltralightNet.csproj" />
-		<ProjectReference Include="..\UltralightNet.AppCore.Binaries\UltralightNet.AppCore.Binaries.csproj" />
-		<PackageReference Include="UltralightNet.AppCore.Binaries" Version="$(Version)" />
+		<PackageReference Include="UltralightNet.AppCore.Binaries" Version="$(UltralightVersion)" />
 	</ItemGroup>
 
 </Project>

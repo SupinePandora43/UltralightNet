@@ -6,10 +6,10 @@
 		<Platform>x64</Platform>
 
 		<Authors>Ultralight, Inc.</Authors>
+		<Copyright>Ultralight, Inc.</Copyright>
 		<PackageId>UltralightNet.Binaries</PackageId>
 		<Description>Ultralight binaries</Description>
 
-		<Copyright>Ultralight, Inc.</Copyright>
 
 		<PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
 
