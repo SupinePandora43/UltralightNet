@@ -12,6 +12,7 @@ public delegate void AddConsoleMessageCallback(
 	uint columnNumber,
 	string sourceId
 );
+// TODO: make popupRect nullable, remove isPopup
 public delegate View? CreateChildViewCallback(
 	string openerUrl,
 	string targetUrl,

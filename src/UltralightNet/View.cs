@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Runtime.InteropServices.Marshalling;
@@ -188,7 +189,7 @@ public static unsafe partial class Methods
 	public static partial bool ulViewGetNeedsPaint(View view);
 
 	[LibraryImport(LibUltralight)]
-	public static partial void* ulViewCreateInspectorView(View view);
+	public static partial void* ulViewCreateLocalInspectorView(View view);
 }
 
 [NativeMarshalling(typeof(Marshaller))]
@@ -281,20 +282,30 @@ public sealed unsafe class View : NativeContainer
 	public void FireMouseEvent(ULMouseEvent mouseEvent) => Methods.ulViewFireMouseEvent(this, &mouseEvent);
 	public void FireScrollEvent(ULScrollEvent scrollEvent) => Methods.ulViewFireScrollEvent(this, &scrollEvent);
 
+	public bool NeedsPaint { get => Methods.ulViewGetNeedsPaint(this); set => Methods.ulViewSetNeedsPaint(this, value); }
+
+	public View? CreateLocalInspectorView()
+	{
+		var handle = Methods.ulViewCreateLocalInspectorView(this);
+		Debug.Assert(handle is not null);
+		var view = FromHandle(handle, false);
+		view.Renderer = Renderer;
+		return view;
+	}
+
 	public event Action<string>? OnChangeTitle;
 	public event Action<string>? OnChangeURL;
 	public event Action<string>? OnChangeTooltip;
 	public event Action<ULCursor>? OnChangeCursor;
 	public event AddConsoleMessageCallback? OnAddConsoleMessage;
-	public event CreateChildViewCallback? OnCreateChildView;
-	public event CreateInspectorViewCallback? OnCreateInspectorViewCallback;
+	public CreateChildViewCallback? OnCreateChildView;
+	public CreateInspectorViewCallback? OnCreateInspectorView;
 	public event BeginLoadingCallback? OnBeginLoading;
 	public event FinishLoadingCallback? OnFinishLoading;
 	public event FailLoadingCallback? OnFailLoading;
 	public event WindowObjectReadyCallback? OnWindowObjectReady;
-	public event DOMReadyCallback? OnDomReady;
+	public event DOMReadyCallback? OnDOMReady;
 	public event Action? OnUpdateHistory;
-
 
 	internal void SetUpCallbacks()
 	{
@@ -304,6 +315,14 @@ public sealed unsafe class View : NativeContainer
 		Methods.ulViewSetChangeTooltipCallback(this, &NativeOnChangeTooltip, data);
 		Methods.ulViewSetChangeCursorCallback(this, &NativeOnChangeCursor, data);
 		Methods.ulViewSetAddConsoleMessageCallback(this, &NativeOnAddConsoleMessage, data);
+		Methods.ulViewSetCreateChildViewCallback(this, &NativeOnCreateChildView, data);
+		Methods.ulViewSetCreateInspectorViewCallback(this, &NativeOnCreateInspectorView, data);
+		Methods.ulViewSetBeginLoadingCallback(this, &NativeOnBeginLoading, data);
+		Methods.ulViewSetFinishLoadingCallback(this, &NativeOnFinishLoading, data);
+		Methods.ulViewSetFailLoadingCallback(this, &NativeOnFailLoading, data);
+		Methods.ulViewSetWindowObjectReadyCallback(this, &NativeOnWindowObjectReady, data);
+		Methods.ulViewSetDOMReadyCallback(this, &NativeOnDOMReady, data);
+		Methods.ulViewSetUpdateHistoryCallback(this, &NativeOnUpdateHistory, data);
 	}
 
 	[UnmanagedCallersOnly(CallConvs = new Type[] { typeof(CallConvCdecl) })]
@@ -316,12 +335,38 @@ public sealed unsafe class View : NativeContainer
 	static void NativeOnChangeCursor(nuint userData, void* caller, ULCursor cursor) => GetView(userData, caller).OnChangeCursor?.Invoke(cursor);
 	[UnmanagedCallersOnly(CallConvs = new Type[] { typeof(CallConvCdecl) })]
 	static void NativeOnAddConsoleMessage(nuint userData, void* caller, ULMessageSource source, ULMessageLevel level, ULString* message, uint lineNumber, uint columnNumber, ULString* sourceId) => GetView(userData, caller).OnAddConsoleMessage?.Invoke(source, level, message->ToString(), lineNumber, columnNumber, sourceId->ToString());
-
-
-
-	public bool NeedsPaint { get => Methods.ulViewGetNeedsPaint(this); set => Methods.ulViewSetNeedsPaint(this, value); }
-
-	public View CreateInspectorView() => FromHandle(Methods.ulViewCreateInspectorView(this));
+	[UnmanagedCallersOnly(CallConvs = new Type[] { typeof(CallConvCdecl) })]
+	static void* NativeOnCreateChildView(nuint userData, void* caller, ULString* openerUrl, ULString* targetUrl, bool isPopup, ULIntRect popupRect)
+	{
+#if DEBUG
+		throw new NotImplementedException("NativeOnCreateChildView");
+#else
+		var view = GetView(userData, caller).OnCreateChildView?.Invoke(openerUrl->ToString(), targetUrl->ToString(), isPopup, popupRect);
+		return view is null ? null : view.Handle;
+#endif
+	}
+	[UnmanagedCallersOnly(CallConvs = new Type[] { typeof(CallConvCdecl) })]
+	static void* NativeOnCreateInspectorView(nuint userData, void* caller, bool isLocal, ULString* inspectedUrl)
+	{
+#if DEBUG
+		throw new NotImplementedException("NativeOnCreateChildView");
+#else
+		var view = GetView(userData, caller).OnCreateInspectorView?.Invoke(isLocal, inspectedUrl->ToString());
+		return view is null ? null : view.Handle;
+#endif
+	}
+	[UnmanagedCallersOnly(CallConvs = new Type[] { typeof(CallConvCdecl) })]
+	static void NativeOnBeginLoading(nuint userData, void* caller, ulong frameId, bool isMainFrame, ULString* url) => GetView(userData, caller).OnBeginLoading?.Invoke(frameId, isMainFrame, url->ToString());
+	[UnmanagedCallersOnly(CallConvs = new Type[] { typeof(CallConvCdecl) })]
+	static void NativeOnFinishLoading(nuint userData, void* caller, ulong frameId, bool isMainFrame, ULString* url) => GetView(userData, caller).OnFinishLoading?.Invoke(frameId, isMainFrame, url->ToString());
+	[UnmanagedCallersOnly(CallConvs = new Type[] { typeof(CallConvCdecl) })]
+	static void NativeOnFailLoading(nuint userData, void* caller, ulong frameId, bool isMainFrame, ULString* url, ULString* description, ULString* errorDomain, int errorCode) => GetView(userData, caller).OnFailLoading?.Invoke(frameId, isMainFrame, url->ToString(), description->ToString(), errorDomain->ToString(), errorCode);
+	[UnmanagedCallersOnly(CallConvs = new Type[] { typeof(CallConvCdecl) })]
+	static void NativeOnWindowObjectReady(nuint userData, void* caller, ulong frameId, bool isMainFrame, ULString* url) => GetView(userData, caller).OnWindowObjectReady?.Invoke(frameId, isMainFrame, url->ToString());
+	[UnmanagedCallersOnly(CallConvs = new Type[] { typeof(CallConvCdecl) })]
+	static void NativeOnDOMReady(nuint userData, void* caller, ulong frameId, bool isMainFrame, ULString* url) => GetView(userData, caller).OnDOMReady?.Invoke(frameId, isMainFrame, url->ToString());
+	[UnmanagedCallersOnly(CallConvs = new Type[] { typeof(CallConvCdecl) })]
+	static void NativeOnUpdateHistory(nuint userData, void* caller) => GetView(userData, caller).OnUpdateHistory?.Invoke();
 
 
 	public override void Dispose()
