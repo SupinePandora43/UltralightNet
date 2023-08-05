@@ -94,8 +94,6 @@ public static unsafe partial class Methods
 public sealed unsafe class ULBitmap : NativeContainer, ICloneable, IEquatable<ULBitmap>
 #pragma warning restore CS0659
 {
-	private ULBitmap() { }
-
 	public uint Width => Methods.ulBitmapGetWidth(this);
 	public uint Height => Methods.ulBitmapGetHeight(this);
 

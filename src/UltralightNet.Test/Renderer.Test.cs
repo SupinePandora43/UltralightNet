@@ -96,10 +96,16 @@ public sealed class RendererTest
 	}
 
 	[Fact]
+	public void InspectorTest()
+	{
+		Assert.True(Renderer.TryStartRemoteInspectorServer("127.0.0.1", 7676));
+	}
+
+	[Fact]
 	public void EventTest()
 	{
 		using View view = Renderer.CreateView(256, 256, ViewConfig);
-		view.FireKeyEvent(new(ULKeyEventType.Char, ULKeyEventModifiers.ShiftKey, 0, 0, "A", "A", false, false, false));
+		view.FireKeyEvent(ULKeyEvent.Create(ULKeyEventType.Char, ULKeyEventModifiers.ShiftKey, 0, 0, "A", "A", false, false, false));
 		view.FireMouseEvent(new ULMouseEvent() { Type = ULMouseEventType.MouseDown, X = 100, Y = 100, Button = ULMouseEventButton.Left });
 		view.FireScrollEvent(new() { Type = ULScrollEventType.ByPage, DeltaX = 23, DeltaY = 123 });
 	}

@@ -7,8 +7,6 @@ namespace UltralightNet.AppCore;
 
 public static unsafe partial class AppCoreMethods
 {
-	public const string LibAppCore = "AppCore";
-
 	[LibraryImport(LibAppCore)]
 	public static unsafe partial void* ulCreateApp(in ULSettings settings, in ULConfig config);
 

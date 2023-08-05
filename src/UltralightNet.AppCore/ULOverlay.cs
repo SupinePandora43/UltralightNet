@@ -11,7 +11,7 @@ public static partial class AppCoreMethods
 	internal static unsafe partial void* ulCreateOverlay(ULWindow window, uint width, uint height, int x, int y);
 
 	[LibraryImport(LibAppCore)]
-	internal static unsafe partial void* ulCreateOverlayWithView(ULWindow window, void* view, int x, int y);
+	internal static unsafe partial void* ulCreateOverlayWithView(ULWindow window, View view, int x, int y);
 
 	[LibraryImport(LibAppCore)]
 	internal static partial void ulDestroyOverlay(ULOverlay overlay);
@@ -69,7 +69,7 @@ public class ULOverlay : NativeContainer
 		get
 		{
 			// INTEROPTODO: GC
-			return new((IntPtr)AppCoreMethods.ulOverlayGetView(this));
+			return View.FromHandle(AppCoreMethods.ulOverlayGetView(this), false);
 		}
 	}
 	public uint Width => AppCoreMethods.ulOverlayGetWidth(this);

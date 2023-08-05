@@ -19,7 +19,7 @@ namespace UltralightNet.Platform
 	{
 		string GetFallbackFont();
 		string GetFallbackFontForCharacters(string text, int weight, bool italic);
-		ULFontFile Load(string text, int weight, bool italic);
+		ULFontFile Load(string font, int weight, bool italic);
 
 #if !NETSTANDARD2_0
 		virtual ULFontLoader? GetNativeStruct() => null;
@@ -59,7 +59,7 @@ namespace UltralightNet.Platform
 				{
 					GetFallbackFont = (delegate* unmanaged[Cdecl]<ULString*>)Helper.AllocateDelegate(() => new ULString(instance.GetFallbackFont().AsSpan()).Allocate(), out handles[0]),
 					GetFallbackFontForCharacters = (delegate* unmanaged[Cdecl]<ULString*, int, bool, ULString*>)Helper.AllocateDelegate((ULString* text, int weight, bool italic) => new ULString(instance.GetFallbackFontForCharacters(text->ToString(), weight, italic).AsSpan()).Allocate(), out handles[1]),
-					Load = (delegate* unmanaged[Cdecl]<ULString*, int, bool, ULFontFile>)Helper.AllocateDelegate((ULString* text, int weight, bool italic) => instance.Load(text->ToString(), weight, italic), out handles[2])
+					Load = (delegate* unmanaged[Cdecl]<ULString*, int, bool, ULFontFile>)Helper.AllocateDelegate((ULString* font, int weight, bool italic) => instance.Load(font->ToString(), weight, italic), out handles[2])
 				};
 			}
 

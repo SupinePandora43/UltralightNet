@@ -41,6 +41,13 @@ namespace UltralightNet.Platform
 
 		internal sealed unsafe class Wrapper : IDisposable
 		{
+			delegate nint CreateCallback(uint width, uint height);
+			delegate void VoidIdCallback(nint id);
+			delegate uint UintIdCallback(nint id);
+			delegate nuint NUintIdCallback(nint id);
+			delegate byte* BytePtrIdCallback(nint id);
+			delegate void ResizeCallback(nint id, uint width, uint height);
+
 			readonly ISurfaceDefinition instance;
 			readonly ULSurfaceDefinition _NativeStruct;
 			public ULSurfaceDefinition NativeStruct
@@ -65,11 +72,19 @@ namespace UltralightNet.Platform
 					return;
 				}
 
-				handles = new GCHandle[3];
+				handles = new GCHandle[9];
 
 				NativeStruct = new()
 				{
-
+					Create = (delegate* unmanaged[Cdecl]<uint, uint, nint>)Helper.AllocateDelegate<CreateCallback>(instance.Create, out handles[0]),
+					Destroy = (delegate* unmanaged[Cdecl]<nint, void>)Helper.AllocateDelegate<VoidIdCallback>(instance.Destroy, out handles[1]),
+					GetWidth = (delegate* unmanaged[Cdecl]<nint, uint>)Helper.AllocateDelegate<UintIdCallback>(instance.GetWidth, out handles[2]),
+					GetHeight = (delegate* unmanaged[Cdecl]<nint, uint>)Helper.AllocateDelegate<UintIdCallback>(instance.GetHeight, out handles[3]),
+					GetRowBytes = (delegate* unmanaged[Cdecl]<nint, uint>)Helper.AllocateDelegate<UintIdCallback>(instance.GetRowBytes, out handles[4]),
+					GetSize = (delegate* unmanaged[Cdecl]<nint, nuint>)Helper.AllocateDelegate<NUintIdCallback>(instance.GetSize, out handles[5]),
+					LockPixels = (delegate* unmanaged[Cdecl]<nint, byte*>)Helper.AllocateDelegate<BytePtrIdCallback>(instance.LockPixels, out handles[6]),
+					UnlockPixels = (delegate* unmanaged[Cdecl]<nint, void>)Helper.AllocateDelegate<VoidIdCallback>(instance.UnlockPixels, out handles[7]),
+					Resize = (delegate* unmanaged[Cdecl]<nint, uint, uint, void>)Helper.AllocateDelegate<ResizeCallback>(instance.Resize, out handles[8])
 				};
 			}
 

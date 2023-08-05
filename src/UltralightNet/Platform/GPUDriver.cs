@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using UltralightNet.Platform.HighPerformance;
 
@@ -53,6 +54,31 @@ namespace UltralightNet.Platform
 
 		internal sealed unsafe class Wrapper : IDisposable
 		{
+			delegate uint IdCallback();
+			delegate void RenderBufferCallback(uint id, ULRenderBuffer renderBuffer);
+			delegate void GeometryCallback(uint id, ULVertexBuffer vertexBuffer, ULIndexBuffer indexBuffer);
+			delegate void DestroyIdCallback(uint id);
+			delegate void CommandListCallback(ULCommandList commandList);
+
+			readonly Dictionary<nint, WeakReference<ULBitmap>>? BitmapCache;
+			ULBitmap BitmapFromHandleCached(void* ptr)
+			{
+				if (!BitmapCache!.TryGetValue((nint)ptr, out var weakBitmap) || !weakBitmap.TryGetTarget(out ULBitmap? bitmap))
+				{
+					bitmap = ULBitmap.FromHandle(ptr, false);
+					BitmapCache[(nint)ptr] = new WeakReference<ULBitmap>(bitmap);
+				}
+
+				if (BitmapCache.Keys.Count > 256)
+				{
+					foreach (var keyValuePair in BitmapCache)
+					{
+						if (!keyValuePair.Value.TryGetTarget(out _)) BitmapCache.Remove(keyValuePair.Key);
+					}
+				}
+				return bitmap;
+			}
+
 			readonly IGPUDriver instance;
 			readonly ULGPUDriver _NativeStruct;
 			public ULGPUDriver NativeStruct
@@ -89,20 +115,22 @@ namespace UltralightNet.Platform
 				}
 				else handles = new GCHandle[12];
 
+				BitmapCache = new(32);
+
 				NativeStruct = NativeStruct with
 				{
-					NextTextureId = (delegate* unmanaged[Cdecl]<uint>)Helper.AllocateDelegate(instance.NextTextureId, out handles[0]),
-					CreateTexture = (delegate* unmanaged[Cdecl]<uint, void*, void>)Helper.AllocateDelegate((uint id, void* bitmap) => instance.CreateTexture(id, ULBitmap.FromHandle(bitmap, false)), out handles[1]),
-					UpdateTexture = (delegate* unmanaged[Cdecl]<uint, void*, void>)Helper.AllocateDelegate((uint id, void* bitmap) => instance.UpdateTexture(id, ULBitmap.FromHandle(bitmap, false)), out handles[2]),
-					DestroyTexture = (delegate* unmanaged[Cdecl]<uint, void>)Helper.AllocateDelegate(instance.DestroyTexture, out handles[3]),
-					NextRenderBufferId = (delegate* unmanaged[Cdecl]<uint>)Helper.AllocateDelegate(instance.NextRenderBufferId, out handles[4]),
-					CreateRenderBuffer = (delegate* unmanaged[Cdecl]<uint, ULRenderBuffer, void>)Helper.AllocateDelegate(instance.CreateRenderBuffer, out handles[5]),
-					DestroyRenderBuffer = (delegate* unmanaged[Cdecl]<uint, void>)Helper.AllocateDelegate(instance.DestroyRenderBuffer, out handles[6]),
-					NextGeometryId = (delegate* unmanaged[Cdecl]<uint>)Helper.AllocateDelegate(instance.NextGeometryId, out handles[7]),
-					CreateGeometry = (delegate* unmanaged[Cdecl]<uint, ULVertexBuffer, ULIndexBuffer, void>)Helper.AllocateDelegate(instance.CreateGeometry, out handles[8]),
-					UpdateGeometry = (delegate* unmanaged[Cdecl]<uint, ULVertexBuffer, ULIndexBuffer, void>)Helper.AllocateDelegate(instance.UpdateGeometry, out handles[9]),
-					DestroyGeometry = (delegate* unmanaged[Cdecl]<uint, void>)Helper.AllocateDelegate(instance.DestroyGeometry, out handles[10]),
-					UpdateCommandList = (delegate* unmanaged[Cdecl]<ULCommandList, void>)Helper.AllocateDelegate(instance.UpdateCommandList, out handles[11])
+					NextTextureId = (delegate* unmanaged[Cdecl]<uint>)Helper.AllocateDelegate<IdCallback>(instance.NextTextureId, out handles[0]),
+					CreateTexture = (delegate* unmanaged[Cdecl]<uint, void*, void>)Helper.AllocateDelegate((uint id, void* bitmap) => instance.CreateTexture(id, BitmapFromHandleCached(bitmap)), out handles[1]),
+					UpdateTexture = (delegate* unmanaged[Cdecl]<uint, void*, void>)Helper.AllocateDelegate((uint id, void* bitmap) => instance.UpdateTexture(id, BitmapFromHandleCached(bitmap)), out handles[2]),
+					DestroyTexture = (delegate* unmanaged[Cdecl]<uint, void>)Helper.AllocateDelegate<DestroyIdCallback>(instance.DestroyTexture, out handles[3]),
+					NextRenderBufferId = (delegate* unmanaged[Cdecl]<uint>)Helper.AllocateDelegate<IdCallback>(instance.NextRenderBufferId, out handles[4]),
+					CreateRenderBuffer = (delegate* unmanaged[Cdecl]<uint, ULRenderBuffer, void>)Helper.AllocateDelegate<RenderBufferCallback>(instance.CreateRenderBuffer, out handles[5]),
+					DestroyRenderBuffer = (delegate* unmanaged[Cdecl]<uint, void>)Helper.AllocateDelegate<DestroyIdCallback>(instance.DestroyRenderBuffer, out handles[6]),
+					NextGeometryId = (delegate* unmanaged[Cdecl]<uint>)Helper.AllocateDelegate<IdCallback>(instance.NextGeometryId, out handles[7]),
+					CreateGeometry = (delegate* unmanaged[Cdecl]<uint, ULVertexBuffer, ULIndexBuffer, void>)Helper.AllocateDelegate<GeometryCallback>(instance.CreateGeometry, out handles[8]),
+					UpdateGeometry = (delegate* unmanaged[Cdecl]<uint, ULVertexBuffer, ULIndexBuffer, void>)Helper.AllocateDelegate<GeometryCallback>(instance.UpdateGeometry, out handles[9]),
+					DestroyGeometry = (delegate* unmanaged[Cdecl]<uint, void>)Helper.AllocateDelegate<DestroyIdCallback>(instance.DestroyGeometry, out handles[10]),
+					UpdateCommandList = (delegate* unmanaged[Cdecl]<ULCommandList, void>)Helper.AllocateDelegate<CommandListCallback>(instance.UpdateCommandList, out handles[11])
 				};
 			}
 

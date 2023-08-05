@@ -156,7 +156,7 @@ public sealed class ULWindow : NativeContainer, IEquatable<ULWindow>
 	public unsafe void* NativeWindowHandle => AppCoreMethods.ulWindowGetNativeHandle(this);
 
 	public unsafe ULOverlay CreateOverlay(uint width, uint height, int x = 0, int y = 0) => ULOverlay.FromHandle(AppCoreMethods.ulCreateOverlay(this, width, height, x, y), true);
-	public unsafe ULOverlay CreateOverlay(View view, int x = 0, int y = 0) => ULOverlay.FromHandle(AppCoreMethods.ulCreateOverlayWithView(this, (void*)view.Ptr, x, y), true);
+	public unsafe ULOverlay CreateOverlay(View view, int x = 0, int y = 0) => ULOverlay.FromHandle(AppCoreMethods.ulCreateOverlayWithView(this, view, x, y), true);
 
 	public bool Equals(ULWindow? other)
 	{

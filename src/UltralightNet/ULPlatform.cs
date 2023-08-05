@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
@@ -29,17 +30,15 @@ public static partial class Methods
 }
 
 [SuppressMessage("Style", "IDE1006:Naming Styles", Justification = "<Pending>")]
-[SuppressMessage("Interoperability", "CA1401:P/Invokes should not be visible", Justification = "<Pending>")]
 public static unsafe class ULPlatform
 {
-	static void ULPLatform() => Methods.Preload();
-
-	public static bool SetDefaultLogger { get; set; } = true;
+	public static bool EnableDefaultLogger { get; set; } = true;
 	/// <summary>
 	/// Default filesystrem with access to bundled in assembly files (cacert.pem, icudt67l.dat, mediaControls*).
 	/// By disabling that (ULPlatform.SetDefaultFileSystem = false), you will face crash, if no filesystem was set.
 	/// </summary>
 	public static bool SetDefaultFileSystem { get; set; } = true;
+	public static bool SetDefaultFontLoader { get; set; } = true;
 
 	public static bool ErrorMissingResources { get; set; } = true;
 	public static bool ErrorGPUDriverNotSet { get; set; } = true;
@@ -60,24 +59,35 @@ public static unsafe class ULPlatform
 	public static ISurfaceDefinition SurfaceDefinition { set => Methods.ulPlatformSetSurfaceDefinition((surfaceDefinitionWrapper = new(value)).NativeStruct); }
 	public static IClipboard Clipboard { set => Methods.ulPlatformSetClipboard((clipboardWrapper = new(value)).NativeStruct); }
 
-	internal static bool IsGPUDriverValid => !(gpuDriverWrapper?.IsDisposed).GetValueOrDefault(true);
-	internal static void KeepAliveGPUDriver() => GC.KeepAlive(gpuDriverWrapper); // FIXME: this won't work if a new gpudriver was set, postponing until 1.4
-
 	public static Renderer CreateRenderer() => CreateRenderer(new());
 	public static Renderer CreateRenderer(ULConfig config, bool dispose = true)
 	{
 		if (config == default) throw new ArgumentException($"You passed default({nameof(ULConfig)}). It's invalid. Use at least \"new {nameof(ULConfig)}()\" instead.", nameof(config));
 
-		if (SetDefaultLogger && loggerWrapper is null)
+		if (EnableDefaultLogger && loggerWrapper is null)
 		{
 			Logger = DefaultLogger;
 		}
-		if (SetDefaultFileSystem && filesystemWrapper is null)
+		if (SetDefaultFileSystem && filesystemWrapper is null) FileSystem = config.ResourcePathPrefix is "resources/" ? DefaultFileSystem : throw new ArgumentException("Default file system supports only \"resources\" ResourcePathPrefix", nameof(config));
+		else if (ErrorMissingResources && filesystemWrapper is not null)
 		{
-			FileSystem = DefaultFileSystem;
+			var path = config.ResourcePathPrefix + "icudt67l.dat";
+			using ULString str = new(path);
+			if (filesystemWrapper.NativeStruct.FileExists is null || !filesystemWrapper.NativeStruct.FileExists(&str)) throw new Exception($"{nameof(FileSystem)}.{nameof(IFileSystem.FileExists)}(\"{path}\") returned 'false'. {nameof(ULConfig)}.{nameof(ULConfig.ResourcePathPrefix)} + \"icudt67l.dat\" is required for Renderer creation. (Set {nameof(ULPlatform)}.{nameof(ErrorMissingResources)} to \'false\' to ignore this exception, however, be ready for unhandled crash.)");
 		}
+
+		if (SetDefaultFontLoader && fontloaderWrapper is null) throw new Exception($"{nameof(FontLoader)} not set.");
+
 		var returnValue = Renderer.FromHandle(Methods.ulCreateRenderer(in config), true);
 		returnValue.ThreadId = Environment.CurrentManagedThreadId;
+
+		returnValue.loggerWrapper = loggerWrapper;
+		returnValue.filesystemWrapper = filesystemWrapper;
+		returnValue.fontloaderWrapper = fontloaderWrapper;
+		returnValue.gpuDriverWrapper = gpuDriverWrapper;
+		returnValue.surfaceDefinitionWrapper = surfaceDefinitionWrapper;
+		returnValue.clipboardWrapper = clipboardWrapper;
+
 		return returnValue;
 	}
 

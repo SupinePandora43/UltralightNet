@@ -2,16 +2,16 @@ using System.Diagnostics.CodeAnalysis;
 
 namespace UltralightNet.LowStuff;
 
-public unsafe abstract class NativeContainer : IDisposable, IEquatable<NativeContainer>
+public abstract unsafe class NativeContainer : IDisposable, IEquatable<NativeContainer>
 {
 	private void* handle;
-	internal virtual void* Handle
+	protected virtual void* Handle
 	{
 		get => !IsDisposed ? handle : throw new ObjectDisposedException(nameof(NativeContainer));
 		init => handle = value;
 	}
 
-	public bool IsDisposed { get; protected set; }
+	public bool IsDisposed { get; private set; }
 
 	private bool _Owns = true;
 	protected bool Owns
