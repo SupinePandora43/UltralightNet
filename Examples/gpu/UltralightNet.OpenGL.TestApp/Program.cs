@@ -56,6 +56,8 @@ void main()
 	static uint vao = 0, vbo = 0, ebo = 0;
 	static uint quadProgram = 0;
 
+	static OpenGLGPUDriver gpuDriver;
+
 	static Renderer renderer;
 	static View view;
 
@@ -63,9 +65,7 @@ void main()
 
 	public unsafe static void Main()
 	{
-		AppCoreMethods.ulEnablePlatformFontLoader();
-		AppCoreMethods.ulEnablePlatformFileSystem("./");
-		AppCoreMethods.ulEnableDefaultLogger("./log123as.txt");
+		AppCoreMethods.SetPlatformFontLoader();
 
 		try {
 			Silk.NET.GLFW.GlfwProvider.GLFW.Value.GetMonitorContentScale(Silk.NET.GLFW.GlfwProvider.GLFW.Value.GetPrimaryMonitor(), out float xscale, out float yscale);
@@ -211,24 +211,23 @@ void main()
 
 		window.SwapBuffers();
 
-		OpenGLGPUDriver.Initialize(gl, 1);
-
-		OpenGLGPUDriver.Check();
+		//OpenGLGPUDriver.Check();
 
 		window.SwapBuffers();
 
-		ULPlatform.GPUDriver = OpenGLGPUDriver.GetGPUDriver();
+		ULPlatform.GPUDriver = gpuDriver = new OpenGLGPUDriver(gl, 1);
 
-		renderer = ULPlatform.CreateRenderer(new ULConfig { FaceWinding = ULFaceWinding.Clockwise, ForceRepaint = false,MaxUpdateTime = (double)1/(double)120 });
+		renderer = ULPlatform.CreateRenderer(new ULConfig { FaceWinding = ULFaceWinding.Clockwise, ForceRepaint = true });
 
 		view = renderer.CreateView((uint)(512 * scale), (uint)(512 * scale), new ULViewConfig { IsAccelerated = true, IsTransparent = false, InitialDeviceScale = scale });
 
 		//view.URL = "https://vk.com/supinepandora43";
 		//view.URL = "https://twitter.com/@supinepandora43";
 		//view.URL = "https://youtube.com";
-		view.URL = "https://en.key-test.ru/";
-		//view.HTML = "<html><body><p>123</p></body></html>";
-		bool loaded = false;
+		//view.URL = "https://github.com";
+		//view.URL = "https://en.key-test.ru/";
+		view.HTML = "<html><body><p>123</p></body></html>";
+		bool loaded = true;
 
 		view.OnFinishLoading += (_, _, _) => loaded = true;
 
@@ -261,7 +260,7 @@ void main()
 	static unsafe void OnRender(double obj)
 	{
 		renderer.Render();
-		var renderBuffer = OpenGLGPUDriver.renderBuffers[(int)view.RenderTarget.RenderBufferId];
+		var renderBuffer = gpuDriver.renderBuffers[(int)view.RenderTarget.RenderBufferId];
 		var textureEntry = renderBuffer.textureEntry;
 
 		// redraw only when it has changed
