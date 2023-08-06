@@ -67,6 +67,12 @@ public sealed class ViewTest
 		using var view = Renderer.CreateView(2, 2);
 		Assert.Equal("3", view.EvaluateScript("1+2", out string exception));
 		Assert.True(string.IsNullOrEmpty(exception));
+
+		bool called = false;
+		view.OnAddConsoleMessage += (_, _, _, _, _, _) => called = true;
+		view.EvaluateScript("console.log(123)", out _);
+
+		Assert.True(called);
 	}
 	[Fact]
 	public void EventTest()

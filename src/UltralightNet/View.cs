@@ -159,24 +159,38 @@ public static unsafe partial class Methods
 
 	[LibraryImport(LibUltralight)]
 	internal static partial void ulViewSetCreateChildViewCallback(View view, delegate* unmanaged[Cdecl]<nuint, void*, ULString*, ULString*, bool, ULIntRect, void*> callback, nuint id);
+	[LibraryImport(LibUltralight)]
+	internal static partial void ulViewSetCreateChildViewCallback(View view, delegate* unmanaged[Cdecl]<nuint, void*, ULString*, ULString*, byte, ULIntRect, void*> callback, nuint id);
 
 	[LibraryImport(LibUltralight)]
 	internal static partial void ulViewSetCreateInspectorViewCallback(View view, delegate* unmanaged[Cdecl]<nuint, void*, bool, ULString*, void*> callback, nuint id);
+	[LibraryImport(LibUltralight)]
+	internal static partial void ulViewSetCreateInspectorViewCallback(View view, delegate* unmanaged[Cdecl]<nuint, void*, byte, ULString*, void*> callback, nuint id);
 
 	[LibraryImport(LibUltralight)]
 	internal static partial void ulViewSetBeginLoadingCallback(View view, delegate* unmanaged[Cdecl]<nuint, void*, ulong, bool, ULString*, void> callback, nuint id);
+	[LibraryImport(LibUltralight)]
+	internal static partial void ulViewSetBeginLoadingCallback(View view, delegate* unmanaged[Cdecl]<nuint, void*, ulong, byte, ULString*, void> callback, nuint id);
 
 	[LibraryImport(LibUltralight)]
 	internal static partial void ulViewSetFinishLoadingCallback(View view, delegate* unmanaged[Cdecl]<nuint, void*, ulong, bool, ULString*, void> callback, nuint id);
+	[LibraryImport(LibUltralight)]
+	internal static partial void ulViewSetFinishLoadingCallback(View view, delegate* unmanaged[Cdecl]<nuint, void*, ulong, byte, ULString*, void> callback, nuint id);
 
 	[LibraryImport(LibUltralight)]
 	internal static partial void ulViewSetFailLoadingCallback(View view, delegate* unmanaged[Cdecl]<nuint, void*, ulong, bool, ULString*, ULString*, ULString*, int, void> callback, nuint id);
+	[LibraryImport(LibUltralight)]
+	internal static partial void ulViewSetFailLoadingCallback(View view, delegate* unmanaged[Cdecl]<nuint, void*, ulong, byte, ULString*, ULString*, ULString*, int, void> callback, nuint id);
 
 	[LibraryImport(LibUltralight)]
 	internal static partial void ulViewSetWindowObjectReadyCallback(View view, delegate* unmanaged[Cdecl]<nuint, void*, ulong, bool, ULString*, void> callback, nuint id);
+	[LibraryImport(LibUltralight)]
+	internal static partial void ulViewSetWindowObjectReadyCallback(View view, delegate* unmanaged[Cdecl]<nuint, void*, ulong, byte, ULString*, void> callback, nuint id);
 
 	[LibraryImport(LibUltralight)]
 	internal static partial void ulViewSetDOMReadyCallback(View view, delegate* unmanaged[Cdecl]<nuint, void*, ulong, bool, ULString*, void> callback, nuint id);
+	[LibraryImport(LibUltralight)]
+	internal static partial void ulViewSetDOMReadyCallback(View view, delegate* unmanaged[Cdecl]<nuint, void*, ulong, byte, ULString*, void> callback, nuint id);
 
 	[LibraryImport(LibUltralight)]
 	internal static partial void ulViewSetUpdateHistoryCallback(View view, delegate* unmanaged[Cdecl]<nuint, void*, void> callback, nuint id);
@@ -336,35 +350,35 @@ public sealed unsafe class View : NativeContainer
 	[UnmanagedCallersOnly(CallConvs = new Type[] { typeof(CallConvCdecl) })]
 	static void NativeOnAddConsoleMessage(nuint userData, void* caller, ULMessageSource source, ULMessageLevel level, ULString* message, uint lineNumber, uint columnNumber, ULString* sourceId) => GetView(userData, caller).OnAddConsoleMessage?.Invoke(source, level, message->ToString(), lineNumber, columnNumber, sourceId->ToString());
 	[UnmanagedCallersOnly(CallConvs = new Type[] { typeof(CallConvCdecl) })]
-	static void* NativeOnCreateChildView(nuint userData, void* caller, ULString* openerUrl, ULString* targetUrl, bool isPopup, ULIntRect popupRect)
+	static void* NativeOnCreateChildView(nuint userData, void* caller, ULString* openerUrl, ULString* targetUrl, byte isPopup, ULIntRect popupRect)
 	{
 #if DEBUG
 		throw new NotImplementedException("NativeOnCreateChildView");
 #else
-		var view = GetView(userData, caller).OnCreateChildView?.Invoke(openerUrl->ToString(), targetUrl->ToString(), isPopup, popupRect);
+		var view = GetView(userData, caller).OnCreateChildView?.Invoke(openerUrl->ToString(), targetUrl->ToString(), isPopup != 0, popupRect);
 		return view is null ? null : view.Handle;
 #endif
 	}
 	[UnmanagedCallersOnly(CallConvs = new Type[] { typeof(CallConvCdecl) })]
-	static void* NativeOnCreateInspectorView(nuint userData, void* caller, bool isLocal, ULString* inspectedUrl)
+	static void* NativeOnCreateInspectorView(nuint userData, void* caller, byte isLocal, ULString* inspectedUrl)
 	{
 #if DEBUG
 		throw new NotImplementedException("NativeOnCreateChildView");
 #else
-		var view = GetView(userData, caller).OnCreateInspectorView?.Invoke(isLocal, inspectedUrl->ToString());
+		var view = GetView(userData, caller).OnCreateInspectorView?.Invoke(isLocal != 0, inspectedUrl->ToString());
 		return view is null ? null : view.Handle;
 #endif
 	}
 	[UnmanagedCallersOnly(CallConvs = new Type[] { typeof(CallConvCdecl) })]
-	static void NativeOnBeginLoading(nuint userData, void* caller, ulong frameId, bool isMainFrame, ULString* url) => GetView(userData, caller).OnBeginLoading?.Invoke(frameId, isMainFrame, url->ToString());
+	static void NativeOnBeginLoading(nuint userData, void* caller, ulong frameId, byte isMainFrame, ULString* url) => GetView(userData, caller).OnBeginLoading?.Invoke(frameId, isMainFrame != 0, url->ToString());
 	[UnmanagedCallersOnly(CallConvs = new Type[] { typeof(CallConvCdecl) })]
-	static void NativeOnFinishLoading(nuint userData, void* caller, ulong frameId, bool isMainFrame, ULString* url) => GetView(userData, caller).OnFinishLoading?.Invoke(frameId, isMainFrame, url->ToString());
+	static void NativeOnFinishLoading(nuint userData, void* caller, ulong frameId, byte isMainFrame, ULString* url) => GetView(userData, caller).OnFinishLoading?.Invoke(frameId, isMainFrame != 0, url->ToString());
 	[UnmanagedCallersOnly(CallConvs = new Type[] { typeof(CallConvCdecl) })]
-	static void NativeOnFailLoading(nuint userData, void* caller, ulong frameId, bool isMainFrame, ULString* url, ULString* description, ULString* errorDomain, int errorCode) => GetView(userData, caller).OnFailLoading?.Invoke(frameId, isMainFrame, url->ToString(), description->ToString(), errorDomain->ToString(), errorCode);
+	static void NativeOnFailLoading(nuint userData, void* caller, ulong frameId, byte isMainFrame, ULString* url, ULString* description, ULString* errorDomain, int errorCode) => GetView(userData, caller).OnFailLoading?.Invoke(frameId, isMainFrame != 0, url->ToString(), description->ToString(), errorDomain->ToString(), errorCode);
 	[UnmanagedCallersOnly(CallConvs = new Type[] { typeof(CallConvCdecl) })]
-	static void NativeOnWindowObjectReady(nuint userData, void* caller, ulong frameId, bool isMainFrame, ULString* url) => GetView(userData, caller).OnWindowObjectReady?.Invoke(frameId, isMainFrame, url->ToString());
+	static void NativeOnWindowObjectReady(nuint userData, void* caller, ulong frameId, byte isMainFrame, ULString* url) => GetView(userData, caller).OnWindowObjectReady?.Invoke(frameId, isMainFrame != 0, url->ToString());
 	[UnmanagedCallersOnly(CallConvs = new Type[] { typeof(CallConvCdecl) })]
-	static void NativeOnDOMReady(nuint userData, void* caller, ulong frameId, bool isMainFrame, ULString* url) => GetView(userData, caller).OnDOMReady?.Invoke(frameId, isMainFrame, url->ToString());
+	static void NativeOnDOMReady(nuint userData, void* caller, ulong frameId, byte isMainFrame, ULString* url) => GetView(userData, caller).OnDOMReady?.Invoke(frameId, isMainFrame != 0, url->ToString());
 	[UnmanagedCallersOnly(CallConvs = new Type[] { typeof(CallConvCdecl) })]
 	static void NativeOnUpdateHistory(nuint userData, void* caller) => GetView(userData, caller).OnUpdateHistory?.Invoke();
 
