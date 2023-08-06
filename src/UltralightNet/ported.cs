@@ -28,17 +28,16 @@ namespace System
 	}
 }
 #endif
-#if !(NETCOREAPP3_0_OR_GREATER || NETSTANDARD2_1)
-namespace System.Diagnostics.CodeAnalysis
+#if NETSTANDARD
+namespace System.Runtime.InteropServices
 {
-	internal sealed class MaybeNullWhenAttribute : Attribute
+	[AttributeUsage(AttributeTargets.Method, Inherited = false)]
+	internal sealed class UnmanagedCallersOnlyAttribute : Attribute
 	{
-		public MaybeNullWhenAttribute(bool returnValue)
-		{
-			ReturnValue = returnValue;
-		}
+		public Type[]? CallConvs;
+		public string? EntryPoint;
 
-		public bool ReturnValue { get; }
+		public UnmanagedCallersOnlyAttribute() { }
 	}
 }
 #endif

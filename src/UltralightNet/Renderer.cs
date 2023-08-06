@@ -76,7 +76,7 @@ public sealed unsafe class Renderer : NativeContainer
 	public View CreateView(uint width, uint height, ULViewConfig? viewConfig = null, Session? session = null, bool dispose = true)
 	{
 		viewConfig ??= new();
-		if (Owns && ULPlatform.ErrorGPUDriverNotSet && viewConfig.Value.IsAccelerated && !(gpuDriverWrapper?.IsDisposed).GetValueOrDefault(true))
+		if (Owns && ULPlatform.ErrorGPUDriverNotSet && viewConfig.Value.IsAccelerated && (gpuDriverWrapper?.IsDisposed).GetValueOrDefault(true))
 		{
 			throw new Exception("No ULPlatform.GPUDriver set, but ULViewConfig.IsAccelerated was set to true. (Disable check by setting ULPlatform.ErrorGPUDriverNotSet to false.)");
 		}

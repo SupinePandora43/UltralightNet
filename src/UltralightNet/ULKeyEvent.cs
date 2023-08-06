@@ -18,13 +18,13 @@ public static unsafe partial class Methods
 		[MarshalAs(UnmanagedType.U1)] bool isSystemKey);
 
 #if NETSTANDARD || NETFRAMEWORK
-	[LibraryImport(LibUltralight)]
+	[DllImport(LibUltralight)]
 	[SupportedOSPlatform("Windows")]
-	public static partial void* ulCreateKeyEventWindows(ULKeyEventType type, nuint wparam, nint lparam);
+	public static extern void* ulCreateKeyEventWindows(ULKeyEventType type, nuint wparam, nint lparam);
 
-	[LibraryImport(LibUltralight)]
+	[DllImport(LibUltralight)]
 	[SupportedOSPlatform("OSX")]
-	public static partial void* ulCreateKeyEventMacOS(nint evt);
+	public static extern void* ulCreateKeyEventMacOS(nint evt);
 #else
 	[SupportedOSPlatform("Windows")]
 	public static void* ulCreateKeyEventWindows(ULKeyEventType type, nuint wparam, nint lparam)

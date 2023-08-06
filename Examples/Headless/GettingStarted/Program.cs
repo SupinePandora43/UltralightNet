@@ -5,7 +5,7 @@ using UltralightNet;
 using UltralightNet.AppCore;
 
 // Set Font Loader
-AppCoreMethods.ulEnablePlatformFontLoader();
+AppCoreMethods.SetPlatformFontLoader();
 
 // Create Renderer
 var cfg = new ULConfig();
@@ -18,7 +18,7 @@ using View view = renderer.CreateView(1980, 1024);
 
 bool loaded = false;
 
-view.OnFinishLoading += (frameId, isMainFrame, url) =>
+view.OnFinishLoading += (_, _, _) =>
 {
 	loaded = true;
 };

@@ -72,7 +72,7 @@ public static unsafe class ULPlatform
 		else if (ErrorMissingResources && filesystemWrapper is not null)
 		{
 			var path = config.ResourcePathPrefix + "icudt67l.dat";
-			using ULString str = new(path);
+			using ULString str = new(path.AsSpan());
 			if (filesystemWrapper.NativeStruct.FileExists is null || !filesystemWrapper.NativeStruct.FileExists(&str)) throw new Exception($"{nameof(FileSystem)}.{nameof(IFileSystem.FileExists)}(\"{path}\") returned 'false'. {nameof(ULConfig)}.{nameof(ULConfig.ResourcePathPrefix)} + \"icudt67l.dat\" is required for Renderer creation. (Set {nameof(ULPlatform)}.{nameof(ErrorMissingResources)} to \'false\' to ignore this exception, however, be ready for unhandled crash.)");
 		}
 
