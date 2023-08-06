@@ -3,16 +3,16 @@ using UltralightNet;
 using UltralightNet.AppCore;
 
 ULPlatform.FileSystem = ULPlatform.DefaultFileSystem;
-using ULApp app = ULApp.Create(new(), new());
-using ULWindow window = app.MainMonitor.CreateWindow(512, 512, false, ULWindowFlags.Titled | ULWindowFlags.Resizable | ULWindowFlags.Maximizable);
+using var app = ULApp.Create(new(), new());
+using var window = app.MainMonitor.CreateWindow(512, 512);
 
 window.Title = "AppCore Example";
 
-using ULOverlay overlay = window.CreateOverlay(window.Width, window.Height, 0, 0);
-window.SetResizeCallback((IntPtr user_data, ULWindow window, uint width, uint height) => overlay.Resize(width, height));
-window.SetCloseCallback((_, _) => app.Quit());
+using var overlay = window.CreateOverlay(window.ScreenWidth, window.ScreenHeight);
+window.OnResize += (uint width, uint height) => overlay.Resize(width, height);
+window.OnClose += () => app.Quit();
 
-View view = overlay.View;
+var view = overlay.View;
 //view.URL = "https://github.com/SupinePandora43/UltralightNet";
 
 view.OnFailLoading += (frame_id, is_main_frame, url, description, error_domain, error_code) => throw new Exception("Failed loading");

@@ -1,11 +1,13 @@
 using System;
+using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Runtime.InteropServices.Marshalling;
 using UltralightNet.LowStuff;
 
 namespace UltralightNet.AppCore;
 
-public static partial class AppCoreMethods
+public static unsafe partial class AppCoreMethods
 {
 	[LibraryImport(LibAppCore)]
 	internal static unsafe partial void* ulCreateWindow(ULMonitor monitor, uint width, uint height, [MarshalAs(UnmanagedType.U1)] bool fullscreen, ULWindowFlags flags);
@@ -14,10 +16,10 @@ public static partial class AppCoreMethods
 	internal static partial void ulDestroyWindow(ULWindow window);
 
 	[LibraryImport(LibAppCore)]
-	internal static partial void ulWindowSetCloseCallback(ULWindow window, ULCloseCallback__PInvoke__? callback, IntPtr user_data);
+	internal static partial void ulWindowSetCloseCallback(ULWindow window, delegate* unmanaged[Cdecl]<nuint, nuint, void> callback, nuint id);
 
 	[LibraryImport(LibAppCore)]
-	internal static partial void ulWindowSetResizeCallback(ULWindow window, ULResizeCallback__PInvoke__? callback, IntPtr user_data);
+	internal static partial void ulWindowSetResizeCallback(ULWindow window, delegate* unmanaged[Cdecl]<nuint, nuint, uint, uint, void> callback, nuint id);
 
 	[LibraryImport(LibAppCore)]
 	internal static partial uint ulWindowGetScreenWidth(ULWindow window);
@@ -80,44 +82,21 @@ public static partial class AppCoreMethods
 }
 
 [NativeMarshalling(typeof(Marshaller))]
-public sealed class ULWindow : NativeContainer, IEquatable<ULWindow>
+public unsafe sealed class ULWindow : NativeContainer
 {
-	private readonly GCHandle[] handles = new GCHandle[2];
+	readonly ULApp app;
 
-	private ULWindow() { }
+	private ULWindow(void* ptr, ULApp app)
+	{
+		Handle = ptr;
+		this.app = app;
+		app.WindowInstances[(nuint)ptr] = new(this);
+		AppCoreMethods.ulWindowSetCloseCallback(this, &NativeOnClose, app.GetUserData());
+		AppCoreMethods.ulWindowSetResizeCallback(this, &NativeOnResize, app.GetUserData());
+	}
 
-	public unsafe void SetCloseCallback(ULCloseCallback callback, IntPtr userData = default)
-	{
-		if (callback is not null)
-		{
-			ULCloseCallback__PInvoke__ callback__PInvoke__ = (user_data, window) => callback(user_data, FromHandle(window, false));
-			if (handles[0].IsAllocated) handles[0].Free();
-			handles[0] = GCHandle.Alloc(callback__PInvoke__, GCHandleType.Normal);
-			AppCoreMethods.ulWindowSetCloseCallback(this, callback__PInvoke__, userData);
-		}
-		else
-		{
-			if (handles[0].IsAllocated) handles[0].Free();
-			handles[0] = default;
-			AppCoreMethods.ulWindowSetCloseCallback(this, null, userData);
-		}
-	}
-	public unsafe void SetResizeCallback(ULResizeCallback callback, IntPtr userData = default)
-	{
-		if (callback is not null)
-		{
-			ULResizeCallback__PInvoke__ callback__PInvoke__ = (user_data, window, width, height) => callback(user_data, FromHandle(window, false), width, height);
-			if (handles[1].IsAllocated) handles[1].Free();
-			handles[1] = GCHandle.Alloc(callback__PInvoke__, GCHandleType.Normal);
-			AppCoreMethods.ulWindowSetResizeCallback(this, callback__PInvoke__, userData);
-		}
-		else
-		{
-			if (handles[1].IsAllocated) handles[1].Free();
-			handles[1] = default;
-			AppCoreMethods.ulWindowSetResizeCallback(this, null, userData);
-		}
-	}
+	public event Action? OnClose;
+	public event Action<uint, uint>? OnResize;
 
 	public uint ScreenWidth => AppCoreMethods.ulWindowGetScreenWidth(this);
 	public uint ScreenHeight => AppCoreMethods.ulWindowGetScreenHeight(this);
@@ -145,7 +124,7 @@ public sealed class ULWindow : NativeContainer, IEquatable<ULWindow>
 
 	public void Close() => AppCoreMethods.ulWindowClose(this);
 
-	public int ScreenToPixel(int val) => AppCoreMethods.ulWindowScreenToPixels(this, val);
+	public int ScreenToPixels(int val) => AppCoreMethods.ulWindowScreenToPixels(this, val);
 	public int PixelsToScreen(int val) => AppCoreMethods.ulWindowPixelsToScreen(this, val);
 
 	/// <summary>
@@ -155,31 +134,22 @@ public sealed class ULWindow : NativeContainer, IEquatable<ULWindow>
 	/// </summary>
 	public unsafe void* NativeWindowHandle => AppCoreMethods.ulWindowGetNativeHandle(this);
 
-	public unsafe ULOverlay CreateOverlay(uint width, uint height, int x = 0, int y = 0) => ULOverlay.FromHandle(AppCoreMethods.ulCreateOverlay(this, width, height, x, y), true);
-	public unsafe ULOverlay CreateOverlay(View view, int x = 0, int y = 0) => ULOverlay.FromHandle(AppCoreMethods.ulCreateOverlayWithView(this, view, x, y), true);
+	public unsafe ULOverlay CreateOverlay(uint width, uint height, int x = 0, int y = 0) => ULOverlay.FromHandle(AppCoreMethods.ulCreateOverlay(this, width, height, x, y), app.Renderer, null);
+	public unsafe ULOverlay CreateOverlay(View view, int x = 0, int y = 0) => ULOverlay.FromHandle(AppCoreMethods.ulCreateOverlayWithView(this, view, x, y), app.Renderer, view);
 
-	public bool Equals(ULWindow? other)
-	{
-		if (other is null) return false;
-		return base.Equals(other);
-	}
+	[UnmanagedCallersOnly(CallConvs = new Type[] { typeof(CallConvCdecl) })]
+	static void NativeOnClose(nuint app, nuint window) => GetWindow(app, window).OnClose?.Invoke();
+	[UnmanagedCallersOnly(CallConvs = new Type[] { typeof(CallConvCdecl) })]
+	static void NativeOnResize(nuint app, nuint window, uint width, uint height) => GetWindow(app, window).OnResize?.Invoke(width, height);
 
 	public override void Dispose()
 	{
-		foreach (GCHandle handle in handles)
-		{
-			if (handle.IsAllocated)
-			{
-				handle.Free();
-			}
-		}
-
 		if (!IsDisposed && Owns) AppCoreMethods.ulDestroyWindow(this);
-
+		GC.KeepAlive(app);
 		base.Dispose();
 	}
 
-	public static unsafe ULWindow FromHandle(void* ptr, bool dispose) => new() { Handle = ptr, Owns = dispose };
+	public static unsafe ULWindow FromHandle(void* ptr, ULApp app) => new(ptr, app);
 
 	[CustomMarshaller(typeof(ULWindow), MarshalMode.ManagedToUnmanagedIn, typeof(Marshaller))]
 	internal ref struct Marshaller
@@ -189,5 +159,18 @@ public sealed class ULWindow : NativeContainer, IEquatable<ULWindow>
 		public void FromManaged(ULWindow window) => this.window = window;
 		public readonly unsafe void* ToUnmanaged() => window.Handle;
 		public readonly void Free() => GC.KeepAlive(window);
+	}
+
+	static ULWindow GetWindow(nuint appId, nuint windowId)
+	{
+		if (ULApp.Instances[appId].TryGetTarget(out var app))
+		{
+			if (app.WindowInstances[windowId].TryGetTarget(out var window))
+			{
+				return window;
+			}
+			else throw new ObjectDisposedException(nameof(ULWindow));
+		}
+		else throw new ObjectDisposedException(nameof(ULApp));
 	}
 }

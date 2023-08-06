@@ -1,26 +1,59 @@
+using System;
 using System.Runtime.InteropServices;
+using System.Runtime.InteropServices.Marshalling;
+using UltralightNet.LowStuff;
 
 namespace UltralightNet.AppCore;
 
 public static partial class AppCoreMethods
 {
-	[DllImport(LibAppCore)]
-	public static extern double ulMonitorGetScale(ULMonitor monitor);
+	[LibraryImport(LibAppCore)]
+	public static partial double ulMonitorGetScale(ULMonitor monitor);
 
-	[DllImport(LibAppCore)]
-	public static extern uint ulMonitorGetWidth(ULMonitor monitor);
+	[LibraryImport(LibAppCore)]
+	public static partial uint ulMonitorGetWidth(ULMonitor monitor);
 
-	[DllImport(LibAppCore)]
-	public static extern uint ulMonitorGetHeight(ULMonitor monitor);
+	[LibraryImport(LibAppCore)]
+	public static partial uint ulMonitorGetHeight(ULMonitor monitor);
 }
 
-public readonly struct ULMonitor
+[NativeMarshalling(typeof(Marshaller))]
+public unsafe sealed class ULMonitor : NativeContainer
 {
-	private readonly nuint _handle;
+	internal readonly ULApp app;
 
-	public readonly double Scale => AppCoreMethods.ulMonitorGetScale(this);
-	public readonly uint Width => AppCoreMethods.ulMonitorGetWidth(this);
-	public readonly uint Height => AppCoreMethods.ulMonitorGetHeight(this);
+	private ULMonitor(void* ptr, ULApp app)
+	{
+		Handle = ptr;
+		this.app = app;
+	}
 
-	public unsafe readonly ULWindow CreateWindow(uint width, uint height, bool fullscreen = false, ULWindowFlags flags = ULWindowFlags.Titled | ULWindowFlags.Resizable | ULWindowFlags.Maximizable) => ULWindow.FromHandle(AppCoreMethods.ulCreateWindow(this, width, height, fullscreen, flags), true);
+	public double Scale => AppCoreMethods.ulMonitorGetScale(this);
+	public uint Width => AppCoreMethods.ulMonitorGetWidth(this);
+	public uint Height => AppCoreMethods.ulMonitorGetHeight(this);
+
+	public ULWindow CreateWindow(uint width, uint height, bool fullscreen = false, ULWindowFlags flags = ULWindowFlags.Titled | ULWindowFlags.Resizable | ULWindowFlags.Maximizable)
+	{
+		if (flags.HasFlag(ULWindowFlags.Borderless) && (flags.HasFlag(ULWindowFlags.Maximizable) || flags.HasFlag(ULWindowFlags.Titled))) throw new ArgumentException("Invalid combination of flags.", nameof(flags));
+		var window = ULWindow.FromHandle(AppCoreMethods.ulCreateWindow(this, width, height, fullscreen, flags), app);
+		return window;
+	}
+
+	internal static ULMonitor FromHandle(void* ptr, ULApp app) => new(ptr, app);
+
+	public override void Dispose()
+	{
+		GC.KeepAlive(app);
+		base.Dispose();
+	}
+
+	[CustomMarshaller(typeof(ULMonitor), MarshalMode.ManagedToUnmanagedIn, typeof(Marshaller))]
+	internal ref struct Marshaller
+	{
+		private ULMonitor monitor;
+
+		public void FromManaged(ULMonitor monitor) => this.monitor = monitor;
+		public readonly unsafe void* ToUnmanaged() => monitor.Handle;
+		public readonly void Free() => GC.KeepAlive(monitor);
+	}
 }

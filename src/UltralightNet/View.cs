@@ -414,4 +414,6 @@ public sealed unsafe class View : NativeContainer
 		}
 		else throw new ObjectDisposedException(nameof(UltralightNet.Renderer));
 	}
+
+	internal nuint GetUserData() => (nuint)Handle;
 }

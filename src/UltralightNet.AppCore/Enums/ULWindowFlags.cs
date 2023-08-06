@@ -9,4 +9,5 @@ public enum ULWindowFlags
 	Titled = 1 << 1,
 	Resizable = 1 << 2,
 	Maximizable = 1 << 3,
+	Hidden = 1 << 4
 }
