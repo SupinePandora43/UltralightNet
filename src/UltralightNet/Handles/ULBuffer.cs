@@ -1,6 +1,6 @@
 using System.Runtime.InteropServices;
 
-namespace UltralightNet;
+namespace UltralightNet.Platform;
 
 [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
 public unsafe delegate void DestroyBufferCallback(void* userData, void* data);
