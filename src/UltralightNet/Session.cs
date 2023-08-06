@@ -41,7 +41,7 @@ public static unsafe partial class Methods
 
 ///<summary>Stores local data such as cookies, local storage, and application cache for one or more Views. </summary>
 [NativeMarshalling(typeof(Marshaller))]
-public sealed class Session : NativeContainer, IEquatable<Session>
+public sealed class Session : NativeContainer
 {
 	private Session() { }
 
@@ -58,11 +58,6 @@ public sealed class Session : NativeContainer, IEquatable<Session>
 	{
 		if (!IsDisposed && Owns) Methods.ulDestroySession(this);
 		base.Dispose();
-	}
-
-	public bool Equals(Session? other){
-		if(other is null) return false;
-		return base.Equals(other);
 	}
 
 	internal static unsafe Session FromHandle(void* handle, bool dispose) => new() { Handle = handle, Owns = dispose };

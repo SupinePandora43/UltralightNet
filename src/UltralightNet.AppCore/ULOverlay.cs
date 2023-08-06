@@ -11,7 +11,7 @@ public static partial class AppCoreMethods
 	internal static unsafe partial void* ulCreateOverlay(ULWindow window, uint width, uint height, int x, int y);
 
 	[LibraryImport(LibAppCore)]
-	internal static unsafe partial void* ulCreateOverlayWithView(ULWindow window, void* view, int x, int y);
+	internal static unsafe partial void* ulCreateOverlayWithView(ULWindow window, View view, int x, int y);
 
 	[LibraryImport(LibAppCore)]
 	internal static partial void ulDestroyOverlay(ULOverlay overlay);
@@ -60,18 +60,23 @@ public static partial class AppCoreMethods
 }
 
 [NativeMarshalling(typeof(Marshaller))]
-public class ULOverlay : NativeContainer
+public unsafe sealed class ULOverlay : NativeContainer
 {
-	private ULOverlay() { }
-
-	public unsafe View View
+	private ULOverlay(void* ptr, Renderer renderer, View? view)
 	{
-		get
+		Handle = ptr;
+		if (view is null)
 		{
-			// INTEROPTODO: GC
-			return new((IntPtr)AppCoreMethods.ulOverlayGetView(this));
+			view = View.FromHandle(AppCoreMethods.ulOverlayGetView(this), false);
+			renderer.views[view.GetUserData()] = new(view);
+			view.Renderer = renderer;
+			view.SetUpCallbacks();
 		}
+		View = view;
 	}
+
+	public View View { get; }
+
 	public uint Width => AppCoreMethods.ulOverlayGetWidth(this);
 	public uint Height => AppCoreMethods.ulOverlayGetHeight(this);
 
@@ -80,39 +85,24 @@ public class ULOverlay : NativeContainer
 		get => new(AppCoreMethods.ulOverlayGetX(this), AppCoreMethods.ulOverlayGetY(this));
 		set => AppCoreMethods.ulOverlayMoveTo(this, value.X, value.Y);
 	}
-	public void Resize(uint width, uint height) { AppCoreMethods.ulOverlayResize(this, width, height); GC.KeepAlive(this); }
+	public void Resize(uint width, uint height) => AppCoreMethods.ulOverlayResize(this, width, height);
 
-	public bool IsHidden
-	{
-		get
-		{
-			var returnValue = AppCoreMethods.ulOverlayIsHidden(this);
-			GC.KeepAlive(this);
-			return returnValue;
-		}
-	}
-	public void Hide() { AppCoreMethods.ulOverlayHide(this); GC.KeepAlive(this); }
-	public void Show() { AppCoreMethods.ulOverlayShow(this); GC.KeepAlive(this); }
+	public bool IsHidden => AppCoreMethods.ulOverlayIsHidden(this);
+	public void Hide() => AppCoreMethods.ulOverlayHide(this);
+	public void Show() => AppCoreMethods.ulOverlayShow(this);
 
-	public bool HasFocus
-	{
-		get
-		{
-			var returnValue = AppCoreMethods.ulOverlayHasFocus(this);
-			GC.KeepAlive(this);
-			return returnValue;
-		}
-	}
-	public void Focus() { AppCoreMethods.ulOverlayFocus(this); GC.KeepAlive(this); }
-	public void Unfocus() { AppCoreMethods.ulOverlayUnfocus(this); GC.KeepAlive(this); }
+	public bool HasFocus => AppCoreMethods.ulOverlayHasFocus(this);
+	public void Focus() => AppCoreMethods.ulOverlayFocus(this);
+	public void Unfocus() => AppCoreMethods.ulOverlayUnfocus(this);
 
 	public override void Dispose()
 	{
 		if (!IsDisposed && Owns) AppCoreMethods.ulDestroyOverlay(this);
+		GC.KeepAlive(View);
 		base.Dispose();
 	}
 
-	public static unsafe ULOverlay FromHandle(void* ptr, bool dispose) => new() { Handle = ptr, Owns = dispose };
+	internal static unsafe ULOverlay FromHandle(void* ptr, Renderer renderer, View? view = null) => new(ptr, renderer, view);
 
 	[CustomMarshaller(typeof(ULOverlay), MarshalMode.ManagedToUnmanagedIn, typeof(Marshaller))]
 	internal ref struct Marshaller

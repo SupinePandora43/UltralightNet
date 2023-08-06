@@ -9,5 +9,5 @@ while [ -h "$SOURCE" ]; do # resolve $SOURCE until the file is no longer a symli
 done
 DIR="$( cd -P "$( dirname "$SOURCE" )" && pwd )"
 
-dotnet pack -c Release src/UltralightNet.Binaries
-dotnet pack -c Release src/UltralightNet.AppCore.Binaries
+dotnet pack -c Release src/UltralightNet.Binaries $@
+dotnet pack -c Release src/UltralightNet.AppCore.Binaries $@

@@ -14,12 +14,7 @@
             "cwd": "${workspaceFolder}/Examples/gpu/UltralightNet.OpenGL.TestApp/bin/Debug/net6.0",
             "console": "internalConsole",
             "stopAtEntry": false,
-            "env": {
-                "DISPLAY": ":0.0",
-				"DOTNET_TieredPGO": "1",
-				"DOTNET_ReadyToRun": "0",
-				"DOTNET_TC_QuickJitForLoops": "1"
-            }
+            "envFile": "${workspaceFolder}/.env"
         },
 		{
             "name": "Vulkan TestApp",
@@ -70,10 +65,8 @@
             "request": "launch",
             "preLaunchTask": "build_Examples_GettingStarted",
             "program": "${workspaceFolder}/Examples/Headless/GettingStarted/bin/Debug/net6.0/GettingStarted.dll",
-            "args": [],
             "cwd": "${workspaceFolder}/Examples/Headless/GettingStarted/bin/Debug/net6.0",
-            "console": "internalConsole",
-            "stopAtEntry": false
+            "envFile": "${workspaceFolder}/.env"
         },
         {
             "name": ".NET Core Attach",

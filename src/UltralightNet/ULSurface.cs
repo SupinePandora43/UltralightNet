@@ -52,7 +52,7 @@ public static unsafe partial class Methods
 
 	/// <summary>Get the underlying user data pointer (this is only valid if you have set a custom surface implementation via ulPlatformSetSurfaceDefinition).</summary>
 	[LibraryImport("Ultralight")]
-	internal static partial nuint ulSurfaceGetUserData(nuint surface);
+	internal static partial nint ulSurfaceGetUserData(nuint surface);
 
 	/// <summary>Get the underlying Bitmap from the default Surface.</summary>
 	[LibraryImport("Ultralight")]
@@ -83,7 +83,7 @@ public readonly struct ULSurface
 	}
 	public void ClearDirtyBounds() => Methods.ulSurfaceClearDirtyBounds(Ptr);
 
-	public nuint UserData => Methods.ulSurfaceGetUserData(Ptr);
+	public nint Id => Methods.ulSurfaceGetUserData(Ptr);
 
 	public unsafe ULBitmap Bitmap => ULBitmap.FromHandle(Methods.ulBitmapSurfaceGetBitmap(Ptr), false);
 

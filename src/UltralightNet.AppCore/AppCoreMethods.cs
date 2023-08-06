@@ -12,8 +12,15 @@ public unsafe static partial class AppCoreMethods
 {
 	static AppCoreMethods() => Methods.Preload();
 
-	[DllImport("AppCore")]
-	public static extern void ulEnablePlatformFontLoader();
+	const string LibAppCore = "AppCore";
+
+	[LibraryImport(LibAppCore)]
+	private static partial void ulEnablePlatformFontLoader();
+
+	public static void SetPlatformFontLoader(){
+		ulEnablePlatformFontLoader();
+		ULPlatform.SetDefaultFontLoader = false;
+	}
 
 	#region ulEnablePlatformFileSystem
 	[DllImport("AppCore", EntryPoint = "ulEnablePlatformFileSystem", ExactSpelling = true, CallingConvention = CallingConvention.Cdecl)]
@@ -48,7 +55,7 @@ public unsafe static partial class AppCoreMethods
 	public static void ulEnableDefaultLogger(ULString* logPath){
 		ulEnableDefaultLoggerActual(logPath);
 
-		ULPlatform.SetDefaultLogger = false;
+		ULPlatform.EnableDefaultLogger = false;
 	}
 
 	public static void ulEnableDefaultLogger(string logPath) => ulEnableDefaultLogger(logPath.AsSpan());
