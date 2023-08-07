@@ -14,6 +14,10 @@
 	</ItemGroup>
 
 	<ItemGroup>
+		<Compile Remove="oldVulkanGPUDriver.cs" />
+	</ItemGroup>
+
+	<ItemGroup>
 		<ProjectReference Include="..\..\..\src\UltralightNet\UltralightNet.csproj" />
 		<ProjectReference Include="../UltralightNet.GPUCommon/UltralightNet.GPUCommon.csproj" />
 

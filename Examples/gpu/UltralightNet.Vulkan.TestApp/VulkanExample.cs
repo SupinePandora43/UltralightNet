@@ -1,6 +1,10 @@
 //namespace VulkanExample;
 
+using System;
+using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
+using System.Linq;
 using Silk.NET.Core;
 using Silk.NET.Core.Native;
 using Silk.NET.Input;
@@ -10,6 +14,7 @@ using Silk.NET.Vulkan.Extensions.KHR;
 using Silk.NET.Windowing;
 using UltralightNet;
 using UltralightNet.AppCore;
+using UltralightNet.Platform;
 using Buffer = Silk.NET.Vulkan.Buffer;
 
 using Application app = new();
@@ -274,57 +279,9 @@ internal unsafe partial class Application : IDisposable
 		}
 
 		{ // Ultralight
-			AppCoreMethods.ulEnablePlatformFontLoader();
+			AppCoreMethods.SetPlatformFontLoader();
 
-			uint FindMemoryTypeIndex(uint memoryTypeBits, MemoryPropertyFlags memoryPropertyFlags)
-			{
-				for (int i = 0; i < physicalDeviceMemoryProperties.MemoryTypeCount; i++)
-					if ((memoryTypeBits & (1 << i)) != 0 && physicalDeviceMemoryProperties.MemoryTypes[i].PropertyFlags.HasFlag(memoryPropertyFlags))
-						return (uint)i;
-				throw new Exception($"Memory not found: {memoryTypeBits}, {memoryPropertyFlags}");
-			}
-			void CreateBuffer(ulong size, BufferUsageFlags bufferUsageFlags, MemoryPropertyFlags memoryPropertyFlags, out Buffer buffer, out DeviceMemory bufferMemory)
-			{
-				var queueFamilyIndices = stackalloc uint[] { graphicsQueueFamily };
-				var bufferCreateInfo = new BufferCreateInfo(size: size, usage: bufferUsageFlags, sharingMode: SharingMode.Exclusive, queueFamilyIndexCount: 1, pQueueFamilyIndices: queueFamilyIndices);
-				vk.CreateBuffer(device, &bufferCreateInfo, null, out buffer).Check();
-
-				MemoryRequirements memoryRequirements;
-				vk.GetBufferMemoryRequirements(device, buffer, &memoryRequirements);
-
-				var memoryAllocateInfo = new MemoryAllocateInfo(allocationSize: memoryRequirements.Size, memoryTypeIndex: FindMemoryTypeIndex(memoryRequirements.MemoryTypeBits, memoryPropertyFlags));
-				vk.AllocateMemory(device, &memoryAllocateInfo, null, out bufferMemory).Check();
-				vk.BindBufferMemory(device, buffer, bufferMemory, 0).Check();
-			}
-
-			Dictionary<nuint, SurfaceEntry> surfaces = new();
-			nuint surfaceId = 1;
-			ULPlatform.SurfaceDefinition = new()
-			{
-				Create = (width, height) =>
-				{
-					CreateBuffer(width * height * 4, BufferUsageFlags.BufferUsageTransferSrcBit, MemoryPropertyFlags.MemoryPropertyHostVisibleBit | MemoryPropertyFlags.MemoryPropertyHostCoherentBit, out Buffer buffer, out DeviceMemory memory);
-					surfaces[surfaceId] = new() { buffer = buffer, memory = memory, size = width * height * 4, width = width, height = height };
-					return (void*)surfaceId++;
-				},
-				Destroy = (index) =>
-				{
-					surfaces.Remove((nuint)index, out SurfaceEntry entry);
-					vk.FreeMemory(device, entry.memory, null);
-					vk.DestroyBuffer(device, entry.buffer, null);
-				},
-				GetWidth = (index) => surfaces[(nuint)index].width,
-				GetHeight = (index) => surfaces[(nuint)index].height,
-				GetRowBytes = (index) => surfaces[(nuint)index].width * 4,
-				GetSize = (index) => surfaces[(nuint)index].size,
-				LockPixels = (index) =>
-				{
-					void* data;
-					vk.MapMemory(device, surfaces[(nuint)index].memory, 0, surfaces[(nuint)index].size, 0, &data).Check();
-					return data;
-				},
-				UnlockPixels = (index) => vk.UnmapMemory(device, surfaces[(nuint)index].memory)
-			};
+			ULPlatform.SurfaceDefinition = this;
 
 			renderer = ULPlatform.CreateRenderer();
 
@@ -488,14 +445,5 @@ internal unsafe partial class Application : IDisposable
 		vk.Dispose();
 		input.Dispose();
 		window.Dispose();
-	}
-
-	private struct SurfaceEntry
-	{
-		public Buffer buffer;
-		public DeviceMemory memory;
-		public nuint size;
-		public uint width;
-		public uint height;
 	}
 }
