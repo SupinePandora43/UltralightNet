@@ -1,280 +1,176 @@
 using System;
+using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
+using System.Runtime.InteropServices.Marshalling;
 using UltralightNet.LowStuff;
 
 namespace UltralightNet.AppCore;
 
-public static partial class AppCoreMethods
+public static unsafe partial class AppCoreMethods
 {
-	[GeneratedDllImport(LibAppCore)]
-	public static partial Handle<ULWindow> ulCreateWindow(ULMonitor monitor, uint width, uint height, [MarshalAs(UnmanagedType.I1)] bool fullscreen, ULWindowFlags flags);
+	[LibraryImport(LibAppCore)]
+	internal static unsafe partial void* ulCreateWindow(ULMonitor monitor, uint width, uint height, [MarshalAs(UnmanagedType.U1)] bool fullscreen, ULWindowFlags flags);
 
-	[DllImport(LibAppCore)]
-	public static extern void ulDestroyWindow(Handle<ULWindow> window);
+	[LibraryImport(LibAppCore)]
+	internal static partial void ulDestroyWindow(ULWindow window);
 
-	[GeneratedDllImport(LibAppCore)]
-	public static partial void ulWindowSetCloseCallback(Handle<ULWindow> window, ULCloseCallback__PInvoke__? callback, IntPtr user_data);
+	[LibraryImport(LibAppCore)]
+	internal static partial void ulWindowSetCloseCallback(ULWindow window, delegate* unmanaged[Cdecl]<nuint, nuint, void> callback, nuint id);
 
-	[GeneratedDllImport(LibAppCore)]
-	public static partial void ulWindowSetResizeCallback(Handle<ULWindow> window, ULResizeCallback__PInvoke__? callback, IntPtr user_data);
+	[LibraryImport(LibAppCore)]
+	internal static partial void ulWindowSetResizeCallback(ULWindow window, delegate* unmanaged[Cdecl]<nuint, nuint, uint, uint, void> callback, nuint id);
 
-	[DllImport(LibAppCore)]
-	public static extern uint ulWindowGetScreenWidth(Handle<ULWindow> window);
+	[LibraryImport(LibAppCore)]
+	internal static partial uint ulWindowGetScreenWidth(ULWindow window);
 
-	[DllImport(LibAppCore)]
-	public static extern uint ulWindowGetWidth(Handle<ULWindow> window);
+	[LibraryImport(LibAppCore)]
+	internal static partial uint ulWindowGetWidth(ULWindow window);
 
-	[DllImport(LibAppCore)]
-	public static extern uint ulWindowGetScreenHeight(Handle<ULWindow> window);
+	[LibraryImport(LibAppCore)]
+	internal static partial uint ulWindowGetScreenHeight(ULWindow window);
 
-	[DllImport(LibAppCore)]
-	public static extern uint ulWindowGetHeight(Handle<ULWindow> window);
+	[LibraryImport(LibAppCore)]
+	internal static partial uint ulWindowGetHeight(ULWindow window);
 
-	[DllImport(LibAppCore)]
-	public static extern void ulWindowMoveTo(Handle<ULWindow> window, int x, int y);
+	[LibraryImport(LibAppCore)]
+	internal static partial void ulWindowMoveTo(ULWindow window, int x, int y);
 
-	[DllImport(LibAppCore)]
-	public static extern void ulWindowMoveToCenter(Handle<ULWindow> window);
+	[LibraryImport(LibAppCore)]
+	internal static partial void ulWindowMoveToCenter(ULWindow window);
 
-	[DllImport(LibAppCore)]
-	public static extern int ulWindowGetPositionX(Handle<ULWindow> window);
+	[LibraryImport(LibAppCore)]
+	internal static partial int ulWindowGetPositionX(ULWindow window);
 
-	[DllImport(LibAppCore)]
-	public static extern int ulWindowGetPositionY(Handle<ULWindow> window);
+	[LibraryImport(LibAppCore)]
+	internal static partial int ulWindowGetPositionY(ULWindow window);
 
-	[GeneratedDllImport(LibAppCore)]
-	[return: MarshalAs(UnmanagedType.I1)]
-	public static partial bool ulWindowIsFullscreen(Handle<ULWindow> window);
+	[LibraryImport(LibAppCore)]
+	[return: MarshalAs(UnmanagedType.U1)]
+	internal static partial bool ulWindowIsFullscreen(ULWindow window);
 
-	[DllImport(LibAppCore)]
-	public static extern double ulWindowGetScale(Handle<ULWindow> window);
+	[LibraryImport(LibAppCore)]
+	internal static partial double ulWindowGetScale(ULWindow window);
 
-	[GeneratedDllImport(LibAppCore)]
-	public static partial void ulWindowSetTitle(Handle<ULWindow> window, [MarshalUsing(typeof(UTF8Marshaller))] string title);
+	[LibraryImport(LibAppCore)]
+	internal static partial void ulWindowSetTitle(ULWindow window, [MarshalUsing(typeof(Utf8StringMarshaller))] string title);
 
-	[DllImport(LibAppCore)]
-	public static extern void ulWindowSetCursor(Handle<ULWindow> window, ULCursor cursor);
+	[LibraryImport(LibAppCore)]
+	internal static partial void ulWindowSetCursor(ULWindow window, ULCursor cursor);
 
-	[DllImport(LibAppCore)]
-	public static extern void ulWindowShow(Handle<ULWindow> window);
+	[LibraryImport(LibAppCore)]
+	internal static partial void ulWindowShow(ULWindow window);
 
-	[DllImport(LibAppCore)]
-	public static extern void ulWindowHide(Handle<ULWindow> window);
+	[LibraryImport(LibAppCore)]
+	internal static partial void ulWindowHide(ULWindow window);
 
-	[GeneratedDllImport(LibAppCore)]
-	[return: MarshalAs(UnmanagedType.I1)]
-	public static partial bool ulWindowIsVisible(Handle<ULWindow> window);
+	[LibraryImport(LibAppCore)]
+	[return: MarshalAs(UnmanagedType.U1)]
+	internal static partial bool ulWindowIsVisible(ULWindow window);
 
-	[DllImport(LibAppCore)]
-	public static extern void ulWindowClose(Handle<ULWindow> window);
+	[LibraryImport(LibAppCore)]
+	internal static partial void ulWindowClose(ULWindow window);
 
-	[DllImport(LibAppCore)]
-	public static extern int ulWindowScreenToPixels(Handle<ULWindow> window, int val);
+	[LibraryImport(LibAppCore)]
+	internal static partial int ulWindowScreenToPixels(ULWindow window, int val);
 
-	[DllImport(LibAppCore)]
-	public static extern int ulWindowPixelsToScreen(Handle<ULWindow> window, int val);
+	[LibraryImport(LibAppCore)]
+	internal static partial int ulWindowPixelsToScreen(ULWindow window, int val);
 
-	[DllImport(LibAppCore)]
-	public static extern IntPtr ulWindowGetNativeHandle(Handle<ULWindow> window);
+	[LibraryImport(LibAppCore)]
+	internal static unsafe partial void* ulWindowGetNativeHandle(ULWindow window);
 }
 
-public class ULWindow : INativeContainer<ULWindow>, INativeContainerInterface<ULWindow>, IEquatable<ULWindow>
+[NativeMarshalling(typeof(Marshaller))]
+public unsafe sealed class ULWindow : NativeContainer
 {
-	private readonly GCHandle[] handles = new GCHandle[2];
+	readonly ULApp app;
 
-	private ULWindow() { }
-
-	public void SetCloseCallback(ULCloseCallback callback, IntPtr userData = default)
+	private ULWindow(void* ptr, ULApp app)
 	{
-		if (callback is not null)
-		{
-			ULCloseCallback__PInvoke__ callback__PInvoke__ = (user_data, window) => callback(user_data, ULWindow.FromHandle(window, false));
-			if (handles[0].IsAllocated) handles[0].Free();
-			handles[0] = GCHandle.Alloc(callback__PInvoke__, GCHandleType.Normal);
-			AppCoreMethods.ulWindowSetCloseCallback(Handle, callback__PInvoke__, userData);
-		}
-		else
-		{
-			if (handles[0].IsAllocated) handles[0].Free();
-			handles[0] = default;
-			AppCoreMethods.ulWindowSetCloseCallback(Handle, null, userData);
-		}
-		GC.KeepAlive(this);
-	}
-	public void SetResizeCallback(ULResizeCallback callback, IntPtr userData = default)
-	{
-		if (callback is not null)
-		{
-			ULResizeCallback__PInvoke__ callback__PInvoke__ = (user_data, window, width, height) => callback(user_data, ULWindow.FromHandle(window, false), width, height);
-			if (handles[1].IsAllocated) handles[1].Free();
-			handles[1] = GCHandle.Alloc(callback__PInvoke__, GCHandleType.Normal);
-			AppCoreMethods.ulWindowSetResizeCallback(Handle, callback__PInvoke__, userData);
-		}
-		else
-		{
-			if (handles[1].IsAllocated) handles[1].Free();
-			handles[1] = default;
-			AppCoreMethods.ulWindowSetResizeCallback(Handle, null, userData);
-		}
-		GC.KeepAlive(this);
+		Handle = ptr;
+		this.app = app;
+		app.WindowInstances[(nuint)ptr] = new(this);
+		AppCoreMethods.ulWindowSetCloseCallback(this, &NativeOnClose, app.GetUserData());
+		AppCoreMethods.ulWindowSetResizeCallback(this, &NativeOnResize, app.GetUserData());
 	}
 
-	public uint ScreenWidth
-	{
-		get
-		{
-			var returnValue = AppCoreMethods.ulWindowGetScreenWidth(Handle);
-			GC.KeepAlive(this);
-			return returnValue;
-		}
-	}
-	public uint Width
-	{
-		get
-		{
-			var returnValue = AppCoreMethods.ulWindowGetWidth(Handle);
-			GC.KeepAlive(this);
-			return returnValue;
-		}
-	}
-	public uint ScreenHeight
-	{
-		get
-		{
-			var returnValue = AppCoreMethods.ulWindowGetScreenHeight(Handle);
-			GC.KeepAlive(this);
-			return returnValue;
-		}
-	}
-	public uint Height
-	{
-		get
-		{
-			var returnValue = AppCoreMethods.ulWindowGetHeight(Handle);
-			GC.KeepAlive(this);
-			return returnValue;
-		}
-	}
+	public event Action? OnClose;
+	public event Action<uint, uint>? OnResize;
 
-	public void MoveToCenter() { AppCoreMethods.ulWindowMoveToCenter(Handle); GC.KeepAlive(this); }
+	public uint ScreenWidth => AppCoreMethods.ulWindowGetScreenWidth(this);
+	public uint ScreenHeight => AppCoreMethods.ulWindowGetScreenHeight(this);
+
+	public uint Width => AppCoreMethods.ulWindowGetWidth(this);
+	public uint Height => AppCoreMethods.ulWindowGetHeight(this);
+
+	public void MoveToCenter() => AppCoreMethods.ulWindowMoveToCenter(this);
 
 	public (int X, int Y) Position // INTEROPTODO: TEST
 	{
-		get
-		{
-			(int X, int Y) pos = new(AppCoreMethods.ulWindowGetPositionX(Handle), AppCoreMethods.ulWindowGetPositionY(Handle));
-			GC.KeepAlive(this);
-			return pos;
-		}
-		set
-		{
-			AppCoreMethods.ulWindowMoveTo(Handle, value.X, value.Y);
-			GC.KeepAlive(this);
-		}
+		get => new(AppCoreMethods.ulWindowGetPositionX(this), AppCoreMethods.ulWindowGetPositionY(this));
+		set => AppCoreMethods.ulWindowMoveTo(this, value.X, value.Y);
 	}
 
-	public bool IsFullscreen
-	{
-		get
-		{
-			var returnValue = AppCoreMethods.ulWindowIsFullscreen(Handle);
-			GC.KeepAlive(this);
-			return returnValue;
-		}
-	}
-	public double Scale
-	{
-		get
-		{
-			var returnValue = AppCoreMethods.ulWindowGetScale(Handle);
-			GC.KeepAlive(this);
-			return returnValue;
-		}
-	}
-	public string Title
-	{
-		set
-		{
-			AppCoreMethods.ulWindowSetTitle(Handle, value);
-			GC.KeepAlive(this);
-		}
-	}
+	public bool IsFullscreen => AppCoreMethods.ulWindowIsFullscreen(this);
 
-	public ULCursor Cursor
-	{
-		set
-		{
-			AppCoreMethods.ulWindowSetCursor(Handle, value);
-			GC.KeepAlive(this);
-		}
-	}
+	public double Scale => AppCoreMethods.ulWindowGetScale(this);
+	public string Title { set => AppCoreMethods.ulWindowSetTitle(this, value); }
 
-	public void Show() { AppCoreMethods.ulWindowShow(Handle); GC.KeepAlive(this); }
-	public void Hide() { AppCoreMethods.ulWindowHide(Handle); GC.KeepAlive(this); }
+	public ULCursor Cursor { set => AppCoreMethods.ulWindowSetCursor(this, value); }
 
-	public void Close() { AppCoreMethods.ulWindowClose(Handle); GC.KeepAlive(this); }
+	public void Show() => AppCoreMethods.ulWindowShow(this);
+	public void Hide() => AppCoreMethods.ulWindowHide(this);
 
-	public int ScreenToPixel(int val)
-	{
-		var returnValue = AppCoreMethods.ulWindowScreenToPixels(Handle, val);
-		GC.KeepAlive(this);
-		return returnValue;
-	}
-	public int PixelsToScreen(int val)
-	{
-		var returnValue = AppCoreMethods.ulWindowPixelsToScreen(Handle, val);
-		GC.KeepAlive(this);
-		return returnValue;
-	}
+	public void Close() => AppCoreMethods.ulWindowClose(this);
+
+	public int ScreenToPixels(int val) => AppCoreMethods.ulWindowScreenToPixels(this, val);
+	public int PixelsToScreen(int val) => AppCoreMethods.ulWindowPixelsToScreen(this, val);
 
 	/// <summary>
 	/// HWND on windows <br/>
 	/// NSWindow* on mac <br/>
 	/// GLFWwindow* on linux <br/>
 	/// </summary>
-	public IntPtr NativeWindowHandle
-	{
-		get
-		{
-			var returnValue = AppCoreMethods.ulWindowGetNativeHandle(Handle);
-			GC.KeepAlive(this);
-			return returnValue;
-		}
-	}
+	public unsafe void* NativeWindowHandle => AppCoreMethods.ulWindowGetNativeHandle(this);
 
-	public ULOverlay CreateOverlay(uint width, uint height, int x = 0, int y = 0)
-	{
-		ULOverlay returnValue = ULOverlay.FromHandle(AppCoreMethods.ulCreateOverlay(Handle, width, height, x, y), true);
-		GC.KeepAlive(this);
-		return returnValue;
-	}
-	public ULOverlay CreateOverlay(View view, int x = 0, int y = 0)
-	{
-		ULOverlay returnValue = ULOverlay.FromHandle(AppCoreMethods.ulCreateOverlayWithView(Handle, (Handle<View>)view.Ptr, x, y), true);
-		GC.KeepAlive(this);
-		return returnValue;
-	}
+	public unsafe ULOverlay CreateOverlay(uint width, uint height, int x = 0, int y = 0) => ULOverlay.FromHandle(AppCoreMethods.ulCreateOverlay(this, width, height, x, y), app.Renderer, null);
+	public unsafe ULOverlay CreateOverlay(View view, int x = 0, int y = 0) => ULOverlay.FromHandle(AppCoreMethods.ulCreateOverlayWithView(this, view, x, y), app.Renderer, view);
 
-	public bool Equals(ULWindow? other)
-	{
-		if (other is null) return false;
-		return _ptr == other._ptr;
-	}
+	[UnmanagedCallersOnly(CallConvs = new Type[] { typeof(CallConvCdecl) })]
+	static void NativeOnClose(nuint app, nuint window) => GetWindow(app, window).OnClose?.Invoke();
+	[UnmanagedCallersOnly(CallConvs = new Type[] { typeof(CallConvCdecl) })]
+	static void NativeOnResize(nuint app, nuint window, uint width, uint height) => GetWindow(app, window).OnResize?.Invoke(width, height);
 
 	public override void Dispose()
 	{
-		foreach (GCHandle handle in handles)
-		{
-			if (handle.IsAllocated)
-			{
-				handle.Free();
-			}
-		}
-
-		if (!IsDisposed && Owns) AppCoreMethods.ulDestroyWindow(Handle);
-
+		if (!IsDisposed && Owns) AppCoreMethods.ulDestroyWindow(this);
+		GC.KeepAlive(app);
 		base.Dispose();
 	}
 
-	public static ULWindow FromHandle(Handle<ULWindow> ptr, bool dispose) => new() { Handle = ptr, Owns = dispose };
+	public static unsafe ULWindow FromHandle(void* ptr, ULApp app) => new(ptr, app);
+
+	[CustomMarshaller(typeof(ULWindow), MarshalMode.ManagedToUnmanagedIn, typeof(Marshaller))]
+	internal ref struct Marshaller
+	{
+		private ULWindow window;
+
+		public void FromManaged(ULWindow window) => this.window = window;
+		public readonly unsafe void* ToUnmanaged() => window.Handle;
+		public readonly void Free() => GC.KeepAlive(window);
+	}
+
+	static ULWindow GetWindow(nuint appId, nuint windowId)
+	{
+		if (ULApp.Instances[appId].TryGetTarget(out var app))
+		{
+			if (app.WindowInstances[windowId].TryGetTarget(out var window))
+			{
+				return window;
+			}
+			else throw new ObjectDisposedException(nameof(ULWindow));
+		}
+		else throw new ObjectDisposedException(nameof(ULApp));
+	}
 }

@@ -3,13 +3,11 @@
 	<PropertyGroup>
 		<OutputType>Exe</OutputType>
 		<TargetFramework>net6.0</TargetFramework>
-		<LangVersion>9</LangVersion>
 	</PropertyGroup>
 
 	<ItemGroup>
-		<PackageReference Include="UltralightNet.Binaries" Version="$(Version)" />
-		<PackageReference Include="UltralightNet.AppCore" Version="$(Version)" />
-		<PackageReference Include="UltralightNet.Resources" Version="$(Version)" />
+		<PackageReference Include="UltralightNet.Binaries" Version="$(UltralightVersion)" />
+		<PackageReference Include="UltralightNet.AppCore.Binaries" Version="$(UltralightVersion)" />
 		<PackageReference Include="Veldrid" Version="4.9.0-beta1" />
 		<PackageReference Include="Veldrid.SDL2" Version="4.9.0-beta1" />
 		<PackageReference Include="Veldrid.StartupUtilities" Version="4.9.0-beta1" />

@@ -1,31 +1,35 @@
-using System;
 using System.Runtime.InteropServices;
 
-namespace UltralightNet;
+namespace UltralightNet.Platform;
 
-public unsafe struct ULFontFile : IDisposable // TODO: INativeContainer
+[StructLayout(LayoutKind.Sequential)]
+public unsafe struct ULFontFile : IDisposable // TODO: INativeContainer ?
 {
 	private nuint handle;
 
-	public ULFontFile(ULString* path)
+	private ULFontFile(nuint handle) { this.handle = handle; }
+
+	public static ULFontFile CreateFromFile(ULString* path) => new(ulFontFileCreateFromFilePath(path));
+	public static ULFontFile CreateFromFile(ReadOnlySpan<char> path)
 	{
-		[DllImport(Methods.LibUltralight)]
-		static extern nuint ulFontFileCreateFromFilePath(ULString* path);
-		handle = ulFontFileCreateFromFilePath(path);
+		using ULString pathUL = new(path);
+		return CreateFromFile(&pathUL);
 	}
-	public ULFontFile(ULBuffer buffer)
-	{
-		[DllImport(Methods.LibUltralight)]
-		static extern nuint ulFontFileCreateFromBuffer(ULBuffer buffer);
-		handle = ulFontFileCreateFromBuffer(buffer);
-	}
+
+	public static ULFontFile Create(ULBuffer buffer) => new(ulFontFileCreateFromBuffer(buffer));
 
 	public void Dispose()
 	{
 		if (handle is 0) return;
-		[DllImport(Methods.LibUltralight)]
-		static extern void ulDestroyFontFile(nuint handle);
+
 		ulDestroyFontFile(handle);
 		handle = 0;
 	}
+
+	[DllImport(Methods.LibUltralight)]
+	static extern nuint ulFontFileCreateFromFilePath(ULString* path);
+	[DllImport(Methods.LibUltralight)]
+	static extern nuint ulFontFileCreateFromBuffer(ULBuffer buffer);
+	[DllImport(Methods.LibUltralight)]
+	static extern void ulDestroyFontFile(nuint handle);
 }

@@ -1,28 +1,22 @@
 # Getting Started
 
-## Nuget packages
-
-you need to install at least:
+## Required Nuget packages
 
 * `UltralightNet`
-* `UltralightNet.Binaries`
-* `UltralightNet.AppCore` (because only AppCore provides font loader)
-
-to have fully functional Ultralight renderer
+* `UltralightNet.AppCore` (because AppCore provides font loader)
 
 ## How to render a static page
 
 1. Set Font Loader (or crash)
-2. Set File System
-3. Create `Renderer`
-4. Create `View`
-5. Load page
-6. Update renderer until page is loaded
-7. Render
-8. Get View's Surface
-9.  Get Surface's Bitmap
-10. Swap Red and Blue channels
-11. Save to png file
+2. Create `Renderer`
+3. Create `View`
+4. Load page
+5. Update renderer until page is loaded
+6. Render
+7. Get View's Surface
+8.  Get Surface's Bitmap
+9. Swap Red and Blue channels
+10. Save to png file
 
 ## Code / Ready to run project
 

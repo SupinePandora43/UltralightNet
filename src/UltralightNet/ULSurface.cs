@@ -1,27 +1,24 @@
-using System;
-using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
-using UltralightNet.LowStuff;
 
 namespace UltralightNet;
 
-public static partial class Methods
+public static unsafe partial class Methods
 {
 	/// <summary>Width (in pixels).</summary>
-	[DllImport("Ultralight")]
-	public static extern uint ulSurfaceGetWidth(IntPtr surface);
+	[LibraryImport("Ultralight")]
+	internal static partial uint ulSurfaceGetWidth(nuint surface);
 
 	/// <summary>Height (in pixels).</summary>
-	[DllImport("Ultralight")]
-	public static extern uint ulSurfaceGetHeight(IntPtr surface);
+	[LibraryImport("Ultralight")]
+	internal static partial uint ulSurfaceGetHeight(nuint surface);
 
 	/// <summary>Number of bytes between rows (usually width * 4)</summary>
-	[DllImport("Ultralight")]
-	public static extern uint ulSurfaceGetRowBytes(IntPtr surface);
+	[LibraryImport("Ultralight")]
+	internal static partial uint ulSurfaceGetRowBytes(nuint surface);
 
 	/// <summary>Size in bytes.</summary>
-	[DllImport("Ultralight")]
-	public static extern nuint ulSurfaceGetSize(IntPtr surface);
+	[LibraryImport("Ultralight")]
+	internal static partial nuint ulSurfaceGetSize(nuint surface);
 
 	/// <summary>
 	/// Lock the pixel buffer and get a pointer to the beginning of the data
@@ -29,43 +26,44 @@ public static partial class Methods
 	/// <br/>
 	/// Native pixel format is premultiplied BGRA 32-bit (8 bits per channel).
 	/// </summary>
-	[DllImport("Ultralight")]
-	public static extern IntPtr ulSurfaceLockPixels(IntPtr surface);
+	[LibraryImport("Ultralight")]
+	internal static partial byte* ulSurfaceLockPixels(nuint surface);
 
 	/// <summary>Unlock the pixel buffer.</summary>
-	[DllImport("Ultralight")]
-	public static extern void ulSurfaceUnlockPixels(IntPtr surface);
+	[LibraryImport("Ultralight")]
+	internal static partial void ulSurfaceUnlockPixels(nuint surface);
 
 	/// <summary>Resize the pixel buffer to a certain width and height (both in pixels).</summary>
-	[DllImport("Ultralight")]
-	public static extern void ulSurfaceResize(IntPtr surface, uint width, uint height);
+	[LibraryImport("Ultralight")]
+	internal static partial void ulSurfaceResize(nuint surface, uint width, uint height);
 
 	/// <summary>Set the dirty bounds to a certain value.</summary>
-	[DllImport("Ultralight")]
-	public static extern void ulSurfaceSetDirtyBounds(IntPtr surface, ULIntRect bounds);
+	[LibraryImport("Ultralight")]
+	internal static partial void ulSurfaceSetDirtyBounds(nuint surface, ULIntRect bounds);
 
 	/// <summary>Get the dirty bounds.</summary>
 	// todo: example code
-	[DllImport("Ultralight")]
-	public static extern ULIntRect ulSurfaceGetDirtyBounds(IntPtr surface);
+	[LibraryImport("Ultralight")]
+	internal static partial ULIntRect ulSurfaceGetDirtyBounds(nuint surface);
 
 	/// <summary>Clear the dirty bounds.</summary>
-	[DllImport("Ultralight")]
-	public static extern void ulSurfaceClearDirtyBounds(IntPtr surface);
+	[LibraryImport("Ultralight")]
+	internal static partial void ulSurfaceClearDirtyBounds(nuint surface);
 
 	/// <summary>Get the underlying user data pointer (this is only valid if you have set a custom surface implementation via ulPlatformSetSurfaceDefinition).</summary>
-	[DllImport("Ultralight")]
-	public static extern IntPtr ulSurfaceGetUserData(IntPtr surface);
+	[LibraryImport("Ultralight")]
+	internal static partial nint ulSurfaceGetUserData(nuint surface);
 
 	/// <summary>Get the underlying Bitmap from the default Surface.</summary>
-	[DllImport("Ultralight")]
-	public static extern Handle<ULBitmap> ulBitmapSurfaceGetBitmap(IntPtr surface);
+	[LibraryImport("Ultralight")]
+	internal static partial void* ulBitmapSurfaceGetBitmap(nuint surface);
 }
 
-public class ULSurface
+[StructLayout(LayoutKind.Sequential)]
+public readonly struct ULSurface
 {
-	public readonly IntPtr Ptr;
-	public ULSurface(IntPtr ptr) => Ptr = ptr;
+	private readonly nuint Ptr;
+	private ULSurface(nuint handle) => Ptr = handle;
 
 	public uint Width => Methods.ulSurfaceGetWidth(Ptr);
 	public uint Height => Methods.ulSurfaceGetHeight(Ptr);
@@ -73,25 +71,21 @@ public class ULSurface
 	public uint RowBytes => Methods.ulSurfaceGetRowBytes(Ptr);
 	public nuint Size => Methods.ulSurfaceGetSize(Ptr);
 
-	public IntPtr LockPixels() => Methods.ulSurfaceLockPixels(Ptr);
+	public unsafe byte* LockPixels() => Methods.ulSurfaceLockPixels(Ptr);
 	public void UnlockPixels() => Methods.ulSurfaceUnlockPixels(Ptr);
 
 	public void Resize(uint width, uint height) => Methods.ulSurfaceResize(Ptr, width, height);
 
 	public ULIntRect DirtyBounds
 	{
-		[MethodImpl(MethodImplOptions.AggressiveInlining)]
 		get => Methods.ulSurfaceGetDirtyBounds(Ptr);
 		set => Methods.ulSurfaceSetDirtyBounds(Ptr, value);
 	}
-	[MethodImpl(MethodImplOptions.AggressiveInlining)]
 	public void ClearDirtyBounds() => Methods.ulSurfaceClearDirtyBounds(Ptr);
 
-	public IntPtr UserData => Methods.ulSurfaceGetUserData(Ptr);
+	public nint Id => Methods.ulSurfaceGetUserData(Ptr);
 
-	public ULBitmap Bitmap
-	{
-		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		get => ULBitmap.FromHandle(Methods.ulBitmapSurfaceGetBitmap(Ptr), false);
-	}
+	public unsafe ULBitmap Bitmap => ULBitmap.FromHandle(Methods.ulBitmapSurfaceGetBitmap(Ptr), false);
+
+	internal static ULSurface FromHandle(nuint handle) => new(handle);
 }

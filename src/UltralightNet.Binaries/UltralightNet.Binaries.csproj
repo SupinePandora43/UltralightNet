@@ -1,13 +1,15 @@
 <Project Sdk="Microsoft.NET.Sdk">
 	<PropertyGroup>
-		<TargetFrameworks>net6.0;net471;net46;net451;net45;netstandard2.1;netstandard2</TargetFrameworks>
+		<Version>$(UltralightVersion)</Version>
+
+		<TargetFramework>netstandard2.0</TargetFramework>
 		<Platform>x64</Platform>
 
 		<Authors>Ultralight, Inc.</Authors>
+		<Copyright>Ultralight, Inc.</Copyright>
 		<PackageId>UltralightNet.Binaries</PackageId>
 		<Description>Ultralight binaries</Description>
 
-		<Copyright>Ultralight, Inc.</Copyright>
 
 		<PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
 
@@ -23,47 +25,14 @@
 		<_NativeAssetName Include="runtimes/win-x64/native/Ultralight.dll" PackagePath="runtimes/win-x64/native" />
 		<_NativeAssetName Include="runtimes/win-x64/native/UltralightCore.dll" PackagePath="runtimes/win-x64/native" />
 		<_NativeAssetName Include="runtimes/win-x64/native/WebCore.dll" PackagePath="runtimes/win-x64/native" />
-		<_NativeAssetName Include="runtimes/win-x64/native/gio-2.0-0.dll" PackagePath="runtimes/win-x64/native" />
-		<_NativeAssetName Include="runtimes/win-x64/native/glib-2.0-0.dll" PackagePath="runtimes/win-x64/native" />
-		<_NativeAssetName Include="runtimes/win-x64/native/gmodule-2.0-0.dll" PackagePath="runtimes/win-x64/native" />
-		<_NativeAssetName Include="runtimes/win-x64/native/gobject-2.0-0.dll" PackagePath="runtimes/win-x64/native" />
-		<_NativeAssetName Include="runtimes/win-x64/native/gstreamer-full-1.0.dll" PackagePath="runtimes/win-x64/native" />
-		<_NativeAssetName Include="runtimes/win-x64/native/gthread-2.0-0.dll" PackagePath="runtimes/win-x64/native" />
 
 		<_NativeAssetName Include="runtimes/osx-x64/native/libUltralight.dylib" PackagePath="runtimes/osx-x64/native" />
 		<_NativeAssetName Include="runtimes/osx-x64/native/libUltralightCore.dylib" PackagePath="runtimes/osx-x64/native" />
 		<_NativeAssetName Include="runtimes/osx-x64/native/libWebCore.dylib" PackagePath="runtimes/osx-x64/native" />
-		<_NativeAssetName Include="runtimes/osx-x64/native/libgio-2.0.0.dylib" PackagePath="runtimes/osx-x64/native" />
-		<_NativeAssetName Include="runtimes/osx-x64/native/libgio-2.0.dylib" PackagePath="runtimes/osx-x64/native" />
-		<_NativeAssetName Include="runtimes/osx-x64/native/libglib-2.0.0.dylib" PackagePath="runtimes/osx-x64/native" />
-		<_NativeAssetName Include="runtimes/osx-x64/native/libglib-2.0.dylib" PackagePath="runtimes/osx-x64/native" />
-		<_NativeAssetName Include="runtimes/osx-x64/native/libgmodule-2.0.0.dylib" PackagePath="runtimes/osx-x64/native" />
-		<_NativeAssetName Include="runtimes/osx-x64/native/libgmodule-2.0.dylib" PackagePath="runtimes/osx-x64/native" />
-		<_NativeAssetName Include="runtimes/osx-x64/native/libgobject-2.0.0.dylib" PackagePath="runtimes/osx-x64/native" />
-		<_NativeAssetName Include="runtimes/osx-x64/native/libgobject-2.0.dylib" PackagePath="runtimes/osx-x64/native" />
-		<_NativeAssetName Include="runtimes/osx-x64/native/libgstreamer-full-1.0.dylib" PackagePath="runtimes/osx-x64/native" />
-		<_NativeAssetName Include="runtimes/osx-x64/native/libgthread-2.0.0.dylib" PackagePath="runtimes/osx-x64/native" />
-		<_NativeAssetName Include="runtimes/osx-x64/native/libgthread-2.0.dylib" PackagePath="runtimes/osx-x64/native" />
 
 		<_NativeAssetName Include="runtimes/linux-x64/native/libUltralight.so" PackagePath="runtimes/linux-x64/native" />
 		<_NativeAssetName Include="runtimes/linux-x64/native/libUltralightCore.so" PackagePath="runtimes/linux-x64/native" />
 		<_NativeAssetName Include="runtimes/linux-x64/native/libWebCore.so" PackagePath="runtimes/linux-x64/native" />
-		<_NativeAssetName Include="runtimes/linux-x64/native/libgio-2.0.so" PackagePath="runtimes/linux-x64/native" />
-		<_NativeAssetName Include="runtimes/linux-x64/native/libgio-2.0.so.0" PackagePath="runtimes/linux-x64/native" />
-		<_NativeAssetName Include="runtimes/linux-x64/native/libgio-2.0.so.0.6800.3" PackagePath="runtimes/linux-x64/native" />
-		<_NativeAssetName Include="runtimes/linux-x64/native/libglib-2.0.so" PackagePath="runtimes/linux-x64/native" />
-		<_NativeAssetName Include="runtimes/linux-x64/native/libglib-2.0.so.0" PackagePath="runtimes/linux-x64/native" />
-		<_NativeAssetName Include="runtimes/linux-x64/native/libglib-2.0.so.0.6800.3" PackagePath="runtimes/linux-x64/native" />
-		<_NativeAssetName Include="runtimes/linux-x64/native/libgmodule-2.0.so" PackagePath="runtimes/linux-x64/native" />
-		<_NativeAssetName Include="runtimes/linux-x64/native/libgmodule-2.0.so.0" PackagePath="runtimes/linux-x64/native" />
-		<_NativeAssetName Include="runtimes/linux-x64/native/libgmodule-2.0.so.0.6800.3" PackagePath="runtimes/linux-x64/native" />
-		<_NativeAssetName Include="runtimes/linux-x64/native/libgobject-2.0.so" PackagePath="runtimes/linux-x64/native" />
-		<_NativeAssetName Include="runtimes/linux-x64/native/libgobject-2.0.so.0" PackagePath="runtimes/linux-x64/native" />
-		<_NativeAssetName Include="runtimes/linux-x64/native/libgobject-2.0.so.0.6800.3" PackagePath="runtimes/linux-x64/native" />
-		<_NativeAssetName Include="runtimes/linux-x64/native/libgstreamer-full-1.0.so" PackagePath="runtimes/linux-x64/native" />
-		<_NativeAssetName Include="runtimes/linux-x64/native/libgthread-2.0.so" PackagePath="runtimes/linux-x64/native" />
-		<_NativeAssetName Include="runtimes/linux-x64/native/libgthread-2.0.so.0" PackagePath="runtimes/linux-x64/native" />
-		<_NativeAssetName Include="runtimes/linux-x64/native/libgthread-2.0.so.0.6800.3" PackagePath="runtimes/linux-x64/native" />
 
 		<_ExistingAssets Include="@(_NativeAssetName)" />
 		<Content Include="@(_ExistingAssets->'%(Identity)')" CopyToOutputDirectory="PreserveNewest" PackagePath="%(PackagePath)" Pack="true" />

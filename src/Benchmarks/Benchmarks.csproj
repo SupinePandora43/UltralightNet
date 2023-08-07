@@ -3,16 +3,13 @@
 	<PropertyGroup>
 		<OutputType>Exe</OutputType>
 		<TargetFrameworks>net6.0;net7.0</TargetFrameworks>
-
-		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
 	</PropertyGroup>
 
 	<ItemGroup>
 		<PackageReference Include="BenchmarkDotNet" Version="0.13.0" />
 
-		<PackageReference Include="UltralightNet.Binaries" Version="$(Version)" />
+		<PackageReference Include="UltralightNet.Binaries" Version="$(UltralightVersion)" />
 		<PackageReference Include="UltralightNet.AppCore" Version="$(Version)" />
-		<PackageReference Include="UltralightNet.Resources" Version="$(Version)" />
 
 		<ProjectReference Include="..\UltralightNet\UltralightNet.csproj" />
 		<ProjectReference Include="..\UltralightNet.AppCore\UltralightNet.AppCore.csproj" />

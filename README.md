@@ -6,22 +6,19 @@ You can learn more about Ultralight on [Ultralight's official site](https://ultr
 
 ## Supported frameworks
 
-* .Net >= `5.0`
-* .Net Framework >= `4.5`
-* .Net Standard >= `2.0` (Unity isn't tested, see [roadmap](https://github.com/SupinePandora43/UltralightNet/projects/3))
+* .NET >= `6.0`
+* .NET Framework >= `4.6.1` (through `netstandard2.0`, untested)
+* .NET Standard >= `2.0` (we do not officialy support Unity [right now](https://github.com/SupinePandora43/UltralightNet/projects/3), untested)
 
 ## Reporting issues
 
 * [issues page on github](https://github.com/SupinePandora43/UltralightNet/issues)
-* Discord `Supinepandora43#3399`
+* Discord `@SupinePandora`
 
 ## License
 
-`UltralightNet` is free and open source
+`UltralightNet` and its subprojects are MIT.
 
 `Ultralight` is free for non-commercial projects, check https://ultralig.ht for other licenses.
 
-# Example projects
-
-* [**Getting Started**](./UltralightNet.GettingStarted)
-* UltralightNet.XXX.TestApp (for testing functionality)
+# [**Getting Started**](./Examples/Headless/GettingStarted/README.md)

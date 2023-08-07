@@ -1,7 +1,6 @@
-using System;
 using System.Runtime.InteropServices;
 
-namespace UltralightNet;
+namespace UltralightNet.Platform;
 
 [UnmanagedFunctionPointer(CallingConvention.Cdecl)]
 public unsafe delegate void DestroyBufferCallback(void* userData, void* data);
@@ -21,12 +20,12 @@ public unsafe struct ULBuffer : IDisposable, IEquatable<ULBuffer> // TODO: INati
 	public static ULBuffer CreateFromOwnedData<T>(ReadOnlySpan<T> data, delegate* unmanaged[Cdecl]<void*, void*, void> destroyCallback = null, void* userData = null) where T : unmanaged
 	{
 		fixed (T* dataPointer = data)
-			return CreateFromOwnedData(dataPointer, unchecked((nuint)data.Length), destroyCallback, userData);
+			return CreateFromOwnedData(dataPointer, (nuint)data.Length * (nuint)sizeof(T), destroyCallback, userData);
 	}
 	public static ULBuffer CreateFromOwnedData<T>(ReadOnlySpan<T> data, DestroyBufferCallback? destroyCallback, void* userData = null) where T : unmanaged
 	{
 		fixed (T* dataPointer = data)
-			return CreateFromOwnedData(dataPointer, unchecked((nuint)data.Length), destroyCallback, userData);
+			return CreateFromOwnedData(dataPointer, (nuint)data.Length * (nuint)sizeof(T), destroyCallback, userData);
 	}
 
 	public static ULBuffer CreateFromDataCopy(void* data, nuint length)
@@ -41,7 +40,7 @@ public unsafe struct ULBuffer : IDisposable, IEquatable<ULBuffer> // TODO: INati
 	public static ULBuffer CreateFromDataCopy<T>(ReadOnlySpan<T> data) where T : unmanaged
 	{
 		fixed (T* dataPointer = data)
-			return CreateFromDataCopy(dataPointer, (nuint)data.Length);
+			return CreateFromDataCopy(dataPointer, (nuint)data.Length * (nuint)sizeof(T));
 	}
 
 	public void Dispose()

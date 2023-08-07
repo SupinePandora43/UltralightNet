@@ -1,15 +1,9 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<TargetFramework>net6.0</TargetFramework>
+		<TargetFrameworks>net6.0;net7.0</TargetFrameworks>
 		<OutputType>Library</OutputType>
 		<CollectCoverage>true</CollectCoverage>
-
-		<LangVersion>preview</LangVersion>
-		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-
-		<IncludeSymbols>true</IncludeSymbols>
-		<UseSourceLink>true</UseSourceLink>
 	</PropertyGroup>
 
 	<ItemGroup>
@@ -17,9 +11,8 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<PackageReference Include="UltralightNet.Binaries" Version="$(Version)" />
-		<PackageReference Include="UltralightNet.AppCore" Version="$(Version)" />
-		<PackageReference Include="UltralightNet.Resources" Version="$(Version)" />
+		<PackageReference Include="UltralightNet.Binaries" Version="$(UltralightVersion)" />
+		<PackageReference Include="UltralightNet.AppCore.Binaries" Version="$(UltralightVersion)" />
 
 		<PackageReference Include="coverlet.collector" Version="3.0.3">
 			<PrivateAssets>all</PrivateAssets>
@@ -35,7 +28,6 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<ProjectReference Include="..\UltralightNet.Resources\UltralightNet.Resources.csproj" />
 		<ProjectReference Include="..\UltralightNet\UltralightNet.csproj" />
 		<ProjectReference Include="..\UltralightNet.AppCore\UltralightNet.AppCore.csproj" />
 	</ItemGroup>
