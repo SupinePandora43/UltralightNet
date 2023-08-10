@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Runtime.InteropServices.Marshalling;
@@ -80,10 +79,9 @@ public sealed unsafe class Renderer : NativeContainer
 		{
 			throw new Exception("No ULPlatform.GPUDriver set, but ULViewConfig.IsAccelerated was set to true. (Disable check by setting ULPlatform.ErrorGPUDriverNotSet to false.)");
 		}
-		void* viewHandle;
-		var view = View.FromHandle(viewHandle = Methods.ulCreateView(this, width, height, viewConfig.Value, session ?? DefaultSession), dispose);
+		var view = View.FromHandle(Methods.ulCreateView(this, width, height, viewConfig.Value, session ?? DefaultSession), dispose);
 		view.Renderer = this;
-		views[(nuint)viewHandle] = new WeakReference<View>(view);
+		views[view.GetUserData()] = new WeakReference<View>(view);
 		view.SetUpCallbacks();
 		return view;
 	}
