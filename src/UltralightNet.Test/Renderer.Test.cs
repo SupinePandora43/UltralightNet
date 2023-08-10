@@ -26,6 +26,9 @@ public sealed class RendererTest
 		Assert.True(session2.IsPersistent);
 
 		Assert.True(session.Id != session1.Id && session1.Id != session2.Id);
+
+		Assert.NotEqual(session, session1);
+		Assert.Equal(session1, session1);
 	}
 
 	[Fact]
