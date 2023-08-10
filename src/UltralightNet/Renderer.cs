@@ -41,13 +41,13 @@ public static unsafe partial class Methods
 	internal static partial void ulSetGamepadDetails(Renderer renderer, uint index, [MarshalUsing(typeof(ULString))] string id, uint axisCount, uint buttonCount);
 
 	[LibraryImport(LibUltralight)]
-	internal static partial void ulFireGamepadEvent(Renderer renderer, GamepadEvent gamepadEvent);
+	internal static partial void ulFireGamepadEvent(Renderer renderer, GamepadEvent* gamepadEvent);
 
 	[LibraryImport(LibUltralight)]
-	internal static partial void ulFireGamepadAxisEvent(Renderer renderer, GamepadAxisEvent gamepadAxisEvent);
+	internal static partial void ulFireGamepadAxisEvent(Renderer renderer, GamepadAxisEvent* gamepadAxisEvent);
 
 	[LibraryImport(LibUltralight)]
-	internal static partial void ulFireGamepadButtonEvent(Renderer renderer, GamepadButtonEvent gamepadButtonEvent);
+	internal static partial void ulFireGamepadButtonEvent(Renderer renderer, GamepadButtonEvent* gamepadButtonEvent);
 }
 
 [NativeMarshalling(typeof(Marshaller))]
@@ -104,9 +104,9 @@ public sealed unsafe class Renderer : NativeContainer
 	public bool TryStartRemoteInspectorServer(string address, ushort port) => Methods.ulStartRemoteInspectorServer(this, address, port);
 
 	public void SetGamepadDetails(uint index, string id, uint axisCount, uint buttonCount) => Methods.ulSetGamepadDetails(this, index, id, axisCount, buttonCount);
-	public void FireGamepadEvent(GamepadEvent gamepadEvent) => Methods.ulFireGamepadEvent(this, gamepadEvent);
-	public void FireGamepadAxisEvent(GamepadAxisEvent gamepadAxisEvent) => Methods.ulFireGamepadAxisEvent(this, gamepadAxisEvent);
-	public void FireGamepadButtonEvent(GamepadButtonEvent gamepadbuttonEvent) => Methods.ulFireGamepadButtonEvent(this, gamepadbuttonEvent);
+	public void FireGamepadEvent(GamepadEvent gamepadEvent) => Methods.ulFireGamepadEvent(this, &gamepadEvent);
+	public void FireGamepadAxisEvent(GamepadAxisEvent gamepadAxisEvent) => Methods.ulFireGamepadAxisEvent(this, &gamepadAxisEvent);
+	public void FireGamepadButtonEvent(GamepadButtonEvent gamepadbuttonEvent) => Methods.ulFireGamepadButtonEvent(this, &gamepadbuttonEvent);
 
 	public override void Dispose()
 	{

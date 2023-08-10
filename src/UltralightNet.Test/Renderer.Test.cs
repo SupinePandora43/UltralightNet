@@ -40,4 +40,10 @@ public sealed class RendererTest
 		Renderer.PurgeMemory();
 		Renderer.LogMemoryUsage();
 	}
+
+	[Fact]
+	public void GPUDriverNotSet()
+	{
+		Assert.Throws<Exception>(() => Renderer.CreateView(128, 128, new() { IsAccelerated = true }));
+	}
 }
