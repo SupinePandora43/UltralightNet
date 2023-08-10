@@ -1,4 +1,3 @@
-using System;
 #if NETCOREAPP3_0_OR_GREATER
 using System.Runtime.Intrinsics;
 #endif
@@ -20,7 +19,7 @@ public struct ULIntRect : IEquatable<ULIntRect>
 #else
 		Left == other.Left && Top == other.Top && Right == other.Right && Bottom == other.Bottom;
 #endif
-	public readonly override bool Equals(object? other) => other is ULIntRect rect ? Equals(rect) : false;
+	public readonly override bool Equals(object? other) => other is ULIntRect rect && Equals(rect);
 	public static bool operator ==(ULIntRect? left, ULIntRect? right) => left is not null ? (right is not null && left.Equals(right)) : right is null;
 	public static bool operator !=(ULIntRect? left, ULIntRect? right) => !(left == right);
 
