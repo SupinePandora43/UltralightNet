@@ -61,20 +61,23 @@ namespace UltralightNet.Platform
 			delegate void CommandListCallback(ULCommandList commandList);
 
 			readonly Dictionary<nint, WeakReference<ULBitmap>>? BitmapCache;
+			uint newCachedInstanceCount = 0;
 			ULBitmap BitmapFromHandleCached(void* ptr)
 			{
 				if (!BitmapCache!.TryGetValue((nint)ptr, out var weakBitmap) || !weakBitmap.TryGetTarget(out ULBitmap? bitmap))
 				{
 					bitmap = ULBitmap.FromHandle(ptr, false);
 					BitmapCache[(nint)ptr] = new WeakReference<ULBitmap>(bitmap);
+					newCachedInstanceCount++;
 				}
 
-				if (BitmapCache.Keys.Count > 256)
+				if (newCachedInstanceCount > 256)
 				{
 					foreach (var keyValuePair in BitmapCache)
 					{
 						if (!keyValuePair.Value.TryGetTarget(out _)) BitmapCache.Remove(keyValuePair.Key);
 					}
+					newCachedInstanceCount = 0;
 				}
 				return bitmap;
 			}
