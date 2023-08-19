@@ -33,7 +33,7 @@ public abstract unsafe class NativeContainer : IDisposable, IEquatable<NativeCon
 	}
 	~NativeContainer() => Dispose(); // it does work (tested on MODiX)
 
-	public bool Equals(NativeContainer? other) => other is not null && handle == other.handle && IsDisposed == other.IsDisposed;
+	public bool Equals(NativeContainer? other) => other is not null && Handle == other.Handle;
 
 	public override bool Equals(object? other) => other is NativeContainer container && Equals(container);
 	public override int GetHashCode() => throw new NotSupportedException($"Instances of {nameof(NativeContainer)} do not support {nameof(GetHashCode)}.");

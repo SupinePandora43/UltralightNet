@@ -7,9 +7,10 @@
 		<PackageId>UltralightNet</PackageId>
 		<Description>Ultralight .NET bindings</Description>
 
-		<NoWarn>$(NoWarn);8974;1816</NoWarn>
+		<NoWarn>$(NoWarn);8974;1816;1401</NoWarn>
 		<!-- CS8974 creates noise with GCHandle.Alloc (dotnet/roslyn-analyzers#6816) -->
 		<!-- CA1816 creates noise in some Dispose() methods of Wrapper classes -->
+		<!-- CA1401 creates noise in JS pinvokes -->
 	</PropertyGroup>
 	<ItemGroup>
 	  <None Remove="resources\cacert.pem" />
@@ -22,6 +23,7 @@
 	<ItemGroup>
 		<Compile Remove="LibraryImportGenerator/**" Condition="'$(TargetFramework)'=='net7.0'" />
 		<Compile Remove="JavaScript/**" />
+		<Compile Include="JavaScript/JSString.cs" />
 	</ItemGroup>
 	<ItemGroup>
 		<!-- <PackageReference Include="ErrorProne.NET.Structs" Version="0.4.0-beta.1" OutputItemType="Analyzer" ReferenceOutputAssembly="false" PrivateAssets="All" /> -->
