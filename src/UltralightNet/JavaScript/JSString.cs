@@ -158,7 +158,7 @@ namespace UltralightNet.JavaScript
 			fixed (byte* bytes = utf8) return EqualsNullTerminatedUTF8(bytes);
 		}
 
-		public static implicit operator JSString(string? str) => CreateFromUTF16(str);
+		public static implicit operator JSString(string? str) => CreateFromUTF16Cached(str);
 		public static explicit operator string(JSString str) => str.ToString();
 
 		public static JSString FromHandle(JSStringRef handle, bool dispose) => new() { JSHandle = handle, Owns = dispose };
