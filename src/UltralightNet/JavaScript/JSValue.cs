@@ -1,111 +1,152 @@
-using System;
+// JSValueRef.h
+
 using System.Runtime.InteropServices;
 
-namespace UltralightNet
+namespace UltralightNet.JavaScript
 {
-	unsafe partial class JavaScriptMethods
+	namespace Low
 	{
-		[DllImport("WebCore")]
-		public static extern JSType JSValueGetType(void* context, void* jsValue);
+		unsafe partial class JavaScriptMethods
+		{
+			[LibraryImport(LibWebCore)]
+			public static partial JSType JSValueGetType(JSContextRef context, JSValueRef jsValue);
 
-		[GeneratedDllImport("WebCore")]
-		[return: MarshalAs(UnmanagedType.I1)]
-		public static partial bool JSValueIsUndefined(void* context, void* jsValue);
+			[LibraryImport(LibWebCore)]
+			[return: MarshalAs(UnmanagedType.U1)]
+			public static partial bool JSValueIsUndefined(JSContextRef context, JSValueRef jsValue);
 
-		[GeneratedDllImport("WebCore")]
-		[return: MarshalAs(UnmanagedType.I1)]
-		public static partial bool JSValueIsNull(void* context, void* jsValue);
+			[LibraryImport(LibWebCore)]
+			[return: MarshalAs(UnmanagedType.U1)]
+			public static partial bool JSValueIsNull(JSContextRef context, JSValueRef jsValue);
 
-		[GeneratedDllImport("WebCore")]
-		[return: MarshalAs(UnmanagedType.I1)]
-		public static partial bool JSValueIsBoolean(void* context, void* jsValue);
+			[LibraryImport(LibWebCore)]
+			[return: MarshalAs(UnmanagedType.U1)]
+			public static partial bool JSValueIsBoolean(JSContextRef context, JSValueRef jsValue);
 
-		[GeneratedDllImport("WebCore")]
-		[return: MarshalAs(UnmanagedType.I1)]
-		public static partial bool JSValueIsNumber(void* context, void* jsValue);
+			[LibraryImport(LibWebCore)]
+			[return: MarshalAs(UnmanagedType.U1)]
+			public static partial bool JSValueIsNumber(JSContextRef context, JSValueRef jsValue);
 
-		[GeneratedDllImport("WebCore")]
-		[return: MarshalAs(UnmanagedType.I1)]
-		public static partial bool JSValueIsString(void* context, void* jsValue);
+			[LibraryImport(LibWebCore)]
+			[return: MarshalAs(UnmanagedType.U1)]
+			public static partial bool JSValueIsString(JSContextRef context, JSValueRef jsValue);
 
-		[GeneratedDllImport("WebCore")]
-		[return: MarshalAs(UnmanagedType.I1)]
-		public static partial bool JSValueIsSymbol(void* context, void* jsValue);
+			[LibraryImport(LibWebCore)]
+			[return: MarshalAs(UnmanagedType.U1)]
+			public static partial bool JSValueIsSymbol(JSContextRef context, JSValueRef jsValue);
 
-		[GeneratedDllImport("WebCore")]
-		[return: MarshalAs(UnmanagedType.I1)]
-		public static partial bool JSValueIsObject(void* context, void* jsValue);
+			[LibraryImport(LibWebCore)]
+			[return: MarshalAs(UnmanagedType.U1)]
+			public static partial bool JSValueIsObject(JSContextRef context, JSValueRef jsValue);
 
-		[GeneratedDllImport("WebCore")]
-		[return: MarshalAs(UnmanagedType.I1)]
-		public static partial bool JSValueIsObjectOfClass(void* context, void* jsValue, void* jsClass);
+			[LibraryImport(LibWebCore)]
+			[return: MarshalAs(UnmanagedType.U1)]
+			public static partial bool JSValueIsObjectOfClass(JSContextRef context, JSValueRef jsValue, JSClassRef jsClass);
 
-		[GeneratedDllImport("WebCore")]
-		[return: MarshalAs(UnmanagedType.I1)]
-		public static partial bool JSValueIsArray(void* context, void* jsValue);
+			[LibraryImport(LibWebCore)]
+			[return: MarshalAs(UnmanagedType.U1)]
+			public static partial bool JSValueIsArray(JSContextRef context, JSValueRef jsValue);
 
-		[GeneratedDllImport("WebCore")]
-		[return: MarshalAs(UnmanagedType.I1)]
-		public static partial bool JSValueIsDate(void* context, void* jsValue);
+			[LibraryImport(LibWebCore)]
+			[return: MarshalAs(UnmanagedType.U1)]
+			public static partial bool JSValueIsDate(JSContextRef context, JSValueRef jsValue);
 
-		[DllImport("WebCore")]
-		public static extern JSTypedArrayType JSValueGetTypedArrayType(void* context, void* jsValue, void** exception);
+			[LibraryImport(LibWebCore)]
+			public static partial JSTypedArrayType JSValueGetTypedArrayType(JSContextRef context, JSValueRef jsValue, JSValueRef* exception = null);
 
-		[GeneratedDllImport("WebCore")]
-		[return: MarshalAs(UnmanagedType.I1)]
-		public static partial bool JSValueIsEqual(void* context, void* a, void* b, void** exception);
+			[LibraryImport(LibWebCore)]
+			[return: MarshalAs(UnmanagedType.U1)]
+			public static partial bool JSValueIsEqual(JSContextRef context, JSValueRef a, JSValueRef b, JSValueRef* exception = null);
 
-		[GeneratedDllImport("WebCore")]
-		[return: MarshalAs(UnmanagedType.I1)]
-		public static partial bool JSValueIsStrictEqual(void* context, void* a, void* b);
+			[LibraryImport(LibWebCore)]
+			[return: MarshalAs(UnmanagedType.U1)]
+			public static partial bool JSValueIsStrictEqual(JSContextRef context, JSValueRef a, JSValueRef b);
 
-		[GeneratedDllImport("WebCore")]
-		[return: MarshalAs(UnmanagedType.I1)]
-		public static partial bool JSValueIsInstanceOfConstructor(void* context, void* jsValue, void* constructor, void** exception);
+			[LibraryImport(LibWebCore)]
+			[return: MarshalAs(UnmanagedType.U1)]
+			public static partial bool JSValueIsInstanceOfConstructor(JSContextRef context, JSValueRef jsValue, JSObjectRef constructor, JSValueRef* exception = null);
 
-		[DllImport("WebCore")]
-		public static extern void* JSValueMakeUndefined(void* context);
+			[LibraryImport(LibWebCore)]
+			public static partial JSValueRef JSValueMakeUndefined(JSContextRef context);
 
-		[DllImport("WebCore")]
-		public static extern void* JSValueMakeNull(void* context);
+			[LibraryImport(LibWebCore)]
+			public static partial JSValueRef JSValueMakeNull(JSContextRef context);
 
-		[GeneratedDllImport("WebCore")]
-		public static partial void* JSValueMakeBoolean(void* context, [MarshalAs(UnmanagedType.I1)] bool boolean);
+			[LibraryImport(LibWebCore)]
+			public static partial JSValueRef JSValueMakeBoolean(JSContextRef context, [MarshalAs(UnmanagedType.U1)] bool boolean);
 
-		[DllImport("WebCore")]
-		public static extern void* JSValueMakeNumber(void* context, double number);
+			[LibraryImport(LibWebCore)]
+			public static partial JSValueRef JSValueMakeNumber(JSContextRef context, double number);
 
-		[DllImport("WebCore")]
-		public static extern void* JSValueMakeString(void* context, void* jsString);
+			[LibraryImport(LibWebCore)]
+			public static partial JSValueRef JSValueMakeString(JSContextRef context, JSStringRef jsString);
 
-		[DllImport("WebCore")]
-		public static extern void* JSValueMakeSymbol(void* context, void* description);
+			[LibraryImport(LibWebCore)]
+			public static partial JSValueRef JSValueMakeSymbol(JSContextRef context, JSStringRef description);
 
-		[DllImport("WebCore")]
-		public static extern void* JSValueMakeFromJSONString(void* context, void* jsString);
+			[LibraryImport(LibWebCore)]
+			public static partial JSValueRef JSValueMakeFromJSONString(JSContextRef context, JSStringRef jsString);
 
-		[DllImport("WebCore")]
-		public static extern void* JSValueCreateJSONString(void* context, void* jsValue, uint indent, void** exception);
+			[LibraryImport(LibWebCore)]
+			public static partial JSStringRef JSValueCreateJSONString(JSContextRef context, JSValueRef jsValue, uint indent, JSValueRef* exception = null);
 
-		[GeneratedDllImport("WebCore")]
-		[return: MarshalAs(UnmanagedType.I1)]
-		public static partial bool JSValueToBoolean(void* context, void* jsValue);
+			[LibraryImport(LibWebCore)]
+			[return: MarshalAs(UnmanagedType.U1)]
+			public static partial bool JSValueToBoolean(JSContextRef context, JSValueRef jsValue);
 
-		[DllImport("WebCore")]
-		public static extern double JSValueToNumber(void* context, void* jsValue, void** exception);
+			[LibraryImport(LibWebCore)]
+			public static partial double JSValueToNumber(JSContextRef context, JSValueRef jsValue, JSValueRef* exception = null);
 
-		[DllImport("WebCore")]
-		public static extern void* JSValueToStringCopy(void* context, void* jsValue, void** exception);
+			[LibraryImport(LibWebCore)]
+			public static partial JSStringRef JSValueToStringCopy(JSContextRef context, JSValueRef jsValue, JSValueRef* exception = null);
 
-		[DllImport("WebCore")]
-		public static extern void* JSValueToObject(void* context, void* jsValue, void** exception);
+			[LibraryImport(LibWebCore)]
+			public static partial JSObjectRef JSValueToObject(JSContextRef context, JSValueRef jsValue, JSValueRef* exception = null);
 
-		[DllImport("WebCore")]
-		public static extern void JSValueProtect(void* context, void* jsValue);
+			[LibraryImport(LibWebCore)]
+			public static partial void JSValueProtect(JSContextRef context, JSValueRef jsValue);
 
-		[DllImport("WebCore")]
-		public static extern void JSValueUnprotect(void* context, void* jsValue);
+			[LibraryImport(LibWebCore)]
+			public static partial void JSValueUnprotect(JSContextRef context, JSValueRef jsValue);
+		}
+
+		public readonly struct JSValueRef
+		{
+			private readonly nuint _handle;
+			public JSValueRef() => JavaScriptMethods.ThrowUnsupportedConstructor();
+			public override int GetHashCode() => throw JavaScriptMethods.UnsupportedMethodException;
+			public override bool Equals(object? o) => throw JavaScriptMethods.UnsupportedMethodException;
+
+			public static bool operator ==(JSValueRef left, JSValueRef right) => left._handle == right._handle;
+			public static bool operator !=(JSValueRef left, JSValueRef right) => left._handle != right._handle;
+		}
+
+		public enum JSType : int
+		{
+			Undefined,
+			Null,
+			Boolean,
+			Number,
+			String,
+			Object,
+			Symbol
+		}
+		public enum JSTypedArrayType : int
+		{
+			Int8Array,
+			Int16Array,
+			Int32Array,
+			Uint8Array,
+			Uint8ClampedArray,
+			Uint16Array,
+			Uint32Array,
+			Float32Array,
+			Float64Array,
+			ArrayBuffer,
+			None
+		}
 	}
+	/*
 
 	public unsafe class JSValue
 	{
@@ -262,6 +303,5 @@ namespace UltralightNet
 		public override string ToString() => (string)this;
 
 		public static implicit operator JSValue(string obj) => new(obj);
-	}
-
+	}*/
 }

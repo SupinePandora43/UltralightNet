@@ -2,26 +2,31 @@
 
 using System.Runtime.InteropServices;
 
-namespace UltralightNet
+namespace UltralightNet.JavaScript
 {
-	unsafe partial class JavaScriptMethods
+	namespace Low
 	{
-		[GeneratedDllImport("WebCore")]
-		public static partial bool JSObjectSetPrivateProperty(void* context, void* jsObject, void* propertyName, void* value);
+		unsafe partial class JavaScriptMethods
+		{
+			[LibraryImport(LibWebCore)]
+			[return: MarshalAs(UnmanagedType.U1)]
+			public static partial bool JSObjectSetPrivateProperty(JSContextRef ctx, JSObjectRef @object, JSStringRef propertyName, JSValueRef value);
 
-		[DllImport("WebCore")]
-		public static extern void* JSObjectGetPrivateProperty(void* context, void* jsObject, void* propertyName);
+			[LibraryImport(LibWebCore)]
+			public static partial JSValueRef JSObjectGetPrivateProperty(JSContextRef ctx, JSObjectRef @object, JSStringRef propertyName);
 
-		[GeneratedDllImport("WebCore")]
-		public static partial bool JSObjectDeletePrivateProperty(void* context, void* jsObject, void* propertyName);
+			[LibraryImport(LibWebCore)]
+			[return: MarshalAs(UnmanagedType.U1)]
+			public static partial bool JSObjectDeletePrivateProperty(JSContextRef ctx, JSObjectRef @object, JSStringRef propertyName);
 
-		/// <summary>
-		/// TODO: may not work
-		/// </summary>
-		[DllImport("WebCore")]
-		public static extern void* JSObjectGetProxyTarget();
+			/// <summary>
+			/// TODO: may not work
+			/// </summary>
+			[LibraryImport(LibWebCore)]
+			public static partial JSObjectRef JSObjectGetProxyTarget(JSObjectRef @object);
 
-		[DllImport("WebCore")]
-		public static extern void* JSObjectGetGlobalContext(void* jsObject);
+			[LibraryImport(LibWebCore)]
+			public static partial JSGlobalContextRef JSObjectGetGlobalContext(JSObjectRef @object);
+		}
 	}
 }

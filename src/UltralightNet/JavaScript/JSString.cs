@@ -11,10 +11,8 @@ namespace UltralightNet.JavaScript
 {
 	namespace Low
 	{
-		public unsafe partial class JavaScriptMethods
+		unsafe partial class JavaScriptMethods
 		{
-			private const string LibWebCore = "WebCore";
-
 			[LibraryImport(LibWebCore)]
 			public static partial JSStringRef JSStringCreateWithCharacters(char* characters, nuint length);
 
@@ -42,23 +40,23 @@ namespace UltralightNet.JavaScript
 			public static partial nuint JSStringGetUTF8CString(JSStringRef @string, byte* buffer, nuint bufferSize);
 
 			[LibraryImport(LibWebCore)]
-			[return: MarshalAs(UnmanagedType.I1)]
+			[return: MarshalAs(UnmanagedType.U1)]
 			public static partial bool JSStringIsEqual(JSStringRef a, JSStringRef b);
 
 			[LibraryImport(LibWebCore)]
-			[return: MarshalAs(UnmanagedType.I1)]
+			[return: MarshalAs(UnmanagedType.U1)]
 			public static partial bool JSStringIsEqualToUTF8CString(JSStringRef str, byte* characters);
 		}
 
 		public readonly struct JSStringRef
 		{
 			private readonly nuint _handle;
-			public JSStringRef() => throw new NotSupportedException();
-			public override int GetHashCode() => throw new NotSupportedException();
-			public override bool Equals(object? o) => throw new NotSupportedException();
+			public JSStringRef() => JavaScriptMethods.ThrowUnsupportedConstructor();
+			public override int GetHashCode() => throw JavaScriptMethods.UnsupportedMethodException;
+			public override bool Equals(object? o) => throw JavaScriptMethods.UnsupportedMethodException;
 
 			public static bool operator ==(JSStringRef left, JSStringRef right) => left._handle == right._handle;
-			public static bool operator !=(JSStringRef left, JSStringRef right) => left._handle == right._handle;
+			public static bool operator !=(JSStringRef left, JSStringRef right) => left._handle != right._handle;
 		}
 	}
 	namespace LowStuff
@@ -67,8 +65,8 @@ namespace UltralightNet.JavaScript
 		{
 			public NativeHandle JSHandle
 			{
-				get => Unsafe.As<nuint, NativeHandle>(ref Unsafe.AsRef((nuint)Handle));
-				protected init => Handle = (void*)Unsafe.As<NativeHandle, nuint>(ref Unsafe.AsRef(value));
+				get => JavaScriptMethods.BitCast<nuint, NativeHandle>((nuint)Handle);
+				protected init => Handle = (void*)JavaScriptMethods.BitCast<NativeHandle, nuint>(value);
 			}
 		}
 	}
@@ -148,13 +146,17 @@ namespace UltralightNet.JavaScript
 		public static bool operator ==(JSString? left, JSString? right) => left is not null ? left.Equals(right) : right is null;
 		public static bool operator !=(JSString? left, JSString? right) => !(left == right);
 
-		public bool Equals(byte* other)
+		public bool EqualsNullTerminatedUTF8(byte* utf8)
 		{
-			bool returnValue = JavaScriptMethods.JSStringIsEqualToUTF8CString(JSHandle, other);
+			bool returnValue = JavaScriptMethods.JSStringIsEqualToUTF8CString(JSHandle, utf8);
 			GC.KeepAlive(this);
 			return returnValue;
 		}
-		public bool Equals(ReadOnlySpan<byte> other) { fixed (byte* bytes = other) { return Equals(bytes); } }
+		public bool EqualsNullTerminatedUTF8(ReadOnlySpan<byte> utf8)
+		{
+			if (utf8.Length is 0 || utf8[utf8.Length - 1] is not 0) throw new ArgumentException("UTF8 byte span must have null-terminator (\\0) at the end. (If you're sure what you're doing, use byte* overload instead.)", nameof(utf8));
+			fixed (byte* bytes = utf8) return EqualsNullTerminatedUTF8(bytes);
+		}
 
 		public static implicit operator JSString(string? str) => CreateFromUTF16(str);
 		public static explicit operator string(JSString str) => str.ToString();
