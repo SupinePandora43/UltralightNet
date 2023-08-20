@@ -3,6 +3,7 @@ using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Runtime.InteropServices.Marshalling;
 using UltralightNet.Callbacks;
+using UltralightNet.JavaScript.Low;
 using UltralightNet.LowStuff;
 
 namespace UltralightNet;
@@ -64,7 +65,7 @@ public static unsafe partial class Methods
 
 	//todo: JavaScriptCore bindings
 	[LibraryImport(LibUltralight)]
-	public static partial void* ulViewLockJSContext(View view);
+	public static partial JSContextRef ulViewLockJSContext(View view);
 
 	[LibraryImport(LibUltralight)]
 	public static partial void ulViewUnlockJSContext(View view);
@@ -261,6 +262,9 @@ public sealed unsafe class View : NativeContainer
 	}
 
 	public void Resize(in uint width, in uint height) => Methods.ulViewResize(this, width, height);
+
+	public JSContextRef LockJSContext() => Methods.ulViewLockJSContext(this);
+	public void UnlockJSContext() => Methods.ulViewUnlockJSContext(this);
 
 	/*public ref readonly JSContext LockJSContext()
 	{

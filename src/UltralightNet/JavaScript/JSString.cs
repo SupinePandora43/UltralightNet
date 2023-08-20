@@ -169,20 +169,20 @@ namespace UltralightNet.JavaScript
 			base.Dispose();
 		}
 
-		public static JSString CreateFromUTF16(char* characters, nuint length) => FromHandle(JavaScriptMethods.JSStringCreateWithCharacters(characters, length), true);
+		public static JSString CreateFromUTF16(char* chars, nuint length) => FromHandle(JavaScriptMethods.JSStringCreateWithCharacters(chars, length), true);
 		public static JSString CreateFromUTF16(ReadOnlySpan<char> chars)
 		{
 			fixed (char* characters = chars)
 				return FromHandle(JavaScriptMethods.JSStringCreateWithCharacters(characters, (nuint)chars.Length), true);
 		}
-		public static JSString CreateFromUTF16(string? @string)
+		public static JSString CreateFromUTF16Cached(string? @string)
 		{
 			// on average, 23 times faster than without cache
 			@string ??= string.Empty;
-			if (Cache.TryGetValue(@string, out var js)) return js;
+			if (Cache.TryGetValue(@string, out var js)) return js.Clone();
 			js = CreateFromUTF16(@string.AsSpan());
 			Cache.Add(@string, js);
-			return js;
+			return js.Clone();
 		}
 
 		public static JSString CreateFromUTF8NullTerminated(byte* utf8Bytes) => FromHandle(JavaScriptMethods.JSStringCreateWithUTF8CString(utf8Bytes), true);

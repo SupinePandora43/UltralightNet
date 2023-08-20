@@ -1,9 +1,7 @@
-using System;
 using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using UltralightNet.JavaScript;
-using Xunit;
 
 namespace UltralightNet.Test;
 

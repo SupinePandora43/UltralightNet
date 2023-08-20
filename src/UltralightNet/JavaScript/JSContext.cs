@@ -18,10 +18,10 @@ namespace UltralightNet.JavaScript
 			public static partial void JSContextGroupRelease(JSContextGroupRef contextGroup);
 
 			[LibraryImport(LibWebCore)]
-			public static partial JSGlobalContextRef JSGlobalContextCreate(JSClassRef globalObjectClass);
+			public static partial JSGlobalContextRef JSGlobalContextCreate(JSClassRef globalObjectClass = default);
 
 			[LibraryImport(LibWebCore)]
-			public static partial JSGlobalContextRef JSGlobalContextCreateInGroup(JSContextGroupRef contextGroup, JSClassRef globalObjectClass);
+			public static partial JSGlobalContextRef JSGlobalContextCreateInGroup(JSContextGroupRef contextGroup = default, JSClassRef globalObjectClass = default);
 
 			[LibraryImport(LibWebCore)]
 			public static partial JSGlobalContextRef JSGlobalContextRetain(JSGlobalContextRef globalContext);
