@@ -21,7 +21,7 @@ public unsafe class JSStringTest
 	[Fact]
 	public void CreateFromCharSpan()
 	{
-		using JSString str = new(TestString.AsSpan());
+		using var str = JSString.CreateFromUTF16(TestString.AsSpan());
 		Assert.Equal(TestString.Length, (int)str.Length);
 		Assert.NotEqual((nuint)0, (nuint)str.UTF16DataRaw);
 		Assert.True(TestString.AsSpan().SequenceEqual(str.UTF16Data));
@@ -31,17 +31,19 @@ public unsafe class JSStringTest
 	[MemberData(nameof(InvalidStrings))]
 	public void CreateFromEmptyCharSpan(string? testString)
 	{
-		using JSString str = new(testString.AsSpan());
+		using var str = JSString.CreateFromUTF16(testString.AsSpan());
 		Assert.Equal((nuint)0, str.Length);
 		Assert.Equal((nuint)0, (nuint)str.UTF16DataRaw);
 		Assert.Equal(string.Empty, str.ToString());
 	}
 	[Fact]
-	public void CreateFromByteSpan(){
-		using JSString str = new(TestStringUTF8);
+	public void CreateFromByteSpan()
+	{
+		using var str = JSString.CreateFromUTF8NullTerminated(TestStringUTF8);
 		Assert.Equal(TestString.Length, (int)str.Length);
 		Assert.NotEqual((nuint)Unsafe.AsPointer(ref MemoryMarshal.GetReference(TestStringUTF8)), (nuint)str.UTF16DataRaw);
 		Assert.Equal(TestString, str.ToString());
 		// TODO make sure utf8 equals
+		Assert.Throws<ArgumentException>("utf8", () => JSString.CreateFromUTF8NullTerminated(TestStringUTF8[..^1]));
 	}
 }

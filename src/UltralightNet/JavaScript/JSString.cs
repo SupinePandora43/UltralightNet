@@ -1,8 +1,6 @@
 // JSStringRef.h
 
-using System;
 using System.Diagnostics;
-using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using UltralightNet.JavaScript.Low;
@@ -76,24 +74,8 @@ namespace UltralightNet.JavaScript
 	}
 
 	[DebuggerDisplay("{ToString(),raw}")]
-	public unsafe sealed class JSString : JSNativeContainer<JSStringRef>, IEquatable<JSString>, ICloneable
+	public unsafe sealed class JSString : JSNativeContainer<JSStringRef>, IEquatable<JSString>, IEquatable<string>, ICloneable
 	{
-		private JSString() { }
-
-		public JSString(char* characters, nuint length) => JSHandle = JavaScriptMethods.JSStringCreateWithCharacters(characters, length);
-		public JSString(byte* utf8Bytes) => JSHandle = JavaScriptMethods.JSStringCreateWithUTF8CString(utf8Bytes);
-		public JSString(ReadOnlySpan<char> chars)
-		{
-			fixed (char* characters = chars)
-				JSHandle = JavaScriptMethods.JSStringCreateWithCharacters(characters, (nuint)chars.Length);
-		}
-		public JSString(ReadOnlySpan<byte> utf8)
-		{
-			if (utf8.Length is 0 || utf8[utf8.Length - 1] is not 0) throw new ArgumentException("UTF8 byte span must have null-terminator (\\0) at the end. (If you're sure what you're doing, use byte* overload instead.)", nameof(utf8));
-			fixed (byte* characters = utf8)
-				JSHandle = JavaScriptMethods.JSStringCreateWithUTF8CString(characters);
-		}
-
 		public JSString Clone()
 		{
 			JSString returnValue = FromHandle(JavaScriptMethods.JSStringRetain(JSHandle), true);
@@ -149,11 +131,6 @@ namespace UltralightNet.JavaScript
 			GC.KeepAlive(this);
 			return returnValue;
 		}
-		public override bool Equals(object? obj)
-		{
-			if (obj is string s) return Equals(s);
-			return obj is JSString jsString && Equals(jsString);
-		}
 		public bool Equals(string? other)
 		{
 			if (other is null) return false;
@@ -179,7 +156,7 @@ namespace UltralightNet.JavaScript
 		}
 		public bool Equals(ReadOnlySpan<byte> other) { fixed (byte* bytes = other) { return Equals(bytes); } }
 
-		public static implicit operator JSString(string? str) => new(string.IsNullOrEmpty(str) ? ReadOnlySpan<char>.Empty : str.AsSpan());
+		public static implicit operator JSString(string? str) => CreateFromUTF16(str);
 		public static explicit operator string(JSString str) => str.ToString();
 
 		public static JSString FromHandle(JSStringRef handle, bool dispose) => new() { JSHandle = handle, Owns = dispose };
@@ -189,5 +166,31 @@ namespace UltralightNet.JavaScript
 			if (!IsDisposed && Owns) JavaScriptMethods.JSStringRelease(JSHandle);
 			base.Dispose();
 		}
+
+		public static JSString CreateFromUTF16(char* characters, nuint length) => FromHandle(JavaScriptMethods.JSStringCreateWithCharacters(characters, length), true);
+		public static JSString CreateFromUTF16(ReadOnlySpan<char> chars)
+		{
+			fixed (char* characters = chars)
+				return FromHandle(JavaScriptMethods.JSStringCreateWithCharacters(characters, (nuint)chars.Length), true);
+		}
+		public static JSString CreateFromUTF16(string? @string)
+		{
+			// on average, 23 times faster than without cache
+			@string ??= string.Empty;
+			if (Cache.TryGetValue(@string, out var js)) return js;
+			js = CreateFromUTF16(@string.AsSpan());
+			Cache.Add(@string, js);
+			return js;
+		}
+
+		public static JSString CreateFromUTF8NullTerminated(byte* utf8Bytes) => FromHandle(JavaScriptMethods.JSStringCreateWithUTF8CString(utf8Bytes), true);
+		public static JSString CreateFromUTF8NullTerminated(ReadOnlySpan<byte> utf8)
+		{
+			if (utf8.Length is 0 || utf8[utf8.Length - 1] is not 0) throw new ArgumentException("UTF8 byte span must have null-terminator (\\0) at the end. (If you're sure what you're doing, use byte* overload instead.)", nameof(utf8));
+			fixed (byte* characters = utf8)
+				return CreateFromUTF8NullTerminated(characters);
+		}
+
+		static readonly ConditionalWeakTable<string, JSString> Cache = new();
 	}
 }
