@@ -1,4 +1,3 @@
-using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
@@ -106,7 +105,7 @@ public static unsafe class ULPlatform
 			}
 		}
 #if NET5_0_OR_GREATER
-		[UnmanagedCallersOnly(CallConvs = new Type[] { typeof(CallConvCdecl) })]
+		[UnmanagedCallersOnly(CallConvs = new[] { typeof(CallConvCdecl) })]
 		private static void LogMessage(ULLogLevel logLevel, ULString* message)
 		{
 			foreach (ReadOnlySpan<byte> line in new SpanEnumerator<byte>(message->ToSpan(), "\n"u8[0]))
