@@ -1,6 +1,4 @@
 using System.Collections.Generic;
-using System.Runtime.CompilerServices;
-using System.Runtime.InteropServices;
 using UltralightNet.JavaScript;
 
 namespace UltralightNet.Test;
@@ -39,9 +37,38 @@ public unsafe class JSStringTest
 	{
 		using var str = JSString.CreateFromUTF8NullTerminated(TestStringUTF8);
 		Assert.Equal(TestString.Length, (int)str.Length);
-		Assert.NotEqual((nuint)Unsafe.AsPointer(ref MemoryMarshal.GetReference(TestStringUTF8)), (nuint)str.UTF16DataRaw);
 		Assert.Equal(TestString, str.ToString());
-		// TODO make sure utf8 equals
+
+		Assert.True(str.EqualsNullTerminatedUTF8(TestStringUTF8));
+
+		Span<byte> bytes = stackalloc byte[(int)str.MaximumUTF8CStringSize];
+		Assert.True(bytes.Length >= TestStringUTF8.Length);
+		bytes.Fill(byte.MaxValue);
+		var written = str.GetUTF8(bytes);
+		Assert.Equal(TestStringUTF8.Length, (int)written);
+		bytes[(int)written] = 0;
+		bytes = bytes[..(int)written];
+		Assert.True(TestStringUTF8.SequenceEqual(bytes));
+
 		Assert.Throws<ArgumentException>("utf8", () => JSString.CreateFromUTF8NullTerminated(TestStringUTF8[..^1]));
+		Assert.Throws<ArgumentException>("utf8", () => JSString.CreateFromUTF8NullTerminated(ReadOnlySpan<byte>.Empty));
+	}
+
+	[Fact]
+	public void EqualityTests()
+	{
+		using var str = JSString.CreateFromUTF8NullTerminated(TestStringUTF8);
+		using var str2 = JSString.CreateFromUTF8NullTerminated(TestStringUTF8);
+		Assert.Equal(TestString, str.ToString());
+		Assert.True(str.Equals(TestString));
+		Assert.True(str.Equals(str));
+		Assert.True(str == str2);
+
+		Assert.False(str.Equals((string?)null));
+		Assert.False(str.Equals((JSString?)null));
+		Assert.True(str != null);
+
+		Assert.Throws<ArgumentException>("utf8", () => str.EqualsNullTerminatedUTF8(TestStringUTF8[..^1]));
+		Assert.Throws<ArgumentException>("utf8", () => str.EqualsNullTerminatedUTF8(ReadOnlySpan<byte>.Empty));
 	}
 }

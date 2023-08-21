@@ -139,7 +139,7 @@ namespace UltralightNet.JavaScript
 		public bool Equals(JSString? other)
 		{
 			if (other is null) return false;
-			var retVal = Equals((NativeContainer)other) || JavaScriptMethods.JSStringIsEqual(JSHandle, other.JSHandle);
+			var retVal = base.Equals(other) || JavaScriptMethods.JSStringIsEqual(JSHandle, other.JSHandle);
 			GC.KeepAlive(this);
 			return retVal;
 		}
@@ -158,7 +158,7 @@ namespace UltralightNet.JavaScript
 			fixed (byte* bytes = utf8) return EqualsNullTerminatedUTF8(bytes);
 		}
 
-		public static implicit operator JSString(string? str) => CreateFromUTF16Cached(str);
+		public static implicit operator JSString(string? str) => CreateFromUTF16(str.AsSpan());
 		public static explicit operator string(JSString str) => str.ToString();
 
 		public static JSString FromHandle(JSStringRef handle, bool dispose) => new() { JSHandle = handle, Owns = dispose };
@@ -175,7 +175,7 @@ namespace UltralightNet.JavaScript
 			fixed (char* characters = chars)
 				return FromHandle(JavaScriptMethods.JSStringCreateWithCharacters(characters, (nuint)chars.Length), true);
 		}
-		public static JSString CreateFromUTF16Cached(string? @string)
+		/*public static JSString CreateFromUTF16Cached(string? @string)
 		{
 			// on average, 23 times faster than without cache
 			@string ??= string.Empty;
@@ -183,7 +183,7 @@ namespace UltralightNet.JavaScript
 			js = CreateFromUTF16(@string.AsSpan());
 			Cache.Add(@string, js);
 			return js.Clone();
-		}
+		}*/
 
 		public static JSString CreateFromUTF8NullTerminated(byte* utf8Bytes) => FromHandle(JavaScriptMethods.JSStringCreateWithUTF8CString(utf8Bytes), true);
 		public static JSString CreateFromUTF8NullTerminated(ReadOnlySpan<byte> utf8)
@@ -193,6 +193,6 @@ namespace UltralightNet.JavaScript
 				return CreateFromUTF8NullTerminated(characters);
 		}
 
-		static readonly ConditionalWeakTable<string, JSString> Cache = new();
+		//static readonly ConditionalWeakTable<string, JSString> Cache = new();
 	}
 }
