@@ -2,6 +2,8 @@
 
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
+using UltralightNet.JavaScript.Low;
+using UltralightNet.LowStuff;
 
 namespace UltralightNet.JavaScript
 {
@@ -40,6 +42,17 @@ namespace UltralightNet.JavaScript
 
 			[LibraryImport(LibWebCore)]
 			public static partial void JSGarbageCollect(JSContextRef context);
+		}
+	}
+	namespace LowStuff
+	{
+		public abstract unsafe class JSNativeContainer<NativeHandle> : NativeContainer where NativeHandle : unmanaged
+		{
+			public NativeHandle JSHandle
+			{
+				get => JavaScriptMethods.BitCast<nuint, NativeHandle>((nuint)Handle);
+				protected init => Handle = (void*)JavaScriptMethods.BitCast<NativeHandle, nuint>(value);
+			}
 		}
 	}
 }

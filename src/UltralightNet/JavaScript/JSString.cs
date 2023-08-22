@@ -59,21 +59,12 @@ namespace UltralightNet.JavaScript
 			public static bool operator !=(JSStringRef left, JSStringRef right) => left._handle != right._handle;
 		}
 	}
-	namespace LowStuff
-	{
-		public abstract unsafe class JSNativeContainer<NativeHandle> : NativeContainer where NativeHandle : unmanaged
-		{
-			public NativeHandle JSHandle
-			{
-				get => JavaScriptMethods.BitCast<nuint, NativeHandle>((nuint)Handle);
-				protected init => Handle = (void*)JavaScriptMethods.BitCast<NativeHandle, nuint>(value);
-			}
-		}
-	}
 
 	[DebuggerDisplay("{ToString(),raw}")]
 	public unsafe sealed class JSString : JSNativeContainer<JSStringRef>, IEquatable<JSString>, IEquatable<string>, ICloneable
 	{
+		private JSString() { }
+
 		public JSString Clone()
 		{
 			JSString returnValue = FromHandle(JavaScriptMethods.JSStringRetain(JSHandle), true);

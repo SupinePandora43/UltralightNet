@@ -1,6 +1,8 @@
 // JSContextRef.h
 
 using System.Runtime.InteropServices;
+using UltralightNet.JavaScript.Low;
+using UltralightNet.JavaScript.LowStuff;
 
 namespace UltralightNet.JavaScript
 {
@@ -66,6 +68,7 @@ namespace UltralightNet.JavaScript
 			public static bool operator !=(JSGlobalContextRef left, JSGlobalContextRef right) => left._handle != right._handle;
 
 			public static implicit operator JSContextRef(JSGlobalContextRef globalContextRef) => JavaScriptMethods.BitCast<JSGlobalContextRef, JSContextRef>(globalContextRef);
+			public static explicit operator JSGlobalContextRef(JSContextRef contextRef) => JavaScriptMethods.BitCast<JSContextRef, JSGlobalContextRef>(contextRef);
 		}
 		public readonly struct JSContextRef
 		{
@@ -78,18 +81,41 @@ namespace UltralightNet.JavaScript
 			public static bool operator !=(JSContextRef left, JSContextRef right) => left._handle != right._handle;
 		}
 	}
-	/*public unsafe class JSContext : IDisposable
+
+	public unsafe sealed class JSContextGroup : JSNativeContainer<JSContextGroupRef>, ICloneable
 	{
-		public JSContext() { }
+		private JSContextGroup() { }
 
-		internal void* handle;
-		internal bool isGlobalContext = false;
-		private bool isDisposed = false;
-		private bool dispose = true;
+		public JSContextGroup Clone()
+		{
+			JSContextGroup returnValue = FromHandle(JavaScriptMethods.JSContextGroupRetain(JSHandle), true);
+			GC.KeepAlive(this);
+			return returnValue;
+		}
+		object ICloneable.Clone() => Clone();
 
-		public void* Handle => handle;
+		public JSGlobalContext CreateGlobalContext(JSNativeContainer<JSClassRef>? globalObject = null)
+		{
+			var handle = JavaScriptMethods.JSGlobalContextCreateInGroup(JSHandle, globalObject?.JSHandle ?? default);
+			GC.KeepAlive(this);
+			GC.KeepAlive(globalObject);
+			return JSGlobalContext.FromHandle(handle, true);
+		}
 
-		internal void OnLocked(void* actualHandle)
+		public static JSContextGroup FromHandle(JSContextGroupRef handle, bool dispose) => new() { JSHandle = handle, Owns = dispose };
+
+		public override void Dispose()
+		{
+			if (!IsDisposed && Owns) JavaScriptMethods.JSContextGroupRelease(JSHandle);
+			base.Dispose();
+		}
+	}
+
+	public unsafe class JSContext : JSNativeContainer<JSContextRef>
+	{
+		internal protected JSContext() { }
+
+		/*internal void OnLocked(void* actualHandle)
 		{
 			handle = actualHandle;
 		}
@@ -160,6 +186,63 @@ namespace UltralightNet.JavaScript
 				isDisposed = true;
 				GC.SuppressFinalize(this);
 			}
+		}*/
+
+		// TODO: GlobalObject
+		public JSContextGroup Group
+		{
+			get
+			{
+				var returnValue = JSContextGroup.FromHandle(JavaScriptMethods.JSContextGroupRetain(JavaScriptMethods.JSContextGetGroup(JSHandle)), true);
+				GC.KeepAlive(this);
+				return returnValue;
+			}
 		}
-	}*/
+		public JSGlobalContext GlobalContext
+		{
+			get
+			{
+				throw new NotSupportedException("Returned instance of view's locked context is invalid.");
+				var returnValue = JSGlobalContext.FromHandle(JavaScriptMethods.JSGlobalContextRetain(JavaScriptMethods.JSContextGetGlobalContext(JSHandle)), true);
+				GC.KeepAlive(this);
+				return returnValue;
+			}
+		}
+
+		public static JSContext FromHandle(JSContextRef handle, bool dispose) => new() { JSHandle = handle, Owns = dispose };
+	}
+	public unsafe sealed class JSGlobalContext : JSContext
+	{
+		private JSGlobalContext() { }
+
+		public new JSGlobalContextRef JSHandle
+		{
+			get => (JSGlobalContextRef)base.JSHandle;
+			private init => base.JSHandle = value;
+		}
+
+		public JSString Name
+		{
+			get
+			{
+				var returnValue = JSString.FromHandle(JavaScriptMethods.JSGlobalContextCopyName(JSHandle), true);
+				GC.KeepAlive(this);
+				return returnValue;
+			}
+			set
+			{
+				JavaScriptMethods.JSGlobalContextSetName(JSHandle, value.JSHandle);
+				GC.KeepAlive(this);
+				GC.KeepAlive(value);
+			}
+		}
+
+		public static JSGlobalContext FromHandle(JSGlobalContextRef handle, bool dispose) => new() { JSHandle = handle, Owns = dispose };
+
+		public override void Dispose()
+		{
+			if (!IsDisposed && Owns) JavaScriptMethods.JSGlobalContextRelease(JSHandle);
+			base.Dispose();
+		}
+	}
 }
