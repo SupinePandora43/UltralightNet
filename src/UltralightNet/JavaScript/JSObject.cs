@@ -59,7 +59,7 @@ namespace UltralightNet.JavaScript
 
 			[LibraryImport(LibWebCore)]
 			[return: MarshalAs(UnmanagedType.U1)]
-			public static partial bool JSObjectHasProperty(JSClassRef jsClass, JSObjectRef jsObject, JSStringRef propertyName);
+			public static partial bool JSObjectHasProperty(JSContextRef ctx, JSObjectRef jsObject, JSStringRef propertyName);
 
 			[LibraryImport(LibWebCore)]
 			public static partial JSValueRef JSObjectGetProperty(JSContextRef ctx, JSObjectRef jsObject, JSStringRef propertyName, JSValueRef* exception = null);
@@ -140,7 +140,8 @@ namespace UltralightNet.JavaScript
 			public static bool operator ==(JSObjectRef left, JSObjectRef right) => left._handle == right._handle;
 			public static bool operator !=(JSObjectRef left, JSObjectRef right) => left._handle != right._handle;
 
-			public static implicit operator JSValueRef(JSObjectRef @object) => JavaScriptMethods.BitCast<JSObjectRef, JSValueRef>(@object);
+			public static implicit operator JSValueRef(JSObjectRef jsObject) => JavaScriptMethods.BitCast<JSObjectRef, JSValueRef>(jsObject);
+			public static explicit operator JSObjectRef(JSValueRef jsValue) => JavaScriptMethods.BitCast<JSValueRef, JSObjectRef>(jsValue);
 		}
 		public readonly struct JSClassRef
 		{
@@ -173,20 +174,20 @@ namespace UltralightNet.JavaScript
 			public static bool operator !=(JSPropertyNameAccumulatorRef left, JSPropertyNameAccumulatorRef right) => left._handle != right._handle;
 		}
 
-		[Flags]
-		public enum JSPropertyAttributes : uint
-		{
-			None = 0,
-			ReadOnly = 1 << 1,
-			DontEnum = 1 << 2,
-			DontDelete = 1 << 3
-		}
-		[Flags]
-		public enum JSClassAttributes : uint
-		{
-			None = 0,
-			NoAutomaticPrototype = 1 << 1
-		}
+	}
+	[Flags]
+	public enum JSPropertyAttributes : uint
+	{
+		None = 0,
+		ReadOnly = 1 << 1,
+		DontEnum = 1 << 2,
+		DontDelete = 1 << 3
+	}
+	[Flags]
+	public enum JSClassAttributes : uint
+	{
+		None = 0,
+		NoAutomaticPrototype = 1 << 1
 	}
 	/*
 	public unsafe class JSObject : JSValue

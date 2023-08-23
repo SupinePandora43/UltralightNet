@@ -1,6 +1,7 @@
 // JSValueRef.h
 
 using System.Runtime.InteropServices;
+using UltralightNet.JavaScript.Low;
 
 namespace UltralightNet.JavaScript
 {
@@ -120,31 +121,30 @@ namespace UltralightNet.JavaScript
 			public static bool operator ==(JSValueRef left, JSValueRef right) => left._handle == right._handle;
 			public static bool operator !=(JSValueRef left, JSValueRef right) => left._handle != right._handle;
 		}
-
-		public enum JSType : int
-		{
-			Undefined,
-			Null,
-			Boolean,
-			Number,
-			String,
-			Object,
-			Symbol
-		}
-		public enum JSTypedArrayType : int
-		{
-			Int8Array,
-			Int16Array,
-			Int32Array,
-			Uint8Array,
-			Uint8ClampedArray,
-			Uint16Array,
-			Uint32Array,
-			Float32Array,
-			Float64Array,
-			ArrayBuffer,
-			None
-		}
+	}
+	public enum JSType : int
+	{
+		Undefined,
+		Null,
+		Boolean,
+		Number,
+		String,
+		Object,
+		Symbol
+	}
+	public enum JSTypedArrayType : int
+	{
+		Int8Array,
+		Int16Array,
+		Int32Array,
+		Uint8Array,
+		Uint8ClampedArray,
+		Uint16Array,
+		Uint32Array,
+		Float32Array,
+		Float64Array,
+		ArrayBuffer,
+		None
 	}
 	/*
 

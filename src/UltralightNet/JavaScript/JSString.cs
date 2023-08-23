@@ -185,5 +185,7 @@ namespace UltralightNet.JavaScript
 		}
 
 		//static readonly ConditionalWeakTable<string, JSString> Cache = new();
+
+		public override int GetHashCode() => unchecked((int)Length);
 	}
 }
