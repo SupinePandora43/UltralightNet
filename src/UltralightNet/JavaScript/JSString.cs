@@ -1,11 +1,9 @@
 // JSStringRef.h
 
 using System.Diagnostics;
-using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using UltralightNet.JavaScript.Low;
 using UltralightNet.JavaScript.LowStuff;
-using UltralightNet.LowStuff;
 
 namespace UltralightNet.JavaScript
 {
@@ -187,5 +185,10 @@ namespace UltralightNet.JavaScript
 		//static readonly ConditionalWeakTable<string, JSString> Cache = new();
 
 		public override int GetHashCode() => unchecked((int)Length);
+		public override bool Equals(object? other){
+			if(other is JSString js) return Equals(js);
+			if(other is string str) return Equals(str);
+			return false;
+		}
 	}
 }
