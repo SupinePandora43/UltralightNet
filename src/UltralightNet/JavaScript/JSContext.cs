@@ -102,6 +102,7 @@ namespace UltralightNet.JavaScript
 			return JSGlobalContext.FromHandle(handle, true);
 		}
 
+		public static JSContextGroup Create() => new() { JSHandle = JavaScriptMethods.JSContextGroupCreate() };
 		public static JSContextGroup FromHandle(JSContextGroupRef handle, bool dispose) => new() { JSHandle = handle, Owns = dispose };
 
 		public override void Dispose()
@@ -188,7 +189,7 @@ namespace UltralightNet.JavaScript
 			}
 		}*/
 
-		// TODO: GlobalObject
+		public JSObjectRef GlobalObject => JavaScriptMethods.JSContextGetGlobalObject(JSHandle); // TODO retain it.
 		public JSContextGroup Group
 		{
 			get
@@ -202,7 +203,6 @@ namespace UltralightNet.JavaScript
 		{
 			get
 			{
-				throw new NotSupportedException("Returned instance of view's locked context is invalid.");
 				var returnValue = JSGlobalContext.FromHandle(JavaScriptMethods.JSGlobalContextRetain(JavaScriptMethods.JSContextGetGlobalContext(JSHandle)), true);
 				GC.KeepAlive(this);
 				return returnValue;

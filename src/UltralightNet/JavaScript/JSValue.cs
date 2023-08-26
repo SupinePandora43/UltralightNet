@@ -1,7 +1,6 @@
 // JSValueRef.h
 
 using System.Runtime.InteropServices;
-using UltralightNet.JavaScript.Low;
 
 namespace UltralightNet.JavaScript
 {

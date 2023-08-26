@@ -6,11 +6,12 @@ public unsafe struct JSClassDefinition
 {
 	public int version;
 	public JSClassAttributes attributes;
+
 	public byte* className;
-	public void* parentJsClass;
+	public JSClassRef parentJsClass;
+
 	public void* staticValues;
 	public void* staticFunctions;
-
 	public void* initialize;
 	public void* finalize;
 	public void* hasProperty;

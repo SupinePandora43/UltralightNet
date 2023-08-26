@@ -10,23 +10,23 @@ namespace UltralightNet.JavaScript
 		{
 			[LibraryImport(LibWebCore)]
 			[return: MarshalAs(UnmanagedType.U1)]
-			public static partial bool JSObjectSetPrivateProperty(JSContextRef ctx, JSObjectRef @object, JSStringRef propertyName, JSValueRef value);
+			public static partial bool JSObjectSetPrivateProperty(JSContextRef ctx, JSObjectRef jsObject, JSStringRef propertyName, JSValueRef value);
 
 			[LibraryImport(LibWebCore)]
-			public static partial JSValueRef JSObjectGetPrivateProperty(JSContextRef ctx, JSObjectRef @object, JSStringRef propertyName);
+			public static partial JSValueRef JSObjectGetPrivateProperty(JSContextRef ctx, JSObjectRef jsObject, JSStringRef propertyName);
 
 			[LibraryImport(LibWebCore)]
 			[return: MarshalAs(UnmanagedType.U1)]
-			public static partial bool JSObjectDeletePrivateProperty(JSContextRef ctx, JSObjectRef @object, JSStringRef propertyName);
+			public static partial bool JSObjectDeletePrivateProperty(JSContextRef ctx, JSObjectRef jsObject, JSStringRef propertyName);
 
 			/// <summary>
 			/// TODO: may not work
 			/// </summary>
 			[LibraryImport(LibWebCore)]
-			public static partial JSObjectRef JSObjectGetProxyTarget(JSObjectRef @object);
+			public static partial JSObjectRef JSObjectGetProxyTarget(JSObjectRef jsObject);
 
 			[LibraryImport(LibWebCore)]
-			public static partial JSGlobalContextRef JSObjectGetGlobalContext(JSObjectRef @object);
+			public static partial JSGlobalContextRef JSObjectGetGlobalContext(JSObjectRef jsObject);
 		}
 	}
 }
