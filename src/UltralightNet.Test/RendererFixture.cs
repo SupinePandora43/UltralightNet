@@ -1,7 +1,8 @@
-using System;
+global using System;
+global using Xunit;
+
 using System.IO;
 using UltralightNet.AppCore;
-using Xunit;
 
 namespace UltralightNet.Test;
 

@@ -1,13 +1,13 @@
-using System;
-using System.Collections.Generic;
+global using System;
+global using System.Collections.Generic;
+global using BenchmarkDotNet.Attributes;
+global using UltralightNet;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
-using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Configs;
 using BenchmarkDotNet.Environments;
 using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Running;
-using UltralightNet;
 
 namespace Benchmarks;
 
@@ -24,7 +24,8 @@ public class Program
 {
 	static void Main()
 	{
-		BenchmarkRunner.Run<SimdBenchmark>();
+		//BenchmarkRunner.Run<SimdBenchmark>();
+		BenchmarkRunner.Run<JSStringBenchmark>();
 		//BenchmarkRunner.Run<StringBenchmark>();
 		//BenchmarkSwitcher.FromAssembly(typeof(Program).Assembly).Run(null, new DebugInProcessConfig());
 	}
