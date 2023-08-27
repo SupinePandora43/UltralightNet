@@ -1,6 +1,7 @@
 // JSValueRef.h
 
 using System.Runtime.InteropServices;
+using UltralightNet.JavaScript.LowLevel;
 
 namespace UltralightNet.JavaScript
 {
@@ -110,7 +111,7 @@ namespace UltralightNet.JavaScript
 			public static partial void JSValueUnprotect(JSContextRef context, JSValueRef jsValue);
 		}
 
-		public readonly struct JSValueRef
+		public readonly struct JSValueRef : IValueRef
 		{
 			private readonly nuint _handle;
 			public JSValueRef() => JavaScriptMethods.ThrowUnsupportedConstructor();
@@ -119,6 +120,22 @@ namespace UltralightNet.JavaScript
 
 			public static bool operator ==(JSValueRef left, JSValueRef right) => left._handle == right._handle;
 			public static bool operator !=(JSValueRef left, JSValueRef right) => left._handle != right._handle;
+		}
+
+		unsafe partial class Crazy
+		{
+			public static JSString? ToString(this (JSContextRef ctx, JSValueRef jsValue) pair)
+			{
+				var handle = JavaScriptMethods.JSValueToStringCopy(pair.ctx, pair.jsValue);
+				return handle != default ? JSString.FromHandle(handle, true) : null;
+			}
+		}
+	}
+	namespace LowLevel
+	{
+		public interface IValueRef
+		{
+
 		}
 	}
 	public enum JSType : int

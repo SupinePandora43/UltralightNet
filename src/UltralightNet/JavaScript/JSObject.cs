@@ -162,6 +162,12 @@ namespace UltralightNet.JavaScript
 
 			public static bool operator ==(JSPropertyNameArrayRef left, JSPropertyNameArrayRef right) => left._handle == right._handle;
 			public static bool operator !=(JSPropertyNameArrayRef left, JSPropertyNameArrayRef right) => left._handle != right._handle;
+
+			public readonly nuint Count => JavaScriptMethods.JSPropertyNameArrayGetCount(this);
+			public readonly JSString this[nuint index]
+			{
+				get => JSString.FromHandle(JavaScriptMethods.JSStringRetain(JavaScriptMethods.JSPropertyNameArrayGetNameAtIndex(this, index)), true);
+			}
 		}
 		public readonly struct JSPropertyNameAccumulatorRef
 		{
@@ -172,6 +178,12 @@ namespace UltralightNet.JavaScript
 
 			public static bool operator ==(JSPropertyNameAccumulatorRef left, JSPropertyNameAccumulatorRef right) => left._handle == right._handle;
 			public static bool operator !=(JSPropertyNameAccumulatorRef left, JSPropertyNameAccumulatorRef right) => left._handle != right._handle;
+
+			public readonly void AddName(JSString str)
+			{
+				JavaScriptMethods.JSPropertyNameAccumulatorAddName(this, str.JSHandle);
+				GC.KeepAlive(str);
+			}
 		}
 
 	}

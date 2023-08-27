@@ -28,5 +28,23 @@ namespace UltralightNet.JavaScript
 			[LibraryImport(LibWebCore)]
 			public static partial JSGlobalContextRef JSObjectGetGlobalContext(JSObjectRef jsObject);
 		}
+		unsafe partial class Crazy
+		{
+			public static bool TrySetPrivateProperty(this (JSContextRef ctx, JSObjectRef jsObject) pair, JSString propertyName, JSValueRef value){
+				var returnValue = 	JavaScriptMethods.JSObjectSetPrivateProperty(pair.ctx, pair.jsObject, propertyName.JSHandle, value);
+				GC.KeepAlive(propertyName);
+				return returnValue;
+			}
+			public static JSValueRef GetPrivateProperty(this (JSContextRef ctx, JSObjectRef jsObject) pair, JSString propertyName){
+				var returnValue = 	JavaScriptMethods.JSObjectGetPrivateProperty(pair.ctx, pair.jsObject, propertyName.JSHandle);
+				GC.KeepAlive(propertyName);
+				return returnValue;
+			}
+			public static bool TryDeletePrivateProperty(this (JSContextRef ctx, JSObjectRef jsObject) pair, JSString propertyName){
+				var returnValue = 	JavaScriptMethods.JSObjectDeletePrivateProperty(pair.ctx, pair.jsObject, propertyName.JSHandle);
+				GC.KeepAlive(propertyName);
+				return returnValue;
+			}
+		}
 	}
 }

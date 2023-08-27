@@ -39,6 +39,7 @@ namespace UltralightNet.JavaScript
 			[LibraryImport(LibWebCore)]
 			public static partial void JSGarbageCollect(JSContextRef context);
 		}
+		public static unsafe partial class Crazy { }
 	}
 	namespace LowStuff
 	{
@@ -49,6 +50,13 @@ namespace UltralightNet.JavaScript
 				get => JavaScriptMethods.BitCast<nuint, NativeHandle>((nuint)Handle);
 				protected init => Handle = (void*)JavaScriptMethods.BitCast<NativeHandle, nuint>(value);
 			}
+		}
+	}
+
+	public class JavaScriptException : Exception
+	{
+		public JavaScriptException(JSContextRef ctx, JSValueRef jsValue) : base((ctx, jsValue).ToString())
+		{
 		}
 	}
 }
