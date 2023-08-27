@@ -3,6 +3,7 @@ using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Runtime.InteropServices.Marshalling;
 using UltralightNet.Callbacks;
+using UltralightNet.JavaScript.Low;
 using UltralightNet.LowStuff;
 
 namespace UltralightNet;
@@ -64,7 +65,7 @@ public static unsafe partial class Methods
 
 	//todo: JavaScriptCore bindings
 	[LibraryImport(LibUltralight)]
-	public static partial void* ulViewLockJSContext(View view);
+	public static partial JSContextRef ulViewLockJSContext(View view);
 
 	[LibraryImport(LibUltralight)]
 	public static partial void ulViewUnlockJSContext(View view);
@@ -262,6 +263,9 @@ public sealed unsafe class View : NativeContainer
 
 	public void Resize(in uint width, in uint height) => Methods.ulViewResize(this, width, height);
 
+	public JSContextRef LockJSContext() => Methods.ulViewLockJSContext(this);
+	public void UnlockJSContext() => Methods.ulViewUnlockJSContext(this);
+
 	/*public ref readonly JSContext LockJSContext()
 	{
 		void* contextHandle = Methods.ulViewLockJSContext(this);
@@ -339,17 +343,17 @@ public sealed unsafe class View : NativeContainer
 		Methods.ulViewSetUpdateHistoryCallback(this, &NativeOnUpdateHistory, data);
 	}
 
-	[UnmanagedCallersOnly(CallConvs = new Type[] { typeof(CallConvCdecl) })]
+	[UnmanagedCallersOnly(CallConvs = new[] { typeof(CallConvCdecl) })]
 	static void NativeOnChangeTitle(nuint userData, void* caller, ULString* title) => GetView(userData, caller).OnChangeTitle?.Invoke(title->ToString());
-	[UnmanagedCallersOnly(CallConvs = new Type[] { typeof(CallConvCdecl) })]
+	[UnmanagedCallersOnly(CallConvs = new[] { typeof(CallConvCdecl) })]
 	static void NativeOnChangeURL(nuint userData, void* caller, ULString* url) => GetView(userData, caller).OnChangeURL?.Invoke(url->ToString());
-	[UnmanagedCallersOnly(CallConvs = new Type[] { typeof(CallConvCdecl) })]
+	[UnmanagedCallersOnly(CallConvs = new[] { typeof(CallConvCdecl) })]
 	static void NativeOnChangeTooltip(nuint userData, void* caller, ULString* tooltip) => GetView(userData, caller).OnChangeTooltip?.Invoke(tooltip->ToString());
-	[UnmanagedCallersOnly(CallConvs = new Type[] { typeof(CallConvCdecl) })]
+	[UnmanagedCallersOnly(CallConvs = new[] { typeof(CallConvCdecl) })]
 	static void NativeOnChangeCursor(nuint userData, void* caller, ULCursor cursor) => GetView(userData, caller).OnChangeCursor?.Invoke(cursor);
-	[UnmanagedCallersOnly(CallConvs = new Type[] { typeof(CallConvCdecl) })]
+	[UnmanagedCallersOnly(CallConvs = new[] { typeof(CallConvCdecl) })]
 	static void NativeOnAddConsoleMessage(nuint userData, void* caller, ULMessageSource source, ULMessageLevel level, ULString* message, uint lineNumber, uint columnNumber, ULString* sourceId) => GetView(userData, caller).OnAddConsoleMessage?.Invoke(source, level, message->ToString(), lineNumber, columnNumber, sourceId->ToString());
-	[UnmanagedCallersOnly(CallConvs = new Type[] { typeof(CallConvCdecl) })]
+	[UnmanagedCallersOnly(CallConvs = new[] { typeof(CallConvCdecl) })]
 	static void* NativeOnCreateChildView(nuint userData, void* caller, ULString* openerUrl, ULString* targetUrl, byte isPopup, ULIntRect popupRect)
 	{
 #if DEBUG
@@ -359,7 +363,7 @@ public sealed unsafe class View : NativeContainer
 		return view is null ? null : view.Handle;
 #endif
 	}
-	[UnmanagedCallersOnly(CallConvs = new Type[] { typeof(CallConvCdecl) })]
+	[UnmanagedCallersOnly(CallConvs = new[] { typeof(CallConvCdecl) })]
 	static void* NativeOnCreateInspectorView(nuint userData, void* caller, byte isLocal, ULString* inspectedUrl)
 	{
 #if DEBUG
@@ -369,17 +373,17 @@ public sealed unsafe class View : NativeContainer
 		return view is null ? null : view.Handle;
 #endif
 	}
-	[UnmanagedCallersOnly(CallConvs = new Type[] { typeof(CallConvCdecl) })]
+	[UnmanagedCallersOnly(CallConvs = new[] { typeof(CallConvCdecl) })]
 	static void NativeOnBeginLoading(nuint userData, void* caller, ulong frameId, byte isMainFrame, ULString* url) => GetView(userData, caller).OnBeginLoading?.Invoke(frameId, isMainFrame != 0, url->ToString());
-	[UnmanagedCallersOnly(CallConvs = new Type[] { typeof(CallConvCdecl) })]
+	[UnmanagedCallersOnly(CallConvs = new[] { typeof(CallConvCdecl) })]
 	static void NativeOnFinishLoading(nuint userData, void* caller, ulong frameId, byte isMainFrame, ULString* url) => GetView(userData, caller).OnFinishLoading?.Invoke(frameId, isMainFrame != 0, url->ToString());
-	[UnmanagedCallersOnly(CallConvs = new Type[] { typeof(CallConvCdecl) })]
+	[UnmanagedCallersOnly(CallConvs = new[] { typeof(CallConvCdecl) })]
 	static void NativeOnFailLoading(nuint userData, void* caller, ulong frameId, byte isMainFrame, ULString* url, ULString* description, ULString* errorDomain, int errorCode) => GetView(userData, caller).OnFailLoading?.Invoke(frameId, isMainFrame != 0, url->ToString(), description->ToString(), errorDomain->ToString(), errorCode);
-	[UnmanagedCallersOnly(CallConvs = new Type[] { typeof(CallConvCdecl) })]
+	[UnmanagedCallersOnly(CallConvs = new[] { typeof(CallConvCdecl) })]
 	static void NativeOnWindowObjectReady(nuint userData, void* caller, ulong frameId, byte isMainFrame, ULString* url) => GetView(userData, caller).OnWindowObjectReady?.Invoke(frameId, isMainFrame != 0, url->ToString());
-	[UnmanagedCallersOnly(CallConvs = new Type[] { typeof(CallConvCdecl) })]
+	[UnmanagedCallersOnly(CallConvs = new[] { typeof(CallConvCdecl) })]
 	static void NativeOnDOMReady(nuint userData, void* caller, ulong frameId, byte isMainFrame, ULString* url) => GetView(userData, caller).OnDOMReady?.Invoke(frameId, isMainFrame != 0, url->ToString());
-	[UnmanagedCallersOnly(CallConvs = new Type[] { typeof(CallConvCdecl) })]
+	[UnmanagedCallersOnly(CallConvs = new[] { typeof(CallConvCdecl) })]
 	static void NativeOnUpdateHistory(nuint userData, void* caller) => GetView(userData, caller).OnUpdateHistory?.Invoke();
 
 

@@ -9,7 +9,7 @@
 		<PackageReference Include="BenchmarkDotNet" Version="0.13.0" />
 
 		<PackageReference Include="UltralightNet.Binaries" Version="$(UltralightVersion)" />
-		<PackageReference Include="UltralightNet.AppCore" Version="$(Version)" />
+		<PackageReference Include="UltralightNet.AppCore.Binaries" Version="$(UltralightVersion)" />
 
 		<ProjectReference Include="..\UltralightNet\UltralightNet.csproj" />
 		<ProjectReference Include="..\UltralightNet.AppCore\UltralightNet.AppCore.csproj" />

@@ -1,47 +1,74 @@
 using System.Collections.Generic;
-using Xunit;
+using UltralightNet.JavaScript;
 
 namespace UltralightNet.Test;
-/*
+
+[Trait("Category", "JS")]
 public unsafe class JSStringTest
 {
-	public static IEnumerable<object[]> GetTestStrings()
+	const string TestString = "лорум ипсум, что-то там...";
+	static ReadOnlySpan<byte> TestStringUTF8 => "лорум ипсум, что-то там...\0"u8;
+	public static IEnumerable<object[]> InvalidStrings()
 	{
-		yield return new object[] { (JSString)"TEST" };
-		yield return new object[] { (JSString)"ТЕСТ" };
-		yield return new object[] { (JSString)"" };
+		yield return new object[] { "" };
+		yield return new object[] { null! };
 	}
 
-	[Theory]
-	[MemberData(nameof(GetTestStrings))]
-	public void Clone(JSString s)
+	[Fact]
+	public void CreateFromCharSpan()
 	{
-		string m = (string)s;
-		var r = s.Clone();
-		Assert.Equal(s, r);
-		Assert.Equal(m, (string)r);
-		Assert.True(JSString.ReferenceEquals(s, r));
-		s.Dispose();
-		Assert.Equal(m, (string)r);
-		r.Dispose();
+		using var str = JSString.CreateFromUTF16(TestString.AsSpan());
+		Assert.Equal(TestString.Length, (int)str.Length);
+		Assert.NotEqual((nuint)0, (nuint)str.UTF16DataRaw);
+		Assert.True(TestString.AsSpan().SequenceEqual(str.UTF16Data));
+		Assert.Equal(TestString, str.ToString());
+	}
+	[Theory]
+	[MemberData(nameof(InvalidStrings))]
+	public void CreateFromEmptyCharSpan(string? testString)
+	{
+		using var str = JSString.CreateFromUTF16(testString.AsSpan());
+		Assert.Equal((nuint)0, str.Length);
+		Assert.Equal((nuint)0, (nuint)str.UTF16DataRaw);
+		Assert.Equal(string.Empty, str.ToString());
+	}
+	[Fact]
+	public void CreateFromByteSpan()
+	{
+		using var str = JSString.CreateFromUTF8NullTerminated(TestStringUTF8);
+		Assert.Equal(TestString.Length, (int)str.Length);
+		Assert.Equal(TestString, str.ToString());
+
+		Assert.True(str.EqualsNullTerminatedUTF8(TestStringUTF8));
+
+		Span<byte> bytes = stackalloc byte[(int)str.MaximumUTF8CStringSize];
+		Assert.True(bytes.Length >= TestStringUTF8.Length);
+		bytes.Fill(byte.MaxValue);
+		var written = str.GetUTF8(bytes);
+		Assert.Equal(TestStringUTF8.Length, (int)written);
+		bytes[(int)written] = 0;
+		bytes = bytes[..(int)written];
+		Assert.True(TestStringUTF8.SequenceEqual(bytes));
+
+		Assert.Throws<ArgumentException>("utf8", () => JSString.CreateFromUTF8NullTerminated(TestStringUTF8[..^1]));
+		Assert.Throws<ArgumentException>("utf8", () => JSString.CreateFromUTF8NullTerminated(ReadOnlySpan<byte>.Empty));
 	}
 
-	[Theory]
-	[MemberData(nameof(GetTestStrings))]
-	public void Equality(JSString s1)
+	[Fact]
+	public void EqualityTests()
 	{
-		JSString s2 = new((string)s1);
-		Assert.True(s1.Equals(s2));
-		Assert.True(s1.Equals((object)s2));
-		Assert.True(s1 == s2);
-		Assert.False(s1 != s2);
-		Assert.False(s1 == null);
-		Assert.False(s1!.Equals((JSString?)null));
-		Assert.False(s1!.Equals((object?)null));
-		Assert.Equal(s1, s2);
-		Assert.Equal((object)s1!, (object)s2);
-		Assert.False(JSString.ReferenceEquals(s1!, s2));
-		Assert.False(s1 == null);
+		using var str = JSString.CreateFromUTF8NullTerminated(TestStringUTF8);
+		using var str2 = JSString.CreateFromUTF8NullTerminated(TestStringUTF8);
+		Assert.Equal(TestString, str.ToString());
+		Assert.True(str.Equals(TestString));
+		Assert.True(str.Equals(str));
+		Assert.True(str == str2);
+
+		Assert.False(str.Equals((string?)null));
+		Assert.False(str.Equals((JSString?)null));
+		Assert.True(str != null);
+
+		Assert.Throws<ArgumentException>("utf8", () => str.EqualsNullTerminatedUTF8(TestStringUTF8[..^1]));
+		Assert.Throws<ArgumentException>("utf8", () => str.EqualsNullTerminatedUTF8(ReadOnlySpan<byte>.Empty));
 	}
 }
-*/

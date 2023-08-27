@@ -1,7 +1,5 @@
-using System;
 using System.Diagnostics;
 using System.Threading;
-using Xunit;
 
 namespace UltralightNet.Test;
 

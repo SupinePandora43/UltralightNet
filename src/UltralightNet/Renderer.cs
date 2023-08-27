@@ -1,5 +1,4 @@
 using System.Collections.Generic;
-using System.Diagnostics.CodeAnalysis;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Runtime.InteropServices.Marshalling;
@@ -41,13 +40,13 @@ public static unsafe partial class Methods
 	internal static partial void ulSetGamepadDetails(Renderer renderer, uint index, [MarshalUsing(typeof(ULString))] string id, uint axisCount, uint buttonCount);
 
 	[LibraryImport(LibUltralight)]
-	internal static partial void ulFireGamepadEvent(Renderer renderer, GamepadEvent gamepadEvent);
+	internal static partial void ulFireGamepadEvent(Renderer renderer, GamepadEvent* gamepadEvent);
 
 	[LibraryImport(LibUltralight)]
-	internal static partial void ulFireGamepadAxisEvent(Renderer renderer, GamepadAxisEvent gamepadAxisEvent);
+	internal static partial void ulFireGamepadAxisEvent(Renderer renderer, GamepadAxisEvent* gamepadAxisEvent);
 
 	[LibraryImport(LibUltralight)]
-	internal static partial void ulFireGamepadButtonEvent(Renderer renderer, GamepadButtonEvent gamepadButtonEvent);
+	internal static partial void ulFireGamepadButtonEvent(Renderer renderer, GamepadButtonEvent* gamepadButtonEvent);
 }
 
 [NativeMarshalling(typeof(Marshaller))]
@@ -80,10 +79,9 @@ public sealed unsafe class Renderer : NativeContainer
 		{
 			throw new Exception("No ULPlatform.GPUDriver set, but ULViewConfig.IsAccelerated was set to true. (Disable check by setting ULPlatform.ErrorGPUDriverNotSet to false.)");
 		}
-		void* viewHandle;
-		var view = View.FromHandle(viewHandle = Methods.ulCreateView(this, width, height, viewConfig.Value, session ?? DefaultSession), dispose);
+		var view = View.FromHandle(Methods.ulCreateView(this, width, height, viewConfig.Value, session ?? DefaultSession), dispose);
 		view.Renderer = this;
-		views[(nuint)viewHandle] = new WeakReference<View>(view);
+		views[view.GetUserData()] = new WeakReference<View>(view);
 		view.SetUpCallbacks();
 		return view;
 	}
@@ -104,9 +102,9 @@ public sealed unsafe class Renderer : NativeContainer
 	public bool TryStartRemoteInspectorServer(string address, ushort port) => Methods.ulStartRemoteInspectorServer(this, address, port);
 
 	public void SetGamepadDetails(uint index, string id, uint axisCount, uint buttonCount) => Methods.ulSetGamepadDetails(this, index, id, axisCount, buttonCount);
-	public void FireGamepadEvent(GamepadEvent gamepadEvent) => Methods.ulFireGamepadEvent(this, gamepadEvent);
-	public void FireGamepadAxisEvent(GamepadAxisEvent gamepadAxisEvent) => Methods.ulFireGamepadAxisEvent(this, gamepadAxisEvent);
-	public void FireGamepadButtonEvent(GamepadButtonEvent gamepadbuttonEvent) => Methods.ulFireGamepadButtonEvent(this, gamepadbuttonEvent);
+	public void FireGamepadEvent(GamepadEvent gamepadEvent) => Methods.ulFireGamepadEvent(this, &gamepadEvent);
+	public void FireGamepadAxisEvent(GamepadAxisEvent gamepadAxisEvent) => Methods.ulFireGamepadAxisEvent(this, &gamepadAxisEvent);
+	public void FireGamepadButtonEvent(GamepadButtonEvent gamepadbuttonEvent) => Methods.ulFireGamepadButtonEvent(this, &gamepadbuttonEvent);
 
 	public override void Dispose()
 	{

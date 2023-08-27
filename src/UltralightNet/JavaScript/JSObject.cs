@@ -1,136 +1,195 @@
-using System;
+// JSObjectRef.h
+
 using System.Runtime.InteropServices;
 
-namespace UltralightNet
+namespace UltralightNet.JavaScript
 {
-	unsafe partial class JavaScriptMethods
+	namespace Low
 	{
-		[DllImport("WebCore")]
-		public static extern void* JSClassCreate(JSClassDefinition* jsClassDefinition);
+		unsafe partial class JavaScriptMethods
+		{
+			[LibraryImport(LibWebCore)]
+			public static partial JSClassRef JSClassCreate(in JSClassDefinition jsClassDefinition);
 
-		[DllImport("WebCore")]
-		public static extern void* JSClassRetain(void* jsClass);
+			[LibraryImport(LibWebCore)]
+			public static partial JSClassRef JSClassRetain(JSClassRef jsClass);
 
-		[DllImport("WebCore")]
-		public static extern void JSClassRelease(void* jsClass);
+			[LibraryImport(LibWebCore)]
+			public static partial void JSClassRelease(JSClassRef jsClass);
 
-		[DllImport("WebCore")]
-		public static extern void* JSClassGetPrivate(void* jsClass);
+			[LibraryImport(LibWebCore)]
+			public static partial nint JSClassGetPrivate(JSClassRef jsClass);
 
-		[GeneratedDllImport("WebCore")]
-		[return: MarshalAs(UnmanagedType.I1)]
-		public static partial bool JSClassSetPrivate(void* jsClass, void* data);
+			[LibraryImport(LibWebCore)]
+			[return: MarshalAs(UnmanagedType.U1)]
+			public static partial bool JSClassSetPrivate(JSClassRef jsClass, nint data);
 
-		[DllImport("WebCore")]
-		public static extern void* JSObjectMake(void* context, void* jsClass, void* data);
+			[LibraryImport(LibWebCore)]
+			public static partial JSObjectRef JSObjectMake(JSContextRef ctx, JSClassRef jsClass, nint privateData);
 
-		[DllImport("WebCore")]
-		public static extern void* JSObjectMakeFunctionWithCallback(void* context, void* name, delegate* unmanaged[Cdecl]<void*, void*, void*, nuint, void**, void**, void*> func);
+			[LibraryImport(LibWebCore)]
+			public static partial JSObjectRef JSObjectMakeFunctionWithCallback(JSContextRef ctx, JSStringRef name, delegate* unmanaged[Cdecl]<JSContextRef /*ctx*/, JSObjectRef /*function*/, JSObjectRef /*thisObject*/, nuint /*argumentCount*/, JSValueRef* /*arguments[]*/, JSValueRef* /*exception*/, JSValueRef> func);
 
-		[DllImport("WebCore")]
-		public static extern void* JSObjectMakeConstructor(void* context, void* jsClass, delegate* unmanaged[Cdecl]<void*, void*, nuint, void**, void**, void*> func);
+			[LibraryImport(LibWebCore)]
+			public static partial JSObjectRef JSObjectMakeConstructor(JSContextRef ctx, JSClassRef jsClass, delegate* unmanaged[Cdecl]<JSContextRef /*ctx*/, JSObjectRef /*constructor*/, nuint /*argumentCount*/, JSValueRef* /*arguments[]*/, JSValueRef* /*exception*/, JSObjectRef> func);
 
-		[DllImport("WebCore")]
-		public static extern void* JSObjectMakeArray(void* context, nuint argumentCount, void** arguments, void** exception);
+			[LibraryImport(LibWebCore)]
+			public static partial JSObjectRef JSObjectMakeArray(JSContextRef ctx, nuint argumentCount, JSValueRef* arguments, JSValueRef* exception = null);
 
-		[DllImport("WebCore")]
-		public static extern void* JSObjectMakeDate(void* context, nuint argumentCount, void** arguments, void** exception);
+			[LibraryImport(LibWebCore)]
+			public static partial JSObjectRef JSObjectMakeDate(JSContextRef ctx, nuint argumentCount, JSValueRef* arguments, JSValueRef* exception = null);
 
-		[DllImport("WebCore")]
-		public static extern void* JSObjectMakeError(void* context, nuint argumentCount, void** arguments, void** exception);
+			[LibraryImport(LibWebCore)]
+			public static partial JSObjectRef JSObjectMakeError(JSContextRef ctx, nuint argumentCount, JSValueRef* arguments, JSValueRef* exception = null);
 
-		[DllImport("WebCore")]
-		public static extern void* JSObjectMakeRegExp(void* context, nuint argumentCount, void** arguments, void** exception);
+			[LibraryImport(LibWebCore)]
+			public static partial JSObjectRef JSObjectMakeRegExp(JSContextRef ctx, nuint argumentCount, JSValueRef* arguments, JSValueRef* exception = null);
 
-		[DllImport("WebCore")]
-		public static extern void* JSObjectMakeDeferredPromise(void* context, void** resolve, void** reject, void** exception);
+			[LibraryImport(LibWebCore)]
+			public static partial JSObjectRef JSObjectMakeDeferredPromise(JSContextRef ctx, JSObjectRef* resolve, JSObjectRef* reject, JSValueRef* exception = null);
 
-		[DllImport("WebCore")]
-		public static extern void* JSObjectMakeFunction(void* context, void* name, uint parameterCount, void** parameterNames, void* body, void* sourceURL, int startingLineNumber, void** exception);
+			[LibraryImport(LibWebCore)]
+			public static partial JSObjectRef JSObjectMakeFunction(JSContextRef ctx, JSStringRef name, uint parameterCount, JSStringRef* parameterNames, JSStringRef body, JSStringRef sourceURL, int startingLineNumber, JSValueRef* exception = null);
 
-		[DllImport("WebCore")]
-		public static extern void* JSObjectGetPrototype(void* context, void* jsObject);
+			[LibraryImport(LibWebCore)]
+			public static partial JSValueRef JSObjectGetPrototype(JSContextRef ctx, JSObjectRef jsObject);
 
-		[DllImport("WebCore")]
-		public static extern void JSObjectSetPrototype(void* context, void* jsObject, void* jsValue);
+			[LibraryImport(LibWebCore)]
+			public static partial void JSObjectSetPrototype(JSContextRef ctx, JSObjectRef jsObject, JSValueRef jsValue);
 
-		[GeneratedDllImport("WebCore")]
-		[return: MarshalAs(UnmanagedType.I1)]
-		public static partial bool JSObjectHasProperty(void* jsClass, void* jsObject, void* propertyName);
+			[LibraryImport(LibWebCore)]
+			[return: MarshalAs(UnmanagedType.U1)]
+			public static partial bool JSObjectHasProperty(JSContextRef ctx, JSObjectRef jsObject, JSStringRef propertyName);
 
-		[DllImport("WebCore")]
-		public static extern void* JSObjectGetProperty(void* context, void* jsObject, void* propertyName, void** exception);
+			[LibraryImport(LibWebCore)]
+			public static partial JSValueRef JSObjectGetProperty(JSContextRef ctx, JSObjectRef jsObject, JSStringRef propertyName, JSValueRef* exception = null);
 
-		[DllImport("WebCore")]
-		public static extern void JSObjectSetProperty(void* context, void* jsObject, void* propertyName, void* value, JSPropertyAttributes attributes = JSPropertyAttributes.None, void** exception = null);
+			[LibraryImport(LibWebCore)]
+			public static partial void JSObjectSetProperty(JSContextRef ctx, JSObjectRef jsObject, JSStringRef propertyName, JSValueRef value, JSPropertyAttributes attributes = JSPropertyAttributes.None, JSValueRef* exception = null);
 
-		[GeneratedDllImport("WebCore")]
-		[return: MarshalAs(UnmanagedType.I1)]
-		public static partial bool JSObjectDeleteProperty(void* context, void* jsObject, void* propertyName, void** exception);
+			[LibraryImport(LibWebCore)]
+			[return: MarshalAs(UnmanagedType.U1)]
+			public static partial bool JSObjectDeleteProperty(JSContextRef ctx, JSObjectRef jsObject, JSStringRef propertyName, JSValueRef* exception = null);
 
-		[GeneratedDllImport("WebCore")]
-		[return: MarshalAs(UnmanagedType.I1)]
-		public static partial bool JSObjectHasPropertyForKey(void* context, void* jsObject, void* propertyKey, void** exception);
+			[LibraryImport(LibWebCore)]
+			[return: MarshalAs(UnmanagedType.U1)]
+			public static partial bool JSObjectHasPropertyForKey(JSContextRef ctx, JSObjectRef jsObject, JSValueRef propertyKey, JSValueRef* exception = null);
 
-		[DllImport("WebCore")]
-		public static extern void* JSObjectGetPropertyForKey(void* context, void* jsObject, void* propertyKey, void** exception);
+			[LibraryImport(LibWebCore)]
+			public static partial JSValueRef JSObjectGetPropertyForKey(JSContextRef ctx, JSObjectRef jsObject, JSValueRef propertyKey, JSValueRef* exception = null);
 
-		[DllImport("WebCore")]
-		public static extern void JSObjectSetPropertyForKey(void* context, void* jsObject, void* propertyKey, void* value, JSPropertyAttributes attributes = JSPropertyAttributes.None, void** exception = null);
+			[LibraryImport(LibWebCore)]
+			public static partial void JSObjectSetPropertyForKey(JSContextRef ctx, JSObjectRef jsObject, JSValueRef propertyKey, JSValueRef value, JSPropertyAttributes attributes = JSPropertyAttributes.None, JSValueRef* exception = null);
 
-		[GeneratedDllImport("WebCore")]
-		[return: MarshalAs(UnmanagedType.I1)]
-		public static partial bool JSObjectDeletePropertyForKey(void* context, void* jsObject, void* propertyKey, void** exception);
+			[LibraryImport(LibWebCore)]
+			[return: MarshalAs(UnmanagedType.U1)]
+			public static partial bool JSObjectDeletePropertyForKey(JSContextRef ctx, JSObjectRef jsObject, JSValueRef propertyKey, JSValueRef* exception = null);
 
-		[DllImport("WebCore")]
-		public static extern void* JSObjectGetPropertyAtIndex(void* context, void* jsObject, uint propertyIndex, void** exception);
+			[LibraryImport(LibWebCore)]
+			public static partial JSValueRef JSObjectGetPropertyAtIndex(JSContextRef ctx, JSObjectRef jsObject, uint propertyIndex, JSValueRef* exception = null);
 
-		[DllImport("WebCore")]
-		public static extern void JSObjectSetPropertyAtIndex(void* context, void* jsObject, uint propertyIndex, void* value, void** exception = null);
+			[LibraryImport(LibWebCore)]
+			public static partial void JSObjectSetPropertyAtIndex(JSContextRef ctx, JSObjectRef jsObject, uint propertyIndex, JSValueRef value, JSValueRef* exception = null);
 
-		[DllImport("WebCore")]
-		public static extern void* JSObjectGetPrivate(void* jsObject);
+			[LibraryImport(LibWebCore)]
+			public static partial nint JSObjectGetPrivate(JSObjectRef jsObject);
 
-		[GeneratedDllImport("WebCore")]
-		[return: MarshalAs(UnmanagedType.I1)]
-		public static partial bool JSObjectSetPrivate(void* jsObject, void* data);
+			[LibraryImport(LibWebCore)]
+			[return: MarshalAs(UnmanagedType.U1)]
+			public static partial bool JSObjectSetPrivate(JSObjectRef jsObject, nint data);
 
-		[GeneratedDllImport("WebCore")]
-		[return: MarshalAs(UnmanagedType.I1)]
-		public static partial bool JSObjectIsFunction(void* context, void* jsObject);
+			[LibraryImport(LibWebCore)]
+			[return: MarshalAs(UnmanagedType.U1)]
+			public static partial bool JSObjectIsFunction(JSContextRef ctx, JSObjectRef jsObject);
 
-		[DllImport("WebCore")]
-		public static extern void* JSObjectCallAsFunction(void* context, void* jsObject, void* thisObject, nuint argumentCount, void** arguments, void** exception);
+			[LibraryImport(LibWebCore)]
+			public static partial JSValueRef JSObjectCallAsFunction(JSContextRef ctx, JSObjectRef jsObject, JSObjectRef thisObject, nuint argumentCount, JSValueRef* arguments, JSValueRef* exception = null);
 
-		[GeneratedDllImport("WebCore")]
-		[return: MarshalAs(UnmanagedType.I1)]
-		public static partial bool JSObjectIsConstructor(void* context, void* jsObject);
+			[LibraryImport(LibWebCore)]
+			[return: MarshalAs(UnmanagedType.U1)]
+			public static partial bool JSObjectIsConstructor(JSContextRef ctx, JSObjectRef jsObject);
 
-		[DllImport("WebCore")]
-		public static extern void* JSObjectCallAsConstructor(void* context, void* jsObject, nuint argumentCount, void** arguments, void** exception);
+			[LibraryImport(LibWebCore)]
+			public static partial JSObjectRef JSObjectCallAsConstructor(JSContextRef ctx, JSObjectRef jsObject, nuint argumentCount, JSValueRef* arguments, JSValueRef* exception = null);
 
-		[DllImport("WebCore")]
-		public static extern JSPropertyNameArray* JSObjectCopyPropertyNames(void* context, void* jsObject);
+			[LibraryImport(LibWebCore)]
+			public static partial JSPropertyNameArrayRef JSObjectCopyPropertyNames(JSContextRef ctx, JSObjectRef jsObject);
 
-		[DllImport("WebCore")]
-		public static extern JSPropertyNameArray* JSPropertyNameArrayRetain(JSPropertyNameArray* array);
+			[LibraryImport(LibWebCore)]
+			public static partial JSPropertyNameArrayRef JSPropertyNameArrayRetain(JSPropertyNameArrayRef array);
 
-		[DllImport("WebCore")]
-		public static extern void JSPropertyNameArrayRelease(JSPropertyNameArray* array);
+			[LibraryImport(LibWebCore)]
+			public static partial void JSPropertyNameArrayRelease(JSPropertyNameArrayRef array);
 
-		[DllImport("WebCore")]
-		public static extern nuint JSPropertyNameArrayGetCount(JSPropertyNameArray* array);
+			[LibraryImport(LibWebCore)]
+			public static partial nuint JSPropertyNameArrayGetCount(JSPropertyNameArrayRef array);
 
-		[DllImport("WebCore")]
-		public static extern void* JSPropertyNameArrayGetNameAtIndex(JSPropertyNameArray* array, nuint index);
+			[LibraryImport(LibWebCore)]
+			public static partial JSStringRef JSPropertyNameArrayGetNameAtIndex(JSPropertyNameArrayRef array, nuint index);
 
-		[DllImport("WebCore")]
-		public static extern void JSPropertyNameAccumulatorAddName(JSPropertyNameAccumulator* accumulator, void* propertyName);
+			[LibraryImport(LibWebCore)]
+			public static partial void JSPropertyNameAccumulatorAddName(JSPropertyNameAccumulatorRef accumulator, JSStringRef propertyName);
+		}
+		public readonly struct JSObjectRef
+		{
+			private readonly nuint _handle;
+			public JSObjectRef() => JavaScriptMethods.ThrowUnsupportedConstructor();
+			public override int GetHashCode() => throw JavaScriptMethods.UnsupportedMethodException;
+			public override bool Equals(object? o) => throw JavaScriptMethods.UnsupportedMethodException;
+
+			public static bool operator ==(JSObjectRef left, JSObjectRef right) => left._handle == right._handle;
+			public static bool operator !=(JSObjectRef left, JSObjectRef right) => left._handle != right._handle;
+
+			public static implicit operator JSValueRef(JSObjectRef jsObject) => JavaScriptMethods.BitCast<JSObjectRef, JSValueRef>(jsObject);
+			public static explicit operator JSObjectRef(JSValueRef jsValue) => JavaScriptMethods.BitCast<JSValueRef, JSObjectRef>(jsValue);
+		}
+		public readonly struct JSClassRef
+		{
+			private readonly nuint _handle;
+			public JSClassRef() => JavaScriptMethods.ThrowUnsupportedConstructor();
+			public override int GetHashCode() => throw JavaScriptMethods.UnsupportedMethodException;
+			public override bool Equals(object? o) => throw JavaScriptMethods.UnsupportedMethodException;
+
+			public static bool operator ==(JSClassRef left, JSClassRef right) => left._handle == right._handle;
+			public static bool operator !=(JSClassRef left, JSClassRef right) => left._handle != right._handle;
+		}
+		public readonly struct JSPropertyNameArrayRef
+		{
+			private readonly nuint _handle;
+			public JSPropertyNameArrayRef() => JavaScriptMethods.ThrowUnsupportedConstructor();
+			public override int GetHashCode() => throw JavaScriptMethods.UnsupportedMethodException;
+			public override bool Equals(object? o) => throw JavaScriptMethods.UnsupportedMethodException;
+
+			public static bool operator ==(JSPropertyNameArrayRef left, JSPropertyNameArrayRef right) => left._handle == right._handle;
+			public static bool operator !=(JSPropertyNameArrayRef left, JSPropertyNameArrayRef right) => left._handle != right._handle;
+		}
+		public readonly struct JSPropertyNameAccumulatorRef
+		{
+			private readonly nuint _handle;
+			public JSPropertyNameAccumulatorRef() => JavaScriptMethods.ThrowUnsupportedConstructor();
+			public override int GetHashCode() => throw JavaScriptMethods.UnsupportedMethodException;
+			public override bool Equals(object? o) => throw JavaScriptMethods.UnsupportedMethodException;
+
+			public static bool operator ==(JSPropertyNameAccumulatorRef left, JSPropertyNameAccumulatorRef right) => left._handle == right._handle;
+			public static bool operator !=(JSPropertyNameAccumulatorRef left, JSPropertyNameAccumulatorRef right) => left._handle != right._handle;
+		}
+
 	}
-	public readonly ref struct JSObjectN
+	[Flags]
+	public enum JSPropertyAttributes : uint
 	{
-		public JSObjectN() => JavaScriptMethods.ThrowUnsupportedConstructor();
+		None = 0,
+		ReadOnly = 1 << 1,
+		DontEnum = 1 << 2,
+		DontDelete = 1 << 3
 	}
+	[Flags]
+	public enum JSClassAttributes : uint
+	{
+		None = 0,
+		NoAutomaticPrototype = 1 << 1
+	}
+	/*
 	public unsafe class JSObject : JSValue
 	{
 		public JSObject(void* context, void* handle) : base(context, handle) { }
@@ -177,6 +236,5 @@ namespace UltralightNet
 		{
 			return new((object)(nint)func);
 		}
-	}
-
+	}*/
 }

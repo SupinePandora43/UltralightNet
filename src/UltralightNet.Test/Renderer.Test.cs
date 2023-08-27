@@ -1,5 +1,4 @@
-using System;
-using Xunit;
+using System.Collections.Generic;
 
 namespace UltralightNet.Test;
 
@@ -13,7 +12,7 @@ public sealed class RendererTest
 	[Fact]
 	public void SessionTest()
 	{
-		using var session = Renderer.DefaultSession;
+		var session = Renderer.DefaultSession;
 		Assert.Equal("default", session.Name);
 		Assert.Equal(OperatingSystem.IsWindows() ? "default" : "/default", session.DiskPath);
 
@@ -26,6 +25,11 @@ public sealed class RendererTest
 		Assert.True(session2.IsPersistent);
 
 		Assert.True(session.Id != session1.Id && session1.Id != session2.Id);
+
+		Assert.NotEqual(session, session1);
+		Assert.Equal(session1, session1);
+
+		Assert.Throws<NotSupportedException>(() => new Dictionary<Session, object>(1) { [session] = new() });
 	}
 
 	[Fact]
@@ -39,5 +43,11 @@ public sealed class RendererTest
 		Renderer.LogMemoryUsage();
 		Renderer.PurgeMemory();
 		Renderer.LogMemoryUsage();
+	}
+
+	[Fact]
+	public void GPUDriverNotSet()
+	{
+		Assert.Throws<Exception>(() => Renderer.CreateView(128, 128, new() { IsAccelerated = true }));
 	}
 }

@@ -40,8 +40,8 @@
 	</PropertyGroup>
 
 	<ItemGroup>
-		<PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0" PrivateAssets="All" />
+		<PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0" PrivateAssets="All" Condition="$(Configuration)==Release" />
 
-		<None Include="$(MSBuildThisFileDirectory)/README.md" Pack="true" PackagePath="README.md"/>
+		<None Include="$(MSBuildThisFileDirectory)/README.md" Pack="true" PackagePath="README.md" Condition="$(Configuration)==Release"/>
 	</ItemGroup>
 </Project>

@@ -1,69 +1,122 @@
-using System;
+// JSContextRef.h
+
 using System.Runtime.InteropServices;
+using UltralightNet.JavaScript.Low;
+using UltralightNet.JavaScript.LowStuff;
 
-namespace UltralightNet
+namespace UltralightNet.JavaScript
 {
-
-	[System.Diagnostics.CodeAnalysis.SuppressMessage("Style", "IDE1006:Naming Styles", Justification = "<Pending>")]
-	[System.Diagnostics.CodeAnalysis.SuppressMessage("Interoperability", "CA1401:P/Invokes should not be visible", Justification = "<Pending>")]
-	public static unsafe partial class JavaScriptMethods
+	namespace Low
 	{
-		static JavaScriptMethods() => Methods.Preload();
+		unsafe partial class JavaScriptMethods
+		{
+			[LibraryImport(LibWebCore)]
+			public static partial JSContextGroupRef JSContextGroupCreate();
 
-		[DllImport("WebCore")]
-		public static extern void* JSContextGroupCreate();
+			[LibraryImport(LibWebCore)]
+			public static partial JSContextGroupRef JSContextGroupRetain(JSContextGroupRef contextGroup);
 
-		[DllImport("WebCore")]
-		public static extern void* JSContextGroupRetain(void* contextGroup);
+			[LibraryImport(LibWebCore)]
+			public static partial void JSContextGroupRelease(JSContextGroupRef contextGroup);
 
-		[DllImport("WebCore")]
-		public static extern void JSContextGroupRelease(void* contextGroup);
+			[LibraryImport(LibWebCore)]
+			public static partial JSGlobalContextRef JSGlobalContextCreate(JSClassRef globalObjectClass = default);
 
-		[DllImport("WebCore")]
-		public static extern void* JSGlobalContextCreate(void* globalObjectClass);
+			[LibraryImport(LibWebCore)]
+			public static partial JSGlobalContextRef JSGlobalContextCreateInGroup(JSContextGroupRef contextGroup = default, JSClassRef globalObjectClass = default);
 
-		[DllImport("WebCore")]
-		public static extern void* JSGlobalContextCreateInGroup(void* contextGroup, void* globalObjectClass);
+			[LibraryImport(LibWebCore)]
+			public static partial JSGlobalContextRef JSGlobalContextRetain(JSGlobalContextRef globalContext);
 
-		[DllImport("WebCore")]
-		public static extern void* JSGlobalContextRetain(void* globalContext);
+			[LibraryImport(LibWebCore)]
+			public static partial void JSGlobalContextRelease(JSGlobalContextRef globalContext);
 
-		[DllImport("WebCore")]
-		public static extern void JSGlobalContextRelease(void* globalContext);
+			[LibraryImport(LibWebCore)]
+			public static partial JSObjectRef JSContextGetGlobalObject(JSContextRef context);
 
-		[DllImport("WebCore")]
-		public static extern void* JSContextGetGlobalObject(void* context);
+			[LibraryImport(LibWebCore)]
+			public static partial JSContextGroupRef JSContextGetGroup(JSContextRef context);
 
-		[DllImport("WebCore")]
-		public static extern void* JSContextGetGroup(void* context);
+			[LibraryImport(LibWebCore)]
+			public static partial JSGlobalContextRef JSContextGetGlobalContext(JSContextRef context);
 
-		[DllImport("WebCore")]
-		public static extern void* JSContextGetGlobalContext(void* context);
+			[LibraryImport(LibWebCore)]
+			public static partial JSStringRef JSGlobalContextCopyName(JSGlobalContextRef globalContext);
 
-		[DllImport("WebCore")]
-		public static extern void* JSGlobalContextCopyName(void* globalContext);
+			[LibraryImport(LibWebCore)]
+			public static partial void JSGlobalContextSetName(JSGlobalContextRef globalContext, JSStringRef name);
+		}
 
-		[DllImport("WebCore")]
-		public static extern void JSGlobalContextSetName(void* globalContext, void* name);
+		public readonly struct JSContextGroupRef
+		{
+			private readonly nuint _handle;
+			public JSContextGroupRef() => JavaScriptMethods.ThrowUnsupportedConstructor();
+			public override int GetHashCode() => throw JavaScriptMethods.UnsupportedMethodException;
+			public override bool Equals(object? o) => throw JavaScriptMethods.UnsupportedMethodException;
+
+			public static bool operator ==(JSContextGroupRef left, JSContextGroupRef right) => left._handle == right._handle;
+			public static bool operator !=(JSContextGroupRef left, JSContextGroupRef right) => left._handle != right._handle;
+		}
+		public readonly struct JSGlobalContextRef
+		{
+			private readonly nuint _handle;
+			public JSGlobalContextRef() => JavaScriptMethods.ThrowUnsupportedConstructor();
+			public override int GetHashCode() => throw JavaScriptMethods.UnsupportedMethodException;
+			public override bool Equals(object? o) => throw JavaScriptMethods.UnsupportedMethodException;
+
+			public static bool operator ==(JSGlobalContextRef left, JSGlobalContextRef right) => left._handle == right._handle;
+			public static bool operator !=(JSGlobalContextRef left, JSGlobalContextRef right) => left._handle != right._handle;
+
+			public static implicit operator JSContextRef(JSGlobalContextRef globalContextRef) => JavaScriptMethods.BitCast<JSGlobalContextRef, JSContextRef>(globalContextRef);
+			public static explicit operator JSGlobalContextRef(JSContextRef contextRef) => JavaScriptMethods.BitCast<JSContextRef, JSGlobalContextRef>(contextRef);
+		}
+		public readonly struct JSContextRef
+		{
+			private readonly nuint _handle;
+			public JSContextRef() => JavaScriptMethods.ThrowUnsupportedConstructor();
+			public override int GetHashCode() => throw JavaScriptMethods.UnsupportedMethodException;
+			public override bool Equals(object? o) => throw JavaScriptMethods.UnsupportedMethodException;
+
+			public static bool operator ==(JSContextRef left, JSContextRef right) => left._handle == right._handle;
+			public static bool operator !=(JSContextRef left, JSContextRef right) => left._handle != right._handle;
+		}
 	}
 
-	public readonly ref struct JSContextN
+	public unsafe sealed class JSContextGroup : JSNativeContainer<JSContextGroupRef>, ICloneable
 	{
-		public JSContextN() => JavaScriptMethods.ThrowUnsupportedConstructor();
+		private JSContextGroup() { }
+
+		public JSContextGroup Clone()
+		{
+			JSContextGroup returnValue = FromHandle(JavaScriptMethods.JSContextGroupRetain(JSHandle), true);
+			GC.KeepAlive(this);
+			return returnValue;
+		}
+		object ICloneable.Clone() => Clone();
+
+		public JSGlobalContext CreateGlobalContext(JSNativeContainer<JSClassRef>? globalObject = null)
+		{
+			var handle = JavaScriptMethods.JSGlobalContextCreateInGroup(JSHandle, globalObject?.JSHandle ?? default);
+			GC.KeepAlive(this);
+			GC.KeepAlive(globalObject);
+			return JSGlobalContext.FromHandle(handle, true);
+		}
+
+		public static JSContextGroup Create() => new() { JSHandle = JavaScriptMethods.JSContextGroupCreate() };
+		public static JSContextGroup FromHandle(JSContextGroupRef handle, bool dispose) => new() { JSHandle = handle, Owns = dispose };
+
+		public override void Dispose()
+		{
+			if (!IsDisposed && Owns) JavaScriptMethods.JSContextGroupRelease(JSHandle);
+			base.Dispose();
+		}
 	}
 
-	public unsafe class JSContext : IDisposable
+	public unsafe class JSContext : JSNativeContainer<JSContextRef>
 	{
-		public JSContext() { }
+		internal protected JSContext() { }
 
-		internal void* handle;
-		internal bool isGlobalContext = false;
-		private bool isDisposed = false;
-		private bool dispose = true;
-
-		public void* Handle => handle;
-
-		internal void OnLocked(void* actualHandle)
+		/*internal void OnLocked(void* actualHandle)
 		{
 			handle = actualHandle;
 		}
@@ -134,7 +187,62 @@ namespace UltralightNet
 				isDisposed = true;
 				GC.SuppressFinalize(this);
 			}
+		}*/
+
+		public JSObjectRef GlobalObject => JavaScriptMethods.JSContextGetGlobalObject(JSHandle); // TODO retain it.
+		public JSContextGroup Group
+		{
+			get
+			{
+				var returnValue = JSContextGroup.FromHandle(JavaScriptMethods.JSContextGroupRetain(JavaScriptMethods.JSContextGetGroup(JSHandle)), true);
+				GC.KeepAlive(this);
+				return returnValue;
+			}
+		}
+		public JSGlobalContext GlobalContext
+		{
+			get
+			{
+				var returnValue = JSGlobalContext.FromHandle(JavaScriptMethods.JSGlobalContextRetain(JavaScriptMethods.JSContextGetGlobalContext(JSHandle)), true);
+				GC.KeepAlive(this);
+				return returnValue;
+			}
+		}
+
+		public static JSContext FromHandle(JSContextRef handle, bool dispose) => new() { JSHandle = handle, Owns = dispose };
+	}
+	public unsafe sealed class JSGlobalContext : JSContext
+	{
+		private JSGlobalContext() { }
+
+		public new JSGlobalContextRef JSHandle
+		{
+			get => (JSGlobalContextRef)base.JSHandle;
+			private init => base.JSHandle = value;
+		}
+
+		public JSString Name
+		{
+			get
+			{
+				var returnValue = JSString.FromHandle(JavaScriptMethods.JSGlobalContextCopyName(JSHandle), true);
+				GC.KeepAlive(this);
+				return returnValue;
+			}
+			set
+			{
+				JavaScriptMethods.JSGlobalContextSetName(JSHandle, value.JSHandle);
+				GC.KeepAlive(this);
+				GC.KeepAlive(value);
+			}
+		}
+
+		public static JSGlobalContext FromHandle(JSGlobalContextRef handle, bool dispose) => new() { JSHandle = handle, Owns = dispose };
+
+		public override void Dispose()
+		{
+			if (!IsDisposed && Owns) JavaScriptMethods.JSGlobalContextRelease(JSHandle);
+			base.Dispose();
 		}
 	}
-
 }

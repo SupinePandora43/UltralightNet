@@ -1,5 +1,4 @@
 using UltralightNet;
-using Xunit;
 
 public class ULRectsTests
 {

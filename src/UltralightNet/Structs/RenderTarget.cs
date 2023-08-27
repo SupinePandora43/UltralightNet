@@ -1,8 +1,4 @@
-using System;
 using System.Runtime.CompilerServices;
-#if NETCOREAPP3_0_OR_GREATER
-using System.Runtime.Intrinsics;
-#endif
 
 namespace UltralightNet;
 
@@ -40,20 +36,15 @@ public struct RenderTarget : IEquatable<RenderTarget>
 
 	public readonly bool Equals(RenderTarget rt) =>
 		IsEmpty == rt.IsEmpty &&
-		TextureFormat == rt.TextureFormat &&
-#if NETCOREAPP3_0_OR_GREATER
-		Vector64.Create(TextureId, RenderBufferId).Equals(Vector64.Create(rt.TextureId, rt.RenderBufferId)) &&
-		Vector128.Create(Width, Height, TextureWidth, TextureHeight).Equals(Vector128.Create(rt.Width, rt.Height, rt.TextureWidth, rt.TextureHeight)) &&
-#else
-		TextureId == rt.TextureId &&
-		RenderBufferId == rt.RenderBufferId &&
 		Width == rt.Width &&
 		Height == rt.Height &&
+		TextureId == rt.TextureId &&
 		TextureWidth == rt.TextureWidth &&
 		TextureHeight == rt.TextureHeight &&
-#endif
-		UV == rt.UV;
-	public override readonly bool Equals(object? other) => other is RenderTarget rt ? Equals(rt) : false;
+		TextureFormat == rt.TextureFormat &&
+		UV == rt.UV &&
+		RenderBufferId == rt.RenderBufferId;
+	public override readonly bool Equals(object? other) => other is RenderTarget rt && Equals(rt);
 #if NETSTANDARD2_1 || NETCOREAPP2_1_OR_GREATER
 	public override readonly int GetHashCode() => HashCode.Combine(HashCode.Combine(IsEmpty, Width, Height, TextureId), HashCode.Combine(TextureWidth, TextureHeight, TextureFormat, UV), RenderBufferId);
 #endif

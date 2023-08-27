@@ -1,85 +1,71 @@
 // JSStringRef.h
 
-using System;
 using System.Diagnostics;
-using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
-using UltralightNet.LowStuff;
+using UltralightNet.JavaScript.Low;
+using UltralightNet.JavaScript.LowStuff;
 
-namespace UltralightNet
+namespace UltralightNet.JavaScript
 {
-	unsafe partial class JavaScriptMethods
+	namespace Low
 	{
-		[DllImport(LibWebCore)]
-		public static extern void* JSStringCreateWithCharacters(ushort* characters, nuint length);
+		unsafe partial class JavaScriptMethods
+		{
+			[LibraryImport(LibWebCore)]
+			public static partial JSStringRef JSStringCreateWithCharacters(char* characters, nuint length);
 
-		[DllImport(LibWebCore)]
-		public static extern void* JSStringCreateWithUTF8CString(byte* characters);
+			[LibraryImport(LibWebCore)]
+			public static partial JSStringRef JSStringCreateWithUTF8CString(byte* characters);
 
-		/// <summary>Increases ref count</summary>
-		[DllImport(LibWebCore)]
-		public static extern void* JSStringRetain(void* @string);
+			/// <summary>Increases ref count</summary>
+			[LibraryImport(LibWebCore)]
+			public static partial JSStringRef JSStringRetain(JSStringRef @string);
 
-		/// <summary>Decreases ref count</summary>
-		[DllImport(LibWebCore)]
-		public static extern void JSStringRelease(void* @string);
+			/// <summary>Decreases ref count</summary>
+			[LibraryImport(LibWebCore)]
+			public static partial void JSStringRelease(JSStringRef @string);
 
-		[DllImport(LibWebCore)]
-		public static extern nuint JSStringGetLength(void* @string);
+			[LibraryImport(LibWebCore)]
+			public static partial nuint JSStringGetLength(JSStringRef @string);
 
-		[DllImport(LibWebCore)]
-		public static extern ushort* JSStringGetCharactersPtr(void* @string);
+			[LibraryImport(LibWebCore)]
+			public static partial ushort* JSStringGetCharactersPtr(JSStringRef @string);
 
-		[DllImport(LibWebCore)]
-		public static extern nuint JSStringGetMaximumUTF8CStringSize(void* @string);
+			[LibraryImport(LibWebCore)]
+			public static partial nuint JSStringGetMaximumUTF8CStringSize(JSStringRef @string);
 
-		[DllImport(LibWebCore)]
-		public static extern nuint JSStringGetUTF8CString(void* @string, byte* buffer, nuint bufferSize);
+			[LibraryImport(LibWebCore)]
+			public static partial nuint JSStringGetUTF8CString(JSStringRef @string, byte* buffer, nuint bufferSize);
 
-		[GeneratedDllImport(LibWebCore)]
-		[return: MarshalAs(UnmanagedType.I1)]
-		public static partial bool JSStringIsEqual(void* a, void* b);
+			[LibraryImport(LibWebCore)]
+			[return: MarshalAs(UnmanagedType.U1)]
+			public static partial bool JSStringIsEqual(JSStringRef a, JSStringRef b);
 
-		[GeneratedDllImport(LibWebCore)]
-		[return: MarshalAs(UnmanagedType.I1)]
-		public static partial bool JSStringIsEqualToUTF8CString(void* str, byte* characters);
+			[LibraryImport(LibWebCore)]
+			[return: MarshalAs(UnmanagedType.U1)]
+			public static partial bool JSStringIsEqualToUTF8CString(JSStringRef str, byte* characters);
+		}
+
+		public readonly struct JSStringRef
+		{
+			private readonly nuint _handle;
+			public JSStringRef() => JavaScriptMethods.ThrowUnsupportedConstructor();
+			public override int GetHashCode() => throw JavaScriptMethods.UnsupportedMethodException;
+			public override bool Equals(object? o) => throw JavaScriptMethods.UnsupportedMethodException;
+
+			public static bool operator ==(JSStringRef left, JSStringRef right) => left._handle == right._handle;
+			public static bool operator !=(JSStringRef left, JSStringRef right) => left._handle != right._handle;
+		}
 	}
 
 	[DebuggerDisplay("{ToString(),raw}")]
-	public unsafe sealed class JSString : INativeContainer<JSString>, INativeContainerInterface<JSString>, IEquatable<JSString>, ICloneable
+	public unsafe sealed class JSString : JSNativeContainer<JSStringRef>, IEquatable<JSString>, IEquatable<string>, ICloneable
 	{
-		private readonly void* handle;
-		public void* Handle
-		{
-			get
-			{
-				static void Throw() => throw new ObjectDisposedException(nameof(JSString));
-				if (IsDisposed) Throw();
-				return handle;
-			}
-			init => handle = value;
-		}
-		private readonly bool dispose = true;
-		public bool IsDisposed { get; private set; } = false;
-
-		[Obsolete]
-		internal JSString(void* handle)
-		{
-			Handle = handle;
-		}
-		public JSString(void* handle, bool dispose) : this(handle) { this.dispose = dispose; }
-		public JSString(ushort* characters, nuint length) : this(JavaScriptMethods.JSStringCreateWithCharacters(characters, length)) { }
-		public JSString(byte* utf8Bytes) : this(JavaScriptMethods.JSStringCreateWithUTF8CString(utf8Bytes)) { }
-		public JSString(ReadOnlySpan<ushort> chars)
-		{
-			fixed (ushort* characters = chars)
-				handle = JavaScriptMethods.JSStringCreateWithCharacters(characters, (nuint)chars.Length);
-		}
-		public JSString(ReadOnlySpan<char> characters) : this(MemoryMarshal.Cast<char, ushort>(characters)) { }
+		private JSString() { }
 
 		public JSString Clone()
 		{
-			JSString returnValue = new(JavaScriptMethods.JSStringRetain(Handle));
+			JSString returnValue = FromHandle(JavaScriptMethods.JSStringRetain(JSHandle), true);
 			GC.KeepAlive(this);
 			return returnValue;
 		}
@@ -89,7 +75,7 @@ namespace UltralightNet
 		{
 			get
 			{
-				nuint returnValue = JavaScriptMethods.JSStringGetLength(Handle);
+				nuint returnValue = JavaScriptMethods.JSStringGetLength(JSHandle);
 				GC.KeepAlive(this);
 				return returnValue;
 			}
@@ -102,29 +88,29 @@ namespace UltralightNet
 		{
 			get
 			{
-				char* returnValue = (char*)JavaScriptMethods.JSStringGetCharactersPtr(Handle);
+				char* returnValue = (char*)JavaScriptMethods.JSStringGetCharactersPtr(JSHandle);
 				GC.KeepAlive(this);
 				return returnValue;
 			}
 		}
-		// do not implement GetPinnableReference because there are UTF16DataRaw
+		// do not implement GetPinnableReference because there is UTF16DataRaw
 
 		public nuint MaximumUTF8CStringSize
 		{
 			get
 			{
-				nuint returnValue = JavaScriptMethods.JSStringGetMaximumUTF8CStringSize(Handle);
+				nuint returnValue = JavaScriptMethods.JSStringGetMaximumUTF8CStringSize(JSHandle);
 				GC.KeepAlive(this);
 				return returnValue;
 			}
 		}
 		public nuint GetUTF8(byte* buffer, nuint bufferSize)
 		{
-			nuint returnValue = JavaScriptMethods.JSStringGetUTF8CString(Handle, buffer, bufferSize);
+			nuint returnValue = JavaScriptMethods.JSStringGetUTF8CString(JSHandle, buffer, bufferSize);
 			GC.KeepAlive(this);
 			return returnValue;
 		}
-		public nuint GetUTF8(Span<byte> buffer) { fixed (byte* bufferPtr = buffer) { return GetUTF8(bufferPtr, (nuint)buffer.Length); } }
+		public nuint GetUTF8(Span<byte> buffer) { fixed (byte* bufferPtr = buffer) { return GetUTF8(bufferPtr, checked((nuint)buffer.Length)); } }
 
 		public override string ToString()
 		{
@@ -132,54 +118,77 @@ namespace UltralightNet
 			GC.KeepAlive(this);
 			return returnValue;
 		}
-		public override bool Equals(object? obj)
+		public bool Equals(string? other)
 		{
-			if (obj is string s) return Equals(new JSString(s.AsSpan()));
-			if (obj is not JSString) return false;
-			return Equals((JSString)obj);
+			if (other is null) return false;
+			var retVal = UTF16Data.SequenceEqual(other.AsSpan());
+			GC.KeepAlive(this);
+			return retVal;
 		}
 		public bool Equals(JSString? other)
 		{
 			if (other is null) return false;
-			if (ReferenceEquals(this, other)) return true;
-			return JavaScriptMethods.JSStringIsEqual(Handle, other.Handle);
+			var retVal = base.Equals(other) || JavaScriptMethods.JSStringIsEqual(JSHandle, other.JSHandle);
+			GC.KeepAlive(this);
+			return retVal;
 		}
-		public static bool operator ==(JSString? left, JSString? right) => left is null ? right is null : left.Equals(right);
+		public static bool operator ==(JSString? left, JSString? right) => left is not null ? left.Equals(right) : right is null;
 		public static bool operator !=(JSString? left, JSString? right) => !(left == right);
 
-		public static bool ReferenceEquals(JSString s1, JSString s2) => s1 is null ? s2 is null : s1.Handle == s2.Handle;
-
-#if NETSTANDARD2_1 || NETCOREAPP2_1_OR_GREATER
-		public override int GetHashCode() => HashCode.Combine((nint)handle, dispose, IsDisposed);
-#else
-		public override int GetHashCode() => unchecked((int)((nuint)handle ^ (Unsafe.As<bool, byte>(ref Unsafe.AsRef(dispose)))));
-#endif
-
-		public bool Equals(byte* other)
+		public bool EqualsNullTerminatedUTF8(byte* utf8)
 		{
-			bool returnValue = JavaScriptMethods.JSStringIsEqualToUTF8CString(Handle, other);
+			bool returnValue = JavaScriptMethods.JSStringIsEqualToUTF8CString(JSHandle, utf8);
 			GC.KeepAlive(this);
 			return returnValue;
 		}
-		public bool Equals(ReadOnlySpan<byte> other) { fixed (byte* bytes = other) { return Equals(bytes); } }
+		public bool EqualsNullTerminatedUTF8(ReadOnlySpan<byte> utf8)
+		{
+			if (utf8.Length is 0 || utf8[utf8.Length - 1] is not 0) throw new ArgumentException("UTF8 byte span must have null-terminator (\\0) at the end. (If you're sure what you're doing, use byte* overload instead.)", nameof(utf8));
+			fixed (byte* bytes = utf8) return EqualsNullTerminatedUTF8(bytes);
+		}
 
-		public static implicit operator JSString(string? str) => new(string.IsNullOrEmpty(str) ? ReadOnlySpan<char>.Empty : str.AsSpan());
+		public static implicit operator JSString(string? str) => CreateFromUTF16(str.AsSpan());
 		public static explicit operator string(JSString str) => str.ToString();
 
-		public static JSString FromHandle(Handle<JSString> handle, bool dispose) => new((void*)handle, dispose);
+		public static JSString FromHandle(JSStringRef handle, bool dispose) => new() { JSHandle = handle, Owns = dispose };
 
 		public override void Dispose()
 		{
-			if (IsDisposed) return;
+			if (!IsDisposed && Owns) JavaScriptMethods.JSStringRelease(JSHandle);
+			base.Dispose();
+		}
 
-			if (dispose)
-			{
-				JavaScriptMethods.JSStringRelease(handle);
-			}
+		public static JSString CreateFromUTF16(char* chars, nuint length) => FromHandle(JavaScriptMethods.JSStringCreateWithCharacters(chars, length), true);
+		public static JSString CreateFromUTF16(ReadOnlySpan<char> chars)
+		{
+			fixed (char* characters = chars)
+				return FromHandle(JavaScriptMethods.JSStringCreateWithCharacters(characters, (nuint)chars.Length), true);
+		}
+		/*public static JSString CreateFromUTF16Cached(string? @string)
+		{
+			// on average, 23 times faster than without cache
+			@string ??= string.Empty;
+			if (Cache.TryGetValue(@string, out var js)) return js.Clone();
+			js = CreateFromUTF16(@string.AsSpan());
+			Cache.Add(@string, js);
+			return js.Clone();
+		}*/
 
-			IsDisposed = true;
-			GC.SuppressFinalize(this);
+		public static JSString CreateFromUTF8NullTerminated(byte* utf8Bytes) => FromHandle(JavaScriptMethods.JSStringCreateWithUTF8CString(utf8Bytes), true);
+		public static JSString CreateFromUTF8NullTerminated(ReadOnlySpan<byte> utf8)
+		{
+			if (utf8.Length is 0 || utf8[utf8.Length - 1] is not 0) throw new ArgumentException("UTF8 byte span must have null-terminator (\\0) at the end. (If you're sure what you're doing, use byte* overload instead.)", nameof(utf8));
+			fixed (byte* characters = utf8)
+				return CreateFromUTF8NullTerminated(characters);
+		}
+
+		//static readonly ConditionalWeakTable<string, JSString> Cache = new();
+
+		public override int GetHashCode() => unchecked((int)Length);
+		public override bool Equals(object? other){
+			if(other is JSString js) return Equals(js);
+			if(other is string str) return Equals(str);
+			return false;
 		}
 	}
-
 }
