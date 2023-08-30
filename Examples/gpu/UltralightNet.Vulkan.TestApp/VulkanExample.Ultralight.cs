@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Runtime.InteropServices;
 using Silk.NET.Vulkan;
 using UltralightNet.Platform;
 using Buffer = Silk.NET.Vulkan.Buffer;
@@ -62,7 +63,11 @@ unsafe partial class Application : ISurfaceDefinition // this may cause problems
 		vk.MapMemory(device, surfaces[(int)id].memory, 0, surfaces[(int)id].size, 0, (void**)&data).Check();
 		return data;
 	}
-	void ISurfaceDefinition.UnlockPixels(nint id) => vk.UnmapMemory(device, surfaces[(int)id].memory);
+	void ISurfaceDefinition.UnlockPixels(nint id){
+		ref var entry = ref CollectionsMarshal.AsSpan(surfaces)[(int)id];
+		vk.UnmapMemory(device, entry.memory);
+		entry.dirty = true;
+	}
 
 	void ISurfaceDefinition.Resize(nint id, uint width, uint height)
 	{
@@ -76,5 +81,6 @@ unsafe partial class Application : ISurfaceDefinition // this may cause problems
 		public nuint size;
 		public uint width;
 		public uint height;
+		public bool dirty;
 	}
 }
