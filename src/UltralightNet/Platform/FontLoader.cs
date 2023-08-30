@@ -10,9 +10,13 @@ namespace UltralightNet.Platform
 		/// </summary>
 		public unsafe struct ULFontLoader
 		{
+#if !NETSTANDARD
 			public delegate* unmanaged[Cdecl]<ULString*> GetFallbackFont;
 			public delegate* unmanaged[Cdecl]<ULString*, int, bool, ULString*> GetFallbackFontForCharacters;
 			public delegate* unmanaged[Cdecl]<ULString*, int, bool, ULFontFile> Load;
+#else
+			public void* GetFallbackFont, GetFallbackFontForCharacters, Load;
+#endif
 		}
 	}
 	public interface IFontLoader : IDisposable

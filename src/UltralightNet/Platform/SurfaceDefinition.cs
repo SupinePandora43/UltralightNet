@@ -10,6 +10,7 @@ namespace UltralightNet.Platform
 		/// </summary>
 		public unsafe struct ULSurfaceDefinition
 		{
+#if !NETSTANDARD
 			public delegate* unmanaged[Cdecl]<uint, uint, nint> Create;
 			public delegate* unmanaged[Cdecl]<nint, void> Destroy;
 			public delegate* unmanaged[Cdecl]<nint, uint> GetWidth;
@@ -19,6 +20,9 @@ namespace UltralightNet.Platform
 			public delegate* unmanaged[Cdecl]<nint, byte*> LockPixels;
 			public delegate* unmanaged[Cdecl]<nint, void> UnlockPixels;
 			public delegate* unmanaged[Cdecl]<nint, uint, uint, void> Resize;
+#else
+			public void* Create, Destroy, GetWidth, GetHeight, GetRowBytes, GetSize, LockPixels, UnlockPixels, Resize;
+#endif
 		}
 	}
 	public interface ISurfaceDefinition : IDisposable

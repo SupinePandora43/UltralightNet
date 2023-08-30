@@ -11,6 +11,7 @@ namespace UltralightNet.Platform
 		/// </summary>
 		public unsafe struct ULGPUDriver
 		{
+#if !NETSTANDARD
 			public delegate* unmanaged[Cdecl]<void> BeginSynchronize;
 			public delegate* unmanaged[Cdecl]<void> EndSynchronize;
 			public delegate* unmanaged[Cdecl]<uint> NextTextureId;
@@ -25,6 +26,9 @@ namespace UltralightNet.Platform
 			public delegate* unmanaged[Cdecl]<uint, ULVertexBuffer, ULIndexBuffer, void> UpdateGeometry;
 			public delegate* unmanaged[Cdecl]<uint, void> DestroyGeometry;
 			public delegate* unmanaged[Cdecl]<ULCommandList, void> UpdateCommandList;
+#else
+			public void* BeginSynchronize, EndSynchronize, NextTextureId, CreateTexture, UpdateTexture, DestroyTexture, NextRenderBufferId, CreateRenderBuffer, DestroyRenderBuffer, NextGeometryId, CreateGeometry, UpdateGeometry, DestroyGeometry, UpdateCommandList;
+#endif
 		}
 	}
 

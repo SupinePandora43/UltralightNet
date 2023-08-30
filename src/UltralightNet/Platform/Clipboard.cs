@@ -10,9 +10,13 @@ namespace UltralightNet.Platform
 		/// </summary>
 		public unsafe struct ULClipboard
 		{
+#if !NETSTANDARD
 			public delegate* unmanaged[Cdecl]<void> Clear;
 			public delegate* unmanaged[Cdecl]<ULString*, void> ReadPlainText;
 			public delegate* unmanaged[Cdecl]<ULString*, void> WritePlainText;
+#else
+			public void* Clear, ReadPlainText, WritePlainText;
+#endif
 		}
 	}
 	public interface IClipboard : IDisposable

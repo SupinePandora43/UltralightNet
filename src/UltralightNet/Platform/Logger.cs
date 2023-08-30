@@ -10,7 +10,11 @@ namespace UltralightNet.Platform
 		/// </summary>
 		public unsafe struct ULLogger
 		{
+#if !NETSTANDARD
 			public delegate* unmanaged[Cdecl]<ULLogLevel, ULString*, void> LogMessage;
+#else
+			public void* LogMessage;
+#endif
 		}
 	}
 	public interface ILogger : IDisposable
