@@ -24,7 +24,7 @@ internal unsafe partial class Application : IDisposable
 {
 	readonly Stopwatch stopwatch = Stopwatch.StartNew();
 
-	readonly IWindow window = Window.Create(WindowOptions.DefaultVulkan with { UpdatesPerSecond = 60, FramesPerSecond = 60 });
+	readonly IWindow window = Window.Create(WindowOptions.DefaultVulkan with { UpdatesPerSecond = 60, FramesPerSecond = 61 });
 	readonly IInputContext input;
 	readonly Vk vk = Vk.GetApi();
 	readonly Instance instance;
@@ -130,7 +130,15 @@ internal unsafe partial class Application : IDisposable
 
 				vk.GetDeviceQueue(device, graphicsQueueFamily, 0, out graphicsQueue);
 				if (graphicsQueueFamily == presentQueueFamily) presentQueue = graphicsQueue;
-				else vk.GetDeviceQueue(device, presentQueueFamily, 0, out presentQueue);
+				else
+				{
+					vk.GetDeviceQueue(device, presentQueueFamily, 0, out presentQueue);
+					throw new NotSupportedException("Separate graphics and present queues are not supported.");
+				}
+
+#if DEBUG
+				debugUtils?.SetDebugUtilsObjectName(device, new DebugUtilsObjectNameInfoEXT(objectType: ObjectType.Queue, objectHandle: (ulong)graphicsQueue.Handle, pObjectName: "Graphics Queue"u8.ToPointer()));
+#endif
 
 				if (!vk.TryGetDeviceExtension(instance, device, out khrSwapchain)) throw new Exception($"{KhrSwapchain.ExtensionName} extension not found.");
 			}
@@ -200,7 +208,7 @@ internal unsafe partial class Application : IDisposable
 		{ // PipelineLayout
 			fixed (DescriptorSetLayout* pDescriptorSetLayout = &descriptorSetLayout)
 			{
-				var pipelineLayoutCreateInfo = new PipelineLayoutCreateInfo(setLayoutCount: 1, pSetLayouts: pDescriptorSetLayout);
+				var pipelineLayoutCreateInfo = new PipelineLayoutCreateInfo(/*setLayoutCount: 1,*/ pSetLayouts: pDescriptorSetLayout);
 				vk.CreatePipelineLayout(device, &pipelineLayoutCreateInfo, null, out pipelineLayout).Check();
 			}
 		}
@@ -237,6 +245,11 @@ internal unsafe partial class Application : IDisposable
 			var vert = CreateShaderModule(vertStream.PositionPointer, (nuint)vertStream.Length);
 			var frag = CreateShaderModule(fragStream.PositionPointer, (nuint)fragStream.Length);
 
+#if DEBUG
+			debugUtils?.SetDebugUtilsObjectName(device, new DebugUtilsObjectNameInfoEXT(objectType: ObjectType.ShaderModule, objectHandle: vert.Handle, pObjectName: "Quad Vertex Shader"u8.ToPointer()));
+			debugUtils?.SetDebugUtilsObjectName(device, new DebugUtilsObjectNameInfoEXT(objectType: ObjectType.ShaderModule, objectHandle: frag.Handle, pObjectName: "Quad Fragment Shader"u8.ToPointer()));
+#endif
+
 			try
 			{
 				var pipelineStages = stackalloc PipelineShaderStageCreateInfo[2] {
@@ -265,6 +278,10 @@ internal unsafe partial class Application : IDisposable
 					pDynamicState: &pipelineDynamicStateCreateInfo,
 					layout: pipelineLayout, renderPass: renderPass);
 				vk.CreateGraphicsPipelines(device, default /* TODO: PipelineCache */, 1, &graphicsPipelineCreateInfo, null, out pipeline).Check();
+
+#if DEBUG
+				debugUtils?.SetDebugUtilsObjectName(device, new DebugUtilsObjectNameInfoEXT(objectType: ObjectType.Pipeline, objectHandle: pipeline.Handle, pObjectName: "Quad Pipeline"u8.ToPointer()));
+#endif
 			}
 			finally
 			{
@@ -306,14 +323,23 @@ internal unsafe partial class Application : IDisposable
 		Console.WriteLine($"Initialized Application in {stopwatch.Elapsed}");
 	}
 
+	const int MaxFramesInFlight = 3;
+
 	bool resized = false;
 
 	SwapchainKHR swapchain;
 	Extent2D extent;
+	int framesInFlight;
 	Image[]? swapchainImages;
 	ImageView[]? swapchainImageViews;
 	Framebuffer[]? framebuffers;
 	CommandBuffer[]? commandBuffers;
+
+	Semaphore[]? imageAvailableSemaphores;
+	Semaphore[]? renderFinishedSemaphores;
+	Fence[]? renderFinishedFences;
+
+	int CurrentFrame;
 
 	void CreateSwapchain()
 	{
@@ -352,7 +378,7 @@ internal unsafe partial class Application : IDisposable
 		khrSwapchain.CreateSwapchain(device, &swapchainCreateInfoKHR, null, out swapchain).Check();
 
 		khrSwapchain.GetSwapchainImages(device, swapchain, &imageCount, null).Check();
-		swapchainImages = new Image[imageCount];
+		swapchainImages = new Image[framesInFlight = (int)imageCount];
 		khrSwapchain.GetSwapchainImages(device, swapchain, &imageCount, swapchainImages.AsSpan()).Check();
 
 		swapchainImageViews = new ImageView[imageCount];
@@ -360,6 +386,13 @@ internal unsafe partial class Application : IDisposable
 		{
 			var imageViewCreateInfo = new ImageViewCreateInfo(image: swapchainImages[i], viewType: ImageViewType.ImageViewType2D, format: surfaceFormat.Format, subresourceRange: new ImageSubresourceRange(ImageAspectFlags.ImageAspectColorBit, 0, 1, 0, 1));
 			vk.CreateImageView(device, &imageViewCreateInfo, null, out swapchainImageViews[i]).Check();
+
+#if DEBUG
+			using ULString swapchainImageName = new($"Swapchain Image#{i}");
+			using ULString swapchainImageViewName = new($"Swapchain ImageView#{i}");
+			debugUtils?.SetDebugUtilsObjectName(device, new DebugUtilsObjectNameInfoEXT(objectType: ObjectType.Image, objectHandle: swapchainImages[i].Handle, pObjectName: swapchainImageName.data));
+			debugUtils?.SetDebugUtilsObjectName(device, new DebugUtilsObjectNameInfoEXT(objectType: ObjectType.ImageView, objectHandle: swapchainImageViews[i].Handle, pObjectName: swapchainImageViewName.data));
+#endif
 		}
 
 		framebuffers = new Framebuffer[imageCount];
@@ -375,6 +408,29 @@ internal unsafe partial class Application : IDisposable
 		commandBuffers = new CommandBuffer[imageCount];
 		var commandBufferAllocateInfo = new CommandBufferAllocateInfo(commandPool: commandPool, level: CommandBufferLevel.Primary, commandBufferCount: imageCount);
 		vk.AllocateCommandBuffers(device, &commandBufferAllocateInfo, commandBuffers.AsSpan()).Check();
+
+		imageAvailableSemaphores = new Semaphore[imageCount];
+		renderFinishedSemaphores = new Semaphore[imageCount];
+		renderFinishedFences = new Fence[imageCount];
+
+		for (int i = 0; i < imageCount; i++)
+		{
+			var semaphoreCreateInfo = new SemaphoreCreateInfo(flags: 0);
+			var fenceCreateInfo = new FenceCreateInfo(flags: FenceCreateFlags.FenceCreateSignaledBit);
+
+			vk.CreateSemaphore(device, &semaphoreCreateInfo, null, out imageAvailableSemaphores[i]).Check();
+			vk.CreateSemaphore(device, &semaphoreCreateInfo, null, out renderFinishedSemaphores[i]).Check();
+			vk.CreateFence(device, &fenceCreateInfo, null, out renderFinishedFences[i]).Check();
+
+#if DEBUG
+			using ULString imageAvailableSemaphoreName = new($"Image Available Semaphore#{i}");
+			using ULString renderFinishedSemaphoreName = new($"Render Finished Semaphore#{i}");
+			using ULString renderFinishedFenceName = new($"Render Finished Fence#{i}");
+			debugUtils?.SetDebugUtilsObjectName(device, new DebugUtilsObjectNameInfoEXT(objectType: ObjectType.Semaphore, objectHandle: imageAvailableSemaphores[i].Handle, pObjectName: imageAvailableSemaphoreName.data));
+			debugUtils?.SetDebugUtilsObjectName(device, new DebugUtilsObjectNameInfoEXT(objectType: ObjectType.Semaphore, objectHandle: renderFinishedSemaphores[i].Handle, pObjectName: renderFinishedSemaphoreName.data));
+			debugUtils?.SetDebugUtilsObjectName(device, new DebugUtilsObjectNameInfoEXT(objectType: ObjectType.Fence, objectHandle: renderFinishedFences[i].Handle, pObjectName: renderFinishedFenceName.data));
+#endif
+		}
 	}
 
 	void RecordCommandBuffers()
@@ -399,6 +455,17 @@ internal unsafe partial class Application : IDisposable
 
 	void CleanupSwapchainResources()
 	{
+		vk.WaitForFences(device, renderFinishedFences, true, ulong.MaxValue).Check();
+
+		for (int i = 0; i < framesInFlight; i++)
+		{
+			vk.DestroySemaphore(device, imageAvailableSemaphores![i], null);
+			vk.DestroySemaphore(device, renderFinishedSemaphores![i], null);
+			vk.DestroyFence(device, renderFinishedFences![i], null);
+		}
+		imageAvailableSemaphores = renderFinishedSemaphores = null;
+		renderFinishedFences = null;
+
 		vk.FreeCommandBuffers(device, commandPool, (uint)commandBuffers!.Length, commandBuffers);
 		for (int i = 0; i < framebuffers?.Length; i++)
 			vk.DestroyFramebuffer(device, framebuffers[i], null);
@@ -412,16 +479,48 @@ internal unsafe partial class Application : IDisposable
 	public void Run()
 	{
 		CreateSwapchain();
-		//RecordCommandBuffers();
+		RecordCommandBuffers();
 
 		window.Render += (delta) =>
 		{
+			vk.WaitForFences(device, 1, renderFinishedFences![CurrentFrame], true, ulong.MaxValue).Check();
+
 			if (resized)
 			{
 				view.Resize((uint)window.FramebufferSize.X, (uint)window.FramebufferSize.Y);
 				resized = false;
 			}
 			renderer.Render();
+
+			uint imageIndex = 0;
+
+			var result = khrSwapchain.AcquireNextImage(device, swapchain, ulong.MaxValue, imageAvailableSemaphores![CurrentFrame], default, ref imageIndex);
+			// check
+			Debug.Assert(imageIndex == CurrentFrame);
+
+
+			vk.ResetFences(device, 1, renderFinishedFences![CurrentFrame]).Check();
+
+			var waitSemaphore = imageAvailableSemaphores![CurrentFrame];
+			var waitStage = PipelineStageFlags.PipelineStageColorAttachmentOutputBit;
+			var commandBuffer = commandBuffers![CurrentFrame];
+			var signalSemaphore = renderFinishedSemaphores![CurrentFrame];
+			var submitInfo = new SubmitInfo(
+				waitSemaphoreCount: 1, pWaitSemaphores: &waitSemaphore, pWaitDstStageMask: &waitStage,
+				commandBufferCount: 1, pCommandBuffers: &commandBuffer,
+				signalSemaphoreCount: 1, pSignalSemaphores: &signalSemaphore);
+			vk.QueueSubmit(graphicsQueue, 1, &submitInfo, renderFinishedFences![CurrentFrame]).Check();
+
+			fixed (SwapchainKHR* swapchainPtr = &swapchain)
+			{
+				var presentInfo = new PresentInfoKHR(
+					waitSemaphoreCount: 1, pWaitSemaphores: &signalSemaphore,
+					swapchainCount: 1, pSwapchains: swapchainPtr,
+					pImageIndices: &imageIndex);
+				khrSwapchain.QueuePresent(presentQueue, &presentInfo).Check();
+			}
+
+			// CurrentFrame = (CurrentFrame + 1) % MaxFramesInFlight;
 		};
 
 		window.Run();
@@ -440,7 +539,10 @@ internal unsafe partial class Application : IDisposable
 		vk.DestroyDescriptorSetLayout(device, descriptorSetLayout, null);
 		//vk.DestroySampler(device, sampler, null);
 		vk.DestroyDevice(device, null);
+		khrSwapchain.Dispose();
 		khrSurface.DestroySurface(instance, surface, null);
+		khrSurface.Dispose();
+		debugUtils?.Dispose();
 		vk.DestroyInstance(instance, null);
 		vk.Dispose();
 		input.Dispose();

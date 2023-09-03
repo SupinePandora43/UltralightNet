@@ -1,11 +1,13 @@
-using Silk.NET.Vulkan;
+using System;
 
-namespace UltralightNet.Vulkan.Memory;
+namespace UltralightNet.GPU.Vulkan;
 
-public readonly struct BufferResource
+internal readonly struct BufferResource
 {
-	public Buffer Buffer { readonly get; init; }
+	public Silk.NET.Vulkan.Buffer Buffer { readonly get; init; }
 	public ulong Offset { readonly get; init; }
 	public ulong Size { readonly get; init; }
 	public unsafe void* Mapped { readonly get; init; }
+
+	public unsafe readonly Span<byte> AsSpan() => new(Mapped, (int)Size);
 }

@@ -1,64 +1,29 @@
-using System;
 using Silk.NET.Vulkan;
+using Buffer = Silk.NET.Vulkan.Buffer;
 
-namespace UltralightNet.Vulkan.Memory;
+namespace UltralightNet.GPU.Vulkan;
 
-public struct GeometryCreateInfo {
-	public int Id { readonly get; init; }
-	public ulong Size { readonly get; init; }
-	public BufferUsageFlags BufferFlags { readonly get; init; }
-	public MemoryPropertyFlags MemoryFlags { readonly get; init; }
-	public BufferResource BufferResource { get; set; }
-}
 
-public struct GeometryDestroyInfo
-{
-	public int Id { readonly get; init; }
-	public BufferResource BufferResource { get; set; }
-}
-
-/*
-public unsafe class Allocator
+internal unsafe class Allocator
 {
 	public uint FramesInFlight = 2;
 	public uint CurrentFrame = 0;
 
-	private Vk vk;
-	private AllocationCallbacks* allocationCallbacks = null;
-	private Device device;
+	readonly Vk vk;
+	readonly Device device;
 
-	private PhysicalDeviceMemoryProperties physicalDeviceMemoryProperties;
+	readonly PhysicalDeviceMemoryProperties physicalDeviceMemoryProperties;
 
-	public BufferAllocation AllocateBuffer(BufferCreateInfo createInfo, MemoryPropertyFlags memoryPropertyFlags)
+	public void CreateBuffer(ulong size, BufferUsageFlags bufferUsageFlags, MemoryPropertyFlags memoryPropertyFlags, out Buffer buffer, out DeviceMemory bufferMemory)
 	{
-		Buffer buffer;
-		vk.CreateBuffer(device, &createInfo, allocationCallbacks, &buffer);
-		var memoryRequirements = GetMemoryRequirements(buffer);
-		var memory = AllocateMemory(new(allocationSize: memoryRequirements.Size, memoryTypeIndex: FindMemoryType(memoryRequirements.MemoryTypeBits, memoryPropertyFlags)));
-		return new() { buffer = buffer, offset = 0, size = createInfo.Size, memory = memory };
-	}
+		var bufferCreateInfo = new BufferCreateInfo(size: size, usage: bufferUsageFlags, sharingMode: SharingMode.Exclusive/*, queueFamilyIndexCount: 1*/);
+		vk.CreateBuffer(device, &bufferCreateInfo, null, out buffer).Check();
 
-	private MemoryRequirements GetMemoryRequirements(Buffer buffer)
-	{
-		MemoryRequirements requirements;
-		vk.GetBufferMemoryRequirements(device, buffer, &requirements);
-		return requirements;
-	}
+		MemoryRequirements memoryRequirements;
+		vk.GetBufferMemoryRequirements(device, buffer, &memoryRequirements);
 
-	private uint FindMemoryType(uint memoryTypeBits, MemoryPropertyFlags memoryPropertyFlags)
-	{
-		for (uint i = 0; i < physicalDeviceMemoryProperties.MemoryTypeCount; i++)
-			if (physicalDeviceMemoryProperties.MemoryTypes[(int)i].PropertyFlags.HasFlag(memoryPropertyFlags))
-				return i;
-
-		throw new System.Exception("no such memory");
-	}
-
-	private DeviceMemory AllocateMemory(MemoryAllocateInfo memoryAllocateInfo)
-	{
-		DeviceMemory memory;
-		vk.AllocateMemory(device, &memoryAllocateInfo, allocationCallbacks, &memory);
-		return memory;
+		var memoryAllocateInfo = new MemoryAllocateInfo(allocationSize: memoryRequirements.Size, memoryTypeIndex: physicalDeviceMemoryProperties.FindMemoryTypeIndex(memoryRequirements.MemoryTypeBits, memoryPropertyFlags));
+		vk.AllocateMemory(device, &memoryAllocateInfo, null, out bufferMemory).Check();
+		vk.BindBufferMemory(device, buffer, bufferMemory, 0).Check();
 	}
 }
-*/

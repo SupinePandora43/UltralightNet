@@ -44,40 +44,6 @@ public unsafe struct TextureEntry
 	public DescriptorSet descriptorSet;
 }
 
-internal unsafe struct GeometryEntry
-{
-	public AllocationTuple Vertex { readonly get; init; }
-
-	public AllocationTuple Index { readonly get; init; }
-
-	public uint FrameToDestroy;
-
-	public struct AllocationTuple
-	{
-		/// <summary>
-		/// Desktop <br />
-		/// 0 - DEVICE_LOCAL bind<br />
-		/// 1 - STAGING frame_id <br />
-		/// 2 - STAGING frame_id <br />
-		/// Unified memory <br />
-		/// 0 - UNIFIED frame_id <br />
-		/// 1 - UNIFIED frame_id <br />
-		/// </summary>
-		/// <remarks>Single DEVICE_LOCAL because frames are executed sequentially and synchronized by a semaphore</remarks>
-		internal readonly BufferResource[] buffers;
-		private int mostRecent = -1;
-
-		public BufferResource ToWrite => VulkanGPUDriver.UnifiedMemory ? buffers[mostRecent = (int)VulkanGPUDriver.CurrentFrame + 1] : buffers[(int)VulkanGPUDriver.CurrentFrame];
-		public readonly BufferResource ToUse => VulkanGPUDriver.UnifiedMemory ? buffers[mostRecent] : buffers[0];
-
-		public AllocationTuple(BufferResource[] buffers)
-		{
-			Debug.Assert(buffers.Length > 0);
-			this.buffers = buffers;
-		}
-	}
-}
-
 public unsafe partial class VulkanGPUDriver
 {
 	private readonly Vk vk;
