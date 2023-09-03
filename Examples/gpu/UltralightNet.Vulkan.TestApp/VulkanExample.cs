@@ -377,6 +377,11 @@ internal unsafe partial class Application : IDisposable
 
 		khrSwapchain.CreateSwapchain(device, &swapchainCreateInfoKHR, null, out swapchain).Check();
 
+#if DEBUG
+		using ULString swapchainName = new($"{window.Title} Swapchain");
+		debugUtils?.SetDebugUtilsObjectName(device, new DebugUtilsObjectNameInfoEXT(objectType: ObjectType.SwapchainKhr, objectHandle: swapchain.Handle, pObjectName: swapchainName.data));
+#endif
+
 		khrSwapchain.GetSwapchainImages(device, swapchain, &imageCount, null).Check();
 		swapchainImages = new Image[framesInFlight = (int)imageCount];
 		khrSwapchain.GetSwapchainImages(device, swapchain, &imageCount, swapchainImages.AsSpan()).Check();
@@ -386,13 +391,6 @@ internal unsafe partial class Application : IDisposable
 		{
 			var imageViewCreateInfo = new ImageViewCreateInfo(image: swapchainImages[i], viewType: ImageViewType.ImageViewType2D, format: surfaceFormat.Format, subresourceRange: new ImageSubresourceRange(ImageAspectFlags.ImageAspectColorBit, 0, 1, 0, 1));
 			vk.CreateImageView(device, &imageViewCreateInfo, null, out swapchainImageViews[i]).Check();
-
-#if DEBUG
-			using ULString swapchainImageName = new($"Swapchain Image#{i}");
-			using ULString swapchainImageViewName = new($"Swapchain ImageView#{i}");
-			debugUtils?.SetDebugUtilsObjectName(device, new DebugUtilsObjectNameInfoEXT(objectType: ObjectType.Image, objectHandle: swapchainImages[i].Handle, pObjectName: swapchainImageName.data));
-			debugUtils?.SetDebugUtilsObjectName(device, new DebugUtilsObjectNameInfoEXT(objectType: ObjectType.ImageView, objectHandle: swapchainImageViews[i].Handle, pObjectName: swapchainImageViewName.data));
-#endif
 		}
 
 		framebuffers = new Framebuffer[imageCount];
@@ -403,6 +401,15 @@ internal unsafe partial class Application : IDisposable
 				var framebufferCreateInfo = new FramebufferCreateInfo(renderPass: renderPass, attachmentCount: 1, pAttachments: imageView, width: extent.Width, height: extent.Height, layers: 1);
 				vk.CreateFramebuffer(device, &framebufferCreateInfo, null, out framebuffers[i]).Check();
 			}
+
+#if DEBUG
+			using ULString swapchainImageName = new($"Swapchain Image#{i}");
+			using ULString swapchainImageViewName = new($"Swapchain ImageView#{i}");
+			using ULString framebufferName = new($"Swapchain Framebuffer#{i}");
+			debugUtils?.SetDebugUtilsObjectName(device, new DebugUtilsObjectNameInfoEXT(objectType: ObjectType.Image, objectHandle: swapchainImages[i].Handle, pObjectName: swapchainImageName.data));
+			debugUtils?.SetDebugUtilsObjectName(device, new DebugUtilsObjectNameInfoEXT(objectType: ObjectType.ImageView, objectHandle: swapchainImageViews[i].Handle, pObjectName: swapchainImageViewName.data));
+			debugUtils?.SetDebugUtilsObjectName(device, new DebugUtilsObjectNameInfoEXT(objectType: ObjectType.Framebuffer, objectHandle: framebuffers[i].Handle, pObjectName: framebufferName.data));
+#endif
 		}
 
 		commandBuffers = new CommandBuffer[imageCount];
@@ -520,7 +527,7 @@ internal unsafe partial class Application : IDisposable
 				khrSwapchain.QueuePresent(presentQueue, &presentInfo).Check();
 			}
 
-			// CurrentFrame = (CurrentFrame + 1) % MaxFramesInFlight;
+			CurrentFrame = (CurrentFrame + 1) % MaxFramesInFlight;
 		};
 
 		window.Run();
