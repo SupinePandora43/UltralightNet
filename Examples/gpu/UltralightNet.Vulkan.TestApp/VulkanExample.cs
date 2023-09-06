@@ -35,6 +35,7 @@ internal unsafe partial class Application : IDisposable
 	readonly SurfaceKHR surface;
 	readonly PhysicalDevice physicalDevice;
 	readonly PhysicalDeviceMemoryProperties physicalDeviceMemoryProperties;
+	readonly PhysicalDeviceFeatures physicalDeviceFeatures; // see enabledPhysicalDeviceFeatures
 	readonly uint graphicsQueueFamily = uint.MaxValue;
 	readonly uint presentQueueFamily = uint.MaxValue;
 
@@ -44,7 +45,7 @@ internal unsafe partial class Application : IDisposable
 	readonly KhrSwapchain khrSwapchain;
 
 	//readonly SampleCountFlags sampleCountFlags = SampleCountFlags.SampleCount4Bit;
-	readonly SurfaceCapabilitiesKHR surfaceCapabilitiesKHR;
+	SurfaceCapabilitiesKHR surfaceCapabilitiesKHR;
 	readonly SurfaceFormatKHR surfaceFormat = new(Format.B8G8R8A8Srgb, ColorSpaceKHR.ColorSpaceSrgbNonlinearKhr);
 	readonly PresentModeKHR presentMode = PresentModeKHR.PresentModeFifoKhr;
 
@@ -65,7 +66,7 @@ internal unsafe partial class Application : IDisposable
 			window.Initialize();
 			if (window.VkSurface is null) throw new PlatformNotSupportedException("Vulkan surface not found.");
 
-			window.FramebufferResize += (_) => resized = true;
+			window.FramebufferResize += (_) => recreateSwapchain = true;
 			input = window.CreateInput();
 		}
 		{ // Instance
@@ -86,7 +87,7 @@ internal unsafe partial class Application : IDisposable
 			if (deviceCount is 0) throw new Exception("Couldn't find physical vulkan device.");
 			var devices = stackalloc PhysicalDevice[(int)deviceCount];
 			vk.EnumeratePhysicalDevices(instance, ref deviceCount, devices).Check();
-			physicalDevice = devices[0]; // idc
+			physicalDevice = devices[0]; // idc, TODO: provide a way to override this
 			if (!vk.IsDeviceExtensionPresent(physicalDevice, KhrSwapchain.ExtensionName)) throw new Exception($"Physical device doesn't support ${KhrSwapchain.ExtensionName}");
 
 			uint queueFamilityCount = 0;
@@ -107,6 +108,7 @@ internal unsafe partial class Application : IDisposable
 			if ((graphicsQueueFamily | presentQueueFamily) is uint.MaxValue) throw new Exception("Suitable queue families not found.");
 
 			vk.GetPhysicalDeviceMemoryProperties(physicalDevice, out physicalDeviceMemoryProperties);
+			vk.GetPhysicalDeviceFeatures(physicalDevice, out physicalDeviceFeatures);
 		}
 		{ // Device + Queues
 			float priority = 1.0f;
@@ -114,7 +116,15 @@ internal unsafe partial class Application : IDisposable
 			queueCreateInfos[0] = new(queueFamilyIndex: graphicsQueueFamily, queueCount: 1, pQueuePriorities: &priority);
 			queueCreateInfos[1] = new(queueFamilyIndex: presentQueueFamily, queueCount: 1, pQueuePriorities: &priority);
 
-			PhysicalDeviceFeatures physicalDeviceFeatures = new() { SamplerAnisotropy = true };
+			PhysicalDeviceFeatures enabledPhysicalDeviceFeatures = new()
+			{
+				SamplerAnisotropy = true,
+#if DEBUG
+				PipelineStatisticsQuery = physicalDeviceFeatures.PipelineStatisticsQuery
+#endif
+			};
+
+			physicalDeviceFeatures = enabledPhysicalDeviceFeatures;
 
 			var extensions = new string[] { KhrSwapchain.ExtensionName };
 			byte** extensionsPtr = (byte**)SilkMarshal.StringArrayToPtr(extensions);
@@ -124,7 +134,7 @@ internal unsafe partial class Application : IDisposable
 				DeviceCreateInfo deviceCreateInfo = new(
 					queueCreateInfoCount: graphicsQueueFamily == presentQueueFamily ? 1u : 2u, pQueueCreateInfos: queueCreateInfos,
 					enabledExtensionCount: (uint)extensions.Length, ppEnabledExtensionNames: extensionsPtr,
-					pEnabledFeatures: &physicalDeviceFeatures);
+					pEnabledFeatures: &enabledPhysicalDeviceFeatures);
 
 				vk.CreateDevice(physicalDevice, &deviceCreateInfo, null, out device).Check();
 
@@ -172,8 +182,6 @@ internal unsafe partial class Application : IDisposable
 			vk.CreateSampler(device, &samplerCreateInfo, null, out sampler);
 		}*/
 		{ // Surface support
-			khrSurface.GetPhysicalDeviceSurfaceCapabilities(physicalDevice, surface, out surfaceCapabilitiesKHR).Check();
-
 			uint surfaceFormatCount = 0;
 			khrSurface.GetPhysicalDeviceSurfaceFormats(physicalDevice, surface, &surfaceFormatCount, null).Check();
 			if (surfaceFormatCount is 0) throw new Exception("No surface formats found.");
@@ -325,7 +333,7 @@ internal unsafe partial class Application : IDisposable
 
 	const int MaxFramesInFlight = 3;
 
-	bool resized = false;
+	bool recreateSwapchain = false;
 
 	SwapchainKHR swapchain;
 	Extent2D extent;
@@ -341,8 +349,12 @@ internal unsafe partial class Application : IDisposable
 
 	int CurrentFrame;
 
-	void CreateSwapchain()
+	void CreateSwapchain(bool again = false)
 	{
+		if (again) CleanupSwapchainResources();
+
+		khrSurface.GetPhysicalDeviceSurfaceCapabilities(physicalDevice, surface, out surfaceCapabilitiesKHR).Check();
+
 		Extent2D GetExtent()
 		{
 			if ((surfaceCapabilitiesKHR.CurrentExtent.Width | surfaceCapabilitiesKHR.CurrentExtent.Height) is not uint.MaxValue) return surfaceCapabilitiesKHR.CurrentExtent;
@@ -376,6 +388,8 @@ internal unsafe partial class Application : IDisposable
 			oldSwapchain: swapchain);
 
 		khrSwapchain.CreateSwapchain(device, &swapchainCreateInfoKHR, null, out swapchain).Check();
+
+		if (swapchainCreateInfoKHR.OldSwapchain.Handle is not 0) khrSwapchain.DestroySwapchain(device, swapchainCreateInfoKHR.OldSwapchain, null);
 
 #if DEBUG
 		using ULString swapchainName = new($"{window.Title} Swapchain");
@@ -438,31 +452,15 @@ internal unsafe partial class Application : IDisposable
 			debugUtils?.SetDebugUtilsObjectName(device, new DebugUtilsObjectNameInfoEXT(objectType: ObjectType.Fence, objectHandle: renderFinishedFences[i].Handle, pObjectName: renderFinishedFenceName.data));
 #endif
 		}
-	}
 
-	void RecordCommandBuffers()
-	{
-		for (int i = 0; i < commandBuffers!.Length; i++)
-		{
-			var commandBufferBeginInfo = new CommandBufferBeginInfo(pNext: null);
-			vk.BeginCommandBuffer(commandBuffers[i], &commandBufferBeginInfo).Check();
-			var renderPassBeginInfo = new RenderPassBeginInfo(renderPass: renderPass, framebuffer: framebuffers![i], renderArea: new Rect2D(extent: extent));
-			vk.CmdBeginRenderPass(commandBuffers[i], &renderPassBeginInfo, SubpassContents.Inline);
-			vk.CmdBindPipeline(commandBuffers[i], PipelineBindPoint.Graphics, pipeline);
-			var viewport = new Viewport(width: extent.Width, height: extent.Height, minDepth: 0, maxDepth: 1);
-			var scissor = new Rect2D(extent: extent);
-			vk.CmdSetViewport(commandBuffers[i], 0, 1, &viewport);
-			vk.CmdSetScissor(commandBuffers[i], 0, 1, &scissor);
-			// TODO: bind texture
-			vk.CmdDraw(commandBuffers[i], 3, 1, 0, 0);
-			vk.CmdEndRenderPass(commandBuffers[i]);
-			vk.EndCommandBuffer(commandBuffers[i]).Check();
-		}
+		CurrentFrame = 0;
 	}
 
 	void CleanupSwapchainResources()
 	{
 		vk.WaitForFences(device, renderFinishedFences, true, ulong.MaxValue).Check();
+
+		vk.QueueWaitIdle(graphicsQueue).Check(); Debug.Assert(graphicsQueue.Handle == presentQueue.Handle); // Wait for semaphores to finish
 
 		for (int i = 0; i < framesInFlight; i++)
 		{
@@ -474,6 +472,8 @@ internal unsafe partial class Application : IDisposable
 		renderFinishedFences = null;
 
 		vk.FreeCommandBuffers(device, commandPool, (uint)commandBuffers!.Length, commandBuffers);
+		commandBuffers = null;
+
 		for (int i = 0; i < framebuffers?.Length; i++)
 			vk.DestroyFramebuffer(device, framebuffers[i], null);
 		framebuffers = null;
@@ -486,46 +486,69 @@ internal unsafe partial class Application : IDisposable
 	public void Run()
 	{
 		CreateSwapchain();
-		RecordCommandBuffers();
 
 		window.Render += (delta) =>
 		{
+			if (recreateSwapchain)
+			{
+				// view.Resize((uint)window.FramebufferSize.X, (uint)window.FramebufferSize.Y);
+				recreateSwapchain = false;
+				CreateSwapchain(true);
+			}
+
 			vk.WaitForFences(device, 1, renderFinishedFences![CurrentFrame], true, ulong.MaxValue).Check();
 
-			if (resized)
-			{
-				view.Resize((uint)window.FramebufferSize.X, (uint)window.FramebufferSize.Y);
-				resized = false;
-			}
-			renderer.Render();
+			// renderer.Render();
 
 			uint imageIndex = 0;
+			var result = khrSwapchain.AcquireNextImage(device, swapchain, ulong.MaxValue, imageAvailableSemaphores![CurrentFrame], default, &imageIndex);
 
-			var result = khrSwapchain.AcquireNextImage(device, swapchain, ulong.MaxValue, imageAvailableSemaphores![CurrentFrame], default, ref imageIndex);
-			// check
+			if (result is Result.ErrorOutOfDateKhr || result is Result.SuboptimalKhr) recreateSwapchain = true;
+			else result.Check();
+
+
 			Debug.Assert(imageIndex == CurrentFrame);
-
+			// CurrentFrame = (int)imageIndex;
 
 			vk.ResetFences(device, 1, renderFinishedFences![CurrentFrame]).Check();
 
+			var commandBuffer = commandBuffers![CurrentFrame];
+			{
+				vk.ResetCommandBuffer(commandBuffer, 0).Check();
+				var commandBufferBeginInfo = new CommandBufferBeginInfo(pNext: null);
+				vk.BeginCommandBuffer(commandBuffer, &commandBufferBeginInfo).Check();
+				var renderPassBeginInfo = new RenderPassBeginInfo(renderPass: renderPass, framebuffer: framebuffers![CurrentFrame], renderArea: new Rect2D(extent: extent));
+				vk.CmdBeginRenderPass(commandBuffer, &renderPassBeginInfo, SubpassContents.Inline);
+				vk.CmdBindPipeline(commandBuffer, PipelineBindPoint.Graphics, pipeline);
+				var viewport = new Viewport(width: extent.Width, height: extent.Height, minDepth: 0, maxDepth: 1);
+				var scissor = new Rect2D(extent: extent);
+				vk.CmdSetViewport(commandBuffer, 0, 1, &viewport);
+				vk.CmdSetScissor(commandBuffer, 0, 1, &scissor);
+				// TODO: bind texture
+				vk.CmdDraw(commandBuffer, 3, 1, 0, 0);
+				vk.CmdEndRenderPass(commandBuffer);
+				vk.EndCommandBuffer(commandBuffer).Check();
+			}
+
 			var waitSemaphore = imageAvailableSemaphores![CurrentFrame];
 			var waitStage = PipelineStageFlags.PipelineStageColorAttachmentOutputBit;
-			var commandBuffer = commandBuffers![CurrentFrame];
-			var signalSemaphore = renderFinishedSemaphores![CurrentFrame];
+			var renderFinishedSemaphore = renderFinishedSemaphores![CurrentFrame];
 			var submitInfo = new SubmitInfo(
 				waitSemaphoreCount: 1, pWaitSemaphores: &waitSemaphore, pWaitDstStageMask: &waitStage,
 				commandBufferCount: 1, pCommandBuffers: &commandBuffer,
-				signalSemaphoreCount: 1, pSignalSemaphores: &signalSemaphore);
+				signalSemaphoreCount: 1, pSignalSemaphores: &renderFinishedSemaphore);
 			vk.QueueSubmit(graphicsQueue, 1, &submitInfo, renderFinishedFences![CurrentFrame]).Check();
 
 			fixed (SwapchainKHR* swapchainPtr = &swapchain)
 			{
 				var presentInfo = new PresentInfoKHR(
-					waitSemaphoreCount: 1, pWaitSemaphores: &signalSemaphore,
+					waitSemaphoreCount: 1, pWaitSemaphores: &renderFinishedSemaphore,
 					swapchainCount: 1, pSwapchains: swapchainPtr,
 					pImageIndices: &imageIndex);
-				khrSwapchain.QueuePresent(presentQueue, &presentInfo).Check();
+				result = khrSwapchain.QueuePresent(presentQueue, &presentInfo);
 			}
+			if (result is Result.ErrorOutOfDateKhr || result is Result.SuboptimalKhr) recreateSwapchain = true;
+			else result.Check();
 
 			CurrentFrame = (CurrentFrame + 1) % MaxFramesInFlight;
 		};
