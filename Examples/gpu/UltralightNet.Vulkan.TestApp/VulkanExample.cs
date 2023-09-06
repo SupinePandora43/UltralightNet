@@ -44,6 +44,9 @@ internal unsafe partial class Application : IDisposable
 	readonly Queue presentQueue;
 	readonly KhrSwapchain khrSwapchain;
 
+	readonly QueryPool queryPool;
+	readonly ulong[]? queryStats;
+
 	//readonly SampleCountFlags sampleCountFlags = SampleCountFlags.SampleCount4Bit;
 	SurfaceCapabilitiesKHR surfaceCapabilitiesKHR;
 	readonly SurfaceFormatKHR surfaceFormat = new(Format.B8G8R8A8Srgb, ColorSpaceKHR.ColorSpaceSrgbNonlinearKhr);
@@ -158,7 +161,19 @@ internal unsafe partial class Application : IDisposable
 				SilkMarshal.Free((nint)extensionsPtr);
 			}
 		}
+		if (physicalDeviceFeatures.PipelineStatisticsQuery) // Query pools
+		{
+			var queryPoolCreateInfo = new QueryPoolCreateInfo(queryType: QueryType.PipelineStatistics, queryCount: 1, pipelineStatistics:
+				QueryPipelineStatisticFlags.QueryPipelineStatisticInputAssemblyVerticesBit |
+				QueryPipelineStatisticFlags.QueryPipelineStatisticInputAssemblyPrimitivesBit |
+				QueryPipelineStatisticFlags.QueryPipelineStatisticVertexShaderInvocationsBit |
+				QueryPipelineStatisticFlags.QueryPipelineStatisticClippingInvocationsBit |
+				QueryPipelineStatisticFlags.QueryPipelineStatisticClippingPrimitivesBit |
+				QueryPipelineStatisticFlags.QueryPipelineStatisticFragmentShaderInvocationsBit);
+			vk.CreateQueryPool(device, &queryPoolCreateInfo, null, out queryPool).Check();
 
+			queryStats = new ulong[6];
+		}
 		/*{ // Sampler
 			var samplerCreateInfo = new SamplerCreateInfo()
 			{
@@ -312,7 +327,15 @@ internal unsafe partial class Application : IDisposable
 
 			window.Update += (delta) => renderer.Update();
 
-			view = renderer.CreateView((uint)window.FramebufferSize.X, (uint)window.FramebufferSize.Y);
+			float scale = 1;
+			try
+			{
+				Silk.NET.GLFW.GlfwProvider.GLFW.Value.GetMonitorContentScale((Silk.NET.GLFW.Monitor*)window.Native!.Glfw!, out scale, out var yscale);
+				Debug.Assert(scale == yscale);
+			}
+			catch (Exception e) { Console.WriteLine(e); }
+
+			view = renderer.CreateView((uint)window.FramebufferSize.X, (uint)window.FramebufferSize.Y, new ULViewConfig() { InitialDeviceScale = scale });
 			view.URL = "https://youtube.com";
 		}
 		{ // Input controls
@@ -460,7 +483,7 @@ internal unsafe partial class Application : IDisposable
 	{
 		vk.WaitForFences(device, renderFinishedFences, true, ulong.MaxValue).Check();
 
-		vk.QueueWaitIdle(graphicsQueue).Check(); Debug.Assert(graphicsQueue.Handle == presentQueue.Handle); // Wait for semaphores to finish
+		vk.QueueWaitIdle(graphicsQueue).Check(); (graphicsQueue.Handle == presentQueue.Handle).Assert(); // Wait for semaphores to finish
 
 		for (int i = 0; i < framesInFlight; i++)
 		{
@@ -491,9 +514,10 @@ internal unsafe partial class Application : IDisposable
 		{
 			if (recreateSwapchain)
 			{
-				// view.Resize((uint)window.FramebufferSize.X, (uint)window.FramebufferSize.Y);
 				recreateSwapchain = false;
 				CreateSwapchain(true);
+
+				view.Resize((uint)window.FramebufferSize.X, (uint)window.FramebufferSize.Y);
 			}
 
 			vk.WaitForFences(device, 1, renderFinishedFences![CurrentFrame], true, ulong.MaxValue).Check();
@@ -512,11 +536,20 @@ internal unsafe partial class Application : IDisposable
 
 			vk.ResetFences(device, 1, renderFinishedFences![CurrentFrame]).Check();
 
+			(vk.GetQueryPoolResults(device, queryPool, 0, 1, queryStats.AsSpan(), sizeof(ulong), QueryResultFlags.QueryResult64Bit) & ~Result.NotReady).Check();
+
 			var commandBuffer = commandBuffers![CurrentFrame];
 			{
 				vk.ResetCommandBuffer(commandBuffer, 0).Check();
 				var commandBufferBeginInfo = new CommandBufferBeginInfo(pNext: null);
 				vk.BeginCommandBuffer(commandBuffer, &commandBufferBeginInfo).Check();
+				if (physicalDeviceFeatures.PipelineStatisticsQuery)
+				{
+					vk.CmdResetQueryPool(commandBuffer, queryPool, 0, 1);
+					vk.CmdBeginQuery(commandBuffer, queryPool, 0, 0);
+				}
+
+
 				var renderPassBeginInfo = new RenderPassBeginInfo(renderPass: renderPass, framebuffer: framebuffers![CurrentFrame], renderArea: new Rect2D(extent: extent));
 				vk.CmdBeginRenderPass(commandBuffer, &renderPassBeginInfo, SubpassContents.Inline);
 				vk.CmdBindPipeline(commandBuffer, PipelineBindPoint.Graphics, pipeline);
@@ -527,6 +560,9 @@ internal unsafe partial class Application : IDisposable
 				// TODO: bind texture
 				vk.CmdDraw(commandBuffer, 3, 1, 0, 0);
 				vk.CmdEndRenderPass(commandBuffer);
+
+
+				if (physicalDeviceFeatures.PipelineStatisticsQuery) vk.CmdEndQuery(commandBuffer, queryPool, 0);
 				vk.EndCommandBuffer(commandBuffer).Check();
 			}
 
@@ -568,6 +604,7 @@ internal unsafe partial class Application : IDisposable
 		vk.DestroyPipelineLayout(device, pipelineLayout, null);
 		vk.DestroyDescriptorSetLayout(device, descriptorSetLayout, null);
 		//vk.DestroySampler(device, sampler, null);
+		if (physicalDeviceFeatures.PipelineStatisticsQuery) vk.DestroyQueryPool(device, queryPool, null);
 		vk.DestroyDevice(device, null);
 		khrSwapchain.Dispose();
 		khrSurface.DestroySurface(instance, surface, null);

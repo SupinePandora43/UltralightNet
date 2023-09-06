@@ -18,6 +18,10 @@ internal unsafe static class Utils
 	{
 		if (result is not Result.Success) throw new Exception($"Result is {result}");
 	}
+	public static void Assert(this bool condition)
+	{
+		if (!condition) throw new Exception("Assertion failed");
+	}
 	public static byte* ToPointer(this ReadOnlySpan<byte> span) => (byte*)Unsafe.AsPointer(ref Unsafe.AsRef(in span[0]));
 
 	public static void CreateInstance(Vk vk, string[] extensions, out Instance instance)
