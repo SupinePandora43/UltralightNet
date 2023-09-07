@@ -37,6 +37,7 @@ internal unsafe partial class Application : IDisposable
 	readonly PhysicalDevice physicalDevice;
 	readonly PhysicalDeviceMemoryProperties physicalDeviceMemoryProperties;
 	readonly PhysicalDeviceFeatures physicalDeviceFeatures; // see enabledPhysicalDeviceFeatures
+	readonly bool UMA = false;
 	readonly uint graphicsQueueFamily = uint.MaxValue;
 	readonly uint presentQueueFamily = uint.MaxValue;
 
@@ -61,6 +62,8 @@ internal unsafe partial class Application : IDisposable
 
 	readonly CommandPool commandPool;
 
+	readonly CommandBuffer[] ultralightCommandBuffers = new CommandBuffer[MaxFramesInFlight];
+	readonly bool[] ultralightCommandBufferBegun = new bool[MaxFramesInFlight]; // can be replaced with a single bool btw
 	readonly Renderer renderer;
 	readonly View view;
 
@@ -113,6 +116,20 @@ internal unsafe partial class Application : IDisposable
 
 			vk.GetPhysicalDeviceMemoryProperties(physicalDevice, out physicalDeviceMemoryProperties);
 			vk.GetPhysicalDeviceFeatures(physicalDevice, out physicalDeviceFeatures);
+
+			for (int i = 0; i < physicalDeviceMemoryProperties.MemoryTypeCount; i++)
+			{
+				var type = physicalDeviceMemoryProperties.MemoryTypes[i];
+				if (physicalDeviceMemoryProperties.MemoryHeaps[(int)type.HeapIndex].Flags.HasFlag(MemoryHeapFlags.MemoryHeapDeviceLocalBit)
+					&& type.PropertyFlags.HasFlag(
+						MemoryPropertyFlags.MemoryPropertyDeviceLocalBit |
+						MemoryPropertyFlags.MemoryPropertyHostVisibleBit |
+						MemoryPropertyFlags.MemoryPropertyHostCoherentBit))
+				{
+					UMA = true;
+					break;
+				}
+			}
 		}
 		{ // Device + Queues
 			float priority = 1.0f;
@@ -124,7 +141,8 @@ internal unsafe partial class Application : IDisposable
 			{
 				SamplerAnisotropy = true,
 #if DEBUG
-				PipelineStatisticsQuery = physicalDeviceFeatures.PipelineStatisticsQuery
+				PipelineStatisticsQuery = physicalDeviceFeatures.PipelineStatisticsQuery && physicalDeviceFeatures.InheritedQueries,
+				InheritedQueries = physicalDeviceFeatures.InheritedQueries
 #endif
 			};
 
@@ -319,6 +337,10 @@ internal unsafe partial class Application : IDisposable
 			vk.CreateCommandPool(device, &commandPoolCreateInfo, null, out commandPool).Check();
 		}
 
+		{ // Ultralight CommandBuffers
+			var commandBufferAllocateInfo = new CommandBufferAllocateInfo(commandPool: commandPool, level: CommandBufferLevel.Secondary, commandBufferCount: MaxFramesInFlight);
+			vk.AllocateCommandBuffers(device, &commandBufferAllocateInfo, ultralightCommandBuffers).Check();
+		}
 		{ // Ultralight
 			AppCoreMethods.SetPlatformFontLoader();
 
@@ -523,6 +545,7 @@ internal unsafe partial class Application : IDisposable
 			}
 
 			vk.WaitForFences(device, 1, renderFinishedFences![CurrentFrame], true, ulong.MaxValue).Check();
+			ExecuteSurfaceDefinitionDestroyByFrameQueue();
 
 			uint imageIndex = 0;
 			var result = khrSwapchain.AcquireNextImage(device, swapchain, ulong.MaxValue, imageAvailableSemaphores![CurrentFrame], default, &imageIndex);
@@ -553,45 +576,11 @@ internal unsafe partial class Application : IDisposable
 
 				renderer.Render();
 
-				Debug.Assert(view.Surface!.Value.Id is 1);
+				if (TryGetSurfaceDefinitionCommandBufferToSubmit(out var ultralightCommandBuffer)) vk.CmdExecuteCommands(commandBuffer, 1, &ultralightCommandBuffer);
 				ref var viewSurface = ref CollectionsMarshal.AsSpan(surfaces)[(int)view.Surface!.Value.Id];
+				Debug.Assert(view.Surface!.Value.Id is 1);
 
-				if (viewSurface.dirty)
-				{
-					viewSurface.dirty = false;
-
-					debugUtils?.CmdBeginDebugUtilsLabel(commandBuffer, new DebugUtilsLabelEXT(pLabelName: "Ultralight View Copy"u8.ToPointer()));
-
-					var imageMemoryBarrier = new ImageMemoryBarrier(
-						srcAccessMask: viewSurface.imageLayout is ImageLayout.Undefined ? AccessFlags.AccessNoneKhr : AccessFlags.AccessShaderReadBit, dstAccessMask: AccessFlags.AccessTransferWriteBit,
-						oldLayout: viewSurface.imageLayout, newLayout: ImageLayout.TransferDstOptimal,
-						image: viewSurface.image, subresourceRange: new ImageSubresourceRange(ImageAspectFlags.ImageAspectColorBit, 0, 1, 0, 1));
-					vk.CmdPipelineBarrier(commandBuffer,
-						PipelineStageFlags.PipelineStageFragmentShaderBit, PipelineStageFlags.PipelineStageTransferBit, 0,
-						0, null,
-						0, null,
-						1, &imageMemoryBarrier);
-
-					var bufferImageCopy = new BufferImageCopy(viewSurface.size * imageIndex, viewSurface.width, viewSurface.height, new ImageSubresourceLayers(ImageAspectFlags.ImageAspectColorBit, 0, 0, 1), imageExtent: new Extent3D(viewSurface.width, viewSurface.height, 1));
-					vk.CmdCopyBufferToImage(commandBuffer, viewSurface.stagingBuffer, viewSurface.image, ImageLayout.TransferDstOptimal, 1, &bufferImageCopy);
-
-					imageMemoryBarrier = imageMemoryBarrier with
-					{
-						SrcAccessMask = AccessFlags.AccessTransferWriteBit,
-						DstAccessMask = AccessFlags.AccessShaderReadBit,
-						OldLayout = ImageLayout.TransferDstOptimal,
-						NewLayout = ImageLayout.ShaderReadOnlyOptimal
-					};
-					vk.CmdPipelineBarrier(commandBuffer,
-						PipelineStageFlags.PipelineStageTransferBit, PipelineStageFlags.PipelineStageFragmentShaderBit, 0,
-						0, null,
-						0, null,
-						1, &imageMemoryBarrier);
-
-					viewSurface.imageLayout = ImageLayout.ShaderReadOnlyOptimal;
-
-					debugUtils?.CmdEndDebugUtilsLabel(commandBuffer);
-				}
+				// something
 
 				debugUtils?.CmdEndDebugUtilsLabel(commandBuffer);
 
@@ -643,6 +632,7 @@ internal unsafe partial class Application : IDisposable
 		if (swapchain.Handle is not 0) khrSwapchain.DestroySwapchain(device, swapchain, null);
 		view.Dispose();
 		renderer.Dispose();
+		ExecuteSurfaceDefinitionDestroyQueue();
 		vk.DestroyCommandPool(device, commandPool, null);
 		vk.DestroyPipeline(device, pipeline, null);
 		vk.DestroyRenderPass(device, renderPass, null);
