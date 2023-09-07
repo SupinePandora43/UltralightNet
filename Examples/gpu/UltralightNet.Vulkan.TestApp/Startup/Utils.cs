@@ -4,6 +4,9 @@ using System.Runtime.InteropServices;
 using Silk.NET.Core;
 using Silk.NET.Core.Native;
 using Silk.NET.Vulkan;
+using Silk.NET.Vulkan.Extensions.EXT;
+using UltralightNet;
+using Buffer = Silk.NET.Vulkan.Buffer;
 
 internal unsafe static class Utils
 {
@@ -21,6 +24,31 @@ internal unsafe static class Utils
 	public static void Assert(this bool condition)
 	{
 		if (!condition) throw new Exception("Assertion failed");
+	}
+
+	public static uint FindMemoryTypeIndex(this PhysicalDeviceMemoryProperties physicalDeviceMemoryProperties, uint memoryTypeBits, MemoryPropertyFlags memoryPropertyFlags)
+	{
+		for (int i = 0; i < physicalDeviceMemoryProperties.MemoryTypeCount; i++)
+			if ((memoryTypeBits & (1 << i)) != 0 && physicalDeviceMemoryProperties.MemoryTypes[i].PropertyFlags.HasFlag(memoryPropertyFlags))
+				return (uint)i;
+		throw new Exception($"Memory not found: {memoryTypeBits}, {memoryPropertyFlags}");
+	}
+	public static ulong AlignTo(this ulong number, ulong alignment)
+	{
+		number -= 1;
+		number |= alignment - 1;
+		number += 1;
+		return number;
+	}
+
+	public static void SetDebugUtilsObjectName<T>(this ExtDebugUtils debugUtils, Device device, T vulkanObject, ReadOnlySpan<char> name) where T : unmanaged
+	{
+		using ULString utf8Name = new(name);
+		debugUtils.SetDebugUtilsObjectName(device, new DebugUtilsObjectNameInfoEXT(objectType:
+			typeof(T) == typeof(Image) ? ObjectType.Image :
+			typeof(T) == typeof(Buffer) ? ObjectType.Buffer :
+			typeof(T) == typeof(DeviceMemory) ? ObjectType.DeviceMemory : ObjectType.Unknown,
+			objectHandle: Unsafe.As<T, ulong>(ref vulkanObject), pObjectName: utf8Name.data)).Check();
 	}
 	public static byte* ToPointer(this ReadOnlySpan<byte> span) => (byte*)Unsafe.AsPointer(ref Unsafe.AsRef(in span[0]));
 

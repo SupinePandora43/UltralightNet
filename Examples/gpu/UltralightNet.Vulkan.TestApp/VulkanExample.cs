@@ -5,6 +5,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Runtime.InteropServices;
 using Silk.NET.Core;
 using Silk.NET.Core.Native;
 using Silk.NET.Input;
@@ -323,7 +324,7 @@ internal unsafe partial class Application : IDisposable
 
 			ULPlatform.SurfaceDefinition = this;
 
-			renderer = ULPlatform.CreateRenderer();
+			renderer = ULPlatform.CreateRenderer(new() { ForceRepaint = true });
 
 			window.Update += (delta) => renderer.Update();
 
@@ -336,7 +337,8 @@ internal unsafe partial class Application : IDisposable
 			catch (Exception e) { Console.WriteLine(e); }
 
 			view = renderer.CreateView((uint)window.FramebufferSize.X, (uint)window.FramebufferSize.Y, new ULViewConfig() { InitialDeviceScale = scale });
-			view.URL = "https://youtube.com";
+			// view.URL = "https://youtube.com";
+			view.HTML = "hello world!";
 		}
 		{ // Input controls
 			void SetupInput(IInputDevice device)
@@ -522,8 +524,6 @@ internal unsafe partial class Application : IDisposable
 
 			vk.WaitForFences(device, 1, renderFinishedFences![CurrentFrame], true, ulong.MaxValue).Check();
 
-			// renderer.Render();
-
 			uint imageIndex = 0;
 			var result = khrSwapchain.AcquireNextImage(device, swapchain, ulong.MaxValue, imageAvailableSemaphores![CurrentFrame], default, &imageIndex);
 
@@ -549,6 +549,51 @@ internal unsafe partial class Application : IDisposable
 					vk.CmdBeginQuery(commandBuffer, queryPool, 0, 0);
 				}
 
+				debugUtils?.CmdBeginDebugUtilsLabel(commandBuffer, new DebugUtilsLabelEXT(pLabelName: "Ultralight"u8.ToPointer()));
+
+				renderer.Render();
+
+				Debug.Assert(view.Surface!.Value.Id is 1);
+				ref var viewSurface = ref CollectionsMarshal.AsSpan(surfaces)[(int)view.Surface!.Value.Id];
+
+				if (viewSurface.dirty)
+				{
+					viewSurface.dirty = false;
+
+					debugUtils?.CmdBeginDebugUtilsLabel(commandBuffer, new DebugUtilsLabelEXT(pLabelName: "Ultralight View Copy"u8.ToPointer()));
+
+					var imageMemoryBarrier = new ImageMemoryBarrier(
+						srcAccessMask: viewSurface.imageLayout is ImageLayout.Undefined ? AccessFlags.AccessNoneKhr : AccessFlags.AccessShaderReadBit, dstAccessMask: AccessFlags.AccessTransferWriteBit,
+						oldLayout: viewSurface.imageLayout, newLayout: ImageLayout.TransferDstOptimal,
+						image: viewSurface.image, subresourceRange: new ImageSubresourceRange(ImageAspectFlags.ImageAspectColorBit, 0, 1, 0, 1));
+					vk.CmdPipelineBarrier(commandBuffer,
+						PipelineStageFlags.PipelineStageFragmentShaderBit, PipelineStageFlags.PipelineStageTransferBit, 0,
+						0, null,
+						0, null,
+						1, &imageMemoryBarrier);
+
+					var bufferImageCopy = new BufferImageCopy(viewSurface.size * imageIndex, viewSurface.width, viewSurface.height, new ImageSubresourceLayers(ImageAspectFlags.ImageAspectColorBit, 0, 0, 1), imageExtent: new Extent3D(viewSurface.width, viewSurface.height, 1));
+					vk.CmdCopyBufferToImage(commandBuffer, viewSurface.stagingBuffer, viewSurface.image, ImageLayout.TransferDstOptimal, 1, &bufferImageCopy);
+
+					imageMemoryBarrier = imageMemoryBarrier with
+					{
+						SrcAccessMask = AccessFlags.AccessTransferWriteBit,
+						DstAccessMask = AccessFlags.AccessShaderReadBit,
+						OldLayout = ImageLayout.TransferDstOptimal,
+						NewLayout = ImageLayout.ShaderReadOnlyOptimal
+					};
+					vk.CmdPipelineBarrier(commandBuffer,
+						PipelineStageFlags.PipelineStageTransferBit, PipelineStageFlags.PipelineStageFragmentShaderBit, 0,
+						0, null,
+						0, null,
+						1, &imageMemoryBarrier);
+
+					viewSurface.imageLayout = ImageLayout.ShaderReadOnlyOptimal;
+
+					debugUtils?.CmdEndDebugUtilsLabel(commandBuffer);
+				}
+
+				debugUtils?.CmdEndDebugUtilsLabel(commandBuffer);
 
 				var renderPassBeginInfo = new RenderPassBeginInfo(renderPass: renderPass, framebuffer: framebuffers![CurrentFrame], renderArea: new Rect2D(extent: extent));
 				vk.CmdBeginRenderPass(commandBuffer, &renderPassBeginInfo, SubpassContents.Inline);

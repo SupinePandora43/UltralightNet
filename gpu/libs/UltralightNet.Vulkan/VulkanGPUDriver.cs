@@ -30,6 +30,8 @@ public unsafe sealed class VulkanGPUDriver : IGPUDriver
 		this.physicalDevice = physicalDevice;
 		this.device = device;
 
+		allocator = new(vk, device, vk.GetPhysicalDeviceMemoryProperty(physicalDevice));
+
 		var descriptorPoolSize = new DescriptorPoolSize(DescriptorType.CombinedImageSampler, 1);
 		var descriptorPoolCreateInfo = new DescriptorPoolCreateInfo(maxSets: 128, poolSizeCount: 1, pPoolSizes: &descriptorPoolSize);
 		textureDescriptorAllocator = new(vk, physicalDevice, device, descriptorPoolCreateInfo);
@@ -95,7 +97,9 @@ public unsafe sealed class VulkanGPUDriver : IGPUDriver
 			g = new()
 			{
 				Vertex = new(this, vertex),
-				Index = new(this, index)
+				Index = new(this, index),
+				Memory0 = sharedDeviceMemory,
+				Memory1 = sharedHostMemory
 			};
 		}
 		else
@@ -180,6 +184,9 @@ public unsafe sealed class VulkanGPUDriver : IGPUDriver
 	{
 		public AllocationTuple Vertex { readonly get; init; }
 		public AllocationTuple Index { readonly get; init; }
+
+		public DeviceMemory Memory0 { readonly get; init; }
+		public DeviceMemory Memory1 { readonly get; init; }
 
 		public struct AllocationTuple
 		{

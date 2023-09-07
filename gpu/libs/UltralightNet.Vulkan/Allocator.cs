@@ -1,10 +1,11 @@
+using System;
 using Silk.NET.Vulkan;
 using Buffer = Silk.NET.Vulkan.Buffer;
 
 namespace UltralightNet.GPU.Vulkan;
 
 
-internal unsafe class Allocator
+internal unsafe class Allocator : IDisposable
 {
 	public uint FramesInFlight = 2;
 	public uint CurrentFrame = 0;
@@ -13,6 +14,12 @@ internal unsafe class Allocator
 	readonly Device device;
 
 	readonly PhysicalDeviceMemoryProperties physicalDeviceMemoryProperties;
+
+	public Allocator(Vk vk, Device device, PhysicalDeviceMemoryProperties physicalDeviceMemoryProperties){
+		this.vk = vk;
+		this.device = device;
+		this.physicalDeviceMemoryProperties = physicalDeviceMemoryProperties;
+	}
 
 	public void CreateBuffer(ulong size, BufferUsageFlags bufferUsageFlags, MemoryPropertyFlags memoryPropertyFlags, out Buffer buffer, out DeviceMemory bufferMemory)
 	{
@@ -26,4 +33,10 @@ internal unsafe class Allocator
 		vk.AllocateMemory(device, &memoryAllocateInfo, null, out bufferMemory).Check();
 		vk.BindBufferMemory(device, buffer, bufferMemory, 0).Check();
 	}
+
+	public void Dispose()
+	{
+		GC.SuppressFinalize(this);
+	}
+	~Allocator() => Dispose();
 }
