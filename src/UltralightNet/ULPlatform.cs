@@ -122,8 +122,6 @@ public static unsafe class ULPlatform
 		ULLogger? ILogger.GetNativeStruct() => null;
 #endif
 
-		void IDisposable.Dispose() { }
-
 		ref struct SpanEnumerator<T> where T : IEquatable<T>
 		{
 			ReadOnlySpan<T> span;
@@ -193,7 +191,5 @@ public static unsafe class ULPlatform
 #elif NETSTANDARD2_0
 		ULFileSystem? IFileSystem.GetNativeStruct() => null;
 #endif
-
-		void IDisposable.Dispose() { }
 	}
 }

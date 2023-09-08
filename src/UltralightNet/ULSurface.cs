@@ -85,7 +85,13 @@ public readonly struct ULSurface
 
 	public nint Id => Methods.ulSurfaceGetUserData(Ptr);
 
-	public unsafe ULBitmap Bitmap => ULBitmap.FromHandle(Methods.ulBitmapSurfaceGetBitmap(Ptr), false);
-
+	public unsafe ULBitmap? Bitmap
+	{
+		get
+		{
+			var handle = Methods.ulBitmapSurfaceGetBitmap(Ptr);
+			return handle is not null ? ULBitmap.FromHandle(handle, false) : null;
+		}
+	}
 	internal static ULSurface FromHandle(nuint handle) => new(handle);
 }
