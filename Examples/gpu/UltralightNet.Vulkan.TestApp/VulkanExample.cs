@@ -578,7 +578,8 @@ internal unsafe partial class Application : IDisposable
 
 				if (TryGetSurfaceDefinitionCommandBufferToSubmit(out var ultralightCommandBuffer)) vk.CmdExecuteCommands(commandBuffer, 1, &ultralightCommandBuffer);
 				ref var viewSurface = ref CollectionsMarshal.AsSpan(surfaces)[(int)view.Surface!.Value.Id];
-				Debug.Assert(view.Surface!.Value.Id is 1);
+				Debug.Assert(view!.Surface?.Id is 1);
+				Debug.Assert(view!.Surface?.Bitmap is null);
 
 				// something
 
