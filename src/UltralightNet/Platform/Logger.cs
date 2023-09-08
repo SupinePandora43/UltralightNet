@@ -17,7 +17,7 @@ namespace UltralightNet.Platform
 #endif
 		}
 	}
-	public interface ILogger : IDisposable
+	public interface ILogger
 	{
 		void LogMessage(ULLogLevel logLevel, string message);
 
@@ -60,12 +60,8 @@ namespace UltralightNet.Platform
 				if (IsDisposed) return;
 				if (handle.IsAllocated) handle.Free();
 
-				try { instance.Dispose(); }
-				finally
-				{
-					GC.SuppressFinalize(this);
-					IsDisposed = true;
-				}
+				GC.SuppressFinalize(this);
+				IsDisposed = true;
 			}
 			~Wrapper() => Dispose();
 		}

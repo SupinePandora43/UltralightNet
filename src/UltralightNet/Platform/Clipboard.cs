@@ -19,7 +19,7 @@ namespace UltralightNet.Platform
 #endif
 		}
 	}
-	public interface IClipboard : IDisposable
+	public interface IClipboard
 	{
 		void Clear();
 		string ReadPlainText();
@@ -75,12 +75,8 @@ namespace UltralightNet.Platform
 					foreach (var handle in handles) if (handle.IsAllocated) handle.Free();
 				}
 
-				try { instance.Dispose(); }
-				finally
-				{
-					GC.SuppressFinalize(this);
-					IsDisposed = true;
-				}
+				GC.SuppressFinalize(this);
+				IsDisposed = true;
 			}
 			~Wrapper() => Dispose();
 		}

@@ -32,7 +32,7 @@ namespace UltralightNet.Platform
 		}
 	}
 
-	public interface IGPUDriver : IDisposable
+	public interface IGPUDriver
 	{
 		uint NextTextureId();
 		void CreateTexture(uint textureId, ULBitmap bitmap);
@@ -149,12 +149,8 @@ namespace UltralightNet.Platform
 					foreach (var handle in handles) if (handle.IsAllocated) handle.Free();
 				}
 
-				try { instance.Dispose(); }
-				finally
-				{
-					GC.SuppressFinalize(this);
-					IsDisposed = true;
-				}
+				GC.SuppressFinalize(this);
+				IsDisposed = true;
 			}
 			~Wrapper() => Dispose();
 		}

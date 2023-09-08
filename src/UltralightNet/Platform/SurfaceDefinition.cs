@@ -25,7 +25,7 @@ namespace UltralightNet.Platform
 #endif
 		}
 	}
-	public interface ISurfaceDefinition : IDisposable
+	public interface ISurfaceDefinition
 	{
 		nint Create(uint width, uint height);
 		void Destroy(nint id);
@@ -100,12 +100,8 @@ namespace UltralightNet.Platform
 					foreach (var handle in handles) if (handle.IsAllocated) handle.Free();
 				}
 
-				try { instance.Dispose(); }
-				finally
-				{
-					GC.SuppressFinalize(this);
-					IsDisposed = true;
-				}
+				GC.SuppressFinalize(this);
+				IsDisposed = true;
 			}
 			~Wrapper() => Dispose();
 		}

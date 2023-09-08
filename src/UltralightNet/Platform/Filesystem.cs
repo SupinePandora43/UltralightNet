@@ -20,7 +20,7 @@ namespace UltralightNet.Platform
 #endif
 		}
 	}
-	public interface IFileSystem : IDisposable
+	public interface IFileSystem
 	{
 		bool FileExists(string path);
 		string GetFileMimeType(string path);
@@ -78,12 +78,8 @@ namespace UltralightNet.Platform
 					foreach (var handle in handles) if (handle.IsAllocated) handle.Free();
 				}
 
-				try { instance.Dispose(); }
-				finally
-				{
-					GC.SuppressFinalize(this);
-					IsDisposed = true;
-				}
+				GC.SuppressFinalize(this);
+				IsDisposed = true;
 			}
 			~Wrapper() => Dispose();
 		}
