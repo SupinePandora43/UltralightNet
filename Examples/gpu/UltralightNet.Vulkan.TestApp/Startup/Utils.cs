@@ -45,9 +45,12 @@ internal unsafe static class Utils
 	{
 		using ULString utf8Name = new(name);
 		debugUtils.SetDebugUtilsObjectName(device, new DebugUtilsObjectNameInfoEXT(objectType:
-			typeof(T) == typeof(Image) ? ObjectType.Image :
+			typeof(T) == typeof(DeviceMemory) ? ObjectType.DeviceMemory :
 			typeof(T) == typeof(Buffer) ? ObjectType.Buffer :
-			typeof(T) == typeof(DeviceMemory) ? ObjectType.DeviceMemory : ObjectType.Unknown,
+			typeof(T) == typeof(Image) ? ObjectType.Image :
+			typeof(T) == typeof(ImageView) ? ObjectType.ImageView :
+			typeof(T) == typeof(DescriptorSet) ? ObjectType.DescriptorSet
+			: ObjectType.Unknown,
 			objectHandle: Unsafe.As<T, ulong>(ref vulkanObject), pObjectName: utf8Name.data)).Check();
 	}
 	public static byte* ToPointer(this ReadOnlySpan<byte> span) => (byte*)Unsafe.AsPointer(ref Unsafe.AsRef(in span[0]));

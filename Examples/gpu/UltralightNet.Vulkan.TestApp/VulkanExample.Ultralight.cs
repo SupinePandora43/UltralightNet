@@ -38,7 +38,7 @@ unsafe partial class Application : ISurfaceDefinition // this may cause problems
 
 		var imageCreateInfo = new ImageCreateInfo(
 			imageType: ImageType.ImageType2D,
-			format: Format.B8G8R8A8Unorm,
+			format: Format.B8G8R8A8Srgb,
 			extent: new(width, height, 1),
 			mipLevels: 1,
 			arrayLayers: 1,

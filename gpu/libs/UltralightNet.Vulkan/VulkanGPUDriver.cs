@@ -17,8 +17,15 @@ public unsafe sealed class VulkanGPUDriver : IGPUDriver
 	readonly ResourceList<int> renderBuffers = new();
 	readonly ResourceList<GeometryEntry> geometries = new();
 
+
 	readonly Allocator allocator;
-	readonly DescriptorAllocator textureDescriptorAllocator;
+
+	readonly DescriptorSetLayout uniformBufferDescriptorSetLayout;
+	readonly DescriptorSetAllocator uniformBufferDescriptorSetAllocator;
+
+	readonly DescriptorSetLayout textureDescriptorSetLayout;
+	readonly DescriptorSetAllocator textureDescriptorSetAllocator;
+
 
 	public uint FrameId { get; set; }
 
@@ -32,15 +39,37 @@ public unsafe sealed class VulkanGPUDriver : IGPUDriver
 
 		allocator = new(vk, device, vk.GetPhysicalDeviceMemoryProperty(physicalDevice));
 
-		var descriptorPoolSize = new DescriptorPoolSize(DescriptorType.CombinedImageSampler, 1);
+		{ // uniformBufferDescriptorSet___
+			var descriptorSetLayoutBinding = new DescriptorSetLayoutBinding(0, DescriptorType.UniformBufferDynamic, 1, ShaderStageFlags.ShaderStageVertexBit | ShaderStageFlags.ShaderStageFragmentBit);
+			var descriptorSetLayoutCreateInfo = new DescriptorSetLayoutCreateInfo(bindingCount: 1, pBindings: &descriptorSetLayoutBinding);
+			vk.CreateDescriptorSetLayout(device, &descriptorSetLayoutCreateInfo, null, out uniformBufferDescriptorSetLayout).Check();
+
+			uniformBufferDescriptorSetAllocator = new(vk, device, new[] { new DescriptorPoolSize(DescriptorType.UniformBufferDynamic, 1) }, uniformBufferDescriptorSetLayout);
+		}
+		{ // textureDescriptorSet___
+			var descriptorSetLayoutBinding = new DescriptorSetLayoutBinding(0, DescriptorType.CombinedImageSampler, 1, ShaderStageFlags.ShaderStageFragmentBit);
+			var descriptorSetLayoutCreateInfo = new DescriptorSetLayoutCreateInfo(bindingCount: 1, pBindings: &descriptorSetLayoutBinding);
+			vk.CreateDescriptorSetLayout(device, &descriptorSetLayoutCreateInfo, null, out textureDescriptorSetLayout).Check();
+
+			textureDescriptorSetAllocator = new(vk, device, new[] { new DescriptorPoolSize(DescriptorType.CombinedImageSampler, 1) }, textureDescriptorSetLayout);
+		}
+
+		/*var descriptorPoolSize = new DescriptorPoolSize(DescriptorType.CombinedImageSampler, 1);
 		var descriptorPoolCreateInfo = new DescriptorPoolCreateInfo(maxSets: 128, poolSizeCount: 1, pPoolSizes: &descriptorPoolSize);
-		textureDescriptorAllocator = new(vk, physicalDevice, device, descriptorPoolCreateInfo);
+		vk.CreateDescriptorSetLayout(device, )
+		textureDescriptorAllocator = new(vk, device, descriptorPoolCreateInfo, descriptorSetLayout);*/
 	}
 
 	// Call only AFTER all commands are completed.
 	public void Dispose()
 	{
-		// free pools
+		textureDescriptorSetAllocator.Dispose();
+		vk.DestroyDescriptorSetLayout(device, textureDescriptorSetLayout, null);
+
+		uniformBufferDescriptorSetAllocator.Dispose();
+		vk.DestroyDescriptorSetLayout(device, uniformBufferDescriptorSetLayout, null);
+
+		allocator.Dispose();
 	}
 
 	void IGPUDriver.CreateRenderBuffer(uint renderBufferId, ULRenderBuffer renderBuffer)

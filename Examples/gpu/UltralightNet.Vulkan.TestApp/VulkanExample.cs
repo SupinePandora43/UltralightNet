@@ -15,6 +15,7 @@ using Silk.NET.Vulkan.Extensions.KHR;
 using Silk.NET.Windowing;
 using UltralightNet;
 using UltralightNet.AppCore;
+using UltralightNet.GPU.Vulkan;
 using UltralightNet.Platform;
 using Buffer = Silk.NET.Vulkan.Buffer;
 
@@ -54,8 +55,9 @@ internal unsafe partial class Application : IDisposable
 	readonly SurfaceFormatKHR surfaceFormat = new(Format.B8G8R8A8Srgb, ColorSpaceKHR.ColorSpaceSrgbNonlinearKhr);
 	readonly PresentModeKHR presentMode = PresentModeKHR.PresentModeFifoKhr;
 
-	//readonly Sampler sampler;
+	readonly Sampler sampler;
 	readonly DescriptorSetLayout descriptorSetLayout;
+	readonly DescriptorSetAllocator descriptorSetAllocator;
 	readonly PipelineLayout pipelineLayout;
 	readonly RenderPass renderPass;
 	readonly Pipeline pipeline;
@@ -193,9 +195,18 @@ internal unsafe partial class Application : IDisposable
 
 			queryStats = new ulong[6];
 		}
-		/*{ // Sampler
-			var samplerCreateInfo = new SamplerCreateInfo()
-			{
+		{ // Sampler
+		  // const SamplerAddressMode samplerAddressMode = SamplerAddressMode.ClampToEdge;
+			var samplerCreateInfo = new SamplerCreateInfo(
+				magFilter: Filter.Nearest,
+				minFilter: Filter.Linear,
+				mipmapMode: SamplerMipmapMode.Nearest
+				//addressModeU: samplerAddressMode,
+				//addressModeV: samplerAddressMode,
+				//addressModeW: SamplerAddressMode.Repeat,
+				//maxLod: 1
+				);
+			/*{
 				SType = StructureType.SamplerCreateInfo,
 				MagFilter = Filter.Linear,
 				MinFilter = Filter.Linear,
@@ -212,9 +223,9 @@ internal unsafe partial class Application : IDisposable
 				MinLod = 0,
 				MaxLod = 1,
 				MipLodBias = 0
-			};
-			vk.CreateSampler(device, &samplerCreateInfo, null, out sampler);
-		}*/
+			};*/
+			vk.CreateSampler(device, &samplerCreateInfo, null, out sampler).Check();
+		}
 		{ // Surface support
 			uint surfaceFormatCount = 0;
 			khrSurface.GetPhysicalDeviceSurfaceFormats(physicalDevice, surface, &surfaceFormatCount, null).Check();
@@ -243,14 +254,18 @@ internal unsafe partial class Application : IDisposable
 			}
 		}
 		{ // DescriptorSetLayout
-			var descriptorSetLayoutBinding = new DescriptorSetLayoutBinding(binding: 0, descriptorType: DescriptorType.CombinedImageSampler, descriptorCount: 1, stageFlags: ShaderStageFlags.ShaderStageFragmentBit);
-			var descriptorSetLayoutCreateInfo = new DescriptorSetLayoutCreateInfo(bindingCount: 1, pBindings: &descriptorSetLayoutBinding);
-			vk.CreateDescriptorSetLayout(device, &descriptorSetLayoutCreateInfo, null, out descriptorSetLayout).Check();
+			fixed (Sampler* samplerPtr = &sampler)
+			{
+				var descriptorSetLayoutBinding = new DescriptorSetLayoutBinding(binding: 0, descriptorType: DescriptorType.CombinedImageSampler, descriptorCount: 1, stageFlags: ShaderStageFlags.ShaderStageFragmentBit, pImmutableSamplers: samplerPtr);
+				var descriptorSetLayoutCreateInfo = new DescriptorSetLayoutCreateInfo(bindingCount: 1, pBindings: &descriptorSetLayoutBinding);
+				vk.CreateDescriptorSetLayout(device, &descriptorSetLayoutCreateInfo, null, out descriptorSetLayout).Check();
+			}
+			descriptorSetAllocator = new(vk, device, new[] { new DescriptorPoolSize(DescriptorType.CombinedImageSampler, 1) }, descriptorSetLayout);
 		}
 		{ // PipelineLayout
 			fixed (DescriptorSetLayout* pDescriptorSetLayout = &descriptorSetLayout)
 			{
-				var pipelineLayoutCreateInfo = new PipelineLayoutCreateInfo(/*setLayoutCount: 1,*/ pSetLayouts: pDescriptorSetLayout);
+				var pipelineLayoutCreateInfo = new PipelineLayoutCreateInfo(setLayoutCount: 1, pSetLayouts: pDescriptorSetLayout);
 				vk.CreatePipelineLayout(device, &pipelineLayoutCreateInfo, null, out pipelineLayout).Check();
 			}
 		}
@@ -530,6 +545,8 @@ internal unsafe partial class Application : IDisposable
 		swapchainImages = null;
 	}
 
+	(Image image, DescriptorSetAllocator.PooledSet imageDescriptorSet) viewSurface;
+
 	public void Run()
 	{
 		CreateSwapchain();
@@ -546,6 +563,8 @@ internal unsafe partial class Application : IDisposable
 
 			vk.WaitForFences(device, 1, renderFinishedFences![CurrentFrame], true, ulong.MaxValue).Check();
 			ExecuteSurfaceDefinitionDestroyByFrameQueue();
+			descriptorSetAllocator.CurrentFrame = CurrentFrame;
+			descriptorSetAllocator.ExecuteCurrentFrameDestroyQueue();
 
 			uint imageIndex = 0;
 			var result = khrSwapchain.AcquireNextImage(device, swapchain, ulong.MaxValue, imageAvailableSemaphores![CurrentFrame], default, &imageIndex);
@@ -564,7 +583,7 @@ internal unsafe partial class Application : IDisposable
 			var commandBuffer = commandBuffers![CurrentFrame];
 			{
 				vk.ResetCommandBuffer(commandBuffer, 0).Check();
-				var commandBufferBeginInfo = new CommandBufferBeginInfo(pNext: null);
+				var commandBufferBeginInfo = new CommandBufferBeginInfo(flags: CommandBufferUsageFlags.CommandBufferUsageOneTimeSubmitBit);
 				vk.BeginCommandBuffer(commandBuffer, &commandBufferBeginInfo).Check();
 				if (physicalDeviceFeatures.PipelineStatisticsQuery)
 				{
@@ -577,11 +596,30 @@ internal unsafe partial class Application : IDisposable
 				renderer.Render();
 
 				if (TryGetSurfaceDefinitionCommandBufferToSubmit(out var ultralightCommandBuffer)) vk.CmdExecuteCommands(commandBuffer, 1, &ultralightCommandBuffer);
+
 				ref var viewSurface = ref CollectionsMarshal.AsSpan(surfaces)[(int)view.Surface!.Value.Id];
 				Debug.Assert(view!.Surface?.Id is 1);
 				Debug.Assert(view!.Surface?.Bitmap is null);
 
-				// something
+				if (viewSurface.image.Handle != this.viewSurface.image.Handle)
+				{
+					if (this.viewSurface.imageDescriptorSet.Value.Handle is not 0) descriptorSetAllocator.Destroy(this.viewSurface.imageDescriptorSet);
+					var pooledSet = descriptorSetAllocator.GetDescriptorSet();
+
+					// TODO: destroy old one.
+
+					var imageViewCreateInfo = new ImageViewCreateInfo(image: viewSurface.image, viewType: ImageViewType.ImageViewType2D, format: Format.B8G8R8A8Srgb, components: new ComponentMapping(ComponentSwizzle.R, ComponentSwizzle.G, ComponentSwizzle.B, view.IsTransparent ? ComponentSwizzle.A : ComponentSwizzle.One), subresourceRange: new ImageSubresourceRange(ImageAspectFlags.ImageAspectColorBit, 0, 1, 0, 1));
+					vk.CreateImageView(device, &imageViewCreateInfo, null, out var imageView).Check();
+
+					var descriptorImageInfo = new DescriptorImageInfo(sampler, imageView, ImageLayout.ShaderReadOnlyOptimal);
+					var writeDescriptorSet = new WriteDescriptorSet(dstSet: pooledSet.Value, descriptorCount: 1, descriptorType: DescriptorType.CombinedImageSampler, pImageInfo: &descriptorImageInfo);
+					vk.UpdateDescriptorSets(device, 1, &writeDescriptorSet, 0, null);
+
+					this.viewSurface = (viewSurface.image, pooledSet);
+
+					debugUtils?.SetDebugUtilsObjectName(device, imageView, $"View {view!.Surface?.Id!} ImageView");
+					debugUtils?.SetDebugUtilsObjectName(device, pooledSet.Value, $"View {view!.Surface?.Id!} DescriptorSet");
+				}
 
 				debugUtils?.CmdEndDebugUtilsLabel(commandBuffer);
 
@@ -592,7 +630,8 @@ internal unsafe partial class Application : IDisposable
 				var scissor = new Rect2D(extent: extent);
 				vk.CmdSetViewport(commandBuffer, 0, 1, &viewport);
 				vk.CmdSetScissor(commandBuffer, 0, 1, &scissor);
-				// TODO: bind texture
+				var descriptorSets = stackalloc DescriptorSet[1] { this.viewSurface.imageDescriptorSet.Value };
+				vk.CmdBindDescriptorSets(commandBuffer, PipelineBindPoint.Graphics, pipelineLayout, 0, 1, descriptorSets, 0, null);
 				vk.CmdDraw(commandBuffer, 3, 1, 0, 0);
 				vk.CmdEndRenderPass(commandBuffer);
 
@@ -638,8 +677,9 @@ internal unsafe partial class Application : IDisposable
 		vk.DestroyPipeline(device, pipeline, null);
 		vk.DestroyRenderPass(device, renderPass, null);
 		vk.DestroyPipelineLayout(device, pipelineLayout, null);
+		descriptorSetAllocator.Dispose();
 		vk.DestroyDescriptorSetLayout(device, descriptorSetLayout, null);
-		//vk.DestroySampler(device, sampler, null);
+		vk.DestroySampler(device, sampler, null);
 		if (physicalDeviceFeatures.PipelineStatisticsQuery) vk.DestroyQueryPool(device, queryPool, null);
 		vk.DestroyDevice(device, null);
 		khrSwapchain.Dispose();

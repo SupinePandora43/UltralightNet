@@ -1,5 +1,6 @@
 using System;
-using System.Diagnostics.CodeAnalysis;
+using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices;
 using Silk.NET.Vulkan;
 
 namespace UltralightNet.GPU.Vulkan;
@@ -10,6 +11,8 @@ internal static class Helper
 	{
 		if (result is not Result.Success) throw new Exception($"Result is {result}");
 	}
+
+	public unsafe static T* AsPointer<T>(this ReadOnlySpan<T> span) where T : unmanaged => (T*)Unsafe.AsPointer(ref MemoryMarshal.GetReference(span));
 
 	public static uint FindMemoryTypeIndex(this PhysicalDeviceMemoryProperties physicalDeviceMemoryProperties, uint memoryTypeBits, MemoryPropertyFlags memoryPropertyFlags)
 	{
