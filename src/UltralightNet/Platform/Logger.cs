@@ -10,10 +10,14 @@ namespace UltralightNet.Platform
 		/// </summary>
 		public unsafe struct ULLogger
 		{
+#if !NETSTANDARD
 			public delegate* unmanaged[Cdecl]<ULLogLevel, ULString*, void> LogMessage;
+#else
+			public void* LogMessage;
+#endif
 		}
 	}
-	public interface ILogger : IDisposable
+	public interface ILogger
 	{
 		void LogMessage(ULLogLevel logLevel, string message);
 
@@ -56,12 +60,8 @@ namespace UltralightNet.Platform
 				if (IsDisposed) return;
 				if (handle.IsAllocated) handle.Free();
 
-				try { instance.Dispose(); }
-				finally
-				{
-					GC.SuppressFinalize(this);
-					IsDisposed = true;
-				}
+				GC.SuppressFinalize(this);
+				IsDisposed = true;
 			}
 			~Wrapper() => Dispose();
 		}

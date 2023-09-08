@@ -70,9 +70,13 @@ public static unsafe class ULPlatform
 		if (SetDefaultFileSystem && filesystemWrapper is null) FileSystem = config.ResourcePathPrefix is "resources/" ? DefaultFileSystem : throw new ArgumentException("Default file system supports only \"resources\" ResourcePathPrefix", nameof(config));
 		else if (ErrorMissingResources && filesystemWrapper is not null)
 		{
+#if !NETSTANDARD
 			var path = config.ResourcePathPrefix + "icudt67l.dat";
 			using ULString str = new(path.AsSpan());
 			if (filesystemWrapper.NativeStruct.FileExists is null || !filesystemWrapper.NativeStruct.FileExists(&str)) throw new Exception($"{nameof(FileSystem)}.{nameof(IFileSystem.FileExists)}(\"{path}\") returned 'false'. {nameof(ULConfig)}.{nameof(ULConfig.ResourcePathPrefix)} + \"icudt67l.dat\" is required for Renderer creation. (Set {nameof(ULPlatform)}.{nameof(ErrorMissingResources)} to \'false\' to ignore this exception, however, be ready for unhandled crash.)");
+#else
+			// throw new PlatformNotSupportedException("We're unable to check presence of required files on netstandard");
+#endif
 		}
 
 		if (SetDefaultFontLoader && fontloaderWrapper is null) throw new Exception($"{nameof(FontLoader)} not set.");
@@ -117,8 +121,6 @@ public static unsafe class ULPlatform
 #elif NETSTANDARD2_0
 		ULLogger? ILogger.GetNativeStruct() => null;
 #endif
-
-		void IDisposable.Dispose() { }
 
 		ref struct SpanEnumerator<T> where T : IEquatable<T>
 		{
@@ -189,7 +191,5 @@ public static unsafe class ULPlatform
 #elif NETSTANDARD2_0
 		ULFileSystem? IFileSystem.GetNativeStruct() => null;
 #endif
-
-		void IDisposable.Dispose() { }
 	}
 }

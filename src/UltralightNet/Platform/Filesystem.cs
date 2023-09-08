@@ -10,13 +10,17 @@ namespace UltralightNet.Platform
 		/// </summary>
 		public unsafe struct ULFileSystem
 		{
+#if !NETSTANDARD
 			public delegate* unmanaged[Cdecl]<ULString*, bool> FileExists;
 			public delegate* unmanaged[Cdecl]<ULString*, ULString*> GetFileMimeType;
 			public delegate* unmanaged[Cdecl]<ULString*, ULString*> GetFileCharset;
 			public delegate* unmanaged[Cdecl]<ULString*, ULBuffer> OpenFile;
+#else
+			public void* FileExists, GetFileMimeType, GetFileCharset, OpenFile;
+#endif
 		}
 	}
-	public interface IFileSystem : IDisposable
+	public interface IFileSystem
 	{
 		bool FileExists(string path);
 		string GetFileMimeType(string path);
@@ -74,12 +78,8 @@ namespace UltralightNet.Platform
 					foreach (var handle in handles) if (handle.IsAllocated) handle.Free();
 				}
 
-				try { instance.Dispose(); }
-				finally
-				{
-					GC.SuppressFinalize(this);
-					IsDisposed = true;
-				}
+				GC.SuppressFinalize(this);
+				IsDisposed = true;
 			}
 			~Wrapper() => Dispose();
 		}
