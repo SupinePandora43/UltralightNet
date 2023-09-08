@@ -35,11 +35,11 @@
         <VertexShader Include="shaders/*.vert" />
         <FragmentShader Include="shaders/*.frag" />
     </ItemGroup>
-    <Target Name="CompileVertexShaders" Inputs="@(VertexShader)" Outputs="@(VertexShader -> '%(RelativeDir)spirv/%(filename).vert.spv')" BeforeTargets="Build">
+    <Target Name="CompileVertexShaders" Inputs="@(VertexShader)" Outputs="@(VertexShader -> '%(RelativeDir)spirv/%(filename).vert.spv')" BeforeTargets="Compile">
         <MakeDir Directories="@(VertexShader -> '%(RelativeDir)spirv')" />
         <Exec Command="glslc -O -o @(VertexShader -> '%(RelativeDir)spirv/%(filename).vert.spv') %(VertexShader.Identity)" EchoOff="false" />
     </Target>
-    <Target Name="CompileFragmentShaders" Inputs="@(FragmentShader)" Outputs="@(FragmentShader -> '%(RelativeDir)spirv/%(filename).frag.spv')" BeforeTargets="Build">
+    <Target Name="CompileFragmentShaders" Inputs="@(FragmentShader)" Outputs="@(FragmentShader -> '%(RelativeDir)spirv/%(filename).frag.spv')" BeforeTargets="Compile">
         <MakeDir Directories="@(FragmentShader -> '%(RelativeDir)spirv')" />
         <Exec Command="glslc -O -o @(FragmentShader -> '%(RelativeDir)spirv/%(filename).frag.spv') %(FragmentShader.Identity)" EchoOff="false" />
     </Target>
