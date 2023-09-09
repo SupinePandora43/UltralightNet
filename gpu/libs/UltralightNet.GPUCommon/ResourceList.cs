@@ -1,9 +1,11 @@
+using System;
 using System.Collections.Generic;
+using System.Diagnostics.CodeAnalysis;
 using System.Runtime.InteropServices;
 
-namespace UltralightNet.GPU.Vulkan;
+namespace UltralightNet.GPUCommon;
 
-public class ResourceList<T>
+public class ResourceList<T> : IDisposable
 {
 	readonly List<T> list = new(16) { default! };
 	readonly Queue<int> freeIds = new(8);
@@ -20,5 +22,14 @@ public class ResourceList<T>
 	public void Remove(int id)
 	{
 		freeIds.Enqueue(id);
+	}
+
+	[SuppressMessage("CodeAnalysis", "CA1816")]
+	public void Dispose()
+	{
+		list.Clear();
+		list.TrimExcess();
+		freeIds.Clear();
+		freeIds.TrimExcess();
 	}
 }

@@ -545,7 +545,8 @@ internal unsafe partial class Application : IDisposable
 		swapchainImages = null;
 	}
 
-	(Image image, DescriptorSetAllocator.PooledSet imageDescriptorSet) viewSurface;
+	readonly DestroyQueue frameDestroyQueue = new();
+	(Image image, ImageView imageView, DescriptorSetAllocator.PooledSet imageDescriptorSet) viewSurface;
 
 	public void Run()
 	{
@@ -562,9 +563,11 @@ internal unsafe partial class Application : IDisposable
 			}
 
 			vk.WaitForFences(device, 1, renderFinishedFences![CurrentFrame], true, ulong.MaxValue).Check();
-			ExecuteSurfaceDefinitionDestroyByFrameQueue();
+
 			descriptorSetAllocator.CurrentFrame = CurrentFrame;
-			descriptorSetAllocator.ExecuteCurrentFrameDestroyQueue();
+			descriptorSetAllocator.ExecuteCurrentFrameDestroyQueue(); // destroy DescriptorSet
+			frameDestroyQueue.Execute((uint)CurrentFrame); // destroy ImageView
+			ExecuteSurfaceDefinitionDestroyByFrameQueue(); // destroy Image
 
 			uint imageIndex = 0;
 			var result = khrSwapchain.AcquireNextImage(device, swapchain, ulong.MaxValue, imageAvailableSemaphores![CurrentFrame], default, &imageIndex);
@@ -603,10 +606,15 @@ internal unsafe partial class Application : IDisposable
 
 				if (viewSurface.image.Handle != this.viewSurface.image.Handle)
 				{
-					if (this.viewSurface.imageDescriptorSet.Value.Handle is not 0) descriptorSetAllocator.Destroy(this.viewSurface.imageDescriptorSet);
-					var pooledSet = descriptorSetAllocator.GetDescriptorSet();
+					if (this.viewSurface.imageDescriptorSet.Value.Handle is not 0)
+					{
+						Debug.Assert(this.viewSurface.imageView.Handle is not 0);
+						var oldImageView = this.viewSurface.imageView;
 
-					// TODO: destroy old one.
+						descriptorSetAllocator.Destroy(this.viewSurface.imageDescriptorSet);
+						frameDestroyQueue.Enqueue(imageIndex, () => vk.DestroyImageView(device, oldImageView, null));
+					}
+					var pooledSet = descriptorSetAllocator.GetDescriptorSet();
 
 					var imageViewCreateInfo = new ImageViewCreateInfo(image: viewSurface.image, viewType: ImageViewType.ImageViewType2D, format: Format.B8G8R8A8Srgb, components: new ComponentMapping(ComponentSwizzle.R, ComponentSwizzle.G, ComponentSwizzle.B, view.IsTransparent ? ComponentSwizzle.A : ComponentSwizzle.One), subresourceRange: new ImageSubresourceRange(ImageAspectFlags.ImageAspectColorBit, 0, 1, 0, 1));
 					vk.CreateImageView(device, &imageViewCreateInfo, null, out var imageView).Check();
@@ -615,10 +623,10 @@ internal unsafe partial class Application : IDisposable
 					var writeDescriptorSet = new WriteDescriptorSet(dstSet: pooledSet.Value, descriptorCount: 1, descriptorType: DescriptorType.CombinedImageSampler, pImageInfo: &descriptorImageInfo);
 					vk.UpdateDescriptorSets(device, 1, &writeDescriptorSet, 0, null);
 
-					this.viewSurface = (viewSurface.image, pooledSet);
+					this.viewSurface = (viewSurface.image, imageView, pooledSet);
 
-					debugUtils?.SetDebugUtilsObjectName(device, imageView, $"View {view!.Surface?.Id!} ImageView");
-					debugUtils?.SetDebugUtilsObjectName(device, pooledSet.Value, $"View {view!.Surface?.Id!} DescriptorSet");
+					debugUtils?.SetDebugUtilsObjectName(device, imageView, $"View {view!.Surface?.Id!} ImageView X{pooledSet.IdInPool}");
+					debugUtils?.SetDebugUtilsObjectName(device, pooledSet.Value, $"View {view!.Surface?.Id!} DescriptorSet X{pooledSet.IdInPool}");
 				}
 
 				debugUtils?.CmdEndDebugUtilsLabel(commandBuffer);
@@ -670,6 +678,9 @@ internal unsafe partial class Application : IDisposable
 	void IDisposable.Dispose()
 	{
 		if (swapchain.Handle is not 0) khrSwapchain.DestroySwapchain(device, swapchain, null);
+		descriptorSetAllocator.Dispose();
+		frameDestroyQueue.Dispose();
+		vk.DestroyImageView(device, viewSurface.imageView, null);
 		view.Dispose();
 		renderer.Dispose();
 		ExecuteSurfaceDefinitionDestroyQueue();
@@ -677,7 +688,6 @@ internal unsafe partial class Application : IDisposable
 		vk.DestroyPipeline(device, pipeline, null);
 		vk.DestroyRenderPass(device, renderPass, null);
 		vk.DestroyPipelineLayout(device, pipelineLayout, null);
-		descriptorSetAllocator.Dispose();
 		vk.DestroyDescriptorSetLayout(device, descriptorSetLayout, null);
 		vk.DestroySampler(device, sampler, null);
 		if (physicalDeviceFeatures.PipelineStatisticsQuery) vk.DestroyQueryPool(device, queryPool, null);

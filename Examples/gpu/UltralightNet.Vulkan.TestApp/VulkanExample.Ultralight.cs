@@ -20,8 +20,7 @@ unsafe partial class Application : ISurfaceDefinition // this may cause problems
 	{
 		void CreateBuffer(ulong size, BufferUsageFlags bufferUsageFlags, MemoryPropertyFlags memoryPropertyFlags, out Buffer buffer, out DeviceMemory bufferMemory)
 		{
-			var queueFamilyIndices = stackalloc uint[] { graphicsQueueFamily };
-			var bufferCreateInfo = new BufferCreateInfo(size: size, usage: bufferUsageFlags, sharingMode: SharingMode.Exclusive, queueFamilyIndexCount: 1, pQueueFamilyIndices: queueFamilyIndices);
+			var bufferCreateInfo = new BufferCreateInfo(size: size, usage: bufferUsageFlags);
 			vk.CreateBuffer(device, &bufferCreateInfo, null, out buffer).Check();
 
 			MemoryRequirements memoryRequirements;
@@ -122,6 +121,7 @@ unsafe partial class Application : ISurfaceDefinition // this may cause problems
 		var imageMemoryBarrier = new ImageMemoryBarrier(
 			srcAccessMask: entry.imageLayout is ImageLayout.Undefined ? AccessFlags.AccessNoneKhr : AccessFlags.AccessShaderReadBit, dstAccessMask: AccessFlags.AccessTransferWriteBit,
 			oldLayout: ImageLayout.Undefined, newLayout: ImageLayout.TransferDstOptimal,
+			srcQueueFamilyIndex: Vk.QueueFamilyIgnored, dstQueueFamilyIndex: Vk.QueueFamilyIgnored,
 			image: entry.image, subresourceRange: new ImageSubresourceRange(ImageAspectFlags.ImageAspectColorBit, 0, 1, 0, 1));
 		vk.CmdPipelineBarrier(commandBuffer,
 			PipelineStageFlags.PipelineStageFragmentShaderBit, PipelineStageFlags.PipelineStageTransferBit, 0,

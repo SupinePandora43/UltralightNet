@@ -1,24 +1,30 @@
 using System;
+using System.Diagnostics;
+using System.Runtime.InteropServices;
 using Silk.NET.Vulkan;
+using UltralightNet.GPUCommon;
 using UltralightNet.Platform;
+using Buffer = Silk.NET.Vulkan.Buffer;
 
 namespace UltralightNet.GPU.Vulkan;
 
-public unsafe sealed class VulkanGPUDriver : IGPUDriver
+public unsafe sealed class VulkanGPUDriver : IGPUDriver, IDisposable
 {
 	readonly Vk vk;
 	readonly PhysicalDevice physicalDevice;
 	readonly Device device;
 
-	readonly int framesInFlight = -1;
+	uint FramesInFlight { get; }
 	readonly bool UMA = false;
 
 	readonly ResourceList<int> textures = new();
 	readonly ResourceList<int> renderBuffers = new();
 	readonly ResourceList<GeometryEntry> geometries = new();
 
-
+	readonly DestroyQueue destroyQueue = new();
 	readonly Allocator allocator;
+
+	readonly Sampler sampler;
 
 	readonly DescriptorSetLayout uniformBufferDescriptorSetLayout;
 	readonly DescriptorSetAllocator uniformBufferDescriptorSetAllocator;
@@ -26,18 +32,31 @@ public unsafe sealed class VulkanGPUDriver : IGPUDriver
 	readonly DescriptorSetLayout textureDescriptorSetLayout;
 	readonly DescriptorSetAllocator textureDescriptorSetAllocator;
 
-
-	public uint FrameId { get; set; }
+	public uint CurrentFrame { get; set; }
 
 	CommandBuffer commandBuffer;
 
-	public VulkanGPUDriver(Vk vk, PhysicalDevice physicalDevice, Device device)
+	public VulkanGPUDriver(Vk vk, PhysicalDevice physicalDevice, Device device, uint framesInFlight)
 	{
 		this.vk = vk;
 		this.physicalDevice = physicalDevice;
 		this.device = device;
+		FramesInFlight = framesInFlight;
 
 		allocator = new(vk, device, vk.GetPhysicalDeviceMemoryProperty(physicalDevice));
+
+		{ // Sampler
+			var samplerCreateInfo = new SamplerCreateInfo(
+				magFilter: Filter.Nearest,
+				minFilter: Filter.Linear,
+				mipmapMode: SamplerMipmapMode.Nearest,
+				addressModeU: SamplerAddressMode.ClampToEdge,
+				addressModeV: SamplerAddressMode.ClampToEdge
+				// TODO: Anisotropy enable flag
+				// TODO: mipmaps
+				);
+			vk.CreateSampler(device, &samplerCreateInfo, null, out sampler).Check();
+		}
 
 		{ // uniformBufferDescriptorSet___
 			var descriptorSetLayoutBinding = new DescriptorSetLayoutBinding(0, DescriptorType.UniformBufferDynamic, 1, ShaderStageFlags.ShaderStageVertexBit | ShaderStageFlags.ShaderStageFragmentBit);
@@ -54,10 +73,6 @@ public unsafe sealed class VulkanGPUDriver : IGPUDriver
 			textureDescriptorSetAllocator = new(vk, device, new[] { new DescriptorPoolSize(DescriptorType.CombinedImageSampler, 1) }, textureDescriptorSetLayout);
 		}
 
-		/*var descriptorPoolSize = new DescriptorPoolSize(DescriptorType.CombinedImageSampler, 1);
-		var descriptorPoolCreateInfo = new DescriptorPoolCreateInfo(maxSets: 128, poolSizeCount: 1, pPoolSizes: &descriptorPoolSize);
-		vk.CreateDescriptorSetLayout(device, )
-		textureDescriptorAllocator = new(vk, device, descriptorPoolCreateInfo, descriptorSetLayout);*/
 	}
 
 	// Call only AFTER all commands are completed.
@@ -69,30 +84,36 @@ public unsafe sealed class VulkanGPUDriver : IGPUDriver
 		uniformBufferDescriptorSetAllocator.Dispose();
 		vk.DestroyDescriptorSetLayout(device, uniformBufferDescriptorSetLayout, null);
 
+		vk.DestroySampler(device, sampler, null);
+
 		allocator.Dispose();
+		destroyQueue.Dispose();
+
+		textures.Dispose();
+		renderBuffers.Dispose();
+		geometries.Dispose();
+	}
+
+
+
+	void IGPUDriver.CreateTexture(uint textureId, ULBitmap bitmap)
+	{
+		throw new NotImplementedException();
+	}
+	void IGPUDriver.UpdateTexture(uint textureId, ULBitmap bitmap)
+	{
+		throw new NotImplementedException();
+	}
+	void IGPUDriver.DestroyTexture(uint textureId)
+	{
+		throw new NotImplementedException();
 	}
 
 	void IGPUDriver.CreateRenderBuffer(uint renderBufferId, ULRenderBuffer renderBuffer)
 	{
 		throw new NotImplementedException();
 	}
-
-	void IGPUDriver.CreateTexture(uint textureId, ULBitmap bitmap)
-	{
-		throw new NotImplementedException();
-	}
-
 	void IGPUDriver.DestroyRenderBuffer(uint renderBufferId)
-	{
-		throw new NotImplementedException();
-	}
-
-	void IGPUDriver.DestroyTexture(uint textureId)
-	{
-		throw new NotImplementedException();
-	}
-
-	void IGPUDriver.UpdateCommandList(ULCommandList commandList)
 	{
 		throw new NotImplementedException();
 	}
@@ -100,49 +121,49 @@ public unsafe sealed class VulkanGPUDriver : IGPUDriver
 	void IGPUDriver.CreateGeometry(uint geometryId, ULVertexBuffer vertexBuffer, ULIndexBuffer indexBuffer)
 	{
 		ref var g = ref geometries[(int)geometryId];
-		// allocate buffers
+
+		Debug.Assert(vertexBuffer.size % 256 == 0, "nonCoherentAtomSize");
+		Debug.Assert(indexBuffer.size % 256 == 0, "nonCoherentAtomSize");
+
+		Buffer sharedDeviceBuffer = default;
+		DeviceMemory sharedDeviceMemory = default;
+
 		if (!UMA)
+			allocator.CreateBuffer(
+				vertexBuffer.size + indexBuffer.size,
+				BufferUsageFlags.BufferUsageVertexBufferBit | BufferUsageFlags.BufferUsageIndexBufferBit | BufferUsageFlags.BufferUsageTransferDstBit,
+				MemoryPropertyFlags.MemoryPropertyDeviceLocalBit,
+				out sharedDeviceBuffer, out sharedDeviceMemory);
+
+		allocator.CreateBuffer(
+			(vertexBuffer.size + indexBuffer.size) * FramesInFlight,
+			!UMA ? BufferUsageFlags.BufferUsageTransferSrcBit : BufferUsageFlags.BufferUsageVertexBufferBit | BufferUsageFlags.BufferUsageIndexBufferBit,
+			MemoryPropertyFlags.MemoryPropertyHostVisibleBit | MemoryPropertyFlags.MemoryPropertyHostCoherentBit,
+			out var sharedHostBuffer, out var sharedHostMemory);
+
+		byte* mapped;
+		vk.MapMemory(device, sharedHostMemory, 0, (vertexBuffer.size + indexBuffer.size) * FramesInFlight, 0, (void**)&mapped).Check();
+
+		g = new()
 		{
-			allocator.CreateBuffer(vertexBuffer.size + indexBuffer.size, BufferUsageFlags.BufferUsageVertexBufferBit | BufferUsageFlags.BufferUsageIndexBufferBit | BufferUsageFlags.BufferUsageTransferDstBit, MemoryPropertyFlags.MemoryPropertyDeviceLocalBit, out var sharedDeviceBuffer, out var sharedDeviceMemory);
-			allocator.CreateBuffer((vertexBuffer.size + indexBuffer.size) * (uint)framesInFlight, BufferUsageFlags.BufferUsageTransferSrcBit, MemoryPropertyFlags.MemoryPropertyHostVisibleBit | MemoryPropertyFlags.MemoryPropertyHostCoherentBit, out var sharedHostBuffer, out var sharedHostMemory);
-
-			byte* mapped;
-			vk.MapMemory(device, sharedHostMemory, 0, (vertexBuffer.size + indexBuffer.size) * (uint)framesInFlight, 0, (void**)&mapped).Check();
-
-			var vertex = new BufferResource[1 + framesInFlight];
-			vertex[0] = new() { Buffer = sharedDeviceBuffer, Offset = indexBuffer.size, Size = vertexBuffer.size };
-			for (uint frame = 0; frame < framesInFlight; frame++)
-			{
-				vertex[frame + 1] = new() { Buffer = sharedHostBuffer, Offset = (indexBuffer.size * (uint)framesInFlight) + (vertexBuffer.size * frame), Size = vertexBuffer.size, Mapped = mapped + (indexBuffer.size * (uint)framesInFlight) + (vertexBuffer.size * frame) };
-			}
-
-			var index = new BufferResource[1 + framesInFlight];
-			index[0] = new() { Buffer = sharedDeviceBuffer, Offset = 0, Size = indexBuffer.size };
-			for (uint frame = 0; frame < framesInFlight; frame++)
-			{
-				index[frame + 1] = new() { Buffer = sharedHostBuffer, Offset = indexBuffer.size * frame, Size = indexBuffer.size, Mapped = mapped + indexBuffer.size * frame };
-			}
-
-			g = new()
-			{
-				Vertex = new(this, vertex),
-				Index = new(this, index),
-				Memory0 = sharedDeviceMemory,
-				Memory1 = sharedHostMemory
-			};
-		}
-		else
-		{
-			allocator.CreateBuffer((vertexBuffer.size + indexBuffer.size) * (uint)framesInFlight, BufferUsageFlags.BufferUsageVertexBufferBit | BufferUsageFlags.BufferUsageIndexBufferBit, MemoryPropertyFlags.MemoryPropertyDeviceLocalBit | MemoryPropertyFlags.MemoryPropertyHostVisibleBit | MemoryPropertyFlags.MemoryPropertyHostCoherentBit, out var sharedBuffer, out var sharedMemory);
-			throw new NotImplementedException("TODO");
-		}
+			Buffer = !UMA ? sharedDeviceBuffer : sharedHostBuffer,
+			HostBuffer = sharedHostBuffer,
+			Index = (0UL, (ulong)indexBuffer.size),
+			Vertex = (!UMA ? (ulong)indexBuffer.size : (ulong)indexBuffer.size * (ulong)FramesInFlight, (ulong)vertexBuffer.size),
+			HostMemory = sharedHostMemory,
+			DeviceMemory = sharedDeviceMemory,
+			Mapped = mapped
+		};
 		(this as IGPUDriver).UpdateGeometry(geometryId, vertexBuffer, indexBuffer);
 	}
 	void IGPUDriver.UpdateGeometry(uint geometryId, ULVertexBuffer vertexBuffer, ULIndexBuffer indexBuffer)
 	{
 		ref var g = ref geometries[(int)geometryId];
-		new Span<byte>(vertexBuffer.data, (int)vertexBuffer.size).CopyTo(g.Vertex.ToWrite.AsSpan());
-		new Span<byte>(indexBuffer.data, (int)indexBuffer.size).CopyTo(g.Index.ToWrite.AsSpan());
+
+		g.GetBuffersToWriteTo(CurrentFrame, out var index, out var vertex);
+
+		new Span<byte>(vertexBuffer.data, (int)vertexBuffer.size).CopyTo(vertex);
+		new Span<byte>(indexBuffer.data, (int)indexBuffer.size).CopyTo(index);
 
 		if (!UMA)
 		{
@@ -150,25 +171,26 @@ public unsafe sealed class VulkanGPUDriver : IGPUDriver
 				new(
 					srcAccessMask: AccessFlags.AccessVertexAttributeReadBit, dstAccessMask: AccessFlags.AccessTransferWriteBit,
 					srcQueueFamilyIndex: Vk.QueueFamilyIgnored, dstQueueFamilyIndex: Vk.QueueFamilyIgnored,
-					buffer: g.Vertex.ToUse.Buffer, offset: g.Vertex.ToUse.Offset, size: g.Vertex.ToUse.Size),
+					buffer: g.Buffer, offset: g.Vertex.offset, size: g.Vertex.size),
 				new(
 					srcAccessMask: AccessFlags.AccessIndexReadBit, dstAccessMask: AccessFlags.AccessTransferWriteBit,
 					srcQueueFamilyIndex: Vk.QueueFamilyIgnored, dstQueueFamilyIndex: Vk.QueueFamilyIgnored,
-					buffer: g.Index.ToUse.Buffer, offset: g.Index.ToUse.Offset, size: g.Index.ToUse.Size)
+					buffer: g.Buffer, offset: g.Index.offset, size: g.Index.size)
 			};
 
 			vk.CmdPipelineBarrier(commandBuffer,
-				PipelineStageFlags.PipelineStageBottomOfPipeBit,
+				PipelineStageFlags.PipelineStageVertexInputBit,
 				PipelineStageFlags.PipelineStageTransferBit,
 				0,
 				0, null,
-				4, bufferMemoryBarriers,
+				2, bufferMemoryBarriers,
 				0, null);
 
-			var bufferCopy = new BufferCopy(g.Vertex.ToWrite.Offset, g.Vertex.ToUse.Offset, g.Vertex.ToUse.Size);
-			vk.CmdCopyBuffer(commandBuffer, g.Vertex.ToWrite.Buffer, g.Vertex.ToUse.Buffer, 1, &bufferCopy);
-			bufferCopy = new(g.Index.ToWrite.Offset, g.Index.ToUse.Offset, g.Index.ToUse.Size);
-			vk.CmdCopyBuffer(commandBuffer, g.Index.ToWrite.Buffer, g.Index.ToUse.Buffer, 1, &bufferCopy);
+			var bufferCopy = stackalloc BufferCopy[] {
+				new(g.Index.size * CurrentFrame, 0, g.Index.size),
+				new(g.Vertex.offset + (g.Vertex.size * CurrentFrame), g.Vertex.size)
+			};
+			vk.CmdCopyBuffer(commandBuffer, g.HostBuffer, g.Buffer, 2, bufferCopy);
 
 			bufferMemoryBarriers[0].SrcAccessMask = AccessFlags.AccessTransferWriteBit;
 			bufferMemoryBarriers[0].DstAccessMask = AccessFlags.AccessVertexAttributeReadBit;
@@ -177,22 +199,52 @@ public unsafe sealed class VulkanGPUDriver : IGPUDriver
 			bufferMemoryBarriers[1].DstAccessMask = AccessFlags.AccessIndexReadBit;
 
 			vk.CmdPipelineBarrier(commandBuffer,
-				PipelineStageFlags.PipelineStageBottomOfPipeBit,
 				PipelineStageFlags.PipelineStageTransferBit,
+				PipelineStageFlags.PipelineStageVertexInputBit,
 				0,
 				0, null,
-				4, bufferMemoryBarriers,
+				2, bufferMemoryBarriers,
 				0, null);
 		}
 	}
 	void IGPUDriver.DestroyGeometry(uint geometryId)
 	{
-		throw new NotImplementedException();
+		var geo = geometries[(int)geometryId];
+
+		vk.UnmapMemory(device, geo.HostMemory);
+
+		destroyQueue.Enqueue(CurrentFrame, () =>
+		{
+			vk.DestroyBuffer(device, geo.Buffer, null);
+			vk.FreeMemory(device, geo.DeviceMemory, null);
+			if (!UMA)
+			{
+				vk.DestroyBuffer(device, geo.HostBuffer, null);
+				vk.FreeMemory(device, geo.HostMemory, null);
+			}
+		});
+
+		geometries.Remove((int)geometryId);
 	}
 
-	void IGPUDriver.UpdateTexture(uint textureId, ULBitmap bitmap)
+	void IGPUDriver.UpdateCommandList(ULCommandList commandList)
 	{
-		throw new NotImplementedException();
+		foreach (var command in commandList.AsSpan())
+		{
+			if (command.CommandType is ULCommandType.ClearRenderBuffer)
+			{
+				return;
+			}
+			else
+			{
+				ref var geo = ref geometries[(int)command.GeometryId];
+				var indexBuffer = geo.GetIndexBufferToUse(UMA);
+				var vertexBuffer = geo.GetVertexBufferToUse(UMA);
+				vk.CmdBindIndexBuffer(commandBuffer, indexBuffer.buffer, indexBuffer.offset, IndexType.Uint32);
+				vk.CmdBindVertexBuffers(commandBuffer, 0, 1, vertexBuffer.buffer, vertexBuffer.offset);
+				vk.CmdDrawIndexed(commandBuffer, command.IndicesCount, 1, command.IndicesOffset, 0, 0);
+			}
+		}
 	}
 
 	uint IGPUDriver.NextTextureId() => (uint)textures.GetNewId();
@@ -209,38 +261,29 @@ public unsafe sealed class VulkanGPUDriver : IGPUDriver
 		vk.EndCommandBuffer(commandBuffer).Check();
 	}
 
-	unsafe readonly struct GeometryEntry
+	[StructLayout(LayoutKind.Auto, Pack = 8)]
+	unsafe struct GeometryEntry
 	{
-		public AllocationTuple Vertex { readonly get; init; }
-		public AllocationTuple Index { readonly get; init; }
+		public Buffer Buffer { readonly get; init; }
+		public Buffer HostBuffer { readonly get; init; }
 
-		public DeviceMemory Memory0 { readonly get; init; }
-		public DeviceMemory Memory1 { readonly get; init; }
+		public (ulong offset, ulong size) Index { readonly get; init; }
+		public (ulong offset, ulong size) Vertex { readonly get; init; }
 
-		public struct AllocationTuple
+		public DeviceMemory HostMemory { readonly get; init; }
+		public DeviceMemory DeviceMemory { readonly get; init; }
+
+		public byte* Mapped { readonly get; init; }
+
+		public uint latestFrame;
+
+		public readonly (Buffer buffer, ulong offset) GetIndexBufferToUse(bool UMA) => (Buffer, !UMA ? 0 : Index.size * latestFrame);
+		public readonly (Buffer buffer, ulong offset) GetVertexBufferToUse(bool UMA) => (Buffer, !UMA ? Index.size : Vertex.offset + (Vertex.size * latestFrame));
+
+		public void GetBuffersToWriteTo(uint frame, out Span<byte> index, out Span<byte> vertex)
 		{
-			/// <summary>
-			/// Desktop <br />
-			/// 0 - DEVICE_LOCAL bind TRANSFER_DST <br />
-			/// 1 - STAGING frame_id TRANSFER_SRC <br />
-			/// 2 - STAGING frame_id TRANSFER_SRC <br />
-			/// Unified memory <br />
-			/// 0 - UNIFIED frame_id <br />
-			/// 1 - UNIFIED frame_id <br />
-			/// </summary>
-			/// <remarks>Single DEVICE_LOCAL because frames are executed sequentially and synchronized by a semaphore</remarks>
-			readonly BufferResource[] buffers;
-			readonly VulkanGPUDriver owner;
-			int mostRecent = -1;
-
-			public BufferResource ToWrite => owner.UMA ? buffers[mostRecent = (int)owner.FrameId + 1] : buffers[(int)owner.FrameId];
-			public readonly BufferResource ToUse => owner.UMA ? buffers[mostRecent] : buffers[0];
-
-			public AllocationTuple(VulkanGPUDriver owner, BufferResource[] buffers)
-			{
-				this.owner = owner;
-				this.buffers = buffers;
-			}
+			index = new Span<byte>(Mapped + (Index.size * (latestFrame = frame)), (int)Index.size);
+			vertex = new Span<byte>(Mapped + (Vertex.offset + (Vertex.size * latestFrame)), (int)Vertex.size);
 		}
 	}
 }
