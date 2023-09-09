@@ -361,7 +361,7 @@ internal unsafe partial class Application : IDisposable
 
 			ULPlatform.SurfaceDefinition = this;
 
-			renderer = ULPlatform.CreateRenderer(new() { ForceRepaint = true });
+			renderer = ULPlatform.CreateRenderer(new() { ForceRepaint = false });
 
 			window.Update += (delta) => renderer.Update();
 
@@ -625,8 +625,8 @@ internal unsafe partial class Application : IDisposable
 
 					this.viewSurface = (viewSurface.image, imageView, pooledSet);
 
-					debugUtils?.SetDebugUtilsObjectName(device, imageView, $"View {view!.Surface?.Id!} ImageView X{pooledSet.IdInPool}");
-					debugUtils?.SetDebugUtilsObjectName(device, pooledSet.Value, $"View {view!.Surface?.Id!} DescriptorSet X{pooledSet.IdInPool}");
+					debugUtils?.SetDebugUtilsObjectName(device, imageView, $"View {view!.Surface?.Id!} ImageView");
+					debugUtils?.SetDebugUtilsObjectName(device, pooledSet.Value, $"View {view!.Surface?.Id!} DescriptorSet");
 				}
 
 				debugUtils?.CmdEndDebugUtilsLabel(commandBuffer);

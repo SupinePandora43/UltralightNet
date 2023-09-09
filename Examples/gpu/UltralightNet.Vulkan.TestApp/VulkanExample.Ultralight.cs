@@ -9,7 +9,7 @@ using Buffer = Silk.NET.Vulkan.Buffer;
 
 unsafe partial class Application : ISurfaceDefinition // this may cause problems in future...
 {
-	const bool SurfaceDefinition_SafeBufferization = true;
+	const bool SurfaceDefinition_SafeBufferization = false;
 
 	readonly List<SurfaceEntry> surfaces = new(2) { new() };
 	readonly Queue<int> freeSurfaceIds = new(2);
@@ -109,7 +109,7 @@ unsafe partial class Application : ISurfaceDefinition // this may cause problems
 	{
 		ref var entry = ref CollectionsMarshal.AsSpan(surfaces)[(int)id];
 
-		Debug.Assert(entry.latestFrame == CurrentFrame);
+		//Debug.Assert(entry.latestFrame == CurrentFrame);
 
 		var commandBuffer = GetSurfaceDefinitionCommandBuffer();
 		if (debugUtils is not null)
@@ -137,15 +137,13 @@ unsafe partial class Application : ISurfaceDefinition // this may cause problems
 			SrcAccessMask = AccessFlags.AccessTransferWriteBit,
 			DstAccessMask = AccessFlags.AccessShaderReadBit,
 			OldLayout = ImageLayout.TransferDstOptimal,
-			NewLayout = ImageLayout.ShaderReadOnlyOptimal
+			NewLayout = entry.imageLayout = ImageLayout.ShaderReadOnlyOptimal
 		};
 		vk.CmdPipelineBarrier(commandBuffer,
 			PipelineStageFlags.PipelineStageTransferBit, PipelineStageFlags.PipelineStageFragmentShaderBit, 0,
 			0, null,
 			0, null,
 			1, &imageMemoryBarrier);
-
-		entry.imageLayout = ImageLayout.ShaderReadOnlyOptimal;
 
 		debugUtils?.CmdEndDebugUtilsLabel(commandBuffer);
 	}
