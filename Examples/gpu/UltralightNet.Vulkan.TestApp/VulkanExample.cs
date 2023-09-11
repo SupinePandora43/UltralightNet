@@ -65,7 +65,7 @@ internal unsafe partial class Application : IDisposable
 	readonly CommandPool commandPool;
 
 	readonly CommandBuffer[] ultralightCommandBuffers = new CommandBuffer[MaxFramesInFlight];
-	readonly bool[] ultralightCommandBufferBegun = new bool[MaxFramesInFlight]; // can be replaced with a single bool btw
+	readonly SurfaceDefinition surfaceDefinition;
 	readonly Renderer renderer;
 	readonly View view;
 
@@ -359,9 +359,9 @@ internal unsafe partial class Application : IDisposable
 		{ // Ultralight
 			AppCoreMethods.SetPlatformFontLoader();
 
-			ULPlatform.SurfaceDefinition = this;
+			ULPlatform.SurfaceDefinition = surfaceDefinition = new(vk, device, physicalDeviceMemoryProperties, MaxFramesInFlight, Bufferization.FrameWithCopy, true, ultralightCommandBuffers);
 
-			renderer = ULPlatform.CreateRenderer(new() { ForceRepaint = false });
+			renderer = ULPlatform.CreateRenderer(new() { ForceRepaint = false, CachePath = Path.Combine(Path.GetDirectoryName(typeof(Application).Assembly.Location)!, "cache") });
 
 			window.Update += (delta) => renderer.Update();
 
@@ -380,9 +380,15 @@ internal unsafe partial class Application : IDisposable
 		{ // Input controls
 			void SetupInput(IInputDevice device)
 			{
+				static ULMouseEventButton ToULMouseButton(MouseButton button) => button switch { MouseButton.Left => ULMouseEventButton.Left, MouseButton.Right => ULMouseEventButton.Right, MouseButton.Middle => ULMouseEventButton.Middle, _ => ULMouseEventButton.None };
+
 				if (device is IMouse mouse)
 				{
-					mouse.MouseDown += (m, button) => view.FireMouseEvent(new() { Type = ULMouseEventType.MouseDown, X = (int)m.Position.X, Y = (int)m.Position.Y, Button = button switch { MouseButton.Left => ULMouseEventButton.Left, MouseButton.Right => ULMouseEventButton.Right, MouseButton.Middle => ULMouseEventButton.Middle, _ => ULMouseEventButton.None } });
+					mouse.MouseDown += (m, button) => view.FireMouseEvent(new() { Type = ULMouseEventType.MouseDown, X = (int)m.Position.X, Y = (int)m.Position.Y, Button = ToULMouseButton(button) });
+					mouse.MouseUp += (m, button) => view.FireMouseEvent(new() { Type = ULMouseEventType.MouseUp, X = (int)m.Position.X, Y = (int)m.Position.Y, Button = ToULMouseButton(button) });
+					mouse.MouseMove += (m, pos) => view.FireMouseEvent(new() { Type = ULMouseEventType.MouseMoved, X = (int)pos.X, Y = (int)pos.Y });
+
+					mouse.Scroll += (m, wheel) => view.FireScrollEvent(new() { Type = ULScrollEventType.ByPixel, DeltaX = (int)wheel.X, DeltaY = (int)(wheel.Y * 100) });
 				}
 			}
 
@@ -567,7 +573,7 @@ internal unsafe partial class Application : IDisposable
 			descriptorSetAllocator.CurrentFrame = CurrentFrame;
 			descriptorSetAllocator.ExecuteCurrentFrameDestroyQueue(); // destroy DescriptorSet
 			frameDestroyQueue.Execute((uint)CurrentFrame); // destroy ImageView
-			ExecuteSurfaceDefinitionDestroyByFrameQueue(); // destroy Image
+			surfaceDefinition.CurrentFrame = (uint)CurrentFrame; // destroy Image
 
 			uint imageIndex = 0;
 			var result = khrSwapchain.AcquireNextImage(device, swapchain, ulong.MaxValue, imageAvailableSemaphores![CurrentFrame], default, &imageIndex);
@@ -598,13 +604,13 @@ internal unsafe partial class Application : IDisposable
 
 				renderer.Render();
 
-				if (TryGetSurfaceDefinitionCommandBufferToSubmit(out var ultralightCommandBuffer)) vk.CmdExecuteCommands(commandBuffer, 1, &ultralightCommandBuffer);
+				if (surfaceDefinition.TryGetCommandBufferForSubmission(out var ultralightCommandBuffer)) vk.CmdExecuteCommands(commandBuffer, 1, &ultralightCommandBuffer);
 
-				ref var viewSurface = ref CollectionsMarshal.AsSpan(surfaces)[(int)view.Surface!.Value.Id];
+				var viewImage = surfaceDefinition.GetImage(view.Surface!.Value.Id);
 				Debug.Assert(view!.Surface?.Id is 1);
 				Debug.Assert(view!.Surface?.Bitmap is null);
 
-				if (viewSurface.image.Handle != this.viewSurface.image.Handle)
+				if (viewImage.Handle != this.viewSurface.image.Handle)
 				{
 					if (this.viewSurface.imageDescriptorSet.Value.Handle is not 0)
 					{
@@ -616,14 +622,14 @@ internal unsafe partial class Application : IDisposable
 					}
 					var pooledSet = descriptorSetAllocator.GetDescriptorSet();
 
-					var imageViewCreateInfo = new ImageViewCreateInfo(image: viewSurface.image, viewType: ImageViewType.ImageViewType2D, format: Format.B8G8R8A8Srgb, components: new ComponentMapping(ComponentSwizzle.R, ComponentSwizzle.G, ComponentSwizzle.B, view.IsTransparent ? ComponentSwizzle.A : ComponentSwizzle.One), subresourceRange: new ImageSubresourceRange(ImageAspectFlags.ImageAspectColorBit, 0, 1, 0, 1));
+					var imageViewCreateInfo = new ImageViewCreateInfo(image: viewImage, viewType: ImageViewType.ImageViewType2D, format: Format.B8G8R8A8Srgb, components: new ComponentMapping(ComponentSwizzle.R, ComponentSwizzle.G, ComponentSwizzle.B, view.IsTransparent ? ComponentSwizzle.A : ComponentSwizzle.One), subresourceRange: new ImageSubresourceRange(ImageAspectFlags.ImageAspectColorBit, 0, 1, 0, 1));
 					vk.CreateImageView(device, &imageViewCreateInfo, null, out var imageView).Check();
 
 					var descriptorImageInfo = new DescriptorImageInfo(sampler, imageView, ImageLayout.ShaderReadOnlyOptimal);
 					var writeDescriptorSet = new WriteDescriptorSet(dstSet: pooledSet.Value, descriptorCount: 1, descriptorType: DescriptorType.CombinedImageSampler, pImageInfo: &descriptorImageInfo);
 					vk.UpdateDescriptorSets(device, 1, &writeDescriptorSet, 0, null);
 
-					this.viewSurface = (viewSurface.image, imageView, pooledSet);
+					this.viewSurface = (viewImage, imageView, pooledSet);
 
 					debugUtils?.SetDebugUtilsObjectName(device, imageView, $"View {view!.Surface?.Id!} ImageView");
 					debugUtils?.SetDebugUtilsObjectName(device, pooledSet.Value, $"View {view!.Surface?.Id!} DescriptorSet");
@@ -683,7 +689,7 @@ internal unsafe partial class Application : IDisposable
 		vk.DestroyImageView(device, viewSurface.imageView, null);
 		view.Dispose();
 		renderer.Dispose();
-		ExecuteSurfaceDefinitionDestroyQueue();
+		surfaceDefinition.Dispose();
 		vk.DestroyCommandPool(device, commandPool, null);
 		vk.DestroyPipeline(device, pipeline, null);
 		vk.DestroyRenderPass(device, renderPass, null);
