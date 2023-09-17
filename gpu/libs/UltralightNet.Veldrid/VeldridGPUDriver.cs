@@ -1,615 +1,483 @@
 using System;
-using System.Buffers;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.IO;
 using System.Numerics;
 using System.Runtime.CompilerServices;
 using UltralightNet.GPUCommon;
+using UltralightNet.Platform;
 using Veldrid;
 using Veldrid.SPIRV;
 
-namespace UltralightNet.Veldrid
+namespace UltralightNet.GPU.Veldrid;
+
+public unsafe sealed class VeldridGPUDriver : IGPUDriver, IDisposable
 {
-	public unsafe class VeldridGPUDriver
+	readonly GraphicsDevice graphicsDevice;
+	readonly bool IsVulkan;
+
+	readonly ResourceLayout uniformsResourceLayout;
+	readonly ResourceLayout textureResourceLayout;
+
+	readonly Sampler sampler;
+	DeviceBuffer? uniformBuffer;
+	ResourceSet? uniformSet;
+
+	// TODO: MSAA
+	// readonly TextureSampleCount SampleCount = TextureSampleCount.Count1;
+
+	readonly Pipeline fillPipeline;
+	readonly Pipeline fillWithoutBlendPipeline;
+	readonly Pipeline fillPathPipeline;
+
+	readonly Dictionary<uint, TextureEntry> TextureEntries = new();
+	readonly Dictionary<uint, GeometryEntry> GeometryEntries = new();
+	readonly Dictionary<uint, RenderBufferEntry> RenderBufferEntries = new();
+
+	readonly bool IsDirectX = false;
+
+	Uniforms[]? FakeMappedUniformBuffer;
+
+	public VeldridGPUDriver(GraphicsDevice graphicsDevice)
 	{
-		private readonly GraphicsDevice graphicsDevice;
-		private readonly ResourceLayout textureResourceLayout;
-		private readonly ResourceLayout samplerResourceLayout;
+		this.graphicsDevice = graphicsDevice;
 
-		private readonly Sampler sampler;
-		private readonly ResourceSet samplerResourceSet;
+		IsVulkan = graphicsDevice.BackendType is GraphicsBackend.Vulkan;
 
-		private ResourceLayout uniformsResourceLayout;
-
-		public TextureSampleCount SampleCount = TextureSampleCount.Count1;
-
-		/// <summary>
-		/// public only for <see cref="GetRenderTarget(View)"/> inlining
-		/// </summary>
-		public readonly Dictionary<uint, TextureEntry> TextureEntries = new();
-		private readonly Dictionary<uint, GeometryEntry> GeometryEntries = new();
-		private readonly Dictionary<uint, RenderBufferEntry> RenderBufferEntries = new();
-
-		private readonly bool IsDirectX = false;
-		private readonly bool IsVulkan = false;
-
-		public CommandList CommandList;
-		private Uniforms[]? FakeMappedUniformBuffer = null;
-		private uint UniformBufferCommandLength = 0;
-
-		/// <summary>
-		/// used for mipmaps, etc
-		/// </summary>
-		private readonly CommandList _commandList;
-
-		public float time = 1f;
-
-		public VeldridGPUDriver(GraphicsDevice graphicsDevice)
-		{
-			this.graphicsDevice = graphicsDevice;
-
+		{ // ResourceLayout
+			uniformsResourceLayout = graphicsDevice.ResourceFactory.CreateResourceLayout(
+				new ResourceLayoutDescription(
+					new ResourceLayoutElementDescription(
+						"Uniforms",
+						ResourceKind.UniformBuffer,
+						ShaderStages.Vertex | ShaderStages.Fragment,
+						IsVulkan ? ResourceLayoutElementOptions.DynamicBinding : ResourceLayoutElementOptions.None
+					),
+					new ResourceLayoutElementDescription("Sampler", ResourceKind.Sampler, ShaderStages.Fragment) // TODO: make sure that stage doesn't cause problems.
+				)
+			);
 			textureResourceLayout = graphicsDevice.ResourceFactory.CreateResourceLayout(
 				new ResourceLayoutDescription(
 					new ResourceLayoutElementDescription("texture", ResourceKind.TextureReadOnly, ShaderStages.Fragment)
 				)
 			);
-			samplerResourceLayout = graphicsDevice.ResourceFactory.CreateResourceLayout(
-				new(new ResourceLayoutElementDescription("Sampler", ResourceKind.Sampler, ShaderStages.Fragment))
-			);
-
-			_commandList = graphicsDevice.ResourceFactory.CreateCommandList();
-
-			IsVulkan = graphicsDevice.BackendType is GraphicsBackend.Vulkan;
-			//IsVulkan = false;
-
-			InitializeBuffers();
-			InitShaders();
-			InitFramebuffers();
-			InitPipelines();
-
-			emptyTexture = graphicsDevice.ResourceFactory.CreateTexture(
-				new(
-					2,
-					2,
-					1,
-					1,
-					1,
+		}
+		{ // Sampler
+			sampler = graphicsDevice.ResourceFactory.CreateSampler(new(
+				SamplerAddressMode.Clamp,
+				SamplerAddressMode.Clamp,
+				SamplerAddressMode.Clamp,
+				SamplerFilter.MinLinear_MagPoint_MipLinear,
+				ComparisonKind.Never,
+				1,
+				0,
+				1,
+				0,
+				SamplerBorderColor.TransparentBlack
+			));
+		}
+		{ // Uniform Buffer
+			if (!IsVulkan)
+			{
+				uniformBuffer = graphicsDevice.ResourceFactory.CreateBuffer(new(768, BufferUsage.UniformBuffer));
+				uniformSet = graphicsDevice.ResourceFactory.CreateResourceSet(new(uniformsResourceLayout, uniformBuffer, sampler));
+			}
+		}
+		{ // 0
+			var emptyTexture = graphicsDevice.ResourceFactory.CreateTexture(
+				new(2, 2,
+					1, 1, 1,
 					PixelFormat.R8_UNorm,
 					TextureUsage.Sampled,
 					TextureType.Texture2D
 				)
 			);
-			emptyResourceSet = graphicsDevice.ResourceFactory.CreateResourceSet(
+			var emptyResourceSet = graphicsDevice.ResourceFactory.CreateResourceSet(
 				new ResourceSetDescription(
 					textureResourceLayout,
 					emptyTexture
 				)
 			);
-
 			TextureEntries.Add(0, new() { texture = emptyTexture, resourceSet = emptyResourceSet });
-
-			{
-				sampler = graphicsDevice.ResourceFactory.CreateSampler(new(
-					SamplerAddressMode.Clamp,
-					SamplerAddressMode.Clamp,
-					SamplerAddressMode.Clamp,
-					SamplerFilter.MinLinear_MagLinear_MipLinear,
-					ComparisonKind.Never,
-					1,
-					0,
-					1,
-					0,
-					SamplerBorderColor.TransparentBlack
-				));
-				samplerResourceSet = graphicsDevice.ResourceFactory.CreateResourceSet(new(samplerResourceLayout, sampler));
-			}
 		}
-		public ULGPUDriver GetGPUDriver() => new()
-		{
-			BeginSynchronize = null,
-			EndSynchronize = null,
-
-			NextTextureId = NextTextureId,
-			NextGeometryId = NextGeometryId,
-			NextRenderBufferId = NextRenderBufferId,
-
-			CreateTexture = CreateTexture,
-			UpdateTexture = UpdateTexture,
-			DestroyTexture = DestroyTexture,
-
-			CreateGeometry = CreateGeometry,
-			UpdateGeometry = UpdateGeometry,
-			DestroyGeometry = DestroyGeometry,
-
-			CreateRenderBuffer = CreateRenderBuffer,
-			DestroyRenderBuffer = DestroyRenderBuffer,
-
-			UpdateCommandList = UpdateCommandList
-		};
-
-		#region NextId
-		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		[SkipLocalsInit]
-		private static uint GetKey<TValue>(Dictionary<uint, TValue> dictionary)
-		{
-			for (uint i = 1; ; i++)
+		{ // Pipelines
+			static byte[] GetEmbeddedShaderBytes(string name)
 			{
-				if (!dictionary.ContainsKey(i))
-					return i;
-			}
-		}
-		[SkipLocalsInit]
-		private uint NextTextureId()
-		{
-			uint id = GetKey(TextureEntries);
-			TextureEntries.Add(id, new());
-#if DEBUG
-			Console.WriteLine($"NextTextureId() = {id}");
-#endif
-			return id;
-		}
-		[SkipLocalsInit]
-		private uint NextGeometryId()
-		{
-			uint id = GetKey(GeometryEntries);
-			GeometryEntries.Add(id, new());
-#if DEBUG
-			Console.WriteLine($"NextGeometryId() = {id}");
-#endif
-			return id;
-		}
-		[SkipLocalsInit]
-		private uint NextRenderBufferId()
-		{
-			uint id = GetKey(RenderBufferEntries);
-			RenderBufferEntries.Add(id, new());
-#if DEBUG
-			Console.WriteLine($"NextRenderBufferId() = {id}");
-#endif
-			return id;
-		}
-		#endregion NextId
-		#region Texture
-		private void UploadTexture(TextureEntry texture, ULBitmap bitmap, uint width, uint height, uint bpp, uint rowBytes)
-		{
-			byte* pixelsPTR = bitmap.LockPixels();
-			ReadOnlySpan<byte> pixels = new ReadOnlySpan<byte>(pixelsPTR, (int)(rowBytes * height));
-
-			if (rowBytes == width * bpp)
-			{
-				graphicsDevice.UpdateTexture(texture.texture, (IntPtr)pixelsPTR, width * height * bpp, 0, 0, 0, width, height, 1, 0, 0);
-			}
-			else
-			{
-				Span<byte> unstridedPixels = texture.unstride;
-				int widthXbpp = (int)(width * bpp);
-				for(uint y = 0; y < height; y++){
-					ReadOnlySpan<byte> row = pixels.Slice((int)(rowBytes * y), widthXbpp);
-					row.CopyTo(unstridedPixels.Slice(widthXbpp*(int)y, widthXbpp));
-				}
-				graphicsDevice.UpdateTexture(texture.texture, unstridedPixels, 0, 0, 0, width, height, 1, 0, 0);
-			}
-			bitmap.UnlockPixels();
-		}
-		[SkipLocalsInit]
-		private unsafe void CreateTexture(uint texture_id, ULBitmap bitmap)
-		{
-#if DEBUG
-			Console.WriteLine($"CreateTexture({texture_id})");
-#endif
-			bool isRT = bitmap.IsEmpty;
-			TextureEntry entry = TextureEntries[texture_id];
-
-			uint width = bitmap.Width;
-			uint height = bitmap.Height;
-			uint bpp = bitmap.Bpp;
-
-			TextureDescription textureDescription = new()
-			{
-				Type = TextureType.Texture2D,
-				Usage = TextureUsage.Sampled,
-				Width = width,
-				Height = height,
-				MipLevels = 1,
-				SampleCount = isRT ? SampleCount : TextureSampleCount.Count1,
-				ArrayLayers = 1,
-				Depth = 1
-			};
-
-			textureDescription.Format = bpp is 1 ? PixelFormat.R8_UNorm : PixelFormat.B8_G8_R8_A8_UNorm;
-
-			if (isRT)
-			{
-				textureDescription.Usage |= TextureUsage.RenderTarget;
+				var stream = typeof(VeldridGPUDriver).Assembly.GetManifestResourceStream(name) ?? throw new FileNotFoundException("Couldn't load embedded .spv file.");
+				var bytes = new byte[stream.Length];
+				stream.Read(bytes);
+				return bytes;
 			}
 
-			entry.texture = graphicsDevice.ResourceFactory.CreateTexture(textureDescription);
+			var fillShaders = graphicsDevice.ResourceFactory.CreateFromSpirv(
+				new ShaderDescription(ShaderStages.Vertex, GetEmbeddedShaderBytes("UltralightNet.Veldrid.shader_fill.vert.spv"), "main"),
+				new ShaderDescription(ShaderStages.Fragment, GetEmbeddedShaderBytes("UltralightNet.Veldrid.shader_fill.frag.spv"), "main"));
+			var fillPathShaders = graphicsDevice.ResourceFactory.CreateFromSpirv(
+				new ShaderDescription(ShaderStages.Vertex, GetEmbeddedShaderBytes("UltralightNet.Veldrid.shader_fill_path.vert.spv"), "main"),
+				new ShaderDescription(ShaderStages.Fragment, GetEmbeddedShaderBytes("UltralightNet.Veldrid.shader_fill_path.frag.spv"), "main"));
 
-			if (!isRT)
-			{
-				uint rowBytes = bitmap.RowBytes;
-				if(bpp * width != rowBytes){
-					entry.unstride = ArrayPool<byte>.Shared.Rent((int)(width * height * bpp));
-				}
-				UploadTexture(entry, bitmap, width, height, bpp, rowBytes);
-			}
+			var fillShaderSetDescription = new ShaderSetDescription(new VertexLayoutDescription[]{new(140,
+				new VertexElementDescription("in_Position", HLSL_to_any(VertexElementSemantic.Position), VertexElementFormat.Float2),
+				new("in_Color", HLSL_to_any(VertexElementSemantic.Color), VertexElementFormat.Byte4_Norm),
+				new("in_TexCoord", VertexElementSemantic.TextureCoordinate, VertexElementFormat.Float2),
+				new("in_ObjCoord", VertexElementSemantic.TextureCoordinate, VertexElementFormat.Float2),
+				new("in_Data0", HLSL_to_any(VertexElementSemantic.Color), VertexElementFormat.Float4),
+				new("in_Data1", HLSL_to_any(VertexElementSemantic.Color), VertexElementFormat.Float4),
+				new("in_Data2", HLSL_to_any(VertexElementSemantic.Color), VertexElementFormat.Float4),
+				new("in_Data3", HLSL_to_any(VertexElementSemantic.Color), VertexElementFormat.Float4),
+				new("in_Data4", HLSL_to_any(VertexElementSemantic.Color), VertexElementFormat.Float4),
+				new("in_Data5", HLSL_to_any(VertexElementSemantic.Color), VertexElementFormat.Float4),
+				new("in_Data6", HLSL_to_any(VertexElementSemantic.Color), VertexElementFormat.Float4))}, fillShaders);
+			var fillPathShaderSetDescription = fillShaderSetDescription with { VertexLayouts = new[] { fillShaderSetDescription.VertexLayouts[0] with { Stride = 20, Elements = fillShaderSetDescription.VertexLayouts[0].Elements[0..3] } }, Shaders = fillPathShaders };
 
-			entry.resourceSet = graphicsDevice.ResourceFactory.CreateResourceSet(
-				new ResourceSetDescription(
+			GraphicsPipelineDescription ultralightPipelineDescription = new(
+				new(default, new[] { new BlendAttachmentDescription(true,
+					BlendFactor.One,
+					BlendFactor.InverseDestinationAlpha,
+					BlendFunction.Add,
+					BlendFactor.InverseDestinationAlpha,
+					BlendFactor.One,
+					BlendFunction.Add) })
+				{
+					AttachmentStates = new[] {
+						// glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
+						new BlendAttachmentDescription()
+						{
+							/*SourceColorFactor = BlendFactor.One,
+							SourceAlphaFactor = BlendFactor.InverseDestinationAlpha,
+							DestinationColorFactor = BlendFactor.InverseSourceAlpha,
+							DestinationAlphaFactor = BlendFactor.One,*/
+							SourceColorFactor = BlendFactor.One,
+							SourceAlphaFactor = BlendFactor.InverseDestinationAlpha,//BlendFactor.One,
+							DestinationColorFactor = BlendFactor.InverseSourceAlpha,
+							DestinationAlphaFactor = BlendFactor.One, // InverseSourceAlpha
+							BlendEnabled = true,
+							ColorFunction = BlendFunction.Add,
+							AlphaFunction = BlendFunction.Add
+						}
+					}
+				},
+				DepthStencilStateDescription.Disabled,
+				new(FaceCullMode.None, PolygonFillMode.Solid, FrontFace.CounterClockwise, false, true),
+				PrimitiveTopology.TriangleList,
+				fillShaderSetDescription,
+				new ResourceLayout[]
+				{
+					uniformsResourceLayout,
 					textureResourceLayout,
-					entry.texture
-				)
-			);
+					textureResourceLayout
+				},
+				new OutputDescription(null, new OutputAttachmentDescription(PixelFormat.B8_G8_R8_A8_UNorm_SRgb)),
+				ResourceBindingModel.Default);
+
+			fillPipeline = graphicsDevice.ResourceFactory.CreateGraphicsPipeline(ultralightPipelineDescription);
+			fillWithoutBlendPipeline = graphicsDevice.ResourceFactory.CreateGraphicsPipeline(ultralightPipelineDescription with { BlendState = ultralightPipelineDescription.BlendState with { AttachmentStates = new[] { ultralightPipelineDescription.BlendState.AttachmentStates[0] with { BlendEnabled = false } } } });
+
+			fillPathPipeline = graphicsDevice.ResourceFactory.CreateGraphicsPipeline(ultralightPipelineDescription with { ShaderSet = fillPathShaderSetDescription, ResourceLayouts = new[] { uniformsResourceLayout } });
 		}
-		[SkipLocalsInit]
-		private void UpdateTexture(uint texture_id, ULBitmap bitmap)
+	}
+	public void Dispose()
+	{
+
+		fillPipeline.Dispose();
+		fillWithoutBlendPipeline.Dispose();
+		fillPathPipeline.Dispose();
+		sampler.Dispose();
+		// TODO: dispose all textures
+		textureResourceLayout.Dispose();
+		uniformsResourceLayout.Dispose();
+	}
+
+	public CommandList CommandList { get; set; } = null;
+
+	#region NextId
+	[MethodImpl(MethodImplOptions.AggressiveInlining)]
+	private static uint GetKey<TValue>(Dictionary<uint, TValue> dictionary)
+	{
+		for (uint i = 1; ; i++)
 		{
-			TextureEntry entry = TextureEntries[texture_id];
-
-			uint height = bitmap.Height;
-			uint width = bitmap.Width;
-			uint bpp = bitmap.Bpp;
-
-			UploadTexture(entry, bitmap, width, height, bpp, bitmap.RowBytes);
+			if (!dictionary.ContainsKey(i))
+				return i;
 		}
-		[SkipLocalsInit]
-		private void DestroyTexture(uint texture_id)
+	}
+	uint IGPUDriver.NextTextureId()
+	{
+		uint id = GetKey(TextureEntries);
+		TextureEntries.Add(id, new());
+		return id;
+	}
+	uint IGPUDriver.NextGeometryId()
+	{
+		uint id = GetKey(GeometryEntries);
+		GeometryEntries.Add(id, new());
+		return id;
+	}
+	uint IGPUDriver.NextRenderBufferId()
+	{
+		uint id = GetKey(RenderBufferEntries);
+		RenderBufferEntries.Add(id, new());
+		return id;
+	}
+	#endregion NextId
+	#region Texture
+	[Obsolete]
+	void UploadTexture(TextureEntry texture, ULBitmap bitmap, uint width, uint height, uint bpp, uint rowBytes)
+	{
+		byte* pixelsPTR = bitmap.LockPixels();
+		graphicsDevice.UpdateTexture(texture.texture, (IntPtr)pixelsPTR, width * height * bpp, 0, 0, 0, width, height, 1, 0, 0);
+		bitmap.UnlockPixels();
+	}
+	void IGPUDriver.CreateTexture(uint texture_id, ULBitmap bitmap)
+	{
+		bool isRT = bitmap.IsEmpty;
+		TextureEntry entry = TextureEntries[texture_id];
+
+		uint width = bitmap.Width;
+		uint height = bitmap.Height;
+		uint bpp = bitmap.Bpp;
+
+		TextureDescription textureDescription = new(
+			width, height,
+			1, 1, 1,
+			bpp is 4 ? PixelFormat.B8_G8_R8_A8_UNorm_SRgb : PixelFormat.R8_UNorm,
+			TextureUsage.Sampled | (isRT ? TextureUsage.RenderTarget : 0), TextureType.Texture2D);
+
+		if (isRT)
 		{
-#if DEBUG
-			Console.WriteLine($"DestroyTexture({texture_id})");
-#endif
-			TextureEntries.Remove(texture_id, out TextureEntry entry);
-			entry.resourceSet.Dispose();
-			entry.resourceSet = null;
-			entry.texture.Dispose();
-			entry.texture = null;
-			if(entry.unstride is not null) ArrayPool<byte>.Shared.Return(entry.unstride);
+			textureDescription.Usage |= TextureUsage.RenderTarget;
 		}
-		#endregion Texture
-		#region Geometry
-		[SkipLocalsInit]
-		private unsafe void CreateGeometry(uint geometry_id, ULVertexBuffer vertices, ULIndexBuffer indices)
+
+		entry.texture = graphicsDevice.ResourceFactory.CreateTexture(textureDescription);
+
+		if (!isRT)
 		{
-#if DEBUG
-			Console.WriteLine($"CreateGeometry({geometry_id})");
-#endif
-			GeometryEntry entry = GeometryEntries[geometry_id];
-
-			BufferDescription vertexDescription = new(vertices.size, BufferUsage.VertexBuffer);
-			entry.vertices = graphicsDevice.ResourceFactory.CreateBuffer(ref vertexDescription);
-			BufferDescription indexDescription = new(indices.size, BufferUsage.IndexBuffer);
-			entry.indicies = graphicsDevice.ResourceFactory.CreateBuffer(ref indexDescription);
-
-			graphicsDevice.UpdateBuffer(entry.vertices, 0, (IntPtr)vertices.data, vertices.size);
-			graphicsDevice.UpdateBuffer(entry.indicies, 0, (IntPtr)indices.data, indices.size);
+			uint rowBytes = bitmap.RowBytes;
+			Debug.Assert(bpp * width == rowBytes);
+			UploadTexture(entry, bitmap, width, height, bpp, rowBytes);
 		}
-		[SkipLocalsInit]
-		private unsafe void UpdateGeometry(uint geometry_id, ULVertexBuffer vertices, ULIndexBuffer indices)
+
+		entry.resourceSet = graphicsDevice.ResourceFactory.CreateResourceSet(
+			new ResourceSetDescription(
+				textureResourceLayout,
+				entry.texture
+			)
+		);
+	}
+	void IGPUDriver.UpdateTexture(uint texture_id, ULBitmap bitmap)
+	{
+		TextureEntry entry = TextureEntries[texture_id];
+
+		uint height = bitmap.Height;
+		uint width = bitmap.Width;
+		uint bpp = bitmap.Bpp;
+
+		UploadTexture(entry, bitmap, width, height, bpp, bitmap.RowBytes);
+	}
+	void IGPUDriver.DestroyTexture(uint texture_id)
+	{
+		TextureEntries.Remove(texture_id, out TextureEntry entry);
+		entry.resourceSet.Dispose();
+		entry.resourceSet = null;
+		entry.texture.Dispose();
+		entry.texture = null;
+	}
+	#endregion Texture
+	#region Geometry
+	void IGPUDriver.CreateGeometry(uint geometry_id, ULVertexBuffer vertices, ULIndexBuffer indices)
+	{
+		GeometryEntry entry = GeometryEntries[geometry_id];
+
+		BufferDescription vertexDescription = new(vertices.size, BufferUsage.VertexBuffer);
+		entry.vertices = graphicsDevice.ResourceFactory.CreateBuffer(ref vertexDescription);
+		BufferDescription indexDescription = new(indices.size, BufferUsage.IndexBuffer);
+		entry.indicies = graphicsDevice.ResourceFactory.CreateBuffer(ref indexDescription);
+
+		graphicsDevice.UpdateBuffer(entry.vertices, 0, (IntPtr)vertices.data, vertices.size);
+		graphicsDevice.UpdateBuffer(entry.indicies, 0, (IntPtr)indices.data, indices.size);
+	}
+	void IGPUDriver.UpdateGeometry(uint geometry_id, ULVertexBuffer vertices, ULIndexBuffer indices)
+	{
+		//Console.WriteLine($"UpdateGeometry({geometry_id})");
+		GeometryEntry entry = GeometryEntries[geometry_id];
+
+		graphicsDevice.UpdateBuffer(entry.vertices, 0, (IntPtr)vertices.data, vertices.size);
+		graphicsDevice.UpdateBuffer(entry.indicies, 0, (IntPtr)indices.data, indices.size);
+	}
+	void IGPUDriver.DestroyGeometry(uint geometry_id)
+	{
+		GeometryEntries.Remove(geometry_id, out GeometryEntry entry);
+
+		entry.vertices.Dispose();
+		entry.indicies.Dispose();
+	}
+	#endregion
+	#region RenderBuffer
+	void IGPUDriver.CreateRenderBuffer(uint render_buffer_id, ULRenderBuffer buffer)
+	{
+		RenderBufferEntry entry = RenderBufferEntries[render_buffer_id];
+		TextureEntry textureEntry = TextureEntries[buffer.TextureId];
+
+		entry.textureEntry = textureEntry;
+
+		FramebufferDescription fd = new()
 		{
-			//Console.WriteLine($"UpdateGeometry({geometry_id})");
-			GeometryEntry entry = GeometryEntries[geometry_id];
-
-			graphicsDevice.UpdateBuffer(entry.vertices, 0, (IntPtr)vertices.data, vertices.size);
-			graphicsDevice.UpdateBuffer(entry.indicies, 0, (IntPtr)indices.data, indices.size);
-		}
-		[SkipLocalsInit]
-		private void DestroyGeometry(uint geometry_id)
-		{
-#if DEBUG
-			Console.WriteLine($"DestroyGeometry({geometry_id})");
-#endif
-			GeometryEntries.Remove(geometry_id, out GeometryEntry entry);
-
-			entry.vertices.Dispose();
-			entry.indicies.Dispose();
-		}
-		#endregion
-		#region RenderBuffer
-		[SkipLocalsInit]
-		private void CreateRenderBuffer(uint render_buffer_id, ULRenderBuffer buffer)
-		{
-#if DEBUG
-			Console.WriteLine($"CreateRenderBuffer({render_buffer_id})");
-#endif
-			RenderBufferEntry entry = RenderBufferEntries[render_buffer_id];
-			TextureEntry textureEntry = TextureEntries[buffer.TextureId];
-
-			entry.textureEntry = textureEntry;
-
-			FramebufferDescription fd = new()
-			{
-				ColorTargets = new[] {
+			ColorTargets = new[] {
 					new FramebufferAttachmentDescription(textureEntry.texture, 0)
 				}
-			};
+		};
 
-			entry.framebuffer = graphicsDevice.ResourceFactory.CreateFramebuffer(ref fd);
-		}
-		[SkipLocalsInit]
-		private void DestroyRenderBuffer(uint render_buffer_id)
+		entry.framebuffer = graphicsDevice.ResourceFactory.CreateFramebuffer(ref fd);
+	}
+	void IGPUDriver.DestroyRenderBuffer(uint render_buffer_id)
+	{
+		if (RenderBufferEntries.Remove(render_buffer_id, out var entry))
 		{
-#if DEBUG
-			Console.WriteLine($"DestroyRenderBuffer({render_buffer_id})");
-#endif
-			RenderBufferEntries.Remove(render_buffer_id, out RenderBufferEntry entry);
 			entry.textureEntry = null;
 			entry.framebuffer.Dispose();
 			entry.framebuffer = null;
 		}
-		#endregion RenderBuffer
+	}
+	#endregion RenderBuffer
 
-		[SkipLocalsInit]
-		private void UpdateCommandList(ULCommandList list)
+	void IGPUDriver.UpdateCommandList(ULCommandList list)
+	{
+		if (list.size is 0) return;
+
+		uint commandId = 0;
+
+		if (IsVulkan)
 		{
-			if(list.size is 0) return;
+			if (uniformBuffer is null || uniformSet is null || FakeMappedUniformBuffer?.Length < list.size)
+			{
+				uniformSet?.Dispose();
+				uniformBuffer?.Dispose();
 
-			uint commandId = 0;
+				uniformBuffer = graphicsDevice.ResourceFactory.CreateBuffer(new BufferDescription((uint)768 * list.size, BufferUsage.UniformBuffer | BufferUsage.Dynamic));
 
-			if(IsVulkan){
-				if(uniformBuffer is null || uniformResourceSet is null || UniformBufferCommandLength < list.size){
+				uniformSet = graphicsDevice.ResourceFactory.CreateResourceSet(new(uniformsResourceLayout, uniformBuffer, sampler));
 
-					if(uniformBuffer is not null) uniformBuffer.Dispose();
-					uniformBuffer = graphicsDevice.ResourceFactory.CreateBuffer(new BufferDescription((uint)768 * list.size, BufferUsage.UniformBuffer | BufferUsage.Dynamic));
-					UniformBufferCommandLength = list.size;
-
-					if(uniformResourceSet is not null) uniformResourceSet.Dispose();
-					uniformResourceSet = graphicsDevice.ResourceFactory.CreateResourceSet(new(uniformsResourceLayout, uniformBuffer));
-
-					FakeMappedUniformBuffer = GC.AllocateUninitializedArray<Uniforms>((int)list.size);
-				}
-
-				Span<Uniforms> uniformSpan = FakeMappedUniformBuffer; // implicit conversion :)
-
-				foreach(ULCommand command in list.ToSpan()){
-					if(command.CommandType is ULCommandType.DrawGeometry){
-						ULGPUState state = command.GPUState;
-						Unsafe.SkipInit(out Uniforms uniforms);
-						uniforms.State.X = state.ViewportWidth;
-						uniforms.State.Y = state.ViewportHeight;
-						uniforms.Transform = state.Transform.ApplyProjection(state.ViewportWidth, state.ViewportHeight, true);
-						state.Scalar.CopyTo(new Span<float>(&uniforms.Scalar4_0.W, 8));
-						state.Vector.CopyTo(new Span<Vector4>(&uniforms.Vector_0.W, 8));
-						state.Clip.CopyTo(new Span<Matrix4x4>(&uniforms.Clip_0.M11, 8));
-						uniforms.ClipSize = state.ClipSize;
-						uniformSpan[(int)commandId++] = uniforms;
-					}
-				}
-
-				CommandList.UpdateBuffer(uniformBuffer, 0, (ReadOnlySpan<Uniforms>)uniformSpan);
-
-				commandId = 0;
+				FakeMappedUniformBuffer = GC.AllocateUninitializedArray<Uniforms>((int)list.size);
 			}
 
-			foreach (ULCommand command in list.ToSpan())
+			Span<Uniforms> uniformSpan = FakeMappedUniformBuffer; // implicit conversion :)
+
+			foreach (ULCommand command in list.AsSpan())
 			{
-				RenderBufferEntry renderBufferEntry = RenderBufferEntries[command.GPUState.RenderBufferId];
-
-				CommandList.SetFramebuffer(renderBufferEntry.framebuffer);
-
-				if (command.CommandType is ULCommandType.ClearRenderBuffer)
-				{
-					CommandList.SetFullScissorRect(0);
-					CommandList.ClearColorTarget(0, RgbaFloat.Clear);
-				}
-				else if ( command.CommandType is ULCommandType.DrawGeometry )
+				if (command.CommandType is ULCommandType.DrawGeometry)
 				{
 					ULGPUState state = command.GPUState;
-					if (state.ShaderType is ULShaderType.Fill)
-					{
-						if (state.EnableScissor)
-						{
-							if (state.EnableBlend)
-								CommandList.SetPipeline(ul_scissor_blend);
-							else
-								CommandList.SetPipeline(ul_scissor);
-							CommandList.SetScissorRect(0, (uint)state.ScissorRect.Left, (uint)state.ScissorRect.Top, (uint)(state.ScissorRect.Right - state.ScissorRect.Left), (uint)(state.ScissorRect.Bottom - state.ScissorRect.Top));
-						}
-						else
-						{
-							if (state.EnableBlend)
-								CommandList.SetPipeline(ul_scissor_blend);
-							else
-								CommandList.SetPipeline(ul_scissor);
-							CommandList.SetFullScissorRect(0);
-						}
-						CommandList.SetGraphicsResourceSet(1, TextureEntries[state.Texture1Id].resourceSet);
-						CommandList.SetGraphicsResourceSet(2, TextureEntries[state.Texture2Id].resourceSet);
-						CommandList.SetGraphicsResourceSet(3, samplerResourceSet);
-					}
-					else
-					{
-						if (state.EnableScissor)
-						{
-							if (state.EnableBlend)
-								CommandList.SetPipeline(ulPath_scissor_blend);
-							else
-								CommandList.SetPipeline(ulPath_scissor);
-							CommandList.SetScissorRect(0, (uint)state.ScissorRect.Left, (uint)state.ScissorRect.Top, (uint)(state.ScissorRect.Right - state.ScissorRect.Left), (uint)(state.ScissorRect.Bottom - state.ScissorRect.Top));
-						}
-						else
-						{
-							if (state.EnableBlend)
-								CommandList.SetPipeline(ulPath_scissor_blend);
-							else
-								CommandList.SetPipeline(ulPath_scissor);
-							CommandList.SetFullScissorRect(0);
-						}
-					}
-
-					#region Uniforms
-					if (IsVulkan){
-						uint offset = (uint) (768 * commandId++);
-						CommandList.SetGraphicsResourceSet(0, uniformResourceSet, 1, ref offset); // dynamic offset my beloved
-					} else {
-						Unsafe.SkipInit(out Uniforms uniforms);
-						uniforms.State.X = state.ViewportWidth;
-						uniforms.State.Y = state.ViewportHeight;
-						uniforms.Transform = state.Transform.ApplyProjection(state.ViewportWidth, state.ViewportHeight, true);
-						state.Scalar.CopyTo(new Span<float>(&uniforms.Scalar4_0.W, 8));
-						state.Vector.CopyTo(new Span<Vector4>(&uniforms.Vector_0.W, 8));
-						state.Clip.CopyTo(new Span<Matrix4x4>(&uniforms.Clip_0.M11, 8));
-						uniforms.ClipSize = (uint)state.ClipSize;
-						CommandList.UpdateBuffer(uniformBuffer, 0, ref uniforms);
-
-						CommandList.SetGraphicsResourceSet(0, uniformResourceSet);
-					}
-					#endregion Uniforms
-
-					CommandList.SetViewport(0, new Viewport(0f, 0f, state.ViewportWidth, state.ViewportHeight, 0f, 1f));
-
-					GeometryEntry geometryEntry = GeometryEntries[command.GeometryId];
-
-					CommandList.SetVertexBuffer(0, geometryEntry.vertices);
-					CommandList.SetIndexBuffer(geometryEntry.indicies, IndexFormat.UInt32);
-
-					CommandList.DrawIndexed(
-						command.IndicesCount,
-						1,
-						command.IndicesOffset,
-						0,
-						0
-					);
+					Unsafe.SkipInit(out Uniforms uniforms);
+					uniforms.State.X = state.ViewportWidth;
+					uniforms.State.Y = state.ViewportHeight;
+					uniforms.Transform = state.Transform.ApplyProjection(state.ViewportWidth, state.ViewportHeight, true);
+					state.Scalar.CopyTo(new Span<float>(&uniforms.Scalar4_0.W, 8));
+					state.Vector.CopyTo(new Span<Vector4>(&uniforms.Vector_0.W, 8));
+					state.Clip.CopyTo(new Span<Matrix4x4>(&uniforms.Clip_0.M11, 8));
+					uniforms.ClipSize = state.ClipSize;
+					uniformSpan[(int)commandId++] = uniforms;
 				}
 			}
+
+			CommandList.UpdateBuffer(uniformBuffer, 0, (ReadOnlySpan<Uniforms>)uniformSpan);
+
+			commandId = 0;
 		}
 
-		/// <remarks>will throw exception when view doesn't have RenderTarget</remarks>
-		/// <exception cref="KeyNotFoundException">When called on view without RenderTarget</exception>
-		[MethodImpl(MethodImplOptions.AggressiveInlining)]
-		[SkipLocalsInit]
-		public ResourceSet GetRenderTarget(View view) => TextureEntries[view.RenderTarget.TextureId].resourceSet;
-
-		public class TextureEntry
+		foreach (ULCommand command in list.AsSpan())
 		{
-			public Texture texture;
-			public byte[]? unstride;
-			public ResourceSet resourceSet;
+			RenderBufferEntry renderBufferEntry = RenderBufferEntries[command.GPUState.RenderBufferId];
+
+			CommandList.SetFramebuffer(renderBufferEntry.framebuffer);
+
+			if (command.CommandType is ULCommandType.ClearRenderBuffer)
+			{
+				CommandList.SetFullScissorRect(0);
+				CommandList.ClearColorTarget(0, RgbaFloat.Clear);
+			}
+			else if (command.CommandType is ULCommandType.DrawGeometry)
+			{
+				ULGPUState state = command.GPUState;
+				if (state.ShaderType is ULShaderType.Fill)
+				{
+					CommandList.SetPipeline(state.EnableBlend ? fillPipeline : fillWithoutBlendPipeline);
+
+					CommandList.SetGraphicsResourceSet(1, TextureEntries[state.Texture1Id].resourceSet);
+					CommandList.SetGraphicsResourceSet(2, TextureEntries[state.Texture2Id].resourceSet);
+				}
+				else
+				{
+					Debug.Assert(state.EnableBlend);
+					CommandList.SetPipeline(fillPathPipeline);
+				}
+
+				CommandList.SetScissorRect(0, (uint)state.ScissorRect.Left, (uint)state.ScissorRect.Top, (uint)(state.ScissorRect.Right - state.ScissorRect.Left), (uint)(state.ScissorRect.Bottom - state.ScissorRect.Top));
+
+				#region Uniforms
+				if (IsVulkan)
+				{
+					uint offset = 768u * commandId++;
+					CommandList.SetGraphicsResourceSet(0, uniformSet, 1, ref offset); // dynamic offset my beloved
+				}
+				else
+				{
+					Unsafe.SkipInit(out Uniforms uniforms);
+					uniforms.State.X = state.ViewportWidth;
+					uniforms.State.Y = state.ViewportHeight;
+					uniforms.Transform = state.Transform.ApplyProjection(state.ViewportWidth, state.ViewportHeight, true);
+					state.Scalar.CopyTo(new Span<float>(&uniforms.Scalar4_0.W, 8));
+					state.Vector.CopyTo(new Span<Vector4>(&uniforms.Vector_0.W, 8));
+					state.Clip.CopyTo(new Span<Matrix4x4>(&uniforms.Clip_0.M11, 8));
+					uniforms.ClipSize = (uint)state.ClipSize;
+					CommandList.UpdateBuffer(uniformBuffer, 0, ref uniforms);
+
+					CommandList.SetGraphicsResourceSet(0, uniformSet);
+				}
+				#endregion Uniforms
+
+				CommandList.SetViewport(0, new Viewport(0f, 0f, state.ViewportWidth, state.ViewportHeight, 0f, 1f));
+
+				GeometryEntry geometryEntry = GeometryEntries[command.GeometryId];
+
+				CommandList.SetVertexBuffer(0, geometryEntry.vertices);
+				CommandList.SetIndexBuffer(geometryEntry.indicies, IndexFormat.UInt32);
+
+				CommandList.DrawIndexed(
+					command.IndicesCount,
+					1,
+					command.IndicesOffset,
+					0,
+					0
+				);
+			}
 		}
-		private class GeometryEntry
-		{
-			public DeviceBuffer vertices;
-			public DeviceBuffer indicies;
-		}
-		private class RenderBufferEntry
-		{
-			public Framebuffer framebuffer;
-			public TextureEntry textureEntry;
-		}
+	}
 
-		// todo: https://github.com/ultralight-ux/AppCore/blob/6324e85f31f815b1519b495f559f1f72717b2651/src/linux/gl/GPUDriverGL.cpp#L407
+	/// <remarks>will throw exception when view doesn't have RenderTarget</remarks>
+	/// <exception cref="KeyNotFoundException">When called on view without RenderTarget</exception>
+	[MethodImpl(MethodImplOptions.AggressiveInlining)]
+	[SkipLocalsInit]
+	public ResourceSet GetRenderTarget(View view) => TextureEntries[view.RenderTarget.TextureId].resourceSet;
 
-		private Texture pipelineOutputTexture;
-		private Framebuffer pipelineOutputFramebuffer;
+	private class TextureEntry
+	{
+		public Texture texture;
+		public ResourceSet resourceSet;
+	}
+	private class GeometryEntry
+	{
+		public DeviceBuffer vertices;
+		public DeviceBuffer indicies;
+	}
+	private class RenderBufferEntry
+	{
+		public Framebuffer framebuffer;
+		public TextureEntry textureEntry;
+	}
 
-		private readonly Texture emptyTexture;
-		private readonly ResourceSet emptyResourceSet;
+	private VertexElementSemantic HLSL_to_any(VertexElementSemantic hlsl_semantic) => IsDirectX ? hlsl_semantic : VertexElementSemantic.TextureCoordinate;
 
-		private Pipeline ul_scissor_blend;
-		private Pipeline ul_scissor;
-
-		private Pipeline ulPath_scissor_blend;
-		private Pipeline ulPath_scissor;
-
-		private DeviceBuffer uniformBuffer;
-
-		private void InitializeBuffers()
-		{
-			if(!IsVulkan) uniformBuffer = graphicsDevice.ResourceFactory.CreateBuffer(new(768, BufferUsage.UniformBuffer));
-		}
-
-		private Shader[] ultralightShaders;
-		private Shader[] ultralightPathShaders;
-
-		private ResourceSet uniformResourceSet;
-
-		private void InitShaders()
-		{
-			var a = typeof(VeldridGPUDriver).Assembly;
-			var fillVert = a.GetManifestResourceStream("UltralightNet.Veldrid.shader_fill.vert.spv");
-			byte[] fillVertBytes = new byte[fillVert.Length];
-			fillVert.Read(fillVertBytes, 0, (int)fillVert.Length);
-			var fillFrag = a.GetManifestResourceStream("UltralightNet.Veldrid.shader_fill.frag.spv");
-			byte[] fillFragBytes = new byte[fillFrag.Length];
-			fillFrag.Read(fillFragBytes, 0, (int)fillFrag.Length);
-
-			ultralightShaders = graphicsDevice.ResourceFactory.CreateFromSpirv(new(ShaderStages.Vertex, fillVertBytes, "main"), new ShaderDescription(ShaderStages.Fragment, fillFragBytes, "main"));
-
-			var pathVert = a.GetManifestResourceStream("UltralightNet.Veldrid.shader_fill_path.vert.spv");
-			byte[] pathVertBytes = new byte[pathVert.Length];
-			pathVert.Read(pathVertBytes, 0, (int)pathVert.Length);
-			var pathFrag = a.GetManifestResourceStream("UltralightNet.Veldrid.shader_fill_path.frag.spv");
-			byte[] pathFragBytes = new byte[pathFrag.Length];
-			pathFrag.Read(pathFragBytes, 0, (int)pathFrag.Length);
-
-			ultralightPathShaders = graphicsDevice.ResourceFactory.CreateFromSpirv(new(ShaderStages.Vertex, pathVertBytes, "main"), new ShaderDescription(ShaderStages.Fragment, pathFragBytes, "main"));
-		}
-
-		private VertexElementSemantic HLSL_to_any(VertexElementSemantic hlsl_semantic) => IsDirectX ? hlsl_semantic : VertexElementSemantic.TextureCoordinate;
-
-		private ShaderSetDescription FillShaderSetDescription() =>
-			new(
-				new VertexLayoutDescription[] {
-					new VertexLayoutDescription(
-						140,
-						new VertexElementDescription(
-							"in_Position",
-							HLSL_to_any(VertexElementSemantic.Position),
-							VertexElementFormat.Float2
-						),
-						new VertexElementDescription(
-							"in_Color",
-							HLSL_to_any(VertexElementSemantic.Color),
-							VertexElementFormat.Byte4_Norm
-						),
-						new VertexElementDescription(
-							"in_TexCoord",
-							VertexElementSemantic.TextureCoordinate,
-							VertexElementFormat.Float2
-						),
-						new VertexElementDescription(
-							"in_ObjCoord",
-							VertexElementSemantic.TextureCoordinate,
-							VertexElementFormat.Float2
-						),
-						new VertexElementDescription(
-							"in_Data0",
-							HLSL_to_any(VertexElementSemantic.Color),
-							VertexElementFormat.Float4
-						),
-						new VertexElementDescription(
-							"in_Data1",
-							HLSL_to_any(VertexElementSemantic.Color),
-							VertexElementFormat.Float4
-						),
-						new VertexElementDescription(
-							"in_Data2",
-							HLSL_to_any(VertexElementSemantic.Color),
-							VertexElementFormat.Float4
-						),
-						new VertexElementDescription(
-							"in_Data3",
-							HLSL_to_any(VertexElementSemantic.Color),
-							VertexElementFormat.Float4
-						),
-						new VertexElementDescription(
-							"in_Data4",
-							HLSL_to_any(VertexElementSemantic.Color),
-							VertexElementFormat.Float4
-						),
-						new VertexElementDescription(
-							"in_Data5",
-							HLSL_to_any(VertexElementSemantic.Color),
-							VertexElementFormat.Float4
-						),
-						new VertexElementDescription(
-							"in_Data6",
-							HLSL_to_any(VertexElementSemantic.Color),
-							VertexElementFormat.Float4
-						)
-					)
-				}, ultralightShaders
-			);
-		private ShaderSetDescription FillPathShaderSetDescription() => new(
-				new VertexLayoutDescription[] {
+	/*private ShaderSetDescription FillPathShaderSetDescription() => new(
+			new VertexLayoutDescription[] {
 					new VertexLayoutDescription(
 							20,
 							new VertexElementDescription(
@@ -628,134 +496,6 @@ namespace UltralightNet.Veldrid
 								VertexElementFormat.Float2
 							)
 						)
-				}, ultralightPathShaders
-			);
-
-		private void InitFramebuffers()
-		{
-			pipelineOutputTexture = graphicsDevice.ResourceFactory.CreateTexture(new(
-				512,
-				512,
-				1,
-				1,
-				1,
-				PixelFormat.B8_G8_R8_A8_UNorm,
-				TextureUsage.RenderTarget,
-				TextureType.Texture2D,
-				SampleCount));
-
-			pipelineOutputFramebuffer = graphicsDevice.ResourceFactory.CreateFramebuffer(
-				new FramebufferDescription()
-				{
-					ColorTargets = new[] {
-						new FramebufferAttachmentDescription(pipelineOutputTexture, 0)
-					}
-				}
-			);
-		}
-		private static void DisableBlend(ref GraphicsPipelineDescription pipa)
-		{
-			pipa.BlendState.AttachmentStates = new[]
-			{
-				new BlendAttachmentDescription()
-				{
-					SourceColorFactor = BlendFactor.One,
-					SourceAlphaFactor = BlendFactor.One,
-					DestinationColorFactor = BlendFactor.InverseSourceAlpha,
-					DestinationAlphaFactor = BlendFactor.InverseSourceAlpha,
-
-					BlendEnabled = false
-				}
-			};
-		}
-		private void InitPipelines()
-		{
-			ShaderSetDescription fillShaderSetDescription = FillShaderSetDescription();
-
-			uniformsResourceLayout = graphicsDevice.ResourceFactory.CreateResourceLayout(
-				new ResourceLayoutDescription(
-					new ResourceLayoutElementDescription(
-						"Uniforms",
-						ResourceKind.UniformBuffer,
-						ShaderStages.Vertex | ShaderStages.Fragment,
-						IsVulkan ? ResourceLayoutElementOptions.DynamicBinding : ResourceLayoutElementOptions.None
-					)
-				)
-			);
-			if(!IsVulkan) uniformResourceSet = graphicsDevice.ResourceFactory.CreateResourceSet(new(uniformsResourceLayout, uniformBuffer));
-
-			GraphicsPipelineDescription _ultralightPipelineDescription = new()
-			{
-				BlendState = new()
-				{
-					AttachmentStates = new[]
-					{
-						// glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
-						new BlendAttachmentDescription()
-						{
-							/*SourceColorFactor = BlendFactor.One,
-							SourceAlphaFactor = BlendFactor.InverseDestinationAlpha,
-							DestinationColorFactor = BlendFactor.InverseSourceAlpha,
-							DestinationAlphaFactor = BlendFactor.One,*/
-							SourceColorFactor = BlendFactor.One,
-							SourceAlphaFactor = BlendFactor.One,
-							DestinationColorFactor = BlendFactor.InverseSourceAlpha,
-							DestinationAlphaFactor = BlendFactor.InverseSourceAlpha,
-							BlendEnabled = true,
-							ColorFunction = BlendFunction.Add,
-							AlphaFunction = BlendFunction.Add
-						}
-					},
-					AlphaToCoverageEnabled = false
-				},
-				DepthStencilState = new DepthStencilStateDescription()
-				{
-					DepthTestEnabled = false, // glDisable(GL_DEPTH_TEST)
-					DepthWriteEnabled = false,
-					StencilTestEnabled = false,
-					DepthComparison = ComparisonKind.Never // glDepthFunc(GL_NEVER)
-				},
-				RasterizerState = new()
-				{
-					CullMode = FaceCullMode.None,
-					FrontFace = FrontFace.CounterClockwise,
-					FillMode = PolygonFillMode.Solid,
-					ScissorTestEnabled = true,
-					DepthClipEnabled = false
-				},
-				PrimitiveTopology = PrimitiveTopology.TriangleList,
-				ResourceBindingModel = ResourceBindingModel.Default,
-				ShaderSet = fillShaderSetDescription,
-				ResourceLayouts = new[]
-				{
-					uniformsResourceLayout,
-					textureResourceLayout,
-					textureResourceLayout,
-					samplerResourceLayout
-				},
-				Outputs = pipelineOutputFramebuffer.OutputDescription
-			};
-
-			GraphicsPipelineDescription ultralight_pd__SCISSOR_TRUE__ENALBE_BLEND = _ultralightPipelineDescription;
-
-			GraphicsPipelineDescription ultralight_pd__SCISSOR_TRUE__DISALBE_BLEND = _ultralightPipelineDescription;
-			DisableBlend(ref ultralight_pd__SCISSOR_TRUE__DISALBE_BLEND);
-
-			ul_scissor_blend = graphicsDevice.ResourceFactory.CreateGraphicsPipeline(ref ultralight_pd__SCISSOR_TRUE__ENALBE_BLEND);
-			ul_scissor = graphicsDevice.ResourceFactory.CreateGraphicsPipeline(ref ultralight_pd__SCISSOR_TRUE__DISALBE_BLEND);
-
-
-			GraphicsPipelineDescription _ultralightPathPipelineDescription = _ultralightPipelineDescription;
-			_ultralightPathPipelineDescription.ShaderSet = FillPathShaderSetDescription();
-			_ultralightPathPipelineDescription.ResourceLayouts = new[] { uniformsResourceLayout };
-
-			GraphicsPipelineDescription ultralightPath_pd__SCISSOR_TRUE__ENALBE_BLEND = _ultralightPathPipelineDescription;
-
-			GraphicsPipelineDescription ultralightPath_pd__SCISSOR_TRUE__DISABLE_BLEND = _ultralightPathPipelineDescription;
-			DisableBlend(ref ultralightPath_pd__SCISSOR_TRUE__DISABLE_BLEND);
-
-			ulPath_scissor_blend = graphicsDevice.ResourceFactory.CreateGraphicsPipeline(ref ultralightPath_pd__SCISSOR_TRUE__ENALBE_BLEND);
-			ulPath_scissor = graphicsDevice.ResourceFactory.CreateGraphicsPipeline(ref ultralightPath_pd__SCISSOR_TRUE__DISABLE_BLEND);
-		}
-	}
+			}, ultralightPathShaders
+		);*/
 }

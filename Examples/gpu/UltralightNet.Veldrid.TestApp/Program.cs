@@ -7,13 +7,14 @@ using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading;
+using TerraFX.Interop.Windows;
 using UltralightNet.AppCore;
+using UltralightNet.GPU.Veldrid;
 using UltralightNet.Veldrid.SDL2;
 using Veldrid;
 using Veldrid.Sdl2;
 using Veldrid.SPIRV;
 using Veldrid.StartupUtilities;
-using TerraFX.Interop.Windows;
 
 namespace UltralightNet.Veldrid.TestApp
 {
@@ -27,7 +28,7 @@ namespace UltralightNet.Veldrid.TestApp
 
 		private static readonly ULConfig config = new()
 		{
-			ForceRepaint = false,
+			ForceRepaint = true,
 			CachePath = "./cache/",
 			BitmapAlignment = 1, // improves performance (veldrid only)
 			FaceWinding = ULFaceWinding.CounterClockwise
@@ -50,34 +51,37 @@ namespace UltralightNet.Veldrid.TestApp
 
 			static bool EnableDPIAwareness()
 			{
-				if(OperatingSystem.IsWindowsVersionAtLeast(8, 1))
+				if (OperatingSystem.IsWindowsVersionAtLeast(8, 1))
 					Windows.SetProcessDpiAwareness(PROCESS_DPI_AWARENESS.PROCESS_PER_MONITOR_DPI_AWARE);
-				else if(OperatingSystem.IsWindowsVersionAtLeast(6))
+				else if (OperatingSystem.IsWindowsVersionAtLeast(6))
 					Windows.SetProcessDPIAware();
 				else return false;
 				return true;
 			}
 
-			if(EnableDPIAwareness())
+			if (EnableDPIAwareness())
 			{
 				HMONITOR monitor = Windows.MonitorFromPoint(new TerraFX.Interop.Windows.POINT(1, 1), MONITOR.MONITOR_DEFAULTTONEAREST);
-				if(OperatingSystem.IsWindowsVersionAtLeast(8, 1))
+				if (OperatingSystem.IsWindowsVersionAtLeast(8, 1))
 				{
-					try {
+					try
+					{
 						DEVICE_SCALE_FACTOR factor;
 						Windows.GetScaleFactorForMonitor(monitor, &factor);
 						scale = (float)factor / 100f;
-					} catch {
+					}
+					catch
+					{
 						uint dpiX, dpiY;
 						Windows.GetDpiForMonitor(monitor, MONITOR_DPI_TYPE.MDT_EFFECTIVE_DPI, &dpiX, &dpiY);
-						scale = ((float)(dpiX + dpiY)/2)/96f;
+						scale = ((float)(dpiX + dpiY) / 2) / 96f;
 					}
 				}
-				else if(OperatingSystem.IsWindows())
+				else if (OperatingSystem.IsWindows())
 				{
 					HDC dc = Windows.GetDC(HWND.NULL);
 					int dpiX = Windows.GetDeviceCaps(dc, Windows.LOGPIXELSX), dpiY = Windows.GetDeviceCaps(dc, Windows.LOGPIXELSY);
-					scale = ((float)(dpiX + dpiY)/2)/96f;
+					scale = ((float)(dpiX + dpiY) / 2) / 96f;
 					Windows.ReleaseDC(HWND.NULL, dc);
 				}
 			}
@@ -194,13 +198,10 @@ void main()
 
 			Pipeline pipeline = factory.CreateGraphicsPipeline(ref mainPipelineDescription);
 
-			VeldridGPUDriver gpuDriver = new(graphicsDevice);
 
-			gpuDriver.CommandList = commandList;
-
-			AppCoreMethods.ulEnablePlatformFileSystem("./");
-			AppCoreMethods.ulEnablePlatformFontLoader();
-			ULPlatform.GPUDriver = gpuDriver.GetGPUDriver();
+			AppCoreMethods.SetPlatformFontLoader();
+			VeldridGPUDriver gpuDriver = new(graphicsDevice) { CommandList = commandList };
+			ULPlatform.GPUDriver = gpuDriver;
 
 			Renderer renderer = ULPlatform.CreateRenderer(config);
 			View view = renderer.CreateView((uint)(Width * scale), (uint)(Height * scale), viewConfig, renderer.CreateSession(true, "Cookies_please"));
@@ -256,8 +257,8 @@ void main()
 				ULMouseEvent mouseEvent = new()
 				{
 					Type = ULMouseEventType.MouseMoved,
-					X = (int)(x/scale),
-					Y = (int)(y/scale),
+					X = (int)(x / scale),
+					Y = (int)(y / scale),
 					Button = ULMouseEventButton.None
 				};
 
@@ -281,8 +282,8 @@ void main()
 				ULMouseEvent mouseEvent = new()
 				{
 					Type = ULMouseEventType.MouseDown,
-					X = (int)(x/scale),
-					Y = (int)(y/scale),
+					X = (int)(x / scale),
+					Y = (int)(y / scale),
 					Button = md.MouseButton switch
 					{
 						MouseButton.Left => ULMouseEventButton.Left,
@@ -300,8 +301,8 @@ void main()
 				ULMouseEvent mouseEvent = new()
 				{
 					Type = ULMouseEventType.MouseUp,
-					X = (int)(x/scale),
-					Y = (int)(y/scale),
+					X = (int)(x / scale),
+					Y = (int)(y / scale),
 					Button = mu.MouseButton switch
 					{
 						MouseButton.Left => ULMouseEventButton.Left,
@@ -319,7 +320,7 @@ void main()
 				ULScrollEvent scrollEvent = new()
 				{
 					Type = ULScrollEventType.ByPixel,
-					DeltaY = (int)mw.WheelDelta*16//(int)((mw.WheelDelta / scale)*0.8) // PixelsToScreen(Delta) * 0.8 from AppCore/win/WindowWin.cpp(h)
+					DeltaY = (int)(mw.WheelDelta * 32f)//16//(int)((mw.WheelDelta / scale)*0.8) // PixelsToScreen(Delta) * 0.8 from AppCore/win/WindowWin.cpp(h)
 				};
 				view.FireScrollEvent(scrollEvent);
 				//cpuView.FireScrollEvent(scrollEvent);
@@ -364,7 +365,7 @@ void main()
 			stopwatch.Start();
 
 
-			view.OnDomReady += ((frame_id, is_main_frame, url) =>
+			view.OnDOMReady += ((frame_id, is_main_frame, url) =>
 			{
 				Console.WriteLine("Dom is ready");
 
@@ -390,7 +391,6 @@ void main()
 				commandList.Begin();
 				//Console.WriteLine("Update");
 				renderer.Update();
-				gpuDriver.time = stopwatch.ElapsedTicks / 1000f;
 				//Console.WriteLine("Render");
 				renderer.Render();
 				//Console.WriteLine("Done");
