@@ -200,13 +200,15 @@ void main()
 
 
 			AppCoreMethods.SetPlatformFontLoader();
-			VeldridGPUDriver gpuDriver = new(graphicsDevice) { CommandList = commandList };
+			GPUDriver gpuDriver = new(graphicsDevice) { CommandList = commandList };
+			SurfaceDefinition surfaceDefinition = new(graphicsDevice) { CommandList = commandList };
 			ULPlatform.GPUDriver = gpuDriver;
+			ULPlatform.SurfaceDefinition = surfaceDefinition;
+
 
 			Renderer renderer = ULPlatform.CreateRenderer(config);
-			View view = renderer.CreateView((uint)(Width * scale), (uint)(Height * scale), viewConfig, renderer.CreateSession(true, "Cookies_please"));
-
-			//View cpuView = new(renderer, Width, Height, TRANSPARENT, Session.DefaultSession(renderer), true);
+			using View view = renderer.CreateView((uint)(Width * scale), (uint)(Height * scale), viewConfig, renderer.CreateSession(true, "Cookies_please"));
+			using View cpuView = renderer.CreateView((uint)(Width * scale), (uint)(Height * scale), viewConfig with { IsAccelerated = false }, renderer.CreateSession(true, "Cookies_please"));
 
 			const string url = "https://en.key-test.ru/";//*/"https://github.com/SupinePandora43";
 
@@ -215,7 +217,7 @@ void main()
 			//view.HTML = "<html><body><p>123</p></body></html>";
 			//view.URL = "https://github.com";
 			//view.URL = "https://youtu.be/YNL692WN6EE";
-			//cpuView.URL = url;
+			cpuView.URL = url;
 
 			/*try
 			{
@@ -325,10 +327,6 @@ void main()
 				view.FireScrollEvent(scrollEvent);
 				//cpuView.FireScrollEvent(scrollEvent);
 			};
-
-			// idk why
-			view.Focus();
-			//cpuView.Focus();
 
 			window.KeyDown += (kd) =>
 			{

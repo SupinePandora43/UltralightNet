@@ -11,7 +11,7 @@ using Veldrid.SPIRV;
 
 namespace UltralightNet.GPU.Veldrid;
 
-public unsafe sealed class VeldridGPUDriver : IGPUDriver, IDisposable
+public unsafe sealed class GPUDriver : IGPUDriver, IDisposable
 {
 	readonly GraphicsDevice graphicsDevice;
 	readonly bool IsVulkan;
@@ -38,7 +38,7 @@ public unsafe sealed class VeldridGPUDriver : IGPUDriver, IDisposable
 
 	Uniforms[]? FakeMappedUniformBuffer;
 
-	public VeldridGPUDriver(GraphicsDevice graphicsDevice)
+	public GPUDriver(GraphicsDevice graphicsDevice)
 	{
 		this.graphicsDevice = graphicsDevice;
 
@@ -103,7 +103,7 @@ public unsafe sealed class VeldridGPUDriver : IGPUDriver, IDisposable
 		{ // Pipelines
 			static byte[] GetEmbeddedShaderBytes(string name)
 			{
-				var stream = typeof(VeldridGPUDriver).Assembly.GetManifestResourceStream(name) ?? throw new FileNotFoundException("Couldn't load embedded .spv file.");
+				var stream = typeof(GPUDriver).Assembly.GetManifestResourceStream(name) ?? throw new FileNotFoundException("Couldn't load embedded .spv file.");
 				var bytes = new byte[stream.Length];
 				stream.Read(bytes);
 				return bytes;
@@ -133,30 +133,11 @@ public unsafe sealed class VeldridGPUDriver : IGPUDriver, IDisposable
 			GraphicsPipelineDescription ultralightPipelineDescription = new(
 				new(default, new[] { new BlendAttachmentDescription(true,
 					BlendFactor.One,
-					BlendFactor.InverseDestinationAlpha,
+					BlendFactor.InverseSourceAlpha,
 					BlendFunction.Add,
 					BlendFactor.InverseDestinationAlpha,
 					BlendFactor.One,
-					BlendFunction.Add) })
-				{
-					AttachmentStates = new[] {
-						// glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
-						new BlendAttachmentDescription()
-						{
-							/*SourceColorFactor = BlendFactor.One,
-							SourceAlphaFactor = BlendFactor.InverseDestinationAlpha,
-							DestinationColorFactor = BlendFactor.InverseSourceAlpha,
-							DestinationAlphaFactor = BlendFactor.One,*/
-							SourceColorFactor = BlendFactor.One,
-							SourceAlphaFactor = BlendFactor.InverseDestinationAlpha,//BlendFactor.One,
-							DestinationColorFactor = BlendFactor.InverseSourceAlpha,
-							DestinationAlphaFactor = BlendFactor.One, // InverseSourceAlpha
-							BlendEnabled = true,
-							ColorFunction = BlendFunction.Add,
-							AlphaFunction = BlendFunction.Add
-						}
-					}
-				},
+					BlendFunction.Add) }),
 				DepthStencilStateDescription.Disabled,
 				new(FaceCullMode.None, PolygonFillMode.Solid, FrontFace.CounterClockwise, false, true),
 				PrimitiveTopology.TriangleList,
