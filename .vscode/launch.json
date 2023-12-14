@@ -67,8 +67,8 @@
             "type": "coreclr",
             "request": "launch",
             "preLaunchTask": "build_Examples_GettingStarted",
-            "program": "${workspaceFolder}/Examples/Headless/GettingStarted/bin/Debug/net6.0/GettingStarted.dll",
-            "cwd": "${workspaceFolder}/Examples/Headless/GettingStarted/bin/Debug/net6.0",
+            "program": "${workspaceFolder}/Examples/Headless/GettingStarted/bin/Debug/net8.0/GettingStarted.dll",
+            "cwd": "${workspaceFolder}/Examples/Headless/GettingStarted/bin/Debug/net8.0",
             "envFile": "${workspaceFolder}/.env"
         },
         {

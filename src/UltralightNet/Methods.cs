@@ -3,8 +3,9 @@ using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
 [assembly: InternalsVisibleTo("UltralightNet.AppCore")]
+#if NET7_0_OR_GREATER
 [assembly: DisableRuntimeMarshalling]
-[assembly: AssemblyMetadata("IsTrimmable", "True")]
+#endif
 
 #if RELEASE
 [module: SkipLocalsInit]

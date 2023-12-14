@@ -35,14 +35,6 @@ namespace System
 #pragma warning restore 0649
 
 #if !NET7_0_OR_GREATER
-namespace System.Runtime.CompilerServices
-{
-	[AttributeUsage(AttributeTargets.Assembly, Inherited = false, AllowMultiple = false)]
-	internal sealed class DisableRuntimeMarshallingAttribute : Attribute
-	{
-		public DisableRuntimeMarshallingAttribute() { }
-	}
-}
 namespace System.Runtime.InteropServices
 {
 	namespace Marshalling

@@ -2,7 +2,9 @@ using System;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices;
 
+#if NET7_0_OR_GREATER
 [assembly: DisableRuntimeMarshalling]
+#endif
 
 namespace UltralightNet.AppCore;
 
