@@ -19,14 +19,14 @@
 
 		<AllowUnsafeBlocks>true</AllowUnsafeBlocks>
 		<Nullable>enable</Nullable>
-		<LangVersion>11</LangVersion>
+		<LangVersion>12</LangVersion>
 		<ImplicitUsings>disable</ImplicitUsings>
 
 		<NoWarn>1006</NoWarn>
 		<AnalysisModeReliability>all</AnalysisModeReliability>
 
 		<IsTrimmable>true</IsTrimmable>
-		<PublishTrimmed>true</PublishTrimmed>
+		<PublishTrimmed Condition="$(TargetFramework)=='net8.0'">true</PublishTrimmed>
 		<TrimMode>full</TrimMode>
 
 		<PackageLicenseExpression>MIT</PackageLicenseExpression>

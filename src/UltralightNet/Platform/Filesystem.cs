@@ -64,8 +64,8 @@ namespace UltralightNet.Platform
 				NativeStruct = new()
 				{
 					FileExists = (delegate* unmanaged[Cdecl]<ULString*, bool>)Helper.AllocateDelegate((ULString* path) => instance.FileExists(path->ToString()), out handles[0]),
-					GetFileMimeType = (delegate* unmanaged[Cdecl]<ULString*, ULString*>)Helper.AllocateDelegate((ULString* path) => instance.GetFileMimeType(path->ToString()), out handles[1]),
-					GetFileCharset = (delegate* unmanaged[Cdecl]<ULString*, ULString*>)Helper.AllocateDelegate((ULString* path) => instance.GetFileCharset(path->ToString()), out handles[2]),
+					GetFileMimeType = (delegate* unmanaged[Cdecl]<ULString*, ULString*>)Helper.AllocateDelegate((ULString* path) => new ULString(instance.GetFileMimeType(path->ToString()).AsSpan()).Allocate(), out handles[1]),
+					GetFileCharset = (delegate* unmanaged[Cdecl]<ULString*, ULString*>)Helper.AllocateDelegate((ULString* path) => new ULString(instance.GetFileCharset(path->ToString()).AsSpan()).Allocate(), out handles[2]),
 					OpenFile = (delegate* unmanaged[Cdecl]<ULString*, ULBuffer>)Helper.AllocateDelegate((ULString* path) => instance.OpenFile(path->ToString()), out handles[3])
 				};
 			}

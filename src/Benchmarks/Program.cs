@@ -16,7 +16,7 @@ public class MyConfig : ManualConfig
 	public MyConfig()
 	{
 		AddJob(Job.Default.WithRuntime(CoreRuntime.Core60));
-		// AddJob(Job.Default.WithRuntime(CoreRuntime.CreateForNewVersion("net7.0", ".NET Core 7")));
+		// AddJob(Job.Default.WithRuntime(CoreRuntime.CreateForNewVersion("net8.0", ".NET Core 7")));
 	}
 }
 
