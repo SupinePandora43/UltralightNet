@@ -44,7 +44,7 @@ namespace UltralightNet.Veldrid.SDL2
 					}
 				}
 
-			return new ULKeyEvent(type, modifiers, keycode, 0, text, text, false, k.Repeat, false);
+			return ULKeyEvent.Create(type, modifiers, keycode, 0, text, text, false, k.Repeat, false);
 		}
 		public static int SDLtoUL(Key key)
 		{
@@ -106,7 +106,7 @@ namespace UltralightNet.Veldrid.SDL2
 
 				Key.PrintScreen => ULKeyCodes.GK_SNAPSHOT,
 				Key.ScrollLock => ULKeyCodes.GK_SCROLL,
-				
+
 				Key.Insert => ULKeyCodes.GK_INSERT,
 				Key.Delete => ULKeyCodes.GK_DELETE,
 				Key.Home => ULKeyCodes.GK_HOME,

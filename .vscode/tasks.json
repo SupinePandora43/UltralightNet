@@ -7,16 +7,14 @@
 			"type": "process",
 			"args": [
 				"build",
-				"-c", "Debug",
+				"-c",
+				"Debug",
 				"${workspaceFolder}/Examples/gpu/UltralightNet.OpenGL.TestApp/UltralightNet.OpenGL.TestApp.csproj",
 				"/property:GenerateFullPaths=true",
 				"/consoleloggerparameters:NoSummary"
 			],
 			"problemMatcher": "$msCompile",
-			"group": {
-				"kind": "build",
-				"isDefault": true
-			}
+			"group": "build"
 		},
 		{
 			"label": "buildVulkan",
@@ -24,11 +22,13 @@
 			"type": "process",
 			"args": [
 				"build",
-				"${workspaceFolder}/Examples/gpu/UltralightNet.Vulkan.TestApp/UltralightNet.Vulkan.TestApp.csproj",
-				"/property:GenerateFullPaths=true",
-				"/consoleloggerparameters:NoSummary"
+				"${workspaceFolder}/Examples/gpu/UltralightNet.Vulkan.TestApp/UltralightNet.Vulkan.TestApp.csproj"
 			],
-			"problemMatcher": "$msCompile"
+			"problemMatcher": "$msCompile",
+			"group": {
+				"kind": "build",
+				"isDefault": true
+			}
 		},
 		{
 			"label": "buildVeldrid",

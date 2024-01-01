@@ -9,9 +9,9 @@
             "type": "coreclr",
             "request": "launch",
             "preLaunchTask": "buildOpenGL",
-            "program": "${workspaceFolder}/Examples/gpu/UltralightNet.OpenGL.TestApp/bin/Debug/net6.0/UltralightNet.OpenGL.TestApp.dll",
+            "program": "${workspaceFolder}/Examples/gpu/UltralightNet.OpenGL.TestApp/bin/Debug/net8.0/UltralightNet.OpenGL.TestApp.dll",
             "args": [],
-            "cwd": "${workspaceFolder}/Examples/gpu/UltralightNet.OpenGL.TestApp/bin/Debug/net6.0",
+            "cwd": "${workspaceFolder}/Examples/gpu/UltralightNet.OpenGL.TestApp/bin/Debug/net8.0",
             "console": "internalConsole",
             "stopAtEntry": false,
             "envFile": "${workspaceFolder}/.env"
@@ -21,11 +21,8 @@
             "type": "coreclr",
             "request": "launch",
             "preLaunchTask": "buildVulkan",
-            "program": "${workspaceFolder}/Examples/gpu/UltralightNet.Vulkan.TestApp/bin/Debug/net6.0/UltralightNet.Vulkan.TestApp.dll",
-            "args": [],
-            "cwd": "${workspaceFolder}/Examples/gpu/UltralightNet.Vulkan.TestApp/bin/Debug/net6.0",
-            "console": "internalConsole",
-            "stopAtEntry": false,
+			"program": "${workspaceFolder}/Examples/gpu/UltralightNet.Vulkan.TestApp/bin/Debug/net8.0/UltralightNet.Vulkan.TestApp.dll",
+            "cwd": "${workspaceFolder}/Examples/gpu/UltralightNet.Vulkan.TestApp/bin/Debug/net8.0",
 			"envFile": "${workspaceFolder}/.env"
         },
 		{
@@ -33,9 +30,9 @@
             "type": "coreclr",
             "request": "launch",
             "preLaunchTask": "buildVeldrid",
-            "program": "${workspaceFolder}/Examples/gpu/UltralightNet.Veldrid.TestApp/bin/Debug/net6.0/UltralightNet.Veldrid.TestApp.dll",
+            "program": "${workspaceFolder}/Examples/gpu/UltralightNet.Veldrid.TestApp/bin/Debug/net8.0/UltralightNet.Veldrid.TestApp.dll",
             "args": [],
-            "cwd": "${workspaceFolder}/Examples/gpu/UltralightNet.Veldrid.TestApp/bin/Debug/net6.0",
+            "cwd": "${workspaceFolder}/Examples/gpu/UltralightNet.Veldrid.TestApp/bin/Debug/net8.0",
             "console": "internalConsole",
             "stopAtEntry": false
         },
