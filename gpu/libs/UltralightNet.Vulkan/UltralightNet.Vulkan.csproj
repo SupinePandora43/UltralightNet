@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<TargetFramework>net7.0</TargetFramework>
+		<TargetFramework>net8.0</TargetFramework>
 	</PropertyGroup>
 
 	<Import Project="../CompileShaders.targets" />
@@ -21,8 +21,8 @@
 		<ProjectReference Include="..\..\..\src\UltralightNet\UltralightNet.csproj" />
 		<ProjectReference Include="../UltralightNet.GPUCommon/UltralightNet.GPUCommon.csproj" />
 
-		<PackageReference Include="Silk.NET.Vulkan" Version="2.11.0"/>
-		<PackageReference Include="Silk.NET.Vulkan.Extensions.EXT" Version="2.11.0" />
-		<PackageReference Include="Silk.NET.Vulkan.Extensions.KHR" Version="2.11.0" />
+		<PackageReference Include="Silk.NET.Vulkan" Version="2.20.0"/>
+		<PackageReference Include="Silk.NET.Vulkan.Extensions.EXT" Version="2.20.0" />
+		<PackageReference Include="Silk.NET.Vulkan.Extensions.KHR" Version="2.20.0" />
 	</ItemGroup>
 </Project>

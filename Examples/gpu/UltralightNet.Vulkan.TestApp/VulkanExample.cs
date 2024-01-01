@@ -52,8 +52,8 @@ internal unsafe partial class Application : IDisposable
 
 	//readonly SampleCountFlags sampleCountFlags = SampleCountFlags.SampleCount4Bit;
 	SurfaceCapabilitiesKHR surfaceCapabilitiesKHR;
-	readonly SurfaceFormatKHR surfaceFormat = new(Format.B8G8R8A8Srgb, ColorSpaceKHR.ColorSpaceSrgbNonlinearKhr);
-	readonly PresentModeKHR presentMode = PresentModeKHR.PresentModeFifoKhr;
+	readonly SurfaceFormatKHR surfaceFormat = new(Format.B8G8R8A8Srgb, ColorSpaceKHR.SpaceSrgbNonlinearKhr);
+	readonly PresentModeKHR presentMode = PresentModeKHR.FifoKhr;
 
 	readonly Sampler sampler;
 	readonly DescriptorSetLayout descriptorSetLayout;
@@ -65,6 +65,7 @@ internal unsafe partial class Application : IDisposable
 	readonly CommandPool commandPool;
 
 	readonly CommandBuffer[] ultralightCommandBuffers = new CommandBuffer[MaxFramesInFlight];
+	readonly VulkanGPUDriver gpuDriver;
 	readonly SurfaceDefinition surfaceDefinition;
 	readonly Renderer renderer;
 	readonly View view;
@@ -106,7 +107,7 @@ internal unsafe partial class Application : IDisposable
 
 			for (uint i = 0; i < queueFamilityCount; i++)
 			{
-				if (graphicsQueueFamily is uint.MaxValue && queueFamilyProperties[i].QueueFlags.HasFlag(QueueFlags.QueueGraphicsBit)) graphicsQueueFamily = i;
+				if (graphicsQueueFamily is uint.MaxValue && queueFamilyProperties[i].QueueFlags.HasFlag(QueueFlags.GraphicsBit)) graphicsQueueFamily = i;
 				if (presentQueueFamily is uint.MaxValue)
 				{
 					khrSurface.GetPhysicalDeviceSurfaceSupport(physicalDevice, i, surface, out Bool32 supported).Check();
@@ -122,11 +123,11 @@ internal unsafe partial class Application : IDisposable
 			for (int i = 0; i < physicalDeviceMemoryProperties.MemoryTypeCount; i++)
 			{
 				var type = physicalDeviceMemoryProperties.MemoryTypes[i];
-				if (physicalDeviceMemoryProperties.MemoryHeaps[(int)type.HeapIndex].Flags.HasFlag(MemoryHeapFlags.MemoryHeapDeviceLocalBit)
+				if (physicalDeviceMemoryProperties.MemoryHeaps[(int)type.HeapIndex].Flags.HasFlag(MemoryHeapFlags.DeviceLocalBit)
 					&& type.PropertyFlags.HasFlag(
-						MemoryPropertyFlags.MemoryPropertyDeviceLocalBit |
-						MemoryPropertyFlags.MemoryPropertyHostVisibleBit |
-						MemoryPropertyFlags.MemoryPropertyHostCoherentBit))
+						MemoryPropertyFlags.DeviceLocalBit |
+						MemoryPropertyFlags.HostVisibleBit |
+						MemoryPropertyFlags.HostCoherentBit))
 				{
 					UMA = true;
 					break;
@@ -256,7 +257,7 @@ internal unsafe partial class Application : IDisposable
 		{ // DescriptorSetLayout
 			fixed (Sampler* samplerPtr = &sampler)
 			{
-				var descriptorSetLayoutBinding = new DescriptorSetLayoutBinding(binding: 0, descriptorType: DescriptorType.CombinedImageSampler, descriptorCount: 1, stageFlags: ShaderStageFlags.ShaderStageFragmentBit, pImmutableSamplers: samplerPtr);
+				var descriptorSetLayoutBinding = new DescriptorSetLayoutBinding(binding: 0, descriptorType: DescriptorType.CombinedImageSampler, descriptorCount: 1, stageFlags: ShaderStageFlags.FragmentBit, pImmutableSamplers: samplerPtr);
 				var descriptorSetLayoutCreateInfo = new DescriptorSetLayoutCreateInfo(bindingCount: 1, pBindings: &descriptorSetLayoutBinding);
 				vk.CreateDescriptorSetLayout(device, &descriptorSetLayoutCreateInfo, null, out descriptorSetLayout).Check();
 			}
@@ -271,7 +272,7 @@ internal unsafe partial class Application : IDisposable
 		}
 		{ // RenderPass
 			var colorAttachment = new AttachmentDescription(
-				format: surfaceFormat.Format, samples: SampleCountFlags.SampleCount1Bit,
+				format: surfaceFormat.Format, samples: SampleCountFlags.Count1Bit,
 				loadOp: AttachmentLoadOp.DontCare, storeOp: AttachmentStoreOp.Store,
 				stencilLoadOp: AttachmentLoadOp.DontCare, stencilStoreOp: AttachmentStoreOp.DontCare,
 				initialLayout: ImageLayout.Undefined, finalLayout: ImageLayout.PresentSrcKhr);
@@ -279,8 +280,8 @@ internal unsafe partial class Application : IDisposable
 			var subpass = new SubpassDescription(pipelineBindPoint: PipelineBindPoint.Graphics, colorAttachmentCount: 1, pColorAttachments: &colorAttachmentRef);
 			var subpassDependency = new SubpassDependency(
 				Vk.SubpassExternal, 0,
-				PipelineStageFlags.PipelineStageColorAttachmentOutputBit | PipelineStageFlags.PipelineStageFragmentShaderBit, PipelineStageFlags.PipelineStageColorAttachmentOutputBit | PipelineStageFlags.PipelineStageFragmentShaderBit,
-				0, AccessFlags.AccessColorAttachmentWriteBit);
+				PipelineStageFlags.ColorAttachmentOutputBit | PipelineStageFlags.FragmentShaderBit, PipelineStageFlags.ColorAttachmentOutputBit | PipelineStageFlags.FragmentShaderBit,
+				0, AccessFlags.ColorAttachmentWriteBit);
 			var renderPassCreateInfo = new RenderPassCreateInfo(
 				attachmentCount: 1, pAttachments: &colorAttachment,
 				subpassCount: 1, pSubpasses: &subpass,
@@ -310,16 +311,16 @@ internal unsafe partial class Application : IDisposable
 			try
 			{
 				var pipelineStages = stackalloc PipelineShaderStageCreateInfo[2] {
-					new(stage: ShaderStageFlags.ShaderStageVertexBit, module: vert, pName: "main"u8.ToPointer()),
-					new(stage: ShaderStageFlags.ShaderStageFragmentBit, module: frag, pName: "main"u8.ToPointer())
+					new(stage: ShaderStageFlags.VertexBit, module: vert, pName: "main"u8.ToPointer()),
+					new(stage: ShaderStageFlags.FragmentBit, module: frag, pName: "main"u8.ToPointer())
 				};
 				var pipelineVertexInputStateCreateInfo = new PipelineVertexInputStateCreateInfo(flags: 0);
 				var pipelineInputAssemblyStateCreateInfo = new PipelineInputAssemblyStateCreateInfo(topology: PrimitiveTopology.TriangleList);
 				var pipelineViewportStateCreateInfo = new PipelineViewportStateCreateInfo(viewportCount: 1, scissorCount: 1);
-				var pipelineRasterizationStateCreateInfo = new PipelineRasterizationStateCreateInfo(polygonMode: PolygonMode.Fill, cullMode: CullModeFlags.CullModeFrontBit, frontFace: FrontFace.CounterClockwise, lineWidth: 1.0f);
-				var pipelineMultisampleStateCreateInfo = new PipelineMultisampleStateCreateInfo(rasterizationSamples: SampleCountFlags.SampleCount1Bit);
+				var pipelineRasterizationStateCreateInfo = new PipelineRasterizationStateCreateInfo(polygonMode: PolygonMode.Fill, cullMode: CullModeFlags.FrontBit, frontFace: FrontFace.CounterClockwise, lineWidth: 1.0f);
+				var pipelineMultisampleStateCreateInfo = new PipelineMultisampleStateCreateInfo(rasterizationSamples: SampleCountFlags.Count1Bit);
 				var pipelineDepthStencilStateCreateInfo = new PipelineDepthStencilStateCreateInfo(depthTestEnable: false);
-				var pipelineColorBlendAttachmentState = new PipelineColorBlendAttachmentState(blendEnable: false, colorWriteMask: ColorComponentFlags.ColorComponentRBit | ColorComponentFlags.ColorComponentGBit | ColorComponentFlags.ColorComponentBBit | ColorComponentFlags.ColorComponentABit);
+				var pipelineColorBlendAttachmentState = new PipelineColorBlendAttachmentState(blendEnable: false, colorWriteMask: ColorComponentFlags.RBit | ColorComponentFlags.GBit | ColorComponentFlags.BBit | ColorComponentFlags.ABit);
 				var pipelineColorBlendStateCreateInfo = new PipelineColorBlendStateCreateInfo(attachmentCount: 1, pAttachments: &pipelineColorBlendAttachmentState);
 				var dynamicStates = stackalloc DynamicState[] { DynamicState.Viewport, DynamicState.Scissor };
 				var pipelineDynamicStateCreateInfo = new PipelineDynamicStateCreateInfo(dynamicStateCount: 2, pDynamicStates: dynamicStates);
@@ -348,7 +349,7 @@ internal unsafe partial class Application : IDisposable
 		}
 
 		{ // CommandPool
-			var commandPoolCreateInfo = new CommandPoolCreateInfo(flags: CommandPoolCreateFlags.CommandPoolCreateResetCommandBufferBit);
+			var commandPoolCreateInfo = new CommandPoolCreateInfo(flags: CommandPoolCreateFlags.ResetCommandBufferBit);
 			vk.CreateCommandPool(device, &commandPoolCreateInfo, null, out commandPool).Check();
 		}
 
@@ -359,6 +360,7 @@ internal unsafe partial class Application : IDisposable
 		{ // Ultralight
 			AppCoreMethods.SetPlatformFontLoader();
 
+			ULPlatform.GPUDriver = gpuDriver = new(vk, physicalDevice, device, MaxFramesInFlight, SampleCountFlags.Count4Bit);
 			ULPlatform.SurfaceDefinition = surfaceDefinition = new(vk, device, physicalDeviceMemoryProperties, MaxFramesInFlight, Bufferization.FrameWithCopy, true, ultralightCommandBuffers);
 
 			renderer = ULPlatform.CreateRenderer(new() { ForceRepaint = false, CachePath = Path.Combine(Path.GetDirectoryName(typeof(Application).Assembly.Location)!, "cache") });
@@ -445,12 +447,12 @@ internal unsafe partial class Application : IDisposable
 			imageColorSpace: surfaceFormat.ColorSpace,
 			imageExtent: extent,
 			imageArrayLayers: 1,
-			imageUsage: ImageUsageFlags.ImageUsageColorAttachmentBit,
+			imageUsage: ImageUsageFlags.ColorAttachmentBit,
 			imageSharingMode: graphicsQueueFamily == presentQueueFamily ? SharingMode.Exclusive : SharingMode.Concurrent,
 			queueFamilyIndexCount: graphicsQueueFamily == presentQueueFamily ? 1u : 2u,
 			pQueueFamilyIndices: queueFamilyIndices,
 			preTransform: surfaceCapabilitiesKHR.CurrentTransform,
-			compositeAlpha: CompositeAlphaFlagsKHR.CompositeAlphaOpaqueBitKhr,
+			compositeAlpha: CompositeAlphaFlagsKHR.OpaqueBitKhr,
 			presentMode: presentMode,
 			clipped: true,
 			oldSwapchain: swapchain);
@@ -471,7 +473,7 @@ internal unsafe partial class Application : IDisposable
 		swapchainImageViews = new ImageView[imageCount];
 		for (int i = 0; i < swapchainImageViews.Length; i++)
 		{
-			var imageViewCreateInfo = new ImageViewCreateInfo(image: swapchainImages[i], viewType: ImageViewType.ImageViewType2D, format: surfaceFormat.Format, subresourceRange: new ImageSubresourceRange(ImageAspectFlags.ImageAspectColorBit, 0, 1, 0, 1));
+			var imageViewCreateInfo = new ImageViewCreateInfo(image: swapchainImages[i], viewType: ImageViewType.Type2D, format: surfaceFormat.Format, subresourceRange: new ImageSubresourceRange(ImageAspectFlags.ColorBit, 0, 1, 0, 1));
 			vk.CreateImageView(device, &imageViewCreateInfo, null, out swapchainImageViews[i]).Check();
 		}
 
@@ -505,7 +507,7 @@ internal unsafe partial class Application : IDisposable
 		for (int i = 0; i < imageCount; i++)
 		{
 			var semaphoreCreateInfo = new SemaphoreCreateInfo(flags: 0);
-			var fenceCreateInfo = new FenceCreateInfo(flags: FenceCreateFlags.FenceCreateSignaledBit);
+			var fenceCreateInfo = new FenceCreateInfo(flags: FenceCreateFlags.SignaledBit);
 
 			vk.CreateSemaphore(device, &semaphoreCreateInfo, null, out imageAvailableSemaphores[i]).Check();
 			vk.CreateSemaphore(device, &semaphoreCreateInfo, null, out renderFinishedSemaphores[i]).Check();
@@ -587,12 +589,12 @@ internal unsafe partial class Application : IDisposable
 
 			vk.ResetFences(device, 1, renderFinishedFences![CurrentFrame]).Check();
 
-			(vk.GetQueryPoolResults(device, queryPool, 0, 1, queryStats.AsSpan(), sizeof(ulong), QueryResultFlags.QueryResult64Bit) & ~Result.NotReady).Check();
+			(vk.GetQueryPoolResults(device, queryPool, 0, 1, queryStats.AsSpan(), sizeof(ulong), QueryResultFlags.Result64Bit) & ~Result.NotReady).Check();
 
 			var commandBuffer = commandBuffers![CurrentFrame];
 			{
 				vk.ResetCommandBuffer(commandBuffer, 0).Check();
-				var commandBufferBeginInfo = new CommandBufferBeginInfo(flags: CommandBufferUsageFlags.CommandBufferUsageOneTimeSubmitBit);
+				var commandBufferBeginInfo = new CommandBufferBeginInfo(flags: CommandBufferUsageFlags.OneTimeSubmitBit);
 				vk.BeginCommandBuffer(commandBuffer, &commandBufferBeginInfo).Check();
 				if (physicalDeviceFeatures.PipelineStatisticsQuery)
 				{
@@ -622,7 +624,7 @@ internal unsafe partial class Application : IDisposable
 					}
 					var pooledSet = descriptorSetAllocator.GetDescriptorSet();
 
-					var imageViewCreateInfo = new ImageViewCreateInfo(image: viewImage, viewType: ImageViewType.ImageViewType2D, format: Format.B8G8R8A8Srgb, components: new ComponentMapping(ComponentSwizzle.R, ComponentSwizzle.G, ComponentSwizzle.B, view.IsTransparent ? ComponentSwizzle.A : ComponentSwizzle.One), subresourceRange: new ImageSubresourceRange(ImageAspectFlags.ImageAspectColorBit, 0, 1, 0, 1));
+					var imageViewCreateInfo = new ImageViewCreateInfo(image: viewImage, viewType: ImageViewType.Type2D, format: Format.B8G8R8A8Srgb, components: new ComponentMapping(ComponentSwizzle.R, ComponentSwizzle.G, ComponentSwizzle.B, view.IsTransparent ? ComponentSwizzle.A : ComponentSwizzle.One), subresourceRange: new ImageSubresourceRange(ImageAspectFlags.ColorBit, 0, 1, 0, 1));
 					vk.CreateImageView(device, &imageViewCreateInfo, null, out var imageView).Check();
 
 					var descriptorImageInfo = new DescriptorImageInfo(sampler, imageView, ImageLayout.ShaderReadOnlyOptimal);
@@ -655,7 +657,7 @@ internal unsafe partial class Application : IDisposable
 			}
 
 			var waitSemaphore = imageAvailableSemaphores![CurrentFrame];
-			var waitStage = PipelineStageFlags.PipelineStageColorAttachmentOutputBit;
+			var waitStage = PipelineStageFlags.ColorAttachmentOutputBit;
 			var renderFinishedSemaphore = renderFinishedSemaphores![CurrentFrame];
 			var submitInfo = new SubmitInfo(
 				waitSemaphoreCount: 1, pWaitSemaphores: &waitSemaphore, pWaitDstStageMask: &waitStage,
@@ -690,6 +692,7 @@ internal unsafe partial class Application : IDisposable
 		view.Dispose();
 		renderer.Dispose();
 		surfaceDefinition.Dispose();
+		gpuDriver.Dispose();
 		vk.DestroyCommandPool(device, commandPool, null);
 		vk.DestroyPipeline(device, pipeline, null);
 		vk.DestroyRenderPass(device, renderPass, null);

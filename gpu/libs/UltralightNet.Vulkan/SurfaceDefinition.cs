@@ -97,13 +97,13 @@ public unsafe sealed class SurfaceDefinition : ISurfaceDefinition, IDisposable
 
 		Debug.Assert(alignedRowSize % 16 == 0);
 
-		var bufferCreateInfo = new BufferCreateInfo(size: frameSize * (bufferization is not Bufferization.None ? framesInFlight : 1u), usage: BufferUsageFlags.BufferUsageTransferSrcBit);
+		var bufferCreateInfo = new BufferCreateInfo(size: frameSize * (bufferization is not Bufferization.None ? framesInFlight : 1u), usage: BufferUsageFlags.TransferSrcBit);
 		vk.CreateBuffer(device, &bufferCreateInfo, null, out var buffer).Check();
 
 		MemoryRequirements memoryRequirements;
 		vk.GetBufferMemoryRequirements(device, buffer, &memoryRequirements);
 
-		var memoryAllocateInfo = new MemoryAllocateInfo(allocationSize: memoryRequirements.Size, memoryTypeIndex: physicalDeviceMemoryProperties.FindMemoryTypeIndex(memoryRequirements.MemoryTypeBits, MemoryPropertyFlags.MemoryPropertyHostVisibleBit | MemoryPropertyFlags.MemoryPropertyHostCoherentBit));
+		var memoryAllocateInfo = new MemoryAllocateInfo(allocationSize: memoryRequirements.Size, memoryTypeIndex: physicalDeviceMemoryProperties.FindMemoryTypeIndex(memoryRequirements.MemoryTypeBits, MemoryPropertyFlags.HostVisibleBit | MemoryPropertyFlags.HostCoherentBit));
 		vk.AllocateMemory(device, &memoryAllocateInfo, null, out var bufferMemory).Check();
 		vk.BindBufferMemory(device, buffer, bufferMemory, 0).Check();
 
@@ -111,13 +111,13 @@ public unsafe sealed class SurfaceDefinition : ISurfaceDefinition, IDisposable
 		vk.MapMemory(device, bufferMemory, 0, bufferCreateInfo.Size, 0, (void**)&data).Check();
 
 		var imageCreateInfo = new ImageCreateInfo(
-			imageType: ImageType.ImageType2D,
+			imageType: ImageType.Type2D,
 			format: Format.B8G8R8A8Srgb,
 			extent: new(width, height, 1u),
 			mipLevels: 1,
 			arrayLayers: 1,
-			samples: SampleCountFlags.SampleCount1Bit,
-			usage: ImageUsageFlags.ImageUsageSampledBit | ImageUsageFlags.ImageUsageTransferDstBit);
+			samples: SampleCountFlags.Count1Bit,
+			usage: ImageUsageFlags.SampledBit | ImageUsageFlags.TransferDstBit);
 		vk.CreateImage(device, &imageCreateInfo, null, out Image image).Check();
 
 		vk.GetImageMemoryRequirements(device, image, out var imageMemoryRequirements);
@@ -125,7 +125,7 @@ public unsafe sealed class SurfaceDefinition : ISurfaceDefinition, IDisposable
 		memoryAllocateInfo = memoryAllocateInfo with
 		{
 			AllocationSize = imageMemoryRequirements.Size,
-			MemoryTypeIndex = physicalDeviceMemoryProperties.FindMemoryTypeIndex(imageMemoryRequirements.MemoryTypeBits, MemoryPropertyFlags.MemoryPropertyDeviceLocalBit)
+			MemoryTypeIndex = physicalDeviceMemoryProperties.FindMemoryTypeIndex(imageMemoryRequirements.MemoryTypeBits, MemoryPropertyFlags.DeviceLocalBit)
 		};
 		vk.AllocateMemory(device, &memoryAllocateInfo, null, out DeviceMemory imageMemory).Check();
 		vk.BindImageMemory(device, image, imageMemory, 0).Check();
@@ -219,28 +219,28 @@ public unsafe sealed class SurfaceDefinition : ISurfaceDefinition, IDisposable
 		}
 
 		var imageMemoryBarrier = new ImageMemoryBarrier(
-			srcAccessMask: entry.imageLayout is ImageLayout.Undefined ? AccessFlags.AccessNoneKhr : AccessFlags.AccessShaderReadBit, dstAccessMask: AccessFlags.AccessTransferWriteBit,
+			srcAccessMask: entry.imageLayout is ImageLayout.Undefined ? AccessFlags.NoneKhr : AccessFlags.ShaderReadBit, dstAccessMask: AccessFlags.TransferWriteBit,
 			oldLayout: ImageLayout.Undefined, newLayout: ImageLayout.TransferDstOptimal,
 			srcQueueFamilyIndex: Vk.QueueFamilyIgnored, dstQueueFamilyIndex: Vk.QueueFamilyIgnored,
-			image: entry.image, subresourceRange: new ImageSubresourceRange(ImageAspectFlags.ImageAspectColorBit, 0, 1, 0, 1));
+			image: entry.image, subresourceRange: new ImageSubresourceRange(ImageAspectFlags.ColorBit, 0, 1, 0, 1));
 		vk.CmdPipelineBarrier(commandBuffer,
-			PipelineStageFlags.PipelineStageFragmentShaderBit, PipelineStageFlags.PipelineStageTransferBit, 0,
+			PipelineStageFlags.FragmentShaderBit, PipelineStageFlags.TransferBit, 0,
 			0, null,
 			0, null,
 			1, &imageMemoryBarrier);
 
-		var bufferImageCopy = new BufferImageCopy(entry.size * (bufferization is not Bufferization.None ? CurrentFrame : 1ul), entry.rowBytes / 4, entry.height, new ImageSubresourceLayers(ImageAspectFlags.ImageAspectColorBit, 0, 0, 1), imageExtent: new Extent3D(entry.width, entry.height, 1));
+		var bufferImageCopy = new BufferImageCopy(entry.size * (bufferization is not Bufferization.None ? CurrentFrame : 1ul), entry.rowBytes / 4, entry.height, new ImageSubresourceLayers(ImageAspectFlags.ColorBit, 0, 0, 1), imageExtent: new Extent3D(entry.width, entry.height, 1));
 		vk.CmdCopyBufferToImage(commandBuffer, entry.stagingBuffer, entry.image, ImageLayout.TransferDstOptimal, 1, &bufferImageCopy);
 
 		imageMemoryBarrier = imageMemoryBarrier with
 		{
-			SrcAccessMask = AccessFlags.AccessTransferWriteBit,
-			DstAccessMask = AccessFlags.AccessShaderReadBit,
+			SrcAccessMask = AccessFlags.TransferWriteBit,
+			DstAccessMask = AccessFlags.ShaderReadBit,
 			OldLayout = ImageLayout.TransferDstOptimal,
 			NewLayout = entry.imageLayout = ImageLayout.ShaderReadOnlyOptimal
 		};
 		vk.CmdPipelineBarrier(commandBuffer,
-			PipelineStageFlags.PipelineStageTransferBit, PipelineStageFlags.PipelineStageFragmentShaderBit, 0,
+			PipelineStageFlags.TransferBit, PipelineStageFlags.FragmentShaderBit, 0,
 			0, null,
 			0, null,
 			1, &imageMemoryBarrier);
@@ -266,7 +266,7 @@ public unsafe sealed class SurfaceDefinition : ISurfaceDefinition, IDisposable
 		{
 			if (resetCommandBuffers) vk.ResetCommandBuffer(commandBuffer, 0).Check();
 			var commandBufferInheritanceInfo = new CommandBufferInheritanceInfo(pNext: null);
-			var commandBufferBeginInfo = new CommandBufferBeginInfo(flags: CommandBufferUsageFlags.CommandBufferUsageOneTimeSubmitBit, pInheritanceInfo: &commandBufferInheritanceInfo);
+			var commandBufferBeginInfo = new CommandBufferBeginInfo(flags: CommandBufferUsageFlags.OneTimeSubmitBit, pInheritanceInfo: &commandBufferInheritanceInfo);
 			vk.BeginCommandBuffer(commandBuffer, &commandBufferBeginInfo).Check();
 
 			commandBufferBegun = true;
