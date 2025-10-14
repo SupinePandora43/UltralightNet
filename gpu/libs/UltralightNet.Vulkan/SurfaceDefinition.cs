@@ -31,7 +31,7 @@ public unsafe sealed class SurfaceDefinition : ISurfaceDefinition, IDisposable
 		get => currentFrame;
 		set
 		{
-			if (currentFrame > framesInFlight) throw new ArgumentOutOfRangeException(nameof(value), $"{currentFrame} is greater than the number of frames in flight, equal to {framesInFlight}.");
+			if (value > framesInFlight) throw new ArgumentOutOfRangeException(nameof(value), $"{currentFrame} is bigger than the number of frames in flight, equal to {framesInFlight}.");
 
 			while (destroyQueue.TryPeek(out (uint frame, SurfaceEntry entry) result) && result.frame == value)
 				FreeSurface(destroyQueue.Dequeue().entry);
@@ -219,7 +219,7 @@ public unsafe sealed class SurfaceDefinition : ISurfaceDefinition, IDisposable
 		}
 
 		var imageMemoryBarrier = new ImageMemoryBarrier(
-			srcAccessMask: entry.imageLayout is ImageLayout.Undefined ? AccessFlags.NoneKhr : AccessFlags.ShaderReadBit, dstAccessMask: AccessFlags.TransferWriteBit,
+			srcAccessMask: AccessFlags.ShaderReadBit, dstAccessMask: AccessFlags.TransferWriteBit,
 			oldLayout: ImageLayout.Undefined, newLayout: ImageLayout.TransferDstOptimal,
 			srcQueueFamilyIndex: Vk.QueueFamilyIgnored, dstQueueFamilyIndex: Vk.QueueFamilyIgnored,
 			image: entry.image, subresourceRange: new ImageSubresourceRange(ImageAspectFlags.ColorBit, 0, 1, 0, 1));

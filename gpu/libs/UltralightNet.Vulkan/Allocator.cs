@@ -34,6 +34,19 @@ internal unsafe class Allocator : IDisposable
 		vk.BindBufferMemory(device, buffer, bufferMemory, 0).Check();
 	}
 
+	public void CreateImage(in ImageCreateInfo imageCreateInfo, MemoryPropertyFlags memoryPropertyFlags, out Image image, out DeviceMemory memory)
+	{
+		vk.CreateImage(device, imageCreateInfo, null, out image).Check();
+
+		MemoryRequirements memoryRequirements;
+		vk.GetImageMemoryRequirements(device, image, &memoryRequirements);
+
+		var memoryAllocateInfo = new MemoryAllocateInfo(allocationSize: memoryRequirements.Size, memoryTypeIndex: physicalDeviceMemoryProperties.FindMemoryTypeIndex(memoryRequirements.MemoryTypeBits, memoryPropertyFlags));
+		vk.AllocateMemory(device, &memoryAllocateInfo, null, out memory).Check();
+
+		vk.BindImageMemory(device, image, memory, 0).Check();
+	}
+
 	public void Dispose()
 	{
 		GC.SuppressFinalize(this);

@@ -65,6 +65,7 @@ internal unsafe partial class Application : IDisposable
 	readonly CommandPool commandPool;
 
 	readonly CommandBuffer[] ultralightCommandBuffers = new CommandBuffer[MaxFramesInFlight];
+	readonly CommandBuffer[] ultralightGPUCommandBuffers = new CommandBuffer[MaxFramesInFlight];
 	readonly VulkanGPUDriver gpuDriver;
 	readonly SurfaceDefinition surfaceDefinition;
 	readonly Renderer renderer;
@@ -356,12 +357,14 @@ internal unsafe partial class Application : IDisposable
 		{ // Ultralight CommandBuffers
 			var commandBufferAllocateInfo = new CommandBufferAllocateInfo(commandPool: commandPool, level: CommandBufferLevel.Secondary, commandBufferCount: MaxFramesInFlight);
 			vk.AllocateCommandBuffers(device, &commandBufferAllocateInfo, ultralightCommandBuffers).Check();
+
+			vk.AllocateCommandBuffers(device, &commandBufferAllocateInfo, ultralightGPUCommandBuffers).Check();
 		}
 		{ // Ultralight
 			AppCoreMethods.SetPlatformFontLoader();
 
-			ULPlatform.GPUDriver = gpuDriver = new(vk, physicalDevice, device, MaxFramesInFlight, SampleCountFlags.Count4Bit);
 			ULPlatform.SurfaceDefinition = surfaceDefinition = new(vk, device, physicalDeviceMemoryProperties, MaxFramesInFlight, Bufferization.FrameWithCopy, true, ultralightCommandBuffers);
+			ULPlatform.GPUDriver = gpuDriver = new(vk, device, physicalDeviceMemoryProperties, true, ultralightGPUCommandBuffers, SampleCountFlags.Count8Bit);
 
 			renderer = ULPlatform.CreateRenderer(new() { ForceRepaint = false, CachePath = Path.Combine(Path.GetDirectoryName(typeof(Application).Assembly.Location)!, "cache") });
 
@@ -376,6 +379,7 @@ internal unsafe partial class Application : IDisposable
 			catch (Exception e) { Console.WriteLine(e); }
 
 			view = renderer.CreateView((uint)window.FramebufferSize.X, (uint)window.FramebufferSize.Y, new ULViewConfig() { InitialDeviceScale = scale });
+			renderer.CreateView((uint)window.FramebufferSize.X, (uint)window.FramebufferSize.Y, new ULViewConfig() { InitialDeviceScale = scale, IsAccelerated = true });
 			// view.URL = "https://youtube.com";
 			view.HTML = "hello world!";
 		}
@@ -575,6 +579,7 @@ internal unsafe partial class Application : IDisposable
 			descriptorSetAllocator.CurrentFrame = CurrentFrame;
 			descriptorSetAllocator.ExecuteCurrentFrameDestroyQueue(); // destroy DescriptorSet
 			frameDestroyQueue.Execute((uint)CurrentFrame); // destroy ImageView
+			gpuDriver.CurrentFrame = (uint)CurrentFrame;
 			surfaceDefinition.CurrentFrame = (uint)CurrentFrame; // destroy Image
 
 			uint imageIndex = 0;

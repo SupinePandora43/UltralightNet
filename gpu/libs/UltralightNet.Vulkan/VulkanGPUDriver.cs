@@ -15,16 +15,18 @@ public unsafe sealed class VulkanGPUDriver : IGPUDriver, IDisposable
 	public const Format ImageFormat = Format.B8G8R8A8Unorm;
 
 	readonly Vk vk;
-	readonly PhysicalDevice physicalDevice;
 	readonly Device device;
 	readonly ExtDebugUtils? debugUtils;
 
-	uint FramesInFlight { get; }
+	readonly bool resetCommandBuffers;
+	readonly CommandBuffer[] commandBuffers;
+
+	uint FramesInFlight => (uint)commandBuffers.Length;
 	readonly bool UMA = false;
 	SampleCountFlags SampleCount { get; }
 	bool MSAA => SampleCount != SampleCountFlags.Count1Bit;
 
-	readonly ResourceList<int> textures = new();
+	readonly ResourceList<TextureEntry> textures = new();
 	readonly ResourceList<RenderBufferEntry> renderBuffers = new();
 	readonly ResourceList<GeometryEntry> geometries = new();
 
@@ -47,20 +49,32 @@ public unsafe sealed class VulkanGPUDriver : IGPUDriver, IDisposable
 	readonly Pipeline pathPipeline;
 
 
-	public uint CurrentFrame { get; set; }
+	uint _CurrentFrame;
+	public uint CurrentFrame
+	{
+		get => _CurrentFrame;
+		set
+		{
+			if (value > commandBuffers.Length) throw new ArgumentOutOfRangeException(nameof(value), $"{value} is bigger than the number of frames in flight (CommandBuffer count) of {commandBuffers.Length}.");
 
-	CommandBuffer commandBuffer;
+			destroyQueue.Execute(value);
 
-	public VulkanGPUDriver(Vk vk, PhysicalDevice physicalDevice, Device device, uint framesInFlight, SampleCountFlags sampleCount = SampleCountFlags.Count4Bit)
+			_CurrentFrame = value;
+		}
+	}
+
+	CommandBuffer commandBuffer = default;
+
+	public VulkanGPUDriver(Vk vk, Device device, PhysicalDeviceMemoryProperties physicalDeviceMemoryProperties, bool resetCommandBuffers, CommandBuffer[] commandBuffers, SampleCountFlags sampleCount = SampleCountFlags.Count4Bit)
 	{
 		this.vk = vk;
-		this.physicalDevice = physicalDevice;
 		this.device = device;
 		vk.TryGetInstanceExtension(vk.CurrentInstance!.Value, out debugUtils);
-		FramesInFlight = framesInFlight;
+		this.resetCommandBuffers = resetCommandBuffers;
+		this.commandBuffers = commandBuffers;
 		SampleCount = sampleCount;
 
-		allocator = new(vk, device, vk.GetPhysicalDeviceMemoryProperty(physicalDevice));
+		allocator = new(vk, device, physicalDeviceMemoryProperties);
 
 		{ // Sampler
 			var samplerCreateInfo = new SamplerCreateInfo(
@@ -182,11 +196,6 @@ public unsafe sealed class VulkanGPUDriver : IGPUDriver, IDisposable
 			{
 				LoadOp = AttachmentLoadOp.Clear,
 				InitialLayout = ImageLayout.Undefined
-			};
-			subpassDependencies[0] = subpassDependencies[0] with
-			{
-				SrcStageMask = PipelineStageFlags.BottomOfPipeBit,
-				SrcAccessMask = MSAA ? AccessFlags.ColorAttachmentReadBit | AccessFlags.ColorAttachmentWriteBit : AccessFlags.ShaderReadBit
 			};
 
 			vk.CreateRenderPass(device, &renderPassCreateInfo, null, out clearRenderBufferRenderPass).Check();
@@ -340,24 +349,134 @@ public unsafe sealed class VulkanGPUDriver : IGPUDriver, IDisposable
 
 	void IGPUDriver.CreateTexture(uint textureId, ULBitmap bitmap)
 	{
-		throw new NotImplementedException();
+		bool isRenderTarget = bitmap.IsEmpty;
+
+		var imageCreateInfo = new ImageCreateInfo(
+			imageType: ImageType.Type2D,
+			format: bitmap.Format is ULBitmapFormat.BGRA8_UNORM_SRGB ? ImageFormat : Format.R8Unorm,
+			extent: new(bitmap.Width, bitmap.Height, 1), mipLevels: 1, arrayLayers: 1,
+			samples: SampleCountFlags.Count1Bit,
+			tiling: ImageTiling.Optimal,
+			usage: ImageUsageFlags.SampledBit | (isRenderTarget ? ImageUsageFlags.ColorAttachmentBit : ImageUsageFlags.TransferDstBit));
+
+		allocator.CreateImage(imageCreateInfo, MemoryPropertyFlags.DeviceLocalBit, out Image image, out DeviceMemory imageMemory);
+
+		var imageViewCreateInfo = new ImageViewCreateInfo(image: image, viewType: ImageViewType.Type2D, format: imageCreateInfo.Format, subresourceRange: new(ImageAspectFlags.ColorBit, 0, 1, 0, 1));
+		vk.CreateImageView(device, &imageViewCreateInfo, null, out ImageView imageView).Check();
+
+
+		textures[(int)textureId] = new(image, imageMemory, imageView);
+
+		if (!isRenderTarget) (this as IGPUDriver).UpdateTexture(textureId, bitmap);
 	}
 	void IGPUDriver.UpdateTexture(uint textureId, ULBitmap bitmap)
 	{
-		throw new NotImplementedException();
+		var texture = textures[(int)textureId];
+
+		ulong size = bitmap.Size;
+		uint width = bitmap.Width;
+		uint height = bitmap.Height;
+
+		allocator.CreateBuffer(size, BufferUsageFlags.TransferSrcBit, MemoryPropertyFlags.HostVisibleBit | MemoryPropertyFlags.HostCoherentBit, out Buffer stagingBuffer, out DeviceMemory stagingMemory);
+
+		void* data;
+		vk.MapMemory(device, stagingMemory, 0, size, 0, &data).Check();
+
+		System.Buffer.MemoryCopy(bitmap.LockPixels(), data, size, size);
+		bitmap.UnlockPixels();
+
+		var imageMemoryBarrier = new ImageMemoryBarrier(
+			srcAccessMask: AccessFlags.ShaderReadBit, dstAccessMask: AccessFlags.TransferWriteBit,
+			oldLayout: ImageLayout.Undefined, newLayout: ImageLayout.TransferDstOptimal,
+			srcQueueFamilyIndex: Vk.QueueFamilyIgnored, dstQueueFamilyIndex: Vk.QueueFamilyIgnored,
+			image: texture.Image,
+			subresourceRange: new(ImageAspectFlags.ColorBit, 0, 1, 0, 1));
+		vk.CmdPipelineBarrier(commandBuffer, PipelineStageFlags.FragmentShaderBit, PipelineStageFlags.TransferBit, 0, 0, null, 0, null, 1, &imageMemoryBarrier);
+
+		var bufferImageCopy = new BufferImageCopy(0, width, height, new(ImageAspectFlags.ColorBit, 0, 1, 1), new(), new(width, height, 1));
+		vk.CmdCopyBufferToImage(commandBuffer, stagingBuffer, texture.Image, ImageLayout.TransferDstOptimal, 1, &bufferImageCopy);
+
+		imageMemoryBarrier = imageMemoryBarrier with
+		{
+			SrcAccessMask = AccessFlags.TransferWriteBit,
+			DstAccessMask = AccessFlags.ShaderReadBit,
+			OldLayout = ImageLayout.TransferDstOptimal,
+			NewLayout = ImageLayout.ReadOnlyOptimal
+		};
+		vk.CmdPipelineBarrier(commandBuffer, PipelineStageFlags.TransferBit, PipelineStageFlags.FragmentShaderBit, 0, 0, null, 0, null, 1, &imageMemoryBarrier);
+
+		vk.UnmapMemory(device, stagingMemory);
+
+		destroyQueue.Enqueue(CurrentFrame, () =>
+		{
+			vk.DestroyBuffer(device, stagingBuffer, null);
+			vk.FreeMemory(device, stagingMemory, null);
+		});
 	}
 	void IGPUDriver.DestroyTexture(uint textureId)
 	{
-		throw new NotImplementedException();
+		var texture = textures[(int)textureId];
+
+		destroyQueue.Enqueue(CurrentFrame, () =>
+		{
+			vk.DestroyImageView(device, texture.ImageView, null);
+			vk.DestroyImage(device, texture.Image, null);
+			vk.FreeMemory(device, texture.ImageMemory, null);
+		});
 	}
 
 	void IGPUDriver.CreateRenderBuffer(uint renderBufferId, ULRenderBuffer renderBuffer)
 	{
-		throw new NotImplementedException();
+		ref var textureEntry = ref textures[(int)renderBuffer.TextureId];
+
+		Image multisampledImage = default;
+		DeviceMemory multisampledImageMemory = default;
+		ImageView multisampledImageView = default;
+
+		if (MSAA)
+		{
+			var multisampledImageCreateInfo = new ImageCreateInfo(
+				imageType: ImageType.Type2D,
+				format: ImageFormat,
+				extent: new(renderBuffer.Width, renderBuffer.Height, 1), mipLevels: 1, arrayLayers: 1,
+				samples: SampleCount,
+				tiling: ImageTiling.Optimal,
+				usage: ImageUsageFlags.ColorAttachmentBit); // I wish TransientAttachment was possible
+
+			allocator.CreateImage(multisampledImageCreateInfo, MemoryPropertyFlags.DeviceLocalBit, out multisampledImage, out multisampledImageMemory);
+
+			var imageViewCreateInfo = new ImageViewCreateInfo(image: multisampledImage, viewType: ImageViewType.Type2D, format: ImageFormat, subresourceRange: new(ImageAspectFlags.ColorBit, 0, 1, 0, 1));
+			vk.CreateImageView(device, &imageViewCreateInfo, null, out multisampledImageView).Check();
+		}
+
+		ImageView* imageViews = stackalloc ImageView[2] { textureEntry.ImageView, multisampledImageView };
+
+		var framebufferCreateInfo = new FramebufferCreateInfo(
+			renderPass: renderPass,
+			attachmentCount: MSAA ? 1u : 2u, pAttachments: imageViews,
+			width: renderBuffer.Width, height: renderBuffer.Height, layers: 1);
+
+		vk.CreateFramebuffer(device, &framebufferCreateInfo, null, out Framebuffer framebuffer).Check();
+
+		renderBuffers[(int)renderBufferId] = new(framebuffer, multisampledImage, multisampledImageMemory, multisampledImageView);
 	}
 	void IGPUDriver.DestroyRenderBuffer(uint renderBufferId)
 	{
-		throw new NotImplementedException();
+		var renderBuffer = renderBuffers[(int)renderBufferId];
+
+		destroyQueue.Enqueue(CurrentFrame, () =>
+		{
+			vk.DestroyFramebuffer(device, renderBuffer.Framebuffer, null);
+
+			if (renderBuffer.MultisampledImage.Handle is not 0)
+			{
+				vk.DestroyImageView(device, renderBuffer.MultisampledImageView, null);
+				vk.DestroyImage(device, renderBuffer.MultisampledImage, null);
+				vk.FreeMemory(device, renderBuffer.MultisampledImageMemory, null);
+			}
+		});
+
+		renderBuffers.Remove((int)renderBufferId);
 	}
 
 	void IGPUDriver.CreateGeometry(uint geometryId, ULVertexBuffer vertexBuffer, ULIndexBuffer indexBuffer)
@@ -370,7 +489,7 @@ public unsafe sealed class VulkanGPUDriver : IGPUDriver, IDisposable
 		Buffer sharedDeviceBuffer = default;
 		DeviceMemory sharedDeviceMemory = default;
 
-		if (!UMA)
+		if (!UMA) // TODO: consider using temporary staging buffers
 			allocator.CreateBuffer(
 				vertexBuffer.size + indexBuffer.size,
 				BufferUsageFlags.VertexBufferBit | BufferUsageFlags.IndexBufferBit | BufferUsageFlags.TransferDstBit,
@@ -538,6 +657,26 @@ public unsafe sealed class VulkanGPUDriver : IGPUDriver, IDisposable
 	}
 
 	[StructLayout(LayoutKind.Auto, Pack = 8)]
+	unsafe readonly struct TextureEntry(Image image, DeviceMemory imageMemory, ImageView imageView)
+	{
+		public readonly Image Image { get; } = image;
+		public readonly DeviceMemory ImageMemory { get; } = imageMemory;
+
+		public readonly ImageView ImageView { get; } = imageView;
+
+	}
+	[StructLayout(LayoutKind.Auto, Pack = 8)]
+	unsafe readonly struct RenderBufferEntry(Framebuffer framebuffer, Image multisampledImage, DeviceMemory multisampledImageMemory, ImageView multisampledImageView)
+	{
+		public readonly Framebuffer Framebuffer { get; } = framebuffer;
+
+		public readonly Image MultisampledImage { get; } = multisampledImage;
+		public readonly DeviceMemory MultisampledImageMemory { get; } = multisampledImageMemory;
+		public readonly ImageView MultisampledImageView { get; } = multisampledImageView;
+
+		// public RenderBufferEntry(Framebuffer framebuffer) : this(framebuffer, default, default, default) { }
+	}
+	[StructLayout(LayoutKind.Auto, Pack = 8)]
 	unsafe struct GeometryEntry
 	{
 		public Buffer Buffer { readonly get; init; }
@@ -549,9 +688,9 @@ public unsafe sealed class VulkanGPUDriver : IGPUDriver, IDisposable
 		public DeviceMemory HostMemory { readonly get; init; }
 		public DeviceMemory DeviceMemory { readonly get; init; }
 
-		public byte* Mapped { readonly get; init; }
+		public byte* Mapped { readonly get; init; } // TODO: consider making this private
 
-		public uint latestFrame;
+		uint latestFrame;
 
 		public readonly (Buffer buffer, ulong offset) GetIndexBufferToUse(bool UMA) => (Buffer, !UMA ? 0 : Index.size * latestFrame);
 		public readonly (Buffer buffer, ulong offset) GetVertexBufferToUse(bool UMA) => (Buffer, !UMA ? Index.size : Vertex.offset + (Vertex.size * latestFrame));
@@ -561,10 +700,5 @@ public unsafe sealed class VulkanGPUDriver : IGPUDriver, IDisposable
 			index = new Span<byte>(Mapped + (Index.size * (latestFrame = frame)), (int)Index.size);
 			vertex = new Span<byte>(Mapped + (Vertex.offset + (Vertex.size * latestFrame)), (int)Vertex.size);
 		}
-	}
-	[StructLayout(LayoutKind.Auto, Pack = 8)]
-	unsafe struct RenderBufferEntry
-	{
-		public readonly Framebuffer Framebuffer { get; }
 	}
 }
