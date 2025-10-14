@@ -15,9 +15,9 @@ float Scalar(uint i) { if (i < 4u) return Scalar4[0][i]; else return Scalar4[1][
 
 // Texture Units
 #if VELDRID
+layout(set = 0, binding = 1) uniform sampler Sampler;
 layout(set = 1, binding = 0) uniform texture2D Texture1;
 layout(set = 2, binding = 0) uniform texture2D Texture2;
-layout(set = 3, binding = 0) uniform sampler Sampler;
 #else
 layout(set = 1, binding = 0) uniform sampler2D Texture1;
 layout(set = 2, binding = 0) uniform sampler2D Texture2;

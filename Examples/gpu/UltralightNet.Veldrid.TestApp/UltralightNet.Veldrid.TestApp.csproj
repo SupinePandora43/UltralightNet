@@ -2,7 +2,7 @@
 
 	<PropertyGroup>
 		<OutputType>Exe</OutputType>
-		<TargetFramework>net6.0</TargetFramework>
+		<TargetFramework>net8.0</TargetFramework>
 	</PropertyGroup>
 
 	<ItemGroup>
@@ -27,4 +27,12 @@
 		<ProjectReference Include="..\..\..\gpu/libs/UltralightNet.Veldrid\UltralightNet.Veldrid.csproj" />
 	</ItemGroup>
 
+	<!-- A fix for veldrid's SDL -->
+	<!-- https://stackoverflow.com/a/44378406/9765252 -->
+	<Target Name="CopyCustomContent" AfterTargets="AfterBuild">
+		<Copy SourceFiles="libdl.so" DestinationFolder="$(OutDir)" />
+	</Target>
+	<Target Name="CopyCustomContentOnPublish" AfterTargets="Publish">
+		<Copy SourceFiles="libdl.so" DestinationFolder="$(PublishDir)" />
+	</Target>
 </Project>

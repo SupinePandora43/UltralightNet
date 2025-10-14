@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<TargetFrameworks>net6.0</TargetFrameworks>
+		<TargetFramework>net8.0</TargetFramework>
 	</PropertyGroup>
 
 	<Import Project="../CompileShaders.targets" />
@@ -14,11 +14,15 @@
 	</ItemGroup>
 
 	<ItemGroup>
+		<Compile Remove="oldVulkanGPUDriver.cs" />
+	</ItemGroup>
+
+	<ItemGroup>
 		<ProjectReference Include="..\..\..\src\UltralightNet\UltralightNet.csproj" />
 		<ProjectReference Include="../UltralightNet.GPUCommon/UltralightNet.GPUCommon.csproj" />
 
-		<PackageReference Include="Silk.NET.Vulkan" Version="2.11.0"/>
-		<PackageReference Include="Silk.NET.Vulkan.Extensions.EXT" Version="2.11.0" />
-		<PackageReference Include="Silk.NET.Vulkan.Extensions.KHR" Version="2.11.0" />
+		<PackageReference Include="Silk.NET.Vulkan" Version="2.20.0"/>
+		<PackageReference Include="Silk.NET.Vulkan.Extensions.EXT" Version="2.20.0" />
+		<PackageReference Include="Silk.NET.Vulkan.Extensions.KHR" Version="2.20.0" />
 	</ItemGroup>
 </Project>
